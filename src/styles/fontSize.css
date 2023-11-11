@@ -1,0 +1,64 @@
+
+/* 默认字体大小 */
+.default-font-size {
+    font-size: var(--default-font-size);
+}
+
+/* 一级字体大小 */
+.font-size-one {
+    font-size: var(--font-size-one);
+}
+
+/* 二级字体大小 */
+.font-size-two {
+    font-size: var(--font-size-two);
+}
+
+/* 三级字体大小 */
+.font-size-three {
+    font-size: var(--font-size-three);
+}
+
+/* 四级字体大小 */
+.font-size-four {
+    font-size: var(--font-size-four);
+}
+
+/* 五级字体大小 */
+.font-size-five {
+    font-size: var(--font-size-five);
+}
+
+/* 六级字体大小 */
+.font-size-six {
+    font-size: var(--font-size-six);
+}
+
+/* 七级字体大小 */
+.font-size-seven {
+    font-size: var(--font-size-seven);
+}
+
+/* 八级字体大小 */
+.font-size-eight {
+    font-size: var(--font-size-eight);
+}
+
+/* 九级字体大小 */
+.font-size-nine {
+    font-size: var(--font-size-nine);
+}
+
+/* 十级字体大小 */
+.font-size-ten {
+    font-size: var(--font-size-ten);
+}
+
+/* 十一级字体大小 */
+.font-size-eleven {
+    font-size: var(--font-size-eleven);
+}
+/* 十二级字体大小 */
+.font-size-twelve {
+    font-size: var(--font-size-twelve);
+}

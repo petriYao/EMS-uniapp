@@ -1,0 +1,38 @@
+{
+    // 使用 IntelliSense 了解相关属性。 
+    // 悬停以查看现有属性的描述。
+    // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "command": "pnpm run dev:mp-weixin",
+            "name": "mp-weixin",
+            "request": "launch",
+            "type": "node-terminal"
+        },
+        {
+            "command": "pnpm run dev:h5",
+            "name": "h5",
+            "request": "launch",
+            "type": "node-terminal"
+        },
+        {
+            "command": "pnpm run dev:app",
+            "name": "app",
+            "request": "launch",
+            "type": "node-terminal"
+        },
+        {
+            "command": "pnpm run dev:handle",
+            "name": "dev:handle",
+            "request": "launch",
+            "type": "node-terminal"
+        },
+        {
+            "command": "pnpm run build:mp-weixin",
+            "name": "weixin打包",
+            "request": "launch",
+            "type": "node-terminal"
+        }
+    ]
+}

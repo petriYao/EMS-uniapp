@@ -1,0 +1,12 @@
+{
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "prettier.enable": false,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  // "[vue]": {
+  //   "editor.defaultFormatter": "johnsoncodehk.volar"
+  // },
+  "god.tsconfig": "./tsconfig.json",
+  "i18n-ally.localesPaths": []
+}

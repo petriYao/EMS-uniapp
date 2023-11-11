@@ -1,0 +1,38 @@
+{
+  "easycom": {
+    "custom": {
+      "^u-(.*)": "uview-plus/components/u-$1/u-$1.vue",
+      "ContentWrap":"@/components/ContentWrap/index.vue"
+    }
+  },
+
+  "permission": {
+    "scope.userLocation": {
+      "desc": "你的位置信息将用于小程序位置接口的效果展示"
+    },
+    "scope.saveFile": {
+      "desc": "你的文件将用于小程序文件保存"
+    }
+  },
+  "pages": [
+    {
+      "path": "pages/customTabbar/index",
+      "style": {
+        "navigationBarTitleText": "",
+        "navigationStyle": "custom"
+      }
+    }
+  ],
+  "subpackages": [
+  ],
+  "preloadRule": {},
+  "globalStyle": {
+    "navigationBarTitleText": "uni-app",
+    "backgroundColor": "#f4f5f7",
+    "navigationBarTextStyle": "black",
+    "navigationBarBackgroundColor": "#FFF",
+    "usingComponents": {
+    }
+  },
+  "usingComponts": true
+}
