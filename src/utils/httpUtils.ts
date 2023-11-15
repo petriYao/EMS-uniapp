@@ -73,7 +73,7 @@ export const getHttpHeader = (isPublic = false) => {
     }
   }
   //版本验证
-  headers['My-User-Agent'] = 'business_interflow_wx__' + getVersion() + '__wifi__' + '800x600'
+  headers['My-User-Agent'] = 'shuxiaobao_wx__' + getVersion() + '__wifi__' + '800x600'
   //随机令牌
   headers['Random-Token'] = Encrypt(getRandomToken(), isPublic)
   return headers

@@ -2,7 +2,8 @@
   "easycom": {
     "custom": {
       "^u-(.*)": "uview-plus/components/u-$1/u-$1.vue",
-      "ContentWrap":"@/components/ContentWrap/index.vue"
+      "ContentWrap": "@/components/ContentWrap/index.vue",
+      "Header": "@/components/Header/index.vue"
     }
   },
 
@@ -21,18 +22,44 @@
         "navigationBarTitleText": "",
         "navigationStyle": "custom"
       }
+    },
+    {
+      "path": "pages/login/login",
+      "style": {
+        "navigationBarTitleText": "",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/login/register",
+      "style": {
+        "navigationBarTitleText": "",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/login/forgotPassword",
+      "style": {
+        "navigationBarTitleText": "",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/login/resetPassword",
+      "style": {
+        "navigationBarTitleText": "",
+        "navigationStyle": "custom"
+      }
     }
   ],
-  "subpackages": [
-  ],
+  "subpackages": [],
   "preloadRule": {},
   "globalStyle": {
     "navigationBarTitleText": "uni-app",
     "backgroundColor": "#f4f5f7",
     "navigationBarTextStyle": "black",
     "navigationBarBackgroundColor": "#FFF",
-    "usingComponents": {
-    }
+    "usingComponents": {}
   },
   "usingComponts": true
 }

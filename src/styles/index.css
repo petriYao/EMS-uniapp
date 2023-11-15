@@ -1,51 +1,48 @@
+@import 'fontSize.css';
+@import 'theme.scss';
 
-@import "fontSize.css";
-
-page {
-    --home-head-bg: #426DFE;
-    --default-content-bg: #F4F5F7;
-    --default-font-size: var(--font-size-seven);
-    --font-size-one:16rpx;
-    --font-size-two:18rpx;
-    --font-size-three:20rpx;
-    --font-size-four:22rpx;
-    --font-size-five:24rpx;
-    --font-size-six:26rpx;
-    --font-size-seven:28rpx;
-    --font-size-eight:30rpx;
-    --font-size-nine:32rpx;
-    --font-size-ten:34rpx;
-    --font-size-eleven:36rpx;
-    --font-size-twelve:38rpx;
+page,
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  background-color: #f6f7fb;
+  font-size: 28rpx;
+  color: #000;
+  -webkit-font-smoothing: antialiased; /*字体进行抗锯齿处理*/
+  -moz-osx-font-smoothing: grayscale; /*字体进行灰度处理*/
 }
 
-/* 透明 */
-.transparency-bg {
-    background-color: transparent;
+page::-webkit-scrollbar,
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
 }
 
-/* 首页头部背景 */
-.home-head-bg {
-    background-color: var(--home-head-bg);
+/* 单行文字换行  */
+.text_ellipsis {
+  /*宽度自定义*/
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-/* 头部样式 */
-.home-head {
-    background-color: var(--home-head-bg);
-    font-size: 0;
+.text_ellipsis-2 {
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 2;
+  line-break: anywhere;
+  -webkit-box-orient: vertical;
 }
 
-/* 首页背景颜色 */
-.home-content-bg {
-    background-color: var(--default-content-bg);
-}
-
-/* 头部通用背景 */
-.head-default-bg {
-    background-color: #FFF;
-}
-
-/* 下边线 */
-.line-default-bottom {
-    border-bottom: 1px solid #F2F2F2;
+.text_ellipsis-3 {
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 3;
+  line-break: anywhere;
+  -webkit-box-orient: vertical;
 }

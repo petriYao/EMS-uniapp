@@ -9,7 +9,7 @@ export const isShowApiLog = false
 export const isShowChatLog = false
 
 //环境路径 false线上，true线下
-const debug = true
+const debug = false
 
 //图片svg路径 false线上，true线下
 const urlDebug = true
@@ -37,28 +37,19 @@ export const TencentMapsData = {
   key: '4LSBZ-EWYWB-6EEU7-JOV4X-74XG7-ZHFEH'
 }
 
-//聊天网络路径
-export const getChatUrl = () => {
-  if (isDebug()) {
-    return 'ws://192.168.3.5:10306'
-  } else {
-    return 'wss://sltchat.hlace.com/jssdk_wx_gateway'
-  }
-}
-
 //主机网络路径
 export const getDeomeUrl = () => {
   if (isDebug()) {
     return 'http://192.168.3.5'
   } else {
-    return 'https://slt.hlace.com'
+    return 'https://sxb.hlace.com'
   }
 }
 
 //基础网络路径
 export const getBaseUrl = () => {
   if (isDebug()) {
-    return getDeomeUrl() + ':8091'
+    return getDeomeUrl() + ':8092'
   } else {
     return getDeomeUrl() + ''
   }

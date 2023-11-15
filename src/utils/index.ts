@@ -28,7 +28,7 @@ export function getImageURLNeedWl(path: string, name: string) {
 
 export function getSvgURL(path: string, name: string) {
   if (isURLDebug()) {
-    return `/static/img/${path}/${name}.svg`
+    return `/static/svg/${path}/${name}.svg`
   }
   const key = `/${path}/${name}.svg`
   const md5 = Md5.hashStr(key)
