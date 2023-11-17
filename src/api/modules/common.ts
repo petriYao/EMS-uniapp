@@ -4,21 +4,21 @@ import { getHttpHeader } from '@/utils/httpUtils'
 
 export const uploadFileApi = async (
   category: string,
-  tempFiles?: any,
-  tempFilePaths?: any,
+  file?: File,
+  filePath?: string,
   duration?: number
 ): Promise<any> => {
   return new Promise((resolve, reject) => {
     uni.uploadFile({
       url: getUploadUrl(), // 替换为你的服务器接口地址
-      filePath: tempFilePaths,
-      name: 'file', // 服务器接收文件的字段名
       header: getHttpHeader(),
       formData: {
-        file: tempFiles,
         category: category,
         duration: duration
       },
+      name: 'file', // 服务器接收文件的字段名
+      file: file,
+      filePath: filePath,
       success: function (uploadRes) {
         const data = JSON.parse(uploadRes.data)
         if (data.success) {

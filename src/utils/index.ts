@@ -10,16 +10,18 @@ export * from './src/lodash'
 //字段
 export * from './src/columnUnit'
 
-const ossUrl =
-  'https://businessinterflow-wx.oss-cn-fuzhou.aliyuncs.com/b62fc9be67c9b51330e999b23e1556e5-'
+const ossUrl = 'https://shuxiaobao-wx.oss-cn-fuzhou.aliyuncs.com/b62fc9be67c9b51330e999b23e1556e5-'
 
 export function getImageURL(path: string, name: string, needWl?: boolean) {
+  //#ifdef MP-WEIXIN
   if (isURLDebug() && !needWl) {
     return `/static/img/${path}/${name}.png`
   }
-  const key = `/${path}/${name}.png`
+  const key = `/img/${path}/${name}.png`
   const md5 = Md5.hashStr(key)
   return ossUrl + md5
+  //#endif
+  return new URL(`/src/static/img/${path}/${name}.png`, import.meta.url).href
 }
 
 export function getImageURLNeedWl(path: string, name: string) {
@@ -27,12 +29,15 @@ export function getImageURLNeedWl(path: string, name: string) {
 }
 
 export function getSvgURL(path: string, name: string) {
+  //#ifdef MP-WEIXIN
   if (isURLDebug()) {
     return `/static/svg/${path}/${name}.svg`
   }
-  const key = `/${path}/${name}.svg`
+  const key = `/svg/${path}/${name}.svg`
   const md5 = Md5.hashStr(key)
   return ossUrl + md5
+  //#endif
+  return new URL(`/src/static/svg/${path}/${name}.svg`, import.meta.url).href
 }
 
 //创建uview方法

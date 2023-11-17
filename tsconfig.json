@@ -14,7 +14,14 @@
       "esnext",
       "dom"
     ],
-    "types": [],
+    "types": [
+      "@dcloudio/types",
+      "@uni-helper/uni-app-types",
+      "vite/client",
+      "@types/node",
+      "vitest/globals",
+      "miniprogram-api-typings",
+    ],
     "baseUrl": "./",
     "paths": {
       "@/*": [

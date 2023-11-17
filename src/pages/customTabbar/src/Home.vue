@@ -5,10 +5,9 @@ import { ref } from 'vue'
 // 轮播图
 const current = ref(0)
 const imgList = [
-  '/static/img/home/home-carousel1.png',
-  '/static/img/home/home-carousel1.png',
-  '/static/img/home/home-carousel1.png',
-  '/static/img/home/home-carousel1.png'
+  getImageURL('home', 'home-carousel1'),
+  getImageURL('home', 'home-carousel1'),
+  getImageURL('home', 'home-carousel1')
 ]
 
 const keyword = ref('')

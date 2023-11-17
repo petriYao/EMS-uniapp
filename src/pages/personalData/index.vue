@@ -31,10 +31,9 @@ onLoad(async () => {
   }
 })
 
-const uploadImg = async (tempFiles: any, tempFilePaths: any) => {
-  console.log('tempFiles', tempFiles)
-  console.log('tempFilePaths', tempFilePaths)
-  const res = await uploadFileApi('avatar', tempFiles, tempFilePaths)
+const uploadImg = async (tempFile: any) => {
+  console.log('tempFile', tempFile)
+  const res = await uploadFileApi('avatar', tempFile)
   if (res.success) {
     console.log('res.value', res.value)
   }
@@ -49,7 +48,7 @@ const onCell = (title: string) => {
         success: (res) => {
           console.log('chooseImage', res)
           const tempFiles = res.tempFiles as any
-          uploadImg(tempFiles[0], res.tempFilePaths[0])
+          uploadImg(tempFiles[0])
         },
         fail: (_err) => {}
       })
