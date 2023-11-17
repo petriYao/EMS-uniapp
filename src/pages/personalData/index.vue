@@ -33,7 +33,7 @@ onLoad(async () => {
 
 const uploadImg = async (tempFile: any) => {
   console.log('tempFile', tempFile)
-  const res = await uploadFileApi('avatar', tempFile)
+  const res = await uploadFileApi('avatar', tempFile, tempFile?.path)
   if (res.success) {
     console.log('res.value', res.value)
   }
