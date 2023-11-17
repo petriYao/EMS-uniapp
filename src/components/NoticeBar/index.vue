@@ -41,7 +41,7 @@ const noticeList = ref([
   <view>
     <!-- 通告栏 -->
     <view class="noticeBar">
-      <view class="flex-center mx-2">
+      <view class="flex-center mx-20rpx">
         <u-icon name="volume-fill" color="var(--UI-BLUE)" size="16" />
       </view>
 

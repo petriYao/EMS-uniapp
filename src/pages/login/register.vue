@@ -126,8 +126,8 @@ const onLogin = () => {
 <template>
   <ContentWrap>
     <Header />
-    <view class="px-4 py-6 text-32rpx font-600">用户注册</view>
-    <view class="px-3">
+    <view class="px-40rpx py-60rpx text-32rpx font-600">用户注册</view>
+    <view class="px-30rpx">
       <u-form errorType="message" :model="fromData" :rules="rules" ref="formRef">
         <u-form-item :borderBottom="true" prop="userPhoneNumber">
           <u-input v-model="fromData.userPhoneNumber" placeholder="请输入您的手机号码" />
@@ -203,13 +203,13 @@ const onLogin = () => {
         </u-form-item>
       </u-form>
     </view>
-    <view class="px-8 mt-8">
+    <view class="px-80rpx mt-80rpx">
       <u-button type="primary" shape="circle" @click="onSubmit">注册</u-button>
     </view>
     <BottomButton>
-      <view class="text-24rpx text-#999999 pl-4 mb-10" @click="onLogin">
+      <view class="text-24rpx text-#999999 pl-40rpx mb-100rpx" @click="onLogin">
         <span>已有账号</span>
-        <span class="text-#1C59E6 ml-1">去登录</span>
+        <span class="text-#1C59E6 ml-10rpx">去登录</span>
       </view>
     </BottomButton>
   </ContentWrap>

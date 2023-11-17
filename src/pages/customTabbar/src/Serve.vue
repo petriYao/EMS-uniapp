@@ -1,10 +1,8 @@
-<script setup lang="ts">
-import Header from '@/components/Header/index.vue'
-</script>
+<script setup lang="ts"></script>
 
 <template>
   <ContentWrap>
-    <Header :isLeftText="false" title="服务" :leftIconSize="0" />
+    <Header :isLeftText="false" title="服务" />
   </ContentWrap>
 </template>
 

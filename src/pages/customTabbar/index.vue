@@ -102,6 +102,7 @@ const isShow = (name: string) => {
         </view>
       </view>
     </view>
+    <view class="w-100vw h-80rpx" />
   </ContentWrap>
 </template>
 

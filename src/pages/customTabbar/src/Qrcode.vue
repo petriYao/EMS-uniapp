@@ -2,7 +2,6 @@
 import { getImageURL, getSvgURL } from '@/utils'
 import { ref } from 'vue'
 import NoticeBar from '@/components/NoticeBar/index.vue'
-import Header from '@/components/Header/index.vue'
 import { onMounted } from 'vue'
 import Uqrcode from '@/components/UQRCode/components/uqrcode/uqrcode.vue'
 
@@ -40,28 +39,30 @@ onMounted(() => {
 
 <template>
   <ContentWrap>
-    <Header :isLeftText="false" :leftIconSize="0" bgColor="#f6f7fb">
+    <Header :isLeftText="false" bgColor="#f6f7fb">
       <template #center>
-        <view class="w-93vw p-3">
+        <view class="w-93vw p-30rpx">
           <u-search placeholder="搜索您想要的" v-model="keyword" :showAction="false" bgColor="#FFF"
         /></view>
       </template>
     </Header>
-    <view class="m-3 p-3 bg-white flex-rows justify-around rounded-20rpx">
+    <view class="m-30rpx p-30rpx bg-white flex-rows justify-around rounded-20rpx">
       <view class="flex-column" v-for="(item, index) in buttonList" :key="index">
-        <view class="mb-2"><u-icon :name="getSvgURL('Qrcode', `${item.icon}`)" :size="50" /></view>
+        <view class="mb-20rpx"
+          ><u-icon :name="getSvgURL('Qrcode', `${item.icon}`)" :size="50"
+        /></view>
         <view class="font-600 text-30rpx">{{ item.title }}</view>
       </view>
     </view>
-    <view class="px-3">
+    <view class="px-30rpx">
       <NoticeBar :interval="3000" />
     </view>
-    <view class="qr-bg pt-20rpx px-3 position-relative">
+    <view class="qr-bg pt-20rpx px-30rpx position-relative">
       <img class="qr-bg-img" :src="getImageURL('home', 'qr-bg')" mode="widthFix" />
       <view class="qr-img">
         <view class="flex-column">
           <Uqrcode canvasId="canvasId" :value="Qrvalue" />
-          <view class="my-3 font-600">
+          <view class="my-30rpx font-600">
             <u-count-down
               ref="methods"
               :time="30 * 60 * 1000"
@@ -72,7 +73,7 @@ onMounted(() => {
             <view v-else>二维码已过期</view>
           </view>
           <view class="text-#196CFF flex-rows" @click="onRefresh">
-            <u-icon name="reload" size="20" class="mr-1 mt-1" />
+            <u-icon name="reload" size="20" class="mr-10rpx mt-10rpx" />
             刷新
           </view>
         </view>
@@ -86,7 +87,7 @@ onMounted(() => {
   color: #196cff !important;
 }
 :deep(.u-status-bar) {
-  background-color: none !important;
+  background-color: #f6f7fb !important;
 }
 :deep(.u-navbar__content) {
   background-color: #f6f7fb !important;

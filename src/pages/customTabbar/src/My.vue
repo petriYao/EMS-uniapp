@@ -4,9 +4,18 @@ import router from '@/router'
 import { onShow } from '@dcloudio/uni-app'
 import { clearUserIdentity, getUserIdentity } from '@/hooks/useCache'
 import { ref } from 'vue'
-import BottomButton from '@/components/BottomButton/index.vue'
+import { logoutApi } from '@/api'
+import { reactive } from 'vue'
+import { UserIdentityType } from '@/types/userModel'
 
-const userInfo = ref<any>()
+const userInfo = ref<UserIdentityType | null>()
+const dialog = reactive({
+  show: false,
+  title: '提示',
+  content: '是否确认退出'
+})
+
+const uToastRef = ref()
 
 const cellLisr = [
   {
@@ -25,13 +34,10 @@ const cellLisr = [
   {
     icon: 'my-contact',
     title: '联系我们'
-  },
-  {
-    icon: 'my-home-set',
-    title: '首页设置'
   }
 ]
 
+/**跳转登录界面 */
 const onLogin = () => {
   router.push({
     url: '/pages/login/login'
@@ -42,9 +48,33 @@ onShow(() => {
   userInfo.value = getUserIdentity()
 })
 
+/**退出 */
 const onExit = () => {
+  dialog.show = true
+}
+
+/**弹框确认 */
+const onConfirm = async () => {
+  await logoutApi()
   clearUserIdentity()
   userInfo.value = null
+  dialog.show = false
+}
+
+const onSetting = (title: string) => {
+  if (!userInfo.value) {
+    uToastRef.value.show({
+      type: 'default',
+      title: '默认主题',
+      message: '请先登录账号'
+    })
+    return
+  }
+  if (title === '个人资料') {
+    router.push({
+      url: '/pages/personalData/index'
+    })
+  }
 }
 </script>
 
@@ -56,10 +86,10 @@ const onExit = () => {
         style="background: linear-gradient(135.93deg, #def6f9 0%, #e1e8f9 100%)"
       />
       <view class="position-relative z-1">
-        <view class="pt-55px flex-rows pl-4" @click="onLogin()">
-          <view class="mr-2">
+        <view class="pt-55px flex-rows pl-40rpx" @click="userInfo ? '' : onLogin()">
+          <view class="mr-20rpx">
             <u-avatar
-              :src="userInfo?.userInfo?.avatarImage.listUrl ?? getImageURL('home', 'my-avatar')"
+              :src="userInfo?.userInfo?.avatarImage?.listUrl ?? getImageURL('home', 'my-avatar')"
               size="100rpx"
             />
           </view>
@@ -71,48 +101,66 @@ const onExit = () => {
             <view class="text-30rpx font-600"> 未登录/请登录 </view>
           </view>
         </view>
-        <view class="flex-rows justify-around py-6">
+        <view class="flex-rows justify-around py-60rpx">
           <view class="flex-column text-#333333">
-            <view class="text-36rpx font-600 mb-1">10</view>
+            <view class="text-36rpx font-600 mb-10rpx">10</view>
             <view class="text-26rpx">我的订单</view>
           </view>
           <view class="flex-column text-#333333">
-            <view class="text-36rpx font-600 mb-1">5</view>
+            <view class="text-36rpx font-600 mb-10rpx">5</view>
             <view class="text-26rpx">会员权益</view>
           </view>
           <view class="flex-column text-#333333">
-            <view class="text-36rpx font-600 mb-1">5996</view>
+            <view class="text-36rpx font-600 mb-10rpx">5996</view>
             <view class="text-26rpx">积分兑换</view>
           </view>
         </view>
       </view>
     </view>
 
-    <view class="bg-[#F6F7FB] p-3 box position-relative z-1">
-      <view class="table bg-#FFF py-1 rounded-20rpx">
+    <view class="bg-[#F6F7FB] p-30rpx box position-relative z-1">
+      <view class="table bg-#FFF py-10rpx rounded-20rpx">
         <view
           v-for="(item, index) in cellLisr"
           :key="index"
-          class="table-item flex-rows justify-between p-4"
+          class="table-item flex-rows justify-between p-40rpx"
+          @click="onSetting(item.title)"
         >
           <view class="flex-rows">
-            <view class="mr-2 mt-0.5"><u-icon :name="getSvgURL('my', item.icon)" size="26" /></view>
+            <view class="mr-20rpx mt-5rpx"
+              ><u-icon :name="getSvgURL('my', item.icon)" size="26"
+            /></view>
             <view class="text-32rpx">{{ item.title }}</view>
           </view>
           <view><u-icon name="arrow-right" size="18" /></view>
         </view>
       </view>
     </view>
-    <view v-if="userInfo" class="px-60rpx mt-30rpx">
-      <u-button type="primary" shape="circle" @click="onExit">退出</u-button>
+
+    <view v-if="userInfo" class="aa px-60rpx mt-30rpx">
+      <view @click="onExit" class="bg-#dfe8f7 text-#1c59e6 h-90rpx flex-center rounded-999">
+        退出
+      </view>
     </view>
+
+    <u-modal
+      :show="dialog.show"
+      :title="dialog.title"
+      showCancelButton
+      :content="dialog.content"
+      @confirm="onConfirm"
+      @cancel="dialog.show = false"
+    >
+      <view class="flex-center">
+        <view>{{ dialog.content }}</view>
+      </view>
+    </u-modal>
+
+    <u-toast ref="uToastRef" />
   </ContentWrap>
 </template>
 
 <style lang="scss" scoped>
-// .table .table-item:not(:last-child) {
-//   border-bottom: 0.5rpx solid #ccc;
-// }
 .box {
   border-radius: 30rpx 30rpx 0 0;
 }
@@ -133,5 +181,15 @@ const onExit = () => {
     transform: scaleY(0.5); // 元素Y方向缩小为原来的0.5
     transform-origin: 0 0; // CSS属性让你更改一个元素变形的原点
   }
+}
+:deep(.u-button) {
+  // background: #dfe8f7;
+  color: #1c59e6;
+  border: unset;
+  height: 90rpx;
+}
+
+:deep(.uni-button:after) {
+  border: unset !important;
 }
 </style>

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import Header from '@/components/Header/index.vue'
 import BottomButton from '@/components/BottomButton/index.vue'
 import LoginPhone from '@/components/LoginMethod/LoginPhone.vue'
 import { getImageURL, getSvgURL } from '@/utils'
@@ -26,10 +25,10 @@ const onLoginMethod = () => {
           <LoginPhone />
         </view>
         <view class="wxchat" v-show="isPhone">
-          <view class="px-8 mt-8 flex-column">
+          <view class="px-80rpx mt-80rpx flex-column">
             <u-button type="primary" shape="circle">微信登录</u-button>
 
-            <view class="mt-5">
+            <view class="mt-50rpx">
               <u-checkbox-group v-model="protocol" shape="square" size="36rpx">
                 <view class="flex-rows">
                   <u-checkbox
@@ -50,7 +49,7 @@ const onLoginMethod = () => {
       </view>
     </view>
     <BottomButton>
-      <view class="px-7 flex-column">
+      <view class="px-70rpx flex-column">
         <view class="w-82vw">
           <u-divider text="其他登录方式" />
         </view>

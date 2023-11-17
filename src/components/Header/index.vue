@@ -50,6 +50,7 @@ const onLeftClick = () => {
     :bgColor="props.bgColor"
     :placeholder="props.placeholder"
     :border="props.border"
+    :leftIconSize="0"
     @leftClick="onLeftClick"
   >
     <template #left v-if="props.isLeftText">

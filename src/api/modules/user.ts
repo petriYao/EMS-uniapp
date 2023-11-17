@@ -1,12 +1,13 @@
 import { getUserIdentity } from '@/hooks/useCache'
 import { useAxios } from '@/hooks/useAxios'
+import { UserIdentityType, UserInfoApiType, UserInfoType } from '@/types/userModel'
 
 const { post } = useAxios()
 /**
  * 注册
  */
 export const registerApi = (userPhoneNumber: string, phoneCode: string, userPassword: string) => {
-  return post<any>('register', {
+  return post<UserIdentityType>('register', {
     userPhoneNumber,
     phoneCode,
     userPassword
@@ -17,7 +18,7 @@ export const registerApi = (userPhoneNumber: string, phoneCode: string, userPass
  * 登录
  */
 export const loginApi = (userPhoneNumber: string, userPassword: string): any => {
-  return post<any>('login', {
+  return post<UserIdentityType>('login', {
     userPhoneNumber,
     userPassword
   })
@@ -110,9 +111,9 @@ export const updatePasswordApi = (oldUserPassword: string, userPassword: string)
 /**
  * 当前登录用户信息
  */
-export const getUserInfoApi = (): any => {
+export const getUserInfoApi = () => {
   const val = getUserIdentity()
-  return post<any>('user/info', {
+  return post<UserInfoApiType>('user/info', {
     params: val
   })
 }
@@ -120,20 +121,8 @@ export const getUserInfoApi = (): any => {
 /**
  * 修改用户信息
  */
-export const updateUserApi = (
-  userNickname: string,
-  sex: string,
-  avatarId?: number,
-  email?: string,
-  qq?: string
-) => {
-  return post<any>('user/update', {
-    userNickname,
-    sex,
-    avatarId,
-    email,
-    qq
-  })
+export const updateUserApi = (data: UserInfoType) => {
+  return post<any>('user/update', data)
 }
 
 /**

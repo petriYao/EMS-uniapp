@@ -65,7 +65,7 @@ const onSubmit = () => {
 </script>
 
 <template>
-  <view class="px-3">
+  <view class="px-30rpx">
     <u-form errorType="toast" :model="fromData" :rules="rules" ref="formRef">
       <u-form-item :borderBottom="true" prop="username">
         <u-input v-model="fromData.username" placeholder="请输入您的账号" />
@@ -87,7 +87,7 @@ const onSubmit = () => {
           </template>
         </u-input>
       </u-form-item>
-      <view class="flex-rows justify-between mt-2">
+      <view class="flex-rows justify-between mt-20rpx">
         <u-form-item prop="protocol">
           <u-checkbox-group v-model="fromData.protocol" shape="square" size="36rpx">
             <view class="flex-rows">
@@ -106,10 +106,10 @@ const onSubmit = () => {
       </view>
     </u-form>
   </view>
-  <view class="px-8 mt-8">
+  <view class="px-80rpx mt-80rpx">
     <u-button type="primary" shape="circle" @click="onSubmit">登录</u-button>
   </view>
-  <view class="text-24rpx my-5 px-3">
+  <view class="text-24rpx my-50rpx px-30rpx">
     <span class="text-#999999">没有账号？</span>
     <span class="text-#1C59E6" @click="onRegister">去注册</span>
   </view>

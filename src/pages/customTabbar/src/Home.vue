@@ -193,7 +193,7 @@ const keyword = ref('')
 <style lang="scss" scoped>
 :deep(.u-swiper) {
   padding-bottom: 40rpx;
-  background: var(bg-base);
+  background: #f6f7fb !important;
 }
 
 .indicator {
