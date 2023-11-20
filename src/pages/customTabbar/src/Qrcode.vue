@@ -39,7 +39,7 @@ onMounted(() => {
 
 <template>
   <ContentWrap>
-    <Header :isLeftText="false" bgColor="#f6f7fb">
+    <Header :isLeftIcon="false" bgColor="#f6f7fb">
       <template #center>
         <view class="w-93vw p-30rpx">
           <u-search placeholder="搜索您想要的" v-model="keyword" :showAction="false" bgColor="#FFF"

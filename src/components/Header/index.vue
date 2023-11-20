@@ -13,7 +13,7 @@ const props = defineProps({
     type: String,
     default: '#ffffff'
   },
-  isLeftText: {
+  isLeftIcon: {
     //左边的提示文字
     type: Boolean,
     default: true
@@ -45,7 +45,6 @@ const onLeftClick = () => {
 
 <template>
   <u-navbar
-    :title="props.title"
     :fixed="props.fixed"
     :bgColor="props.bgColor"
     :placeholder="props.placeholder"
@@ -53,13 +52,15 @@ const onLeftClick = () => {
     :leftIconSize="0"
     @leftClick="onLeftClick"
   >
-    <template #left v-if="props.isLeftText">
+    <template #left>
       <slot name="left">
-        <u-icon name="arrow-left" size="36rpx" />
+        <u-icon name="arrow-left" size="36rpx" v-if="props.isLeftIcon" />
       </slot>
     </template>
-    <template #center v-if="slots.center">
-      <slot name="center"></slot>
+    <template #center>
+      <slot name="center">
+        <view v-if="props.title">{{ props.title }}</view>
+      </slot>
     </template>
     <template #right v-if="slots.right">
       <slot name="right"></slot>

@@ -1,6 +1,7 @@
 import { getUserIdentity } from '@/hooks/useCache'
 import { useAxios } from '@/hooks/useAxios'
 import { UserIdentityType, UserInfoApiType, UserInfoType } from '@/types/userModel'
+import { AppSetInfoType } from '@/types/commonModel'
 
 const { post } = useAxios()
 /**
@@ -21,39 +22,6 @@ export const loginApi = (userPhoneNumber: string, userPassword: string): any => 
   return post<UserIdentityType>('login', {
     userPhoneNumber,
     userPassword
-  })
-}
-
-/**
- * 退出登录
- */
-export const logoutApi = (): any => {
-  return post<any>('logout', {})
-}
-/**
- * 微信登录
- */
-export const wxLoginApi = (loginCode: string): any => {
-  return post<any>('wx-login', {
-    loginCode
-  })
-}
-
-/**
- * 微信绑定账号
- */
-export const wxBindAccountApi = (phoneCode: string): any => {
-  return post<any>('wx-bind-account', {
-    phoneCode
-  })
-}
-
-/**
- * 账号绑定微信
- */
-export const accountBindWxApi = (bindCode: string): any => {
-  return post<any>('account-bind-wx', {
-    bindCode
   })
 }
 
@@ -99,16 +67,6 @@ export const findPasswordApi = (
 }
 
 /**
- * 修改密码
- */
-export const updatePasswordApi = (oldUserPassword: string, userPassword: string) => {
-  return post<any>('user/update-password', {
-    oldUserPassword,
-    userPassword
-  })
-}
-
-/**
  * 当前登录用户信息
  */
 export const getUserInfoApi = () => {
@@ -123,6 +81,50 @@ export const getUserInfoApi = () => {
  */
 export const updateUserApi = (data: UserInfoType) => {
   return post<any>('user/update', data)
+}
+
+/**
+ * 退出登录
+ */
+export const logoutApi = (): any => {
+  return post<any>('logout', {})
+}
+
+/**
+ * 微信登录
+ */
+export const wxLoginApi = (loginCode: string): any => {
+  return post<any>('wx-login', {
+    loginCode
+  })
+}
+
+/**
+ * 微信绑定账号
+ */
+export const wxBindAccountApi = (phoneCode: string): any => {
+  return post<any>('wx-bind-account', {
+    phoneCode
+  })
+}
+
+/**
+ * 账号绑定微信
+ */
+export const accountBindWxApi = (bindCode: string): any => {
+  return post<any>('account-bind-wx', {
+    bindCode
+  })
+}
+
+/**
+ * 修改密码
+ */
+export const updatePasswordApi = (oldUserPassword: string, userPassword: string) => {
+  return post<any>('user/update-password', {
+    oldUserPassword,
+    userPassword
+  })
 }
 
 /**

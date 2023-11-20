@@ -1,27 +1,29 @@
 <script setup lang="ts">
 import { AppSetInfoApi } from '@/api'
 import { AppSetInfoType } from '@/types/commonModel'
-import { onMounted, ref } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
+import { ref } from 'vue'
 import UniversalPark from '@components/UniversalPark/index.vue'
 
 // 轮播图
 const dataObj = ref({} as AppSetInfoType)
 
 const getParkProfile = async () => {
-  const res = await AppSetInfoApi('parkService')
+  const res = await AppSetInfoApi('parkProfile')
   if (res.success && res.value) {
     dataObj.value = res.value
   }
 }
 
-onMounted(() => {
+onLoad(async () => {
   getParkProfile()
 })
 </script>
 
 <template>
   <ContentWrap>
-    <Header :isLeftIcon="false" title="服务" />
+    <!-- 头部开始 -->
+    <Header title="园区简介" />
     <!-- 头部结束 -->
     <UniversalPark :data="dataObj" />
   </ContentWrap>

@@ -7,12 +7,15 @@ import { ref } from 'vue'
 
 const userHead = ref<UserHeadType>()
 const userInfo = ref<UserInfoType>()
+//当前点击单元格信息
 const sheet = reactive({
   show: false,
   title: '',
   value: '',
   parameter: ''
 })
+
+//当前修改性别信息
 const sheetSex = reactive({
   show: false,
   title: '',
@@ -21,24 +24,26 @@ const sheetSex = reactive({
   list: [] as any[]
 })
 
-onLoad(async () => {
+/**获取当前用户信息 */
+const getUserInfo = async () => {
   const res = await getUserInfoApi()
-  console.log('res.value', res.value)
-
   if (res.success) {
     userHead.value = res.value?.userHead
     userInfo.value = res.value?.userInfo
   }
-})
+}
 
+/**上传图片 */
 const uploadImg = async (tempFile: any) => {
-  console.log('tempFile', tempFile)
   const res = await uploadFileApi('avatar', tempFile, tempFile?.path)
   if (res.success) {
-    console.log('res.value', res.value)
+    sheet.value = res.value.id
+    sheet.parameter = 'avatarId'
+    onSave()
   }
 }
 
+/**点击单元格 */
 const onCell = (title: string) => {
   switch (title) {
     case '头像':
@@ -46,7 +51,6 @@ const onCell = (title: string) => {
         count: 1, // 最多可选择的图片数量
         sourceType: ['album', 'camera'], // 图片选择的来源，可选相册或相机
         success: (res) => {
-          console.log('chooseImage', res)
           const tempFiles = res.tempFiles as any
           uploadImg(tempFiles[0])
         },
@@ -97,10 +101,9 @@ const onCell = (title: string) => {
   }
 }
 
-const onSave = async (isSex: boolean, valSex?: { name: string }) => {
+/**修改信息 */
+const onSave = async (isSex?: boolean, valSex?: { name: string }) => {
   let data = {} as any
-  console.log('isSex', isSex)
-
   if (isSex) {
     data[sheetSex.parameter] = valSex?.name === '男' ? 1 : valSex?.name === '女' ? 2 : 0
   } else {
@@ -108,12 +111,15 @@ const onSave = async (isSex: boolean, valSex?: { name: string }) => {
   }
   const res = await updateUserApi(data)
   if (res.success) {
-    userHead.value = res.value?.userHead
-    userInfo.value = res.value?.userInfo
+    getUserInfo()
     sheet.show = false
     sheetSex.show = false
   }
 }
+
+onLoad(() => {
+  getUserInfo()
+})
 </script>
 
 <template>
@@ -122,20 +128,22 @@ const onSave = async (isSex: boolean, valSex?: { name: string }) => {
     <!-- 头部 -->
     <view class="m-30rpx p-30rpx bg-#FFF rounded-20rpx">
       <view class="flex-rows">
-        <view class="mr-30rpx"
-          ><u-avatar :src="userHead?.avatarImage.listUrl" size="100rpx"
-        /></view>
+        <view class="mr-30rpx">
+          <u-avatar :src="userHead?.avatarImage.listUrl" size="100rpx" />
+        </view>
         <view class="flex flex-col justify-between h-120rpx">
           <view class="text-30rpx">{{ userHead?.title }}</view>
           <view class="text-24rpx text-#999999">{{ userHead?.content }}</view>
-          <view v-for="(item, index) in userHead?.tags" :key="index" class="mr-10rpx">
-            <u-tag
-              :text="item.title"
-              :plain="item.isPlain === 1"
-              :color="item.color"
-              :bgColor="item.background"
-              :borderColor="item.background"
-            />
+          <view class="flex-rows">
+            <view v-for="(item, index) in userHead?.tags" :key="index" class="mr-10rpx">
+              <u-tag
+                :text="item.title"
+                :plain="item.isPlain === 1"
+                :color="item.color"
+                :bgColor="item.background"
+                :borderColor="item.background"
+              />
+            </view>
           </view>
         </view>
       </view>
@@ -149,8 +157,6 @@ const onSave = async (isSex: boolean, valSex?: { name: string }) => {
           @click="onCell('头像')"
         >
           <view>
-            <!-- <u-upload @afterRead="afterRead" @delete="deletePic" :maxCount="1">
-          </u-upload> -->
             <view class="flex-rows">
               <view class="text-28rpx">头像</view>
             </view>
@@ -162,7 +168,7 @@ const onSave = async (isSex: boolean, valSex?: { name: string }) => {
               mode="aspectFill"
               style="width: 60rpx; height: 60rpx"
             />
-            <u-icon name="arrow-right" size="18" />
+            <u-icon name="arrow-right" size="34rpx" />
           </view>
         </view>
         <view
@@ -174,7 +180,7 @@ const onSave = async (isSex: boolean, valSex?: { name: string }) => {
           </view>
           <view class="flex-rows">
             <view class="text-#999999">{{ userInfo?.userNickname }}</view>
-            <u-icon name="arrow-right" size="18" />
+            <u-icon name="arrow-right" size="34rpx" />
           </view>
         </view>
         <view
@@ -188,7 +194,7 @@ const onSave = async (isSex: boolean, valSex?: { name: string }) => {
             <view class="text-#999999">{{
               userInfo?.sex === 0 ? '保密' : userInfo?.sex === 1 ? '男' : '女'
             }}</view>
-            <u-icon name="arrow-right" size="18" />
+            <u-icon name="arrow-right" size="34rpx" />
           </view>
         </view>
         <view class="table-item flex-rows justify-between px-40rpx py-30rpx" @click="onCell('QQ')">
@@ -197,7 +203,7 @@ const onSave = async (isSex: boolean, valSex?: { name: string }) => {
           </view>
           <view class="flex-rows">
             <view class="text-#999999">{{ userInfo?.qq }}</view>
-            <u-icon name="arrow-right" size="18" />
+            <u-icon name="arrow-right" size="34rpx" />
           </view>
         </view>
         <view
@@ -209,7 +215,7 @@ const onSave = async (isSex: boolean, valSex?: { name: string }) => {
           </view>
           <view class="flex-rows">
             <view class="text-#999999">{{ userInfo?.userPhoneNumber }}</view>
-            <u-icon name="arrow-right" size="18" />
+            <u-icon name="arrow-right" size="34rpx" />
           </view>
         </view>
         <view
@@ -221,7 +227,7 @@ const onSave = async (isSex: boolean, valSex?: { name: string }) => {
           </view>
           <view class="flex-rows">
             <view class="text-#999999">{{ userInfo?.email }}</view>
-            <u-icon name="arrow-right" size="18" />
+            <u-icon name="arrow-right" size="34rpx" />
           </view>
         </view>
       </view>
@@ -278,5 +284,9 @@ const onSave = async (isSex: boolean, valSex?: { name: string }) => {
 .input {
   flex: 1;
   border-bottom: 0.5px solid rgba(0, 0, 0, 0.2);
+}
+
+:deep(.u-action-sheet__item-wrap__item) {
+  padding: 30rpx !important;
 }
 </style>

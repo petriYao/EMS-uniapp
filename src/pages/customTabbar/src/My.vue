@@ -44,7 +44,7 @@ const onLogin = () => {
   })
 }
 
-onShow(() => {
+onShow(async () => {
   userInfo.value = getUserIdentity()
 })
 
