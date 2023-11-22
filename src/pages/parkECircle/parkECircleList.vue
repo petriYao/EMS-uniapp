@@ -30,7 +30,7 @@ onMounted(() => {
     <!-- 头部结束 -->
     <view class="u-page" v-if="listData.length > 0">
       <template v-for="(item, index) in listData" :key="index">
-        <ImgTexe :item="item" />
+        <ImgTexe :item="item" title="园区E圈" />
       </template>
     </view>
     <noData v-else />

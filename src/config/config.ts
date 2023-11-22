@@ -49,7 +49,7 @@ export const getDeomeUrl = () => {
 //基础网络路径
 export const getBaseUrl = () => {
   if (isDebug()) {
-    return getDeomeUrl() + ':8092'
+    return getDeomeUrl() + ':8080'
   } else {
     return getDeomeUrl() + ''
   }

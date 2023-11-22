@@ -38,6 +38,13 @@
       }
     },
     {
+      "path": "pages/listInfo/index",
+      "style": {
+        "navigationBarTitleText": "",
+        "navigationStyle": "custom"
+      }
+    },
+    {
       "path": "pages/enterprisesDemeanour/index",
       "style": {
         "navigationBarTitleText": "",

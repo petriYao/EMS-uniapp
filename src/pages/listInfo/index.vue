@@ -1,29 +1,38 @@
 <script setup lang="ts">
-import { AppSetInfoApi } from '@/api'
+import { AppSetListInfo } from '@/api'
 import { AppSetInfoType } from '@/types/commonModel'
-import { onMounted, ref } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
+import { ref } from 'vue'
 import UniversalPark from '@components/UniversalPark/index.vue'
 
 // 轮播图
 const dataObj = ref({} as AppSetInfoType)
 
+const infoData = ref({
+  id: '',
+  title: ''
+})
+
 const getParkProfile = async () => {
-  const res = await AppSetInfoApi('parkWelfare')
+  const res = await AppSetListInfo(infoData.value.id)
   if (res.success && res.value) {
     dataObj.value = res.value
   }
 }
 
-onMounted(() => {
+onLoad(async (val: any) => {
+  console.log('onLoad', val)
+  infoData.value.id = val.id
+  infoData.value.title = val.title + '详情'
   getParkProfile()
 })
 </script>
 
 <template>
   <ContentWrap>
-    <!-- <Header :isLeftIcon="false" title="福利" /> -->
+    <!-- 头部开始 -->
+    <Header :title="infoData.title" />
     <!-- 头部结束 -->
-
     <UniversalPark :data="dataObj" />
   </ContentWrap>
 </template>

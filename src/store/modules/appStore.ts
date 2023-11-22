@@ -25,6 +25,8 @@ const useAppStore = defineStore('app', {
       bottomHeight: 0,
       //底部整个的高度 rpx
       bottomTabbarHeight: 0,
+      //rpx
+      screenWidth: 0,
       //底部显示的值
       bottomTabbarTitle: '',
       //加载
@@ -82,10 +84,15 @@ const useAppStore = defineStore('app', {
       //#endif
       this.navbarHeight = this.menuHeight + this.menuTop + this.menuSafeHeight
       //获取安全区域边距信息 rpx
-      const systemInfo = uni.getSystemInfoSync().safeAreaInsets
-      this.notchHeight = systemInfo?.top ?? 0
-      this.bottomHeight = systemInfo?.bottom ?? 0
+      const systemInfo = uni.getSystemInfoSync()
+      const safeAreaInsets = systemInfo.safeAreaInsets
+      this.notchHeight = safeAreaInsets?.top ?? 0
+      this.bottomHeight = safeAreaInsets?.bottom ?? 0
       this.bottomTabbarHeight = this.bottomHeight + 120
+
+      //屏幕宽度
+      const getWindowInfo = uni.getWindowInfo()
+      this.screenWidth = getWindowInfo.screenWidth
 
       //身份信息
       const userIdentity = getUserIdentity()

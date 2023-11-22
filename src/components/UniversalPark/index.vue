@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useAppStore } from '@/store'
 import { AppSetInfoType } from '@/types/commonModel'
 import { isEmpty } from 'lodash-es'
 import { ref, watch } from 'vue'
@@ -9,17 +10,44 @@ const props = defineProps({
     default: {}
   }
 })
+
+const appStore = useAppStore()
+
 // 轮播图
 const current = ref(0) //当前所在滑块的 index
 const swiperImgList = ref([] as string[]) //轮播图图片
 const htmlContent = ref()
+const productHeight = ref()
+
+const getImageHeight = (imageItem: any) => {
+  if (imageItem.imageDim) {
+    return (imageItem.imageDim.height / imageItem.imageDim.width) * appStore.screenWidth
+  }
+  return ''
+}
 
 watch(
   () => props.data,
   () => {
     if (!isEmpty(props.data)) {
-      swiperImgList.value = props.data.imageArray.map((item) => item.listUrl)
       htmlContent.value = props.data.content
+      swiperImgList.value = props.data.imageArray.map((item) => item.previewUrl)
+
+      //图片显示高度
+      const min = uni.upx2px(300)
+      const max = (appStore.screenWidth * 4) / 3
+      const screenWidth = appStore.screenWidth
+      let height = min
+      for (const item of props.data.imageArray) {
+        if (item.imageDim) {
+          const temp = (item.imageDim.height / item.imageDim.width) * screenWidth
+          if (temp > height) {
+            height = temp
+          }
+        }
+      }
+      if (height > max) height = max
+      productHeight.value = height
     }
   },
   {
@@ -30,10 +58,10 @@ watch(
 </script>
 
 <template>
-  <view v-if="swiperImgList && swiperImgList.length > 0">
+  <view v-if="swiperImgList && swiperImgList.length > 1">
     <u-swiper
       :list="swiperImgList"
-      :height="`580rpx`"
+      :height="productHeight"
       imgMode="heightFix"
       :autoplay="true"
       indicatorActiveColor="#9D9D9D"
@@ -52,8 +80,16 @@ watch(
       </template>
     </u-swiper>
   </view>
-
-  <view class="p-3 mx-3 bg-white rounded-lg" v-if="props.data.title">
+  <view v-else-if="swiperImgList && swiperImgList.length === 1">
+    <u-image
+      width="100%"
+      mode="widthFix"
+      :height="getImageHeight(props.data.imageArray[0])"
+      :src="swiperImgList[0]"
+      :show-loading="true"
+    />
+  </view>
+  <view class="p-3 mx-3 mt-3 bg-white rounded-lg" v-if="props.data.title">
     <view class="text-36rpx font-550 pb-4">{{ props.data.title }}</view>
     <view v-html="htmlContent" />
   </view>

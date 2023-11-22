@@ -11,3 +11,5 @@ declare type ContentWrap = Element
 
 // declare module "第三方库"
 declare module 'uview-plus'
+
+// declare module 'html2text'

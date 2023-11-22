@@ -31,7 +31,7 @@ onLoad(() => {
     <!-- 头部结束 -->
     <view class="u-page" v-if="listData.length > 0">
       <template v-for="(item, index) in listData" :key="index">
-        <ImgTexe :item="item" />
+        <ImgTexe :item="item" title="招商政策" />
       </template>
     </view>
     <noData v-else />

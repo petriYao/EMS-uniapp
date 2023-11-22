@@ -20,3 +20,10 @@ export const AppSetListApi = (name: string, page?: number, size?: number) => {
 export const AppSetInfoApi = (name: string) => {
   return post<AppSetInfoType>('app-set/app-set-info', { name })
 }
+
+/**
+ * 显示详情
+ */
+export const AppSetListInfo = (id: string) => {
+  return post<AppSetInfoType>('app-set/app-set-list-info', { id })
+}

@@ -32,5 +32,11 @@ export default defineConfig({
         additionalData: '@import "@/styles/vars/_base.less";'
       }
     }
-  }
+  },
+    // ...其他配置
+    build: {
+      rollupOptions: {
+        external: ['html-to-text']
+      }
+    }
 })

@@ -21,7 +21,7 @@ onMounted(() => {
 
 <template>
   <ContentWrap>
-    <Header :isLeftIcon="false" title="服务" />
+    <!-- <Header :isLeftIcon="false" title="服务" /> -->
     <!-- 头部结束 -->
     <UniversalPark :data="dataObj" />
   </ContentWrap>
