@@ -89,8 +89,10 @@ watch(
       :show-loading="true"
     />
   </view>
-  <view class="p-3 mx-3 mt-3 bg-white rounded-lg" v-if="props.data?.title">
+  <view class="p-3 mx-3 mt-3 bg-white rdouned-lg" v-if="props.data?.title">
     <view class="text-36rpx font-550 pb-4">{{ props.data.title }}</view>
+    <!-- eslint-disable vue/no-v-text-v-html-on-component -->
+    <!-- eslint-disable vue/no-v-html -->
     <view v-html="htmlContent" />
   </view>
   <view class="w-full h-[200rpx]" />
