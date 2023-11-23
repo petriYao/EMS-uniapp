@@ -7,7 +7,7 @@ import { ref, watch } from 'vue'
 const props = defineProps({
   item: {
     type: Object as () => AppSetInfoType,
-    default: {}
+    default: {} as any
   },
   title: {
     type: String,

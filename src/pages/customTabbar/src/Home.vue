@@ -14,7 +14,9 @@ const uToastRef = ref()
 const getHeadCarouselImage = async () => {
   const res = await AppSetInfoApi('headCarouselImage')
   if (res.success && res.value) {
-    swiperImgList.value = res.value.imageArray.map((item: any) => item.listUrl)
+    swiperImgList.value = res.value.imageArray.map((item: any) => item.previewUrl)
+  } else {
+    swiperImgList.value = [getImageURL('home', 'home-carousel1')]
   }
 }
 
@@ -63,7 +65,7 @@ onMounted(() => {
     <!-- 标题栏 -->
     <!-- <Header title="首页" /> -->
     <!-- 轮播图 -->
-    <view class="mb-20rpx" v-if="swiperImgList && swiperImgList.length > 0">
+    <view class="mb-20rpx">
       <u-swiper
         :list="swiperImgList"
         :height="`580rpx`"

@@ -48,9 +48,9 @@ onMounted(() => {
     </Header>
     <view class="m-30rpx p-30rpx bg-white flex-rows justify-around rounded-20rpx">
       <view class="flex-column" v-for="(item, index) in buttonList" :key="index">
-        <view class="mb-20rpx"
-          ><u-icon :name="getSvgURL('Qrcode', `${item.icon}`)" :size="50"
-        /></view>
+        <view class="mb-20rpx" @tap="onRefresh">
+          <u-icon :name="getSvgURL('Qrcode', `${item.icon}`)" :size="50" />
+        </view>
         <view class="font-600 text-30rpx">{{ item.title }}</view>
       </view>
     </view>
