@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 import { getUserIdentity } from '@/hooks/useCache'
 import router from '@/router'
 import { getImageURL } from '@/utils'
+import { getAppStatusBarHeight } from '@/interaction'
 
 const useAppStore = defineStore('app', {
   state: () => {
@@ -89,7 +90,9 @@ const useAppStore = defineStore('app', {
       this.notchHeight = safeAreaInsets?.top ?? 0
       this.bottomHeight = safeAreaInsets?.bottom ?? 0
       this.bottomTabbarHeight = this.bottomHeight + 120
-
+      //#ifdef H5
+      this.menuTop = Number(getAppStatusBarHeight())
+      //#endif
       //屏幕宽度
       const getWindowInfo = uni.getWindowInfo()
       this.screenWidth = getWindowInfo.screenWidth

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useSlots } from 'vue'
 import router from '../../router'
+import { useAppStore } from '@/store'
 
 const props = defineProps({
   title: {
@@ -37,12 +38,11 @@ const props = defineProps({
   }
 })
 const slots = useSlots() //检查是否有插槽
-
+const appStore = useAppStore()
 const onLeftClick = () => {
   router.back()
 }
 </script>
-
 <template>
   <u-navbar
     :fixed="props.fixed"
@@ -50,16 +50,29 @@ const onLeftClick = () => {
     :placeholder="props.placeholder"
     :border="props.border"
     :leftIconSize="0"
-    @leftClick="onLeftClick"
+    :height="appStore.menuTop + 40 + 'px'"
+    @left-click="onLeftClick"
   >
     <template #left>
       <slot name="left">
-        <u-icon name="arrow-left" size="36rpx" v-if="props.isLeftIcon" />
+        <view
+          :style="`padding-top:${appStore.menuTop + 'px'}`"
+          v-if="props.title"
+          class="items-center text-center"
+        >
+          <u-icon name="arrow-left" size="36rpx" v-if="props.isLeftIcon" />
+        </view>
       </slot>
     </template>
     <template #center>
       <slot name="center">
-        <view v-if="props.title">{{ props.title }}</view>
+        <view
+          :style="`padding-top:${appStore.menuTop + 'px'}`"
+          v-if="props.title"
+          class="items-center text-center"
+        >
+          <view>{{ props.title }}</view>
+        </view>
       </slot>
     </template>
     <template #right v-if="slots.right">
@@ -69,13 +82,13 @@ const onLeftClick = () => {
 </template>
 
 <style lang="scss" scoped>
-:deep(.u-navbar__placeholder) {
-  padding-top: 55px !important;
-}
-:deep(.u-navbar__content__left) {
-  padding: 55px 13px 0 13px;
-}
-:deep(.u-navbar__content) {
-  padding-top: 55px !important;
-}
+// :deep(.u-navbar__placeholder) {
+//   padding-top: 55px !important;
+// }
+// :deep(.u-navbar__content__left) {
+//   padding: 55px 13px 0 13px;
+// }
+// :deep(.u-navbar__content) {
+//   padding-top: 55px !important;
+// }
 </style>

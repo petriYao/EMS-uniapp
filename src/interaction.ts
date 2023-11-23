@@ -35,6 +35,12 @@ export const setAppStatusBarTitleColor = (isWhite: boolean) => {
   prompt('setAppStatusBarTitleColor', 'setAppStatusBarTitleColor@' + (isWhite ? '1' : '0'))
 }
 
+//获取App顶部状态栏的高度
+export const getAppStatusBarHeight = () => {
+  if (isDebug()) return
+  return prompt('getStatusBarHeight', 'getStatusBarHeight') ?? 0
+}
+
 //更新版本
 export const openAppUpdater = (url: string) => {
   if (isDebug()) return
