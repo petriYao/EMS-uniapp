@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { getImageURL, getSvgURL } from '@/utils'
 import router from '@/router'
-import { onShow } from '@dcloudio/uni-app'
+// import { onShow } from '@dcloudio/uni-app'
 import { clearUserIdentity, getUserIdentity } from '@/hooks/useCache'
-import { ref } from 'vue'
+import { onBeforeMount, ref } from 'vue'
 import { logoutApi } from '@/api'
 import { reactive } from 'vue'
 import { UserIdentityType } from '@/types/userModel'
@@ -48,14 +48,10 @@ const onLogin = () => {
   //微信的时候跳转
   // #ifdef MP
   router.push({
-    url: '/pages/login/login'
+    url: `/pages/login/login?isPhone=true`
   })
   // #endif
 }
-
-onShow(async () => {
-  userInfo.value = getUserIdentity()
-})
 
 /**退出 */
 const onExit = () => {
@@ -85,6 +81,10 @@ const onSetting = (title: string) => {
     })
   }
 }
+
+onBeforeMount(async () => {
+  userInfo.value = await getUserIdentity()
+})
 </script>
 
 <template>

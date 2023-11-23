@@ -45,6 +45,13 @@
       }
     },
     {
+      "path": "pages/exhibition/index",
+      "style": {
+        "navigationBarTitleText": "",
+        "navigationStyle": "custom"
+      }
+    },
+    {
       "path": "pages/enterprisesDemeanour/index",
       "style": {
         "navigationBarTitleText": "",

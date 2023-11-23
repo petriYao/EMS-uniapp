@@ -36,6 +36,9 @@ const onJump = (title: string) => {
     case '企业风采':
       src = 'enterprisesDemeanour/index'
       break
+    case '园区展览':
+      src = 'exhibition/index'
+      break
     default:
       uToastRef.value.show({
         type: 'default',

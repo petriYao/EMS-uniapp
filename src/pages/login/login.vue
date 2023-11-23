@@ -1,14 +1,38 @@
 <script setup lang="ts">
 import BottomButton from '@/components/BottomButton/index.vue'
 import LoginPhone from '@/components/LoginMethod/LoginPhone.vue'
+import WxLogin from './components/WxLogin.vue'
 import { getImageURL, getSvgURL } from '@/utils'
-import { ref } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
+import { reactive, ref } from 'vue'
 
-const isPhone = ref(false)
-const protocol = ref(false)
+const reactiveData = reactive({
+  isPhone: false, //是否是手机号登录
+  protocol: false, //是否同意协议
+  isWX: false, //是否是微信
+  loginShow: false //获取手机号弹窗
+})
+
+const wxLoginRef = ref()
+
 const onLoginMethod = () => {
-  isPhone.value = !isPhone.value
+  reactiveData.isPhone = !reactiveData.isPhone
 }
+
+//微信登录
+const wxLoginClick = () => {
+  if (!reactiveData.protocol) {
+    return wx.showToast({ title: '请阅读并勾选协议', icon: 'none' })
+  }
+  wxLoginRef.value.loginClick()
+}
+
+onLoad((val: any) => {
+  if (val.isPhone) {
+    reactiveData.isPhone = true
+    reactiveData.isWX = true
+  }
+})
 </script>
 
 <template>
@@ -21,15 +45,15 @@ const onLoginMethod = () => {
         <view class="mt-40rpx text-42rpx font-600">您好，欢迎登录数小宝</view>
       </view>
       <view class="bg-#fff">
-        <view class="phone" v-show="!isPhone">
+        <view class="phone" v-show="!reactiveData.isPhone">
           <LoginPhone />
         </view>
-        <view class="wxchat" v-show="isPhone">
+        <view class="wxchat" v-show="reactiveData.isPhone">
           <view class="px-80rpx mt-80rpx flex-column">
-            <u-button type="primary" shape="circle">微信登录</u-button>
+            <u-button type="primary" shape="circle" @click="wxLoginClick">微信登录</u-button>
 
             <view class="mt-50rpx">
-              <u-checkbox-group v-model="protocol" shape="square" size="36rpx">
+              <u-checkbox-group v-model="reactiveData.protocol" shape="square" size="36rpx">
                 <view class="flex-rows">
                   <u-checkbox
                     shape="circle"
@@ -57,18 +81,21 @@ const onLoginMethod = () => {
           <u-icon
             :name="getSvgURL('login', 'login-WeChat')"
             size="80rpx"
-            v-if="!isPhone"
+            v-if="!reactiveData.isPhone"
             @click="onLoginMethod()"
           />
           <u-icon
             :name="getSvgURL('login', 'login-phone')"
             size="80rpx"
-            v-if="isPhone"
+            v-if="reactiveData.isPhone"
             @click="onLoginMethod()"
           />
         </view>
       </view>
     </BottomButton>
+
+    <!-- 绑定手机弹窗 -->
+    <WxLogin ref="wxLoginRef" />
   </ContentWrap>
 </template>
 
@@ -102,5 +129,9 @@ const onLoginMethod = () => {
   box-shadow: 0px 5px 5px rgba(25, 108, 255, 0.16);
   border: unset;
   height: 90rpx;
+}
+
+:deep(.u-modal__button-group--confirm-button) {
+  padding: 0 !important;
 }
 </style>

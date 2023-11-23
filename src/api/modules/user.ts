@@ -1,7 +1,7 @@
 import { getUserIdentity } from '@/hooks/useCache'
 import { useAxios } from '@/hooks/useAxios'
 import { UserIdentityType, UserInfoApiType, UserInfoType } from '@/types/userModel'
-import { AppSetInfoType } from '@/types/commonModel'
+// import { AppSetInfoType } from '@/types/commonModel'
 
 const { post } = useAxios()
 /**
@@ -22,6 +22,23 @@ export const loginApi = (userPhoneNumber: string, userPassword: string): any => 
   return post<UserIdentityType>('login', {
     userPhoneNumber,
     userPassword
+  })
+}
+/**
+ * 微信登录
+ */
+export function wxLogin(loginCode: string): any {
+  return post<any>('wx-login', {
+    loginCode
+  })
+}
+
+/**
+ * 微信绑定账号
+ */
+export function wxBindAccount(phoneCode: string): any {
+  return post<any>('wx-bind-account', {
+    phoneCode
   })
 }
 

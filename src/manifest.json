@@ -40,9 +40,6 @@
       "ios": {
         "dSYMs": false
       },
-      "sdkConfigs": {
-        "ad": {}
-      },
       "icons": {
         "android": {
           "hdpi": "unpackage/res/icons/72x72.png",
@@ -89,6 +86,16 @@
     "requiredPrivateInfos": ["getLocation", "chooseLocation"],
     "usingComponents": true
   },
+  "h5": {
+    "sdkConfigs": {
+      "maps": {
+              "qqmap": {
+                  "key": "4LSBZ-EWYWB-6EEU7-JOV4X-74XG7-ZHFEH"
+              }            
+      }
+    }
+  },
+    
   "uniStatistics": {
     "enable": false
   },
