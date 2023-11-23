@@ -7,7 +7,7 @@ import { ref, watch } from 'vue'
 const props = defineProps({
   data: {
     type: Object as () => AppSetInfoType,
-    default: {}
+    default: {} as any
   }
 })
 
@@ -31,14 +31,14 @@ watch(
   () => {
     if (!isEmpty(props.data)) {
       htmlContent.value = props.data.content
-      swiperImgList.value = props.data.imageArray.map((item) => item.previewUrl)
+      swiperImgList.value = props.data?.imageArray?.map((item) => item.previewUrl) ?? []
 
       //图片显示高度
       const min = uni.upx2px(300)
       const max = (appStore.screenWidth * 4) / 3
       const screenWidth = appStore.screenWidth
       let height = min
-      for (const item of props.data.imageArray) {
+      for (const item of props.data?.imageArray ?? []) {
         if (item.imageDim) {
           const temp = (item.imageDim.height / item.imageDim.width) * screenWidth
           if (temp > height) {
@@ -84,12 +84,12 @@ watch(
     <u-image
       width="100%"
       mode="widthFix"
-      :height="getImageHeight(props.data.imageArray[0])"
+      :height="getImageHeight(props.data?.imageArray[0])"
       :src="swiperImgList[0]"
       :show-loading="true"
     />
   </view>
-  <view class="p-3 mx-3 mt-3 bg-white rounded-lg" v-if="props.data.title">
+  <view class="p-3 mx-3 mt-3 bg-white rounded-lg" v-if="props.data?.title">
     <view class="text-36rpx font-550 pb-4">{{ props.data.title }}</view>
     <view v-html="htmlContent" />
   </view>

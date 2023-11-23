@@ -3,13 +3,13 @@
  */
 
 //是否显示日志
-export const isShowApiLog = false
+export const isShowApiLog = true
 
 //是否显示聊天日志
 export const isShowChatLog = false
 
 //环境路径 false线上，true线下
-const debug = true
+const debug = false
 
 //图片svg路径 false线上，true线下
 const urlDebug = true

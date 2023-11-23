@@ -13,7 +13,7 @@ const uToastRef = ref()
 
 const getHeadCarouselImage = async () => {
   const res = await AppSetInfoApi('headCarouselImage')
-  if (res.success && res.value) {
+  if (res.success && res.value && res.value.imageArray) {
     swiperImgList.value = res.value.imageArray.map((item: any) => item.previewUrl)
   } else {
     swiperImgList.value = [getImageURL('home', 'home-carousel1')]

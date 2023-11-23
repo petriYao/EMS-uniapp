@@ -50,7 +50,10 @@ export const getIsPublic = (url: string | undefined) => {
     url === 'register' ||
     url === 'user/find-password' ||
     url === 'send-sms-code' ||
-    url === 'check-sms-code'
+    url === 'check-sms-code' ||
+    url === 'app/app-info' ||
+    url === 'app/app-list' ||
+    url === 'app/app-list-info'
   ) {
     // 公开接口
     return true
