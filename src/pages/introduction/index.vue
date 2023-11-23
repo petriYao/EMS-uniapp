@@ -4,6 +4,7 @@ import { AppSetInfoType } from '@/types/commonModel'
 import { onLoad } from '@dcloudio/uni-app'
 import { ref } from 'vue'
 import UniversalPark from '@components/UniversalPark/index.vue'
+import noData from '@components/noData/NoData.vue'
 
 // 轮播图
 const dataObj = ref({} as AppSetInfoType)
@@ -25,7 +26,10 @@ onLoad(async () => {
     <!-- 头部开始 -->
     <Header title="园区简介" />
     <!-- 头部结束 -->
-    <UniversalPark :data="dataObj" />
+    <view v-if="dataObj.createdAt">
+      <UniversalPark :data="dataObj" />
+    </view>
+    <noData v-else />
   </ContentWrap>
 </template>
 

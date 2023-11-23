@@ -3,6 +3,7 @@ import { AppSetInfoApi } from '@/api'
 import { AppSetInfoType } from '@/types/commonModel'
 import { onMounted, ref } from 'vue'
 import UniversalPark from '@components/UniversalPark/index.vue'
+import noData from '@components/noData/NoData.vue'
 
 // 轮播图
 const dataObj = ref({} as AppSetInfoType)
@@ -23,8 +24,10 @@ onMounted(() => {
   <ContentWrap>
     <!-- <Header :isLeftIcon="false" title="福利" /> -->
     <!-- 头部结束 -->
-
-    <UniversalPark :data="dataObj" />
+    <view v-if="dataObj.createdAt">
+      <UniversalPark :data="dataObj" />
+    </view>
+    <noData v-else />
   </ContentWrap>
 </template>
 

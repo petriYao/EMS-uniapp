@@ -22,6 +22,7 @@ const center = ref({
       class="w-100% h-100vh"
     ></map>
   </view>
+
   <!-- <map
       id="myMap"
       :longitude="lng"
