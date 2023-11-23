@@ -3,7 +3,7 @@
  */
 
 //是否显示日志
-export const isShowApiLog = true
+export const isShowApiLog = false
 
 //是否显示聊天日志
 export const isShowChatLog = false
