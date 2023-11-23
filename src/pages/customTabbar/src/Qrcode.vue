@@ -4,6 +4,9 @@ import { ref } from 'vue'
 import NoticeBar from '@/components/NoticeBar/index.vue'
 import { onMounted } from 'vue'
 import Uqrcode from '@/components/UQRCode/components/uqrcode/uqrcode.vue'
+import { useAppStore } from '@/store'
+
+const appStore = useAppStore()
 
 const keyword = ref('')
 const buttonList = [
@@ -41,9 +44,16 @@ onMounted(() => {
   <ContentWrap>
     <Header :isLeftIcon="false" bgColor="#f6f7fb">
       <template #center>
-        <view class="w-93vw p-30rpx">
-          <u-search placeholder="搜索您想要的" v-model="keyword" :showAction="false" bgColor="#FFF"
-        /></view>
+        <view :style="`padding-top:${appStore.menuTop + 'px'}`" class="items-center text-center">
+          <view class="w-93vw p-30rpx">
+            <u-search
+              placeholder="搜索您想要的"
+              v-model="keyword"
+              :showAction="false"
+              bgColor="#FFF"
+            />
+          </view>
+        </view>
       </template>
     </Header>
     <view class="m-30rpx p-30rpx bg-white flex-rows justify-around rounded-20rpx">
