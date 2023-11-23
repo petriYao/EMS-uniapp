@@ -7,7 +7,9 @@ const center = ref({
 })
 </script>
 <template>
-  <view class="container">
+  <Header title="园区地图" />
+
+  <view class="w-100% fixed">
     <map
       id="myMap"
       :longitude="center.lng"
