@@ -11,7 +11,13 @@ import { getHttpHeader, getIsPublic } from '@/utils/httpUtils'
 import { showApiLog, isString } from '@/utils'
 import { showError, showNoLogin } from '@/hooks/useModal'
 import { getPathUrl, isDebug } from '@/config/config'
-import { ResponseDataType, result_code_no_login, result_code_success } from '@/types/httpModel'
+import {
+  ResponseDataType,
+  result_code_no_login,
+  result_code_success,
+  result_code_version_error
+} from '@/types/httpModel'
+import { openAppUpdater } from '@/interaction'
 
 type ParamsSerializer = AxiosRequestConfig['paramsSerializer']
 
@@ -120,6 +126,23 @@ service.interceptors.response.use(
       showNoLogin(responseData.message)
       return responseData as any
     }
+    //#ifdef H5
+    if (responseData.code === result_code_version_error) {
+      //模态框
+      uni.showModal({
+        title: '提示',
+        content: responseData.message,
+        showCancel: false,
+        success: function (res) {
+          if (res.confirm) {
+            openAppUpdater(responseData.value.url)
+          }
+        },
+        complete: () => {}
+      })
+      return
+    }
+    //#endif
     //未成功显示错误
     if (!responseData.success) {
       showError(responseData?.message ?? '网络错误')

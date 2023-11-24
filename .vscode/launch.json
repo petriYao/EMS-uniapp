@@ -33,6 +33,12 @@
             "name": "weixin打包",
             "request": "launch",
             "type": "node-terminal"
+        },
+        {
+            "command": "pnpm run build:h5",
+            "name": "h5打包",
+            "request": "launch",
+            "type": "node-terminal"
         }
     ]
 }
