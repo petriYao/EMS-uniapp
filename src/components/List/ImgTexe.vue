@@ -51,7 +51,9 @@ watch(
           height="300rpx"
         />
       </view>
-      <view class="font-semibold text-[#000000] mt-2 text_ellipsis">{{ dataObj.title }}</view>
+      <view class="font-semibold text-[20rpx] text-[#000000] mt-2 text_ellipsis">{{
+        dataObj.title
+      }}</view>
       <view class="text_ellipsis my-2">
         {{ htmlContent }}
       </view>
