@@ -13,6 +13,7 @@ const getParkProfile = async () => {
   const res = await AppSetInfoApi('parkProfile')
   if (res.success && res.value) {
     dataObj.value = res.value
+    console.log(dataObj.value)
   }
 }
 
@@ -26,7 +27,7 @@ onLoad(async () => {
     <!-- 头部开始 -->
     <Header title="园区简介" />
     <!-- 头部结束 -->
-    <view v-if="dataObj.createdAt">
+    <view v-if="dataObj.content || dataObj.imageArray || dataObj.title">
       <UniversalPark :data="dataObj" />
     </view>
     <noData v-else />
