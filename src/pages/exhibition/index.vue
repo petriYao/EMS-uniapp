@@ -7,7 +7,7 @@ const center = ref({
 })
 </script>
 <template>
-  <Header title="园区地图" />
+  <Header title="园区展览" />
 
   <view class="w-100% fixed">
     <map
