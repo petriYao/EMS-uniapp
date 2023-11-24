@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 import { getUserIdentity } from '@/hooks/useCache'
 import router from '@/router'
 import { getImageURL } from '@/utils'
-import { getAppStatusBarHeight } from '@/interaction'
+import { getAppStatusBarHeight, setAppStatusBarTitleColor } from '@/interaction'
 
 const useAppStore = defineStore('app', {
   state: () => {
@@ -91,6 +91,7 @@ const useAppStore = defineStore('app', {
       this.bottomHeight = safeAreaInsets?.bottom ?? 0
       this.bottomTabbarHeight = this.bottomHeight + 120
       //#ifdef H5
+      setAppStatusBarTitleColor(false)
       this.menuTop = Number(getAppStatusBarHeight())
       //#endif
       //屏幕宽度

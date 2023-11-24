@@ -44,19 +44,13 @@ onMounted(() => {
   <ContentWrap>
     <Header :isLeftIcon="false" bgColor="#f6f7fb">
       <template #center>
-        <view :style="`padding-top:${appStore.menuTop + 'px'}`" class="items-center text-center">
-          <view class="w-93vw p-30rpx">
-            <u-search
-              placeholder="搜索您想要的"
-              v-model="keyword"
-              :showAction="false"
-              bgColor="#FFF"
-            />
-          </view>
-        </view>
+        <view class="w-93vw p-30rpx">
+          <u-search placeholder="搜索您想要的" v-model="keyword" :showAction="false" bgColor="#FFF"
+        /></view>
       </template>
     </Header>
-    <view class="m-30rpx p-30rpx bg-white flex-rows justify-around rounded-20rpx">
+    <view class="h-30rpx" />
+    <view class="m-30rpx mt-0 p-30rpx bg-white flex-rows justify-around rounded-20rpx">
       <view class="flex-column" v-for="(item, index) in buttonList" :key="index">
         <view class="mb-20rpx" @tap="onRefresh">
           <u-icon :name="getSvgURL('Qrcode', `${item.icon}`)" :size="50" />
