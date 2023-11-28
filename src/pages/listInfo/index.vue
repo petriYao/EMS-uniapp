@@ -34,10 +34,15 @@ onLoad(async (val: any) => {
     <!-- 头部开始 -->
     <Header :title="infoData.title" />
     <!-- 头部结束 -->
-    <view v-if="dataObj.content || dataObj.imageArray || dataObj.title">
-      <UniversalPark :data="dataObj" />
+    <view v-if="!dataObj.jumpContent">
+      <view v-if="dataObj.content || dataObj.imageArray || dataObj.title">
+        <UniversalPark :data="dataObj" />
+      </view>
+      <noData v-else />
     </view>
-    <noData v-else />
+    <view v-else>
+      <web-view src="http://192.168.3.5:8080/cs/" />
+    </view>
   </ContentWrap>
 </template>
 

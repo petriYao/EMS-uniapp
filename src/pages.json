@@ -45,6 +45,13 @@
       }
     },
     {
+      "path": "pages/listInfo/JumpUrl",
+      "style": {
+        "navigationBarTitleText": "",
+        "navigationStyle": "custom"
+      }
+    },
+    {
       "path": "pages/exhibition/index",
       "style": {
         "navigationBarTitleText": "",

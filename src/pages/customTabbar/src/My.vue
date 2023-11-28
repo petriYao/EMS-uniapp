@@ -4,9 +4,10 @@ import router from '@/router'
 // import { onShow } from '@dcloudio/uni-app'
 import { clearUserIdentity, getUserIdentity } from '@/hooks/useCache'
 import { onBeforeMount, ref } from 'vue'
-import { logoutApi } from '@/api'
+// import { logoutApi } from '@/api'
 import { reactive } from 'vue'
 import { UserIdentityType } from '@/types/userModel'
+import { onShow } from '@dcloudio/uni-app'
 
 const userInfo = ref<UserIdentityType | null>()
 const dialog = reactive({
@@ -60,7 +61,7 @@ const onExit = () => {
 
 /**弹框确认 */
 const onConfirm = async () => {
-  await logoutApi()
+  // await logoutApi()
   clearUserIdentity()
   userInfo.value = null
   dialog.show = false
@@ -83,6 +84,10 @@ const onSetting = (title: string) => {
 }
 
 onBeforeMount(async () => {
+  userInfo.value = await getUserIdentity()
+})
+
+onShow(async () => {
   userInfo.value = await getUserIdentity()
 })
 </script>

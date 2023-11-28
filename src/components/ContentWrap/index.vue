@@ -89,16 +89,18 @@ onUnmounted(() => {
       <view v-if="modalData.type == 0">
         <u-loading-icon :title="modalData.title" color="#196CFF" size="60rpx" />
       </view>
-      <view
-        v-else
-        class="rounded-20rpx px-20rpx bg-#FFF text-32rpx mx-40rpx box-sizing: border-box;"
-      >
+      <view v-else class="rounded-20rpx box-border px-20rpx bg-#FFF text-32rpx w-90vw">
         <view class="pt-30rpx text-center text-34rpx font-bold">{{ modalData.title }}</view>
-        <view
-          class="text-#999999 py-30rpx flex items-center justify-center min-h-100rpx w-100% min-w-450rpx"
-        >
-          {{ modalData.content }}
-        </view>
+        <scroll-view scroll-y class="min-h-200rpx max-h-800rpx">
+          <view
+            class="text-#999999 py-30rpx flex items-center justify-center min-h-100rpx w-100% min-w-450rpx"
+          >
+            <text class="max-w-560rpx" style="word-wrap: break-word; white-space: normal">{{
+              modalData.content
+            }}</text>
+          </view>
+        </scroll-view>
+
         <view class="flex py-20rpx" style="border-top: 1rpx solid #f3efef">
           <view
             class="text-center text-#999999 w-50%"

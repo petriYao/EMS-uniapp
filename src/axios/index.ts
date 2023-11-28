@@ -114,6 +114,9 @@ service.interceptors.response.use(
     }
     const url = response.config.url ?? ''
     const responseData = response.data as ResponseDataType
+    console.log('是否成功1', responseData.success)
+    console.log('是否成功2', responseData)
+
     //未登录
     if (responseData.code === result_code_no_login) {
       //扫码提示
@@ -143,6 +146,7 @@ service.interceptors.response.use(
       return
     }
     //#endif
+
     //未成功显示错误
     if (!responseData.success) {
       showError(responseData?.message ?? '网络错误')

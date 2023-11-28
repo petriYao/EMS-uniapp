@@ -8,5 +8,6 @@
   //   "editor.defaultFormatter": "johnsoncodehk.volar"
   // },
   "god.tsconfig": "./tsconfig.json",
-  "i18n-ally.localesPaths": []
+  "i18n-ally.localesPaths": [],
+  "editor.inlineSuggest.showToolbar": "always"
 }

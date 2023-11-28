@@ -34,7 +34,7 @@ onMounted(() => {
     <!-- 头部开始 -->
     <Header title="园区E闻" />
     <!-- 头部结束 -->
-    <view class="u-page" v-if="listData.length > 0">
+    <view class="u-page pt-1.5" v-if="listData.length > 0">
       <u-list @scrolltolower="scrolltolower">
         <u-list-item v-for="(item, index) in listData" :key="index">
           <ImgTexe :item="item" title="园区E闻" />

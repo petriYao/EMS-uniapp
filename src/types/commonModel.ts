@@ -28,4 +28,8 @@ export type AppSetInfoType = {
   imageArray: productImageType[]
   name: string
   title: string
+  listType?: number
+  jumpUrl?: string
+  publishOrigin?: string
+  jumpContent?: string
 }
