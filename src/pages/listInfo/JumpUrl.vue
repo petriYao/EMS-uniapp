@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import { onLoad } from '@dcloudio/uni-app'
 import { ref } from 'vue'
+import { getBaseUrl } from '@/config/config'
+import { useAppStore } from '@/store'
 
-const jumpUrl = ref('')
+const id = ref('')
 const title = ref('')
+const appStore = useAppStore()
 
 onLoad(async (val: any) => {
   console.log('onLoad', val)
-  jumpUrl.value = decodeURIComponent(val.jumpUrl)
   title.value = val.title
+  id.value = val.id
 })
 </script>
 
@@ -18,7 +21,12 @@ onLoad(async (val: any) => {
     <!-- #ifdef H5 -->
     <Header :title="title" />
     <!-- #endif -->
-    <web-view :src="jumpUrl" />
+    <view>
+      <web-view
+        :style="`margin-top:${appStore.menuTop + 44}px`"
+        :src="getBaseUrl() + '/app/app-jump-content?id=' + id"
+      />
+    </view>
   </ContentWrap>
 </template>
 

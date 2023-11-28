@@ -11,7 +11,7 @@ const useAppStore = defineStore('app', {
       //缓存图片
       cacheImageList: {} as any,
       //小程序胶囊菜单按钮的高度
-      menuTop: 0,
+      menuTop: 0 as number,
       //小程序胶囊菜单按钮的上边界坐标
       menuHeight: 0,
       //小程序胶囊宽度
@@ -92,7 +92,7 @@ const useAppStore = defineStore('app', {
       this.bottomTabbarHeight = this.bottomHeight + 120
       //#ifdef H5
       setAppStatusBarTitleColor(false)
-      this.menuTop = Number(getAppStatusBarHeight())
+      this.menuTop = Number(getAppStatusBarHeight()) || 0
       //#endif
       //屏幕宽度
       const getWindowInfo = uni.getWindowInfo()

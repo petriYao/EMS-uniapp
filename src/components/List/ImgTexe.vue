@@ -24,9 +24,8 @@ const infoClick = () => {
       url: `/pages/listInfo/index?title=${props.title}&id=${dataObj.value.id}`
     })
   } else {
-    const val = encodeURIComponent(dataObj.value.jumpUrl)
     router.push({
-      url: `/pages/listInfo/JumpUrl?jumpUrl=${val}&title=${dataObj.value.title}`
+      url: `/pages/listInfo/JumpUrl?id=${dataObj.value.id}&title=${dataObj.value.title}`
     })
     // window.location.href = dataObj.value.jumpUrl!
   }
@@ -48,19 +47,23 @@ watch(
 </script>
 
 <template>
+  <view class="my-2 w-[100%] text-[#929CB5] text-[24rpx] flex justify-center">{{
+    dataObj.createdAt
+  }}</view>
+
   <view class="mx-3 my-1.5" v-if="!isEmpty(dataObj)" @click="infoClick">
-    <div class="bg-white p-3 rounded-20rpx" v-if="dataObj.listType === 0">
-      <view class="">
+    <div class="bg-white rounded-20rpx" v-if="dataObj.listType === 0">
+      <view class="image-title">
         <u-image
           :show-loading="true"
           :src="dataObj.imageArray?.[0].listUrl"
-          radius="20rpx"
+          radius="8px 8px 0 0"
           width="100%"
           height="300rpx"
         />
       </view>
-      <view>
-        <view class="font-semibold text-[16px] text-[#000000] mt-2 text_ellipsis">
+      <view class="p-3 pt-2">
+        <view class="font-semibold text-[16px] text-[#000000] text_ellipsis">
           {{ dataObj.title }}
         </view>
         <view class="text_ellipsis text-[#929CB5] my-2">
@@ -69,12 +72,11 @@ watch(
 
         <view class="flex justify-between text-[#929CB5] text-[24rpx]">
           <view>{{ dataObj.publishOrigin }}</view>
-          <view>{{ dataObj.createdAt }}</view>
         </view>
       </view>
     </div>
     <div class="bg-white p-3 rounded-20rpx flex justify-between" v-if="dataObj.listType === 1">
-      <view class="flex-col flex justify-between">
+      <view class="flex-col flex justify-between flex-1">
         <view>
           <view class="font-semibold text-[16px] text-[#000000] text_ellipsis">
             {{ dataObj.title }}
@@ -85,7 +87,6 @@ watch(
         </view>
         <view class="flex justify-between text-[#929CB5] text-[24rpx]">
           <view>{{ dataObj.publishOrigin }}</view>
-          <view>{{ dataObj.createdAt }}</view>
         </view>
       </view>
       <view class="ml-20rpx">
@@ -105,6 +106,9 @@ watch(
 // :deep(.u-image__image) {
 //   border-radius: 20rpx 20rpx 0 0 !important;
 // }
+.image-title {
+  border-radius: 8px 8px 0 0;
+}
 .text_ellipsis {
   display: -webkit-box;
   -webkit-box-orient: vertical;
