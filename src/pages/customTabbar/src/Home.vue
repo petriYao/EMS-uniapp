@@ -8,15 +8,13 @@ import { onMounted, ref } from 'vue'
 const current = ref(0)
 
 const keyword = ref('')
-const swiperImgList = ref([] as string[])
+const swiperImgList = ref([getImageURL('home', 'home-carousel1')])
 const uToastRef = ref()
 
 const getHeadCarouselImage = async () => {
   const res = await AppSetInfoApi('headCarouselImage')
   if (res.success && res.value && res.value.imageArray) {
     swiperImgList.value = res.value.imageArray.map((item: any) => item.previewUrl)
-  } else {
-    swiperImgList.value = [getImageURL('home', 'home-carousel1')]
   }
 }
 
