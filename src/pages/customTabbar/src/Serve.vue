@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { AppSetInfoApi } from '@/api'
+import { ref, onMounted } from 'vue'
+
 import { AppSetInfoType } from '@/types/commonModel'
-import { onMounted, ref } from 'vue'
+import { AppSetInfoApi } from '@/api'
+
 import UniversalPark from '@components/UniversalPark/index.vue'
 import noData from '@components/noData/NoData.vue'
 

@@ -1,13 +1,11 @@
 <script setup lang="ts">
-import { getImageURL, getSvgURL } from '@/utils'
-import router from '@/router'
-// import { onShow } from '@dcloudio/uni-app'
-import { clearUserIdentity, getUserIdentity } from '@/hooks/useCache'
-import { onBeforeMount, ref } from 'vue'
-// import { logoutApi } from '@/api'
-import { reactive } from 'vue'
-import { UserIdentityType } from '@/types/userModel'
+import { ref, reactive, onBeforeMount } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
+
+import { clearUserIdentity, getUserIdentity } from '@/hooks/useCache'
+import { getImageURL, getSvgURL } from '@/utils'
+import { UserIdentityType } from '@/types/userModel'
+import router from '@/router'
 
 const userInfo = ref<UserIdentityType | null>()
 const dialog = reactive({

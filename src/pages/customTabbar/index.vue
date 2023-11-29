@@ -1,12 +1,12 @@
 <script setup lang="ts">
+import { useAppStore } from '@/store'
 import { getSvgURL } from '@/utils'
-import { ref } from 'vue'
+
 import Home from './src/Home.vue'
 import Serve from './src/Serve.vue'
 import Qrcode from './src/Qrcode.vue'
 import Welfare from './src/Welfare.vue'
 import My from './src/My.vue'
-import { useAppStore } from '@/store'
 
 const appStore = useAppStore()
 // 底部导航栏
@@ -71,11 +71,11 @@ const isShow = (name: string) => {
 
 <template>
   <ContentWrap>
-    <Home v-if="isShow('首页')" />
-    <Serve v-if="isShow('服务')" />
-    <Qrcode v-if="isShow('一码通')" />
-    <Welfare v-if="isShow('福利')" />
-    <My v-if="isShow('我的')" />
+    <Home v-show="isShow('首页')" />
+    <Serve v-show="isShow('服务')" />
+    <Qrcode v-show="isShow('一码通')" />
+    <Welfare v-show="isShow('福利')" />
+    <My v-show="isShow('我的')" />
     <!-- 底部导航栏 -->
     <view class="tabbar">
       <view class="tabbar__content tabbar--fixed">

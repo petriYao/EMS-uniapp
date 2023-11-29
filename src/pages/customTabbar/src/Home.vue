@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { AppSetInfoApi } from '@/api'
-import router from '@/router'
-import { getImageURL, getSvgURL } from '@/utils'
-import { onMounted, ref } from 'vue'
+import { ref, onMounted } from 'vue'
+
 import { useAppStore } from '@/store'
 import { useEmitt } from '@/hooks/useEmitt'
+import { getImageURL, getSvgURL } from '@/utils'
+import { AppSetInfoApi } from '@/api'
+import router from '@/router'
 
 const appStore = useAppStore()
 const { emitter } = useEmitt()
@@ -46,10 +47,8 @@ const onJump = (title: string) => {
       break
     case '停车缴费':
       appStore.bottomTabbarTitle = '一码通'
-      setTimeout(() => {
-        emitter.emit('Qrcode:Change', 1)
-      }, 100)
-      break
+      emitter.emit('Qrcode:Change', 1)
+      return
     case '会议预定':
       src = 'home/meetingBooking/index'
       break
@@ -68,12 +67,13 @@ const onJump = (title: string) => {
         title: '默认主题',
         message: '待开发'
       })
-      break
+      return
   }
-
-  router.push({
-    url: `/pages/${src}`
-  })
+  if (src.length > 0) {
+    router.push({
+      url: `/pages/${src}`
+    })
+  }
 }
 
 onMounted(() => {
@@ -83,8 +83,6 @@ onMounted(() => {
 
 <template>
   <ContentWrap>
-    <!-- 标题栏 -->
-    <!-- <Header title="首页" /> -->
     <!-- 轮播图 -->
     <scroll-view class="container">
       <view class="mb-20rpx">

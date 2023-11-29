@@ -1,22 +1,16 @@
 <script setup lang="ts">
-import { getImageURL } from '@/utils'
-import { ref } from 'vue'
-// import NoticeBar from '@/components/NoticeBar/index.vue'
-import { onMounted } from 'vue'
-import Uqrcode from '@/components/UQRCode/components/uqrcode/uqrcode.vue'
+import { ref, onMounted } from 'vue'
+
 import { useAppStore } from '@/store'
 import { useEmitt } from '@/hooks/useEmitt'
+import { getImageURL } from '@/utils'
+
+import Uqrcode from '@/components/UQRCode/components/uqrcode/uqrcode.vue'
 
 const appStore = useAppStore()
 
 const menuTop = appStore.menuTop + 'px'
-
-const keyword = ref('')
-
-const noticeText = ref('时迦餐厅今日开业，12月01日-12月05日全场七折，欢迎您的光临！')
-
-const qrSize = ref(uni.upx2px(350))
-
+const qrSize = uni.upx2px(350)
 const buttonList = [
   {
     icon: 'people-access',
@@ -34,17 +28,21 @@ const buttonList = [
     title: '付款码'
   }
 ]
-//选中的马
+
+const keyword = ref('')
+const noticeText = ref('时迦餐厅开业大吉，会员全场9.2折，欢迎您的光临！')
+//选中的码
 const buttonAction = ref(0)
-
+//跑马灯
 const methods = ref()
-const finishVal = ref(false) //倒计时是否结束
-
-const Qrvalue = ref('shu-xiao-bao-YYDS')
+//倒计时是否结束
+const finishVal = ref(false)
+//二维码值
+const QRvalue = ref('shu-xiao-bao-YYDS')
 
 const onRefresh = (index: number) => {
   const timestamp = new Date().getTime()
-  Qrvalue.value = timestamp + ':shu-xiao-bao-YYDS'
+  QRvalue.value = timestamp + ':shu-xiao-bao-YYDS'
   finishVal.value = false
   methods.value.reset()
   buttonAction.value = index
@@ -56,6 +54,7 @@ useEmitt({
     onRefresh(val)
   }
 })
+
 onMounted(() => {
   onRefresh(0)
 })
@@ -90,7 +89,7 @@ onMounted(() => {
     </view>
     <view class="qr-bg flex-column flex justify-center items-center">
       <view class="bg-[#FFF] p-20rpx">
-        <Uqrcode canvasId="canvasId" :value="Qrvalue" :size="qrSize" />
+        <Uqrcode canvasId="canvasId" :value="QRvalue" :size="qrSize" />
       </view>
       <view class="my-20rpx font-600">
         <u-count-down
