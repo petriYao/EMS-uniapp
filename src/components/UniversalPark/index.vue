@@ -16,7 +16,7 @@ const appStore = useAppStore()
 // 轮播图
 const current = ref(0) //当前所在滑块的 index
 const swiperImgList = ref([] as string[]) //轮播图图片
-const htmlContent = ref()
+const htmlContent = ref('')
 const productHeight = ref()
 
 const getImageHeight = (imageItem: any) => {
@@ -30,7 +30,7 @@ watch(
   () => props.data,
   () => {
     if (!isEmpty(props.data)) {
-      htmlContent.value = props.data.content
+      htmlContent.value = props.data.content ?? ''
       swiperImgList.value = props.data?.imageArray?.map((item) => item.previewUrl) ?? []
 
       //图片显示高度
@@ -91,8 +91,13 @@ watch(
     />
   </view>
 
-  <view class="p-3 mx-3 mt-3 bg-white rdouned-lg" v-if="props.data?.title || htmlContent">
+  <view
+    class="p-3 mx-3 mt-3 bg-white rdouned-lg"
+    v-if="(props.data?.title && props.data?.title?.length > 0) || htmlContent.length > 0"
+  >
     <view class="text-36rpx font-550 pb-4">{{ props.data?.title }}</view>
+    <!-- eslint-disable vue/no-v-text-v-html-on-component -->
+    <!-- eslint-disable vue/no-v-html -->
     <view v-html="htmlContent" />
   </view>
   <view class="w-full h-[200rpx]" />

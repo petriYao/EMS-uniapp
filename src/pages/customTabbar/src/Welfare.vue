@@ -22,7 +22,7 @@ onMounted(() => {
 
 <template>
   <ContentWrap>
-    <!-- <Header :isLeftIcon="false" title="福利" /> -->
+    <Header :isLeftIcon="false" title="福利" />
     <!-- 头部结束 -->
     <view v-if="dataObj.content || dataObj.imageArray || dataObj.title">
       <UniversalPark :data="dataObj" />
