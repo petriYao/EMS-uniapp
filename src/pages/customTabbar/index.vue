@@ -160,4 +160,10 @@ const isShow = (name: string) => {
   position: relative;
   top: -34rpx;
 }
+
+:deep(.notice-qr) {
+  .u-icon__icon {
+    color: #196cff !important;
+  }
+}
 </style>

@@ -13,7 +13,6 @@ export * from './src/columnUnit'
 const ossUrl = 'https://shuxiaobao-wx.oss-cn-fuzhou.aliyuncs.com/b62fc9be67c9b51330e999b23e1556e5-'
 
 export function getImageURL(path: string, name: string, needWl?: boolean) {
-  console.log('拼接', path, name)
   //#ifdef MP-WEIXIN
   if (isURLDebug() && !needWl) {
     return `/static/img/${path}/${name}.png`

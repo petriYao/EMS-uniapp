@@ -4,8 +4,11 @@ import router from '@/router'
 import { getImageURL, getSvgURL } from '@/utils'
 import { onMounted, ref } from 'vue'
 import { useAppStore } from '@/store'
+import { useEmitt } from '@/hooks/useEmitt'
 
 const appStore = useAppStore()
+const { emitter } = useEmitt()
+
 // 轮播图
 const current = ref(0)
 
@@ -43,6 +46,9 @@ const onJump = (title: string) => {
       break
     case '停车缴费':
       appStore.bottomTabbarTitle = '一码通'
+      setTimeout(() => {
+        emitter.emit('Qrcode:Change', 1)
+      }, 100)
       break
     case '会议预定':
       src = 'home/meetingBooking/index'
