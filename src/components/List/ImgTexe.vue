@@ -76,13 +76,15 @@ defineExpose({ setContent })
   <view class="mx-3 my-1.5" v-if="!isEmpty(dataObj)" @click="infoClick">
     <div class="bg-white rounded-20rpx" v-if="dataObj.listType === 0">
       <view class="image-title">
-        <u-image
+        <!-- <u-image
           :show-loading="true"
           :src="dataObj.imageArray?.[0].listUrl"
           radius="8px 8px 0 0"
           width="100%"
           height="300rpx"
-        />
+        /> -->
+
+        <img :src="dataObj.imageArray?.[0].listUrl" class="w-[100%] h-[300rpx]" />
       </view>
       <view class="p-3 pt-2">
         <view class="font-semibold text-[16px] text-[#000000] title_ellipsis">
