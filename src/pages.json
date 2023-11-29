@@ -113,6 +113,34 @@
         "navigationBarTitleText": "",
         "navigationStyle": "custom"
       }
+    },
+    {
+      "path": "pages/home/meetingBooking/index",
+      "style": {
+        "navigationBarTitleText": "会议室预定",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/home/visitorRegistration/index",
+      "style": {
+        "navigationBarTitleText": "访客登记",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/home/reportRepairs/index",
+      "style": {
+        "navigationBarTitleText": "报事报修",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/home/consult/index",
+      "style": {
+        "navigationBarTitleText": "客服咨询",
+        "navigationStyle": "custom"
+      }
     }
   ],
   "subpackages": [],

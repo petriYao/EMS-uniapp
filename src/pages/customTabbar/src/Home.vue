@@ -3,7 +3,9 @@ import { AppSetInfoApi } from '@/api'
 import router from '@/router'
 import { getImageURL, getSvgURL } from '@/utils'
 import { onMounted, ref } from 'vue'
+import { useAppStore } from '@/store'
 
+const appStore = useAppStore()
 // 轮播图
 const current = ref(0)
 
@@ -38,6 +40,21 @@ const onJump = (title: string) => {
       break
     case '园区展览':
       src = 'exhibition/index'
+      break
+    case '停车缴费':
+      appStore.bottomTabbarTitle = '一码通'
+      break
+    case '会议预定':
+      src = 'home/meetingBooking/index'
+      break
+    case '访客登记':
+      src = 'home/visitorRegistration/index'
+      break
+    case '报事报修':
+      src = 'home/reportRepairs/index'
+      break
+    case '客服咨询':
+      src = 'home/consult/index'
       break
     default:
       uToastRef.value.show({
@@ -95,7 +112,10 @@ onMounted(() => {
           :showAction="false"
           :searchIconSize="0"
         />
-        <view class="position-absolute right-60rpx bottom-40rpx">
+        <view
+          class="position-absolute right-60rpx bottom-40rpx z-99"
+          @click.stop="onJump('客服咨询')"
+        >
           <u-icon :name="getSvgURL('home', 'home-keyword')" :size="50" />
         </view>
       </view>

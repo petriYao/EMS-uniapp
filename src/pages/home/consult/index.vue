@@ -1,0 +1,17 @@
+<script setup lang="ts">
+import { onLoad } from '@dcloudio/uni-app'
+
+// 轮播图
+
+onLoad(async () => {})
+</script>
+
+<template>
+  <ContentWrap>
+    <!-- 头部开始 -->
+    <Header title="客服咨询" />
+    <!-- 头部结束 -->
+  </ContentWrap>
+</template>
+
+<style lang="scss" scoped></style>

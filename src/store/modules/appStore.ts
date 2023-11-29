@@ -29,7 +29,7 @@ const useAppStore = defineStore('app', {
       //rpx
       screenWidth: 0,
       //底部显示的值
-      bottomTabbarTitle: '',
+      bottomTabbarTitle: '首页',
       //加载
       loadedList: [] as string[],
       //是否登录

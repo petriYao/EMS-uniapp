@@ -6,9 +6,10 @@ import Serve from './src/Serve.vue'
 import Qrcode from './src/Qrcode.vue'
 import Welfare from './src/Welfare.vue'
 import My from './src/My.vue'
+import { useAppStore } from '@/store'
 
+const appStore = useAppStore()
 // 底部导航栏
-const tabbarVal = ref('首页')
 const tabBar = [
   {
     title: '首页',
@@ -59,12 +60,12 @@ const tabBar = [
 
 // 底部导航栏切换
 const onChange = (name: string) => {
-  tabbarVal.value = name
+  appStore.bottomTabbarTitle = name
 }
 
 //是否显示
 const isShow = (name: string) => {
-  return tabbarVal.value === name
+  return appStore.bottomTabbarTitle === name
 }
 </script>
 
