@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useAppStore } from '@/store'
 import { AppSetInfoType } from '@/types/commonModel'
-import { isEmpty } from 'lodash-es'
+import { isEmpty } from '@/utils'
 import { ref, watch } from 'vue'
 
 const props = defineProps({

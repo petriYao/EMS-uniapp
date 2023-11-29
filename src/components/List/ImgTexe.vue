@@ -1,8 +1,9 @@
 <script setup lang="ts">
+import { getCurrentInstance, onMounted, ref, watch } from 'vue'
+
 import router from '@/router'
 import { AppSetInfoType } from '@/types/commonModel'
-import { isEmpty } from 'lodash-es'
-import { getCurrentInstance, onMounted, ref, watch } from 'vue'
+import { isEmpty } from '@/utils'
 
 const props = defineProps({
   item: {
@@ -14,6 +15,8 @@ const props = defineProps({
     default: ''
   }
 })
+
+const instance = getCurrentInstance()
 
 const dataObj = ref({} as AppSetInfoType)
 const htmlContent = ref()
@@ -27,8 +30,23 @@ const infoClick = () => {
     router.push({
       url: `/pages/listInfo/JumpUrl?id=${dataObj.value.id}&title=${dataObj.value.title}`
     })
-    // window.location.href = dataObj.value.jumpUrl!
   }
+}
+
+const maxHeight = uni.upx2px(90)
+
+const setContent = () => {
+  uni
+    .createSelectorQuery()
+    .in(instance)
+    .select('#titleID')
+    .boundingClientRect(function (rect: any) {
+      console.log('titleID', rect, maxHeight)
+      if (rect?.height > maxHeight) {
+        htmlContent.value = ''
+      }
+    })
+    .exec()
 }
 
 watch(
@@ -36,7 +54,7 @@ watch(
   () => {
     if (props.item) {
       dataObj.value = props.item
-      htmlContent.value = dataObj.value.content.replace(/<[^>]+>/g, '')
+      if (dataObj.value.content) htmlContent.value = dataObj.value.content.replace(/<[^>]+>/g, '')
     }
   },
   {
@@ -45,26 +63,9 @@ watch(
   }
 )
 
-onMounted(() => {
-  setTimeout(() => {
-    getDATa()
-  }, 200)
-})
+onMounted(() => {})
 
-const instance = getCurrentInstance()
-const getDATa = () => {
-  uni
-    .createSelectorQuery()
-    .in(instance)
-    .select('#titleID')
-    .boundingClientRect(function (rect: any) {
-      console.log('titleID', rect)
-      if (rect.height > 60) {
-        htmlContent.value = ''
-      }
-    })
-    .exec()
-}
+defineExpose({ setContent })
 </script>
 
 <template>
@@ -137,13 +138,13 @@ const getDATa = () => {
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
-  -webkit-line-clamp: 3; /* 设置显示的行数 */
+  -webkit-line-clamp: 2; /* 设置显示的行数 */
   -webkit-box-orient: vertical;
 }
 .content_ellipsis {
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 1;
   overflow: hidden;
   white-space: pre-wrap;
 }
