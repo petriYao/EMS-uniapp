@@ -3,10 +3,7 @@ import { useAppStore } from '@/store'
 
 export const initCacheIamge = () => {
   const appStore = useAppStore()
-  const imageArray = [
-    // { name: 'homeBG', image: getImageURLNeedWl('home', 'homeBG') }, //逛逛背景
-    // { name: 'noData', image: getImageURLNeedWl('home', 'no-data') } //无数据
-  ] as any[]
+  const imageArray = [] as any[]
   for (const item of imageArray) {
     if (1 == 1) continue
     uni.downloadFile({
