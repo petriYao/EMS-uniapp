@@ -1,42 +1,54 @@
 <script setup lang="ts">
-import { getImageURL, getSvgURL } from '@/utils'
+import { getImageURL } from '@/utils'
 import { ref } from 'vue'
-import NoticeBar from '@/components/NoticeBar/index.vue'
+// import NoticeBar from '@/components/NoticeBar/index.vue'
 import { onMounted } from 'vue'
 import Uqrcode from '@/components/UQRCode/components/uqrcode/uqrcode.vue'
 import { useAppStore } from '@/store'
 
 const appStore = useAppStore()
 
+const menuTop = appStore.menuTop + 'px'
+
 const keyword = ref('')
+
+const noticeText = ref('时迦餐厅今日开业，12月01日-12月05日全场七折，欢迎您的光临！')
+
 const buttonList = [
   {
-    icon: 'Qrcode-people-access',
-    title: '人通行'
+    icon: 'people-access',
+    iconSelect: 'people-access-select',
+    title: '人行码'
   },
   {
-    icon: 'Qrcode-car-access',
-    title: '车通行'
+    icon: 'car-access',
+    iconSelect: 'car-access-select',
+    title: '车行码'
   },
   {
-    icon: 'Qrcode-payment-code',
+    icon: 'payment-code',
+    iconSelect: 'payment-code-select',
     title: '付款码'
   }
 ]
+//选中的马
+const buttonAction = ref(0)
+
 const methods = ref()
 const finishVal = ref(false) //倒计时是否结束
 
 const Qrvalue = ref('shu-xiao-bao-YYDS')
 
-const onRefresh = () => {
+const onRefresh = (index: number) => {
   const timestamp = new Date().getTime()
   Qrvalue.value = timestamp + ':shu-xiao-bao-YYDS'
   finishVal.value = false
   methods.value.reset()
+  buttonAction.value = index
 }
 
 onMounted(() => {
-  onRefresh()
+  onRefresh(0)
 })
 </script>
 
@@ -44,43 +56,53 @@ onMounted(() => {
   <ContentWrap>
     <Header :isLeftIcon="false" bgColor="#f6f7fb">
       <template #center>
-        <view class="w-93vw p-30rpx">
-          <u-search placeholder="搜索您想要的" v-model="keyword" :showAction="false" bgColor="#FFF"
-        /></view>
+        <view class="w-100% p-30rpx">
+          <u-search
+            placeholder="搜索您想要的"
+            v-model="keyword"
+            :showAction="false"
+            bgColor="#FFF"
+          />
+        </view>
       </template>
     </Header>
-    <view class="h-30rpx" />
-    <view class="m-30rpx mt-0 p-30rpx bg-white flex-rows justify-around rounded-20rpx">
+    <view class="m-30rpx mb-20rpx p-30rpx bg-white flex-rows justify-around rounded-20rpx">
       <view class="flex-column" v-for="(item, index) in buttonList" :key="index">
-        <view class="mb-20rpx" @tap="onRefresh">
-          <u-icon :name="getSvgURL('Qrcode', `${item.icon}`)" :size="50" />
+        <view class="mb-20rpx" @tap="onRefresh(index)">
+          <u-image
+            width="80rpx"
+            height="80rpx"
+            :src="getImageURL('Qrcode', buttonAction === index ? item.iconSelect : item.icon)"
+          />
         </view>
-        <view class="font-600 text-30rpx">{{ item.title }}</view>
+        <view class="font-600 text-30rpx" :style="buttonAction === index ? '' : 'color:#808080'">
+          {{ item.title }}
+        </view>
+
+        <view v-if="buttonAction === index" class="w-24px h-1px bg-#196CFF mt-10rpx" />
+        <view v-else class="h-1px w-24px mt-10rpx" />
       </view>
     </view>
-    <view class="px-30rpx">
-      <NoticeBar :interval="3000" />
+    <view class="px-10rpx">
+      <u-notice-bar bgColor="#f6f7fb" color="#000" :text="noticeText" />
     </view>
-    <view class="qr-bg pt-20rpx px-30rpx position-relative">
-      <img class="qr-bg-img" :src="getImageURL('home', 'qr-bg')" mode="widthFix" />
-      <view class="qr-img">
-        <view class="flex-column">
-          <Uqrcode canvasId="canvasId" :value="Qrvalue" />
-          <view class="my-30rpx font-600">
-            <u-count-down
-              ref="methods"
-              :time="30 * 60 * 1000"
-              format="HH:mm:ss"
-              @finish="finishVal = true"
-              v-if="!finishVal"
-            />
-            <view v-else>二维码已过期</view>
-          </view>
-          <view class="text-#196CFF flex-rows" @click="onRefresh">
-            <u-icon name="reload" size="20" class="mr-10rpx mt-10rpx" />
-            刷新
-          </view>
-        </view>
+    <view class="qr-bg flex-column flex justify-center items-center">
+      <view class="bg-[#FFF] p-20rpx">
+        <Uqrcode canvasId="canvasId" :value="Qrvalue" />
+      </view>
+      <view class="my-30rpx font-600">
+        <u-count-down
+          ref="methods"
+          :time="30 * 60 * 1000"
+          format="HH:mm:ss"
+          @finish="finishVal = true"
+          v-if="!finishVal"
+        />
+        <view v-else>二维码已过期</view>
+      </view>
+      <view class="text-#196CFF flex-rows" @click="onRefresh(buttonAction)">
+        <u-icon name="reload" size="20" class="mr-10rpx" />
+        刷新
       </view>
     </view>
   </ContentWrap>
@@ -97,14 +119,10 @@ onMounted(() => {
   background-color: #f6f7fb !important;
 }
 .qr-bg {
-  .qr-bg-img {
-    width: 100%;
-  }
-  .qr-img {
-    position: absolute;
-    left: 50%;
-    top: 12%;
-    transform: translate(-50%, 0);
-  }
+  margin: 20rpx 20rpx 0 20rpx;
+  // padding: 20rpx 0;
+  background: linear-gradient(to bottom, #f7fbff, #ffffff);
+  border-radius: 10rpx;
+  height: calc(100vh - 71px - 250rpx - 250rpx - v-bind(menuTop));
 }
 </style>
