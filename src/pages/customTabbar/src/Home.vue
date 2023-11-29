@@ -193,9 +193,15 @@ onMounted(() => {
               <view class="text-30rpx mb-6rpx">园区简介</view>
               <view class="text-14rpx text-#eaebed mix-blend-soft-light">ADMISSION POLICY</view>
             </view>
-            <view class="position-absolute bottom-[-6rpx]">
-              <!-- <up-image :show-loading="true" width="80px" height="80px" /> -->
-              <img class="w-full rounded-20rpx" :src="getImageURL('home', 'home-introduction')" />
+            <view class="position-absolute bottom-[-6rpx] w-[inherit]">
+              <u-image
+                :show-loading="true"
+                width="100%"
+                height="180rpx"
+                rounded="20rpx"
+                :src="appStore.introductionBG"
+              />
+              <!-- <img class="w-full rounded-20rpx" :src="getImageURL('home', 'home-introduction')" /> -->
             </view>
           </view>
           <view

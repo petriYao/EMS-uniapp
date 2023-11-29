@@ -10,7 +10,7 @@ export * from './src/lodash'
 //字段
 export * from './src/columnUnit'
 
-const ossUrl = 'https://shuxiaobao-wx.oss-cn-fuzhou.aliyuncs.com/b62fc9be67c9b51330e999b23e1556e5-'
+const ossUrl = 'https://shuxiaobao-wx.oss-cn-fuzhou.aliyuncs.com/d4cf42697b128c16a82aee00a0d991cc-'
 
 export function getImageURL(path: string, name: string, needWl?: boolean) {
   //#ifdef MP-WEIXIN

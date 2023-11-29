@@ -76,12 +76,17 @@ onMounted(() => {
       <u-search placeholder="搜索您想要的" v-model="keyword" :showAction="false" bgColor="#FFF" />
     </view>
     <view class="m-30rpx mb-20rpx p-30rpx bg-white flex-rows justify-around rounded-20rpx">
-      <view class="flex-column" v-for="(item, index) in buttonList" :key="index">
-        <view class="mb-20rpx" v-show="buttonAction === index" @tap="onRefresh(index)">
+      <view
+        class="flex-column"
+        v-for="(item, index) in buttonList"
+        :key="index"
+        @tap="onRefresh(index)"
+      >
+        <view class="mb-20rpx" v-show="buttonAction === index">
           <u-image width="80rpx" height="80rpx" :src="getImageURL('Qrcode', item.iconSelect)" />
         </view>
 
-        <view class="mb-20rpx" v-show="buttonAction !== index" @tap="onRefresh(index)">
+        <view class="mb-20rpx" v-show="buttonAction !== index">
           <u-image width="80rpx" height="80rpx" :src="getImageURL('Qrcode', item.icon)" />
         </view>
 

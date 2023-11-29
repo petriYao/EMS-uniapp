@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 
 import { useAppStore } from '@/store'
 import { AppSetInfoType } from '@/types/commonModel'
@@ -20,6 +20,12 @@ const props = defineProps({
 })
 
 const appStore = useAppStore()
+
+const height = computed(() => {
+  const h = appStore.menuTop + 44
+  console.log('menuTop', appStore.menuTop, h)
+  return `calc(100vh - ${h}px)`
+})
 
 const reactiveData = reactive({
   //下拉
@@ -78,6 +84,7 @@ const onRefresherrefresh = () => {
 
 //上拉加载更多
 const onScrolltolower = async () => {
+  console.log('onScrolltolower')
   if (reactiveData.loadMore === 'loadmore') {
     reactiveData.loadMore = 'loading'
     page.value++
@@ -102,15 +109,16 @@ onMounted(() => {
         :refresher-triggered="reactiveData.triggered"
         :scroll-top="reactiveData.scrollTop"
         scroll-y
-        :style="`height: calc(100vh - 44px-${appStore.menuTop}px)`"
+        :style="`height:${height};`"
         @scrolltolower="onScrolltolower"
         @refresherrefresh="onRefresherrefresh"
       >
-        <view class="h-12rpx" />
-        <view v-for="(item, index) in listData" :key="index">
-          <ImgTexe :item="item" :title="props.title" />
+        <view class="u-page">
+          <view class="h-12rpx" />
+          <view v-for="(item, index) in listData" :key="index">
+            <ImgTexe :item="item" :title="props.title" />
+          </view>
         </view>
-
         <!-- 上拉加载 -->
         <view class="h-50rpx" v-if="listData.length > 9">
           <u-loadmore

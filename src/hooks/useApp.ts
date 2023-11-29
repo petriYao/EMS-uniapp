@@ -1,11 +1,12 @@
 import { useAppStore } from '@/store'
-// import { getImageURLNeedWl } from '@/utils'
+import { getImageURLNeedWl } from '@/utils'
 
 export const initCacheIamge = () => {
   const appStore = useAppStore()
-  const imageArray = [] as any[]
+  const imageArray = [
+    { name: 'introductionBG', image: getImageURLNeedWl('home', 'home-introduction') }
+  ] as any[]
   for (const item of imageArray) {
-    if (1 == 1) continue
     uni.downloadFile({
       url: item.image,
       success: (res) => {

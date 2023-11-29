@@ -46,14 +46,8 @@ const useAppStore = defineStore('app', {
     }
   },
   getters: {
-    strollAroundBG(state) {
-      return state.cacheImageList['strollAroundBG'] ?? ''
-    },
-    myBG(state) {
-      return state.cacheImageList['myBG'] ?? ''
-    },
-    noData(state) {
-      return state.cacheImageList['noData'] ?? ''
+    introductionBG(state) {
+      return state.cacheImageList['introductionBG'] ?? ''
     },
     needLogin(state) {
       return !state.instituteType || state.instituteType == 'consumer'
