@@ -71,11 +71,22 @@ const isShow = (name: string) => {
 
 <template>
   <ContentWrap>
-    <Home v-show="isShow('首页')" />
-    <Serve v-show="isShow('服务')" />
-    <Qrcode v-show="isShow('一码通')" />
-    <Welfare v-show="isShow('福利')" />
-    <My v-show="isShow('我的')" />
+    <view v-show="isShow('首页')">
+      <Home />
+    </view>
+    <view v-show="isShow('服务')">
+      <Serve />
+    </view>
+    <view v-show="isShow('一码通')">
+      <Qrcode />
+    </view>
+    <view v-show="isShow('福利')">
+      <Welfare />
+    </view>
+    <view v-show="isShow('我的')">
+      <My />
+    </view>
+
     <!-- 底部导航栏 -->
     <view class="tabbar">
       <view class="tabbar__content tabbar--fixed">

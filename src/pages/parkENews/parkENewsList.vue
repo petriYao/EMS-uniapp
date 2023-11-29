@@ -21,6 +21,7 @@ const getAppSetList = async () => {
 }
 
 const scrolltolower = () => {
+  console.log('到底')
   getAppSetList()
 }
 
@@ -34,15 +35,18 @@ onMounted(() => {
     <!-- 头部开始 -->
     <Header title="园区E闻" />
     <!-- 头部结束 -->
-    <view class="u-page pt-1.5" v-if="listData.length > 0">
-      <u-list @scrolltolower="scrolltolower">
-        <u-list-item v-for="(item, index) in listData" :key="index">
-          <ImgTexe :item="item" title="园区E闻" />
-        </u-list-item>
-      </u-list>
+
+    <view v-if="listData.length > 0">
+      <scroll-view scroll-y height="200px" @scrolltolower="scrolltolower">
+        <view class="u-page" style="height: calc(100vh - 44px)">
+          <view class="h-12rpx" />
+          <view v-for="(item, index) in listData" :key="index">
+            <ImgTexe :item="item" title="园区E闻" />
+          </view>
+        </view>
+      </scroll-view>
     </view>
     <noData v-else />
-    <div class="w-full h-[200px]"></div>
   </ContentWrap>
 </template>
 

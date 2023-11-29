@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 
 import { useAppStore } from '@/store'
 import { useEmitt } from '@/hooks/useEmitt'
@@ -30,7 +30,7 @@ const buttonList = [
 ]
 
 const keyword = ref('')
-const noticeText = ref('时迦餐厅开业大吉，会员全场9.2折，欢迎您的光临！')
+const noticeText = ref('')
 //选中的码
 const buttonAction = ref(0)
 //跑马灯
@@ -39,6 +39,7 @@ const methods = ref()
 const finishVal = ref(false)
 //二维码值
 const QRvalue = ref('shu-xiao-bao-YYDS')
+const isShowNotice = ref(false)
 
 const onRefresh = (index: number) => {
   const timestamp = new Date().getTime()
@@ -58,6 +59,17 @@ useEmitt({
 onMounted(() => {
   onRefresh(0)
 })
+
+watch(
+  () => appStore.bottomTabbarTitle,
+  () => {
+    if (appStore.bottomTabbarTitle === '一码通' && !isShowNotice.value) {
+      console.log('一码通')
+      noticeText.value = '时迦餐厅开业大吉，会员全场9.2折，欢迎您的光临！'
+    }
+  },
+  {}
+)
 </script>
 
 <template>
@@ -84,7 +96,7 @@ onMounted(() => {
         <view v-else class="h-2px w-24px mt-10rpx" />
       </view>
     </view>
-    <view class="px-10rpx notice-qr">
+    <view class="px-10rpx notice-qr" v-if="noticeText">
       <u-notice-bar bgColor="#f6f7fb" color="#000" :text="noticeText" />
     </view>
     <view class="qr-bg flex-column flex justify-center items-center">
