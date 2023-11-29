@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import { getCurrentInstance, onMounted, ref, watch } from 'vue'
 
-import router from '@/router'
-import { AppSetInfoType } from '@/types/commonModel'
 import { isEmpty } from '@/utils'
+import { AppSetInfoType } from '@/types/commonModel'
+import router from '@/router'
 
 const props = defineProps({
-  item: {
-    type: Object as () => AppSetInfoType,
-    default: {} as any
-  },
   title: {
     type: String,
     default: ''
+  },
+  item: {
+    type: Object as () => AppSetInfoType,
+    default: {} as any
   }
 })
 
@@ -22,13 +22,13 @@ const dataObj = ref({} as AppSetInfoType)
 const htmlContent = ref()
 
 const infoClick = () => {
-  if (!dataObj.value.jumpUrl) {
+  if (dataObj.value.jumpUrl && dataObj.value.jumpUrl.length > 0) {
     router.push({
-      url: `/pages/listInfo/index?title=${props.title}&id=${dataObj.value.id}`
+      url: `/pages/listInfo/JumpUrl?title=${props.title}&id=${dataObj.value.id}`
     })
   } else {
     router.push({
-      url: `/pages/listInfo/JumpUrl?id=${dataObj.value.id}&title=${dataObj.value.title}`
+      url: `/pages/listInfo/index?title=${props.title}&id=${dataObj.value.id}`
     })
   }
 }
@@ -73,18 +73,18 @@ defineExpose({ setContent })
     {{ dataObj.createdAt }}
   </view>
 
-  <view class="mx-3 my-1.5" v-if="!isEmpty(dataObj)" @click="infoClick">
-    <div class="bg-white rounded-20rpx" v-if="dataObj.listType === 0">
-      <view class="image-title">
-        <!-- <u-image
-          :show-loading="true"
-          :src="dataObj.imageArray?.[0].listUrl"
-          radius="8px 8px 0 0"
-          width="100%"
-          height="300rpx"
-        /> -->
-
-        <img :src="dataObj.imageArray?.[0].listUrl" class="w-[100%] h-[300rpx]" />
+  <view class="mx-3 my-1.5" v-if="!isEmpty(dataObj)" @tap="infoClick">
+    <view class="bg-white rounded-20rpx" v-if="dataObj.listType === 0">
+      <view class="image-title h-[300rpx] z-1">
+        <view class="z-0">
+          <u-image
+            :show-loading="false"
+            :src="dataObj.imageArray?.[0].listUrl"
+            radius="8px 8px 0 0"
+            width="100%"
+            height="300rpx"
+          />
+        </view>
       </view>
       <view class="p-3 pt-2">
         <view class="font-semibold text-[16px] text-[#000000] title_ellipsis">
@@ -101,8 +101,8 @@ defineExpose({ setContent })
           {{ dataObj.publishOrigin }}
         </view>
       </view>
-    </div>
-    <div class="bg-white p-3 rounded-20rpx flex justify-between" v-if="dataObj.listType === 1">
+    </view>
+    <view class="bg-white p-3 rounded-20rpx flex justify-between" v-if="dataObj.listType === 1">
       <view class="flex-col flex justify-between flex-1">
         <view>
           <view id="titleID" class="font-semibold text-[16px] text-[#000000] title_ellipsis">
@@ -118,14 +118,14 @@ defineExpose({ setContent })
       </view>
       <view class="ml-20rpx">
         <u-image
-          :show-loading="true"
+          :show-loading="false"
           :src="dataObj.imageArray?.[0].listUrl"
           radius="20rpx"
           width="200rpx"
           height="200rpx"
         />
       </view>
-    </div>
+    </view>
   </view>
 </template>
 

@@ -39,7 +39,6 @@ const methods = ref()
 const finishVal = ref(false)
 //二维码值
 const QRvalue = ref('shu-xiao-bao-YYDS')
-const isShowNotice = ref(false)
 
 const onRefresh = (index: number) => {
   const timestamp = new Date().getTime()
@@ -56,20 +55,18 @@ useEmitt({
   }
 })
 
-onMounted(() => {
-  onRefresh(0)
-})
-
 watch(
   () => appStore.bottomTabbarTitle,
   () => {
-    if (appStore.bottomTabbarTitle === '一码通' && !isShowNotice.value) {
-      console.log('一码通')
+    if (appStore.bottomTabbarTitle === '一码通' && !noticeText.value) {
       noticeText.value = '时迦餐厅开业大吉，会员全场9.2折，欢迎您的光临！'
     }
-  },
-  {}
+  }
 )
+
+onMounted(() => {
+  onRefresh(0)
+})
 </script>
 
 <template>

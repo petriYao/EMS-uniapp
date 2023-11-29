@@ -1,20 +1,26 @@
 <script setup lang="ts">
-import { AppSetListApi } from '@/api'
-import { onMounted, ref, reactive } from 'vue'
-import noData from '@components/noData/NoData.vue'
-import ImgTexe from '@components/List/ImgTexe.vue'
+import { ref, reactive, onMounted } from 'vue'
+
+import { useAppStore } from '@/store'
 import { AppSetInfoType } from '@/types/commonModel'
+import { AppSetListApi } from '@/api'
+
+import ImgTexe from '@components/List/ImgTexe.vue'
+import noData from '@components/noData/NoData.vue'
 
 const props = defineProps({
   title: {
     type: String,
-    default: 'dataIsEmpty'
+    default: ''
   },
   name: {
     type: String,
-    default: 'parkENews'
+    default: ''
   }
 })
+
+const appStore = useAppStore()
+
 const reactiveData = reactive({
   //下拉
   triggered: false,
@@ -96,15 +102,13 @@ onMounted(() => {
         :refresher-triggered="reactiveData.triggered"
         :scroll-top="reactiveData.scrollTop"
         scroll-y
-        style="height: calc(100vh - 74px)"
+        :style="`height: calc(100vh - 44px-${appStore.menuTop}px)`"
         @scrolltolower="onScrolltolower"
         @refresherrefresh="onRefresherrefresh"
       >
-        <view class="u-page">
-          <view class="h-12rpx" />
-          <view v-for="(item, index) in listData" :key="index">
-            <ImgTexe :item="item" :title="props.title" />
-          </view>
+        <view class="h-12rpx" />
+        <view v-for="(item, index) in listData" :key="index">
+          <ImgTexe :item="item" :title="props.title" />
         </view>
 
         <!-- 上拉加载 -->
