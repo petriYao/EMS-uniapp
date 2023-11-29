@@ -59,7 +59,7 @@ watch(
   () => appStore.bottomTabbarTitle,
   () => {
     if (appStore.bottomTabbarTitle === '一码通') {
-      if (noticeText.value) noticeText.value = '时迦餐厅开业大吉，会员全场9.2折，欢迎您的光临！'
+      if (!noticeText.value) noticeText.value = '时迦餐厅开业大吉，会员全场9.2折，欢迎您的光临！'
       onRefresh(buttonAction.value)
     }
   }
