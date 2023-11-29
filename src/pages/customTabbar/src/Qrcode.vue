@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, watch } from 'vue'
 
 import { useAppStore } from '@/store'
 import { useEmitt } from '@/hooks/useEmitt'
@@ -58,15 +58,12 @@ useEmitt({
 watch(
   () => appStore.bottomTabbarTitle,
   () => {
-    if (appStore.bottomTabbarTitle === '一码通' && !noticeText.value) {
-      noticeText.value = '时迦餐厅开业大吉，会员全场9.2折，欢迎您的光临！'
+    if (appStore.bottomTabbarTitle === '一码通') {
+      if (noticeText.value) noticeText.value = '时迦餐厅开业大吉，会员全场9.2折，欢迎您的光临！'
+      onRefresh(buttonAction.value)
     }
   }
 )
-
-onMounted(() => {
-  onRefresh(0)
-})
 </script>
 
 <template>
