@@ -152,6 +152,6 @@ watch(
   // padding: 20rpx 0;
   background: linear-gradient(to bottom, #f7fbff, #ffffff);
   border-radius: 10rpx;
-  height: calc(100vh - 71px - 32px - 30rpx - 250rpx - 250rpx - v-bind(menuTop));
+  height: calc(100vh - 44px - 32px - 30rpx - 220rpx - 250rpx - v-bind(menuTop));
 }
 </style>

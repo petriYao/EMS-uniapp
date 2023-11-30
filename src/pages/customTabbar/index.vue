@@ -60,13 +60,11 @@ const tabBar = [
 
 // 底部导航栏切换
 const onChange = (name: string) => {
+  appStore.bottomTabbarTitle = name
   uni.pageScrollTo({
     scrollTop: 0,
     duration: 0
   })
-  setTimeout(() => {
-    appStore.bottomTabbarTitle = name
-  }, 100)
 }
 
 //是否显示
