@@ -9,10 +9,10 @@ export const isShowApiLog = false
 export const isShowChatLog = false
 
 //环境路径 false 线上，true 线下
-const debug = true
+const debug = false
 
 //图片svg路径 false 线上，true 线下
-const urlDebug = true
+const urlDebug = false
 
 //是否调试
 export const isDebug = () => {

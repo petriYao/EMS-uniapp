@@ -176,7 +176,7 @@ onMounted(() => {
             @click="onJump('报事报修')"
           >
             <view class="text-white p-20rpx">
-              <view class="text-30rpx mb-6rpx">报事报修</view>
+              <view class="text-30rpx mb-6rpx">报事报修123</view>
               <view class="text-14rpx text-#eaebed mix-blend-soft-light"
                 >REPORTING FOR REPAIRS</view
               >
