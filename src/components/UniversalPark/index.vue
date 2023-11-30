@@ -105,9 +105,13 @@ watch(
 
 <style lang="scss" scoped>
 :deep(.u-swiper) {
-  padding-bottom: 40rpx;
+  padding-bottom: 0 !important;
   background: #f6f7fb !important;
 }
+
+// :deep(.u-swiper__indicator) {
+//   bottom: 30px;
+// }
 
 .indicator {
   @include flex(row);

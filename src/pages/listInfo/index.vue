@@ -43,7 +43,7 @@ onLoad(async (val: any) => {
 
 <style lang="scss" scoped>
 :deep(.u-swiper) {
-  padding-bottom: 40rpx;
+  padding-bottom: 0 !important;
   background: #f6f7fb !important;
 }
 

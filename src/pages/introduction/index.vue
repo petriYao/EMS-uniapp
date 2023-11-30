@@ -13,7 +13,6 @@ const getParkProfile = async () => {
   const res = await AppSetInfoApi('parkProfile')
   if (res.success && res.value) {
     dataObj.value = res.value
-    console.log(dataObj.value)
   }
 }
 
@@ -36,7 +35,7 @@ onLoad(async () => {
 
 <style lang="scss" scoped>
 :deep(.u-swiper) {
-  padding-bottom: 40rpx;
+  padding-bottom: 0 !important;
   background: #f6f7fb !important;
 }
 
