@@ -60,7 +60,13 @@ const tabBar = [
 
 // 底部导航栏切换
 const onChange = (name: string) => {
-  appStore.bottomTabbarTitle = name
+  uni.pageScrollTo({
+    scrollTop: 0,
+    duration: 0
+  })
+  setTimeout(() => {
+    appStore.bottomTabbarTitle = name
+  }, 100)
 }
 
 //是否显示
@@ -176,5 +182,9 @@ const isShow = (name: string) => {
   .u-icon__icon {
     color: #196cff !important;
   }
+}
+
+:deep(.u-search__content) {
+  border: 0 !important;
 }
 </style>

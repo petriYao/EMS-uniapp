@@ -15,6 +15,8 @@ const useAppStore = defineStore('app', {
       //小程序胶囊菜单按钮的上边界坐标
       menuHeight: 0,
       //小程序胶囊宽度
+      menuRightWidth: 0,
+      //小程序胶囊距离右边的距离
       menuWidth: 0,
       //自定义安全高度
       menuSafeHeight: 8,
@@ -70,20 +72,23 @@ const useAppStore = defineStore('app', {
   actions: {
     //初始化app的值 //APP-PLUS  MP-WEIXIN H5
     initApp() {
+      const systemInfo = uni.getSystemInfoSync()
+
       //小程序胶囊 条件编译
       //#ifdef MP-WEIXIN
       const menuButton = uni.getMenuButtonBoundingClientRect()
       this.menuWidth = menuButton.width
       this.menuHeight = menuButton.height
       this.menuTop = menuButton.top
+      this.menuRightWidth = systemInfo.screenWidth - menuButton.right + menuButton.width
       //#endif
       this.navbarHeight = this.menuHeight + this.menuTop + this.menuSafeHeight
       //获取安全区域边距信息 rpx
-      const systemInfo = uni.getSystemInfoSync()
       const safeAreaInsets = systemInfo.safeAreaInsets
       this.notchHeight = safeAreaInsets?.top ?? 0
       this.bottomHeight = safeAreaInsets?.bottom ?? 0
       this.bottomTabbarHeight = this.bottomHeight + 120
+
       //#ifdef H5
       setAppStatusBarTitleColor(false)
       this.menuTop = Number(getAppStatusBarHeight()) || 0

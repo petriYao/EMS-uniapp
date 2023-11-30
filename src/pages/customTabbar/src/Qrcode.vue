@@ -10,6 +10,8 @@ import Uqrcode from '@/components/UQRCode/components/uqrcode/uqrcode.vue'
 const appStore = useAppStore()
 
 const menuTop = appStore.menuTop + 'px'
+const menuRightWidth = appStore.menuRightWidth + 'px'
+
 const qrSize = uni.upx2px(350)
 const buttonList = [
   {
@@ -68,10 +70,25 @@ watch(
 
 <template>
   <ContentWrap>
-    <Header :isLeftIcon="false" title="一码通" />
-    <view class="w-100% p-30rpx pb-0 box-border">
+    <!--#ifdef H5-->
+    <view class="w-100% p-30rpx pb-0 box-border" :style="{ marginTop: menuTop }">
       <u-search placeholder="搜索您想要的" v-model="keyword" :showAction="false" bgColor="#FFF" />
     </view>
+    <!--#endif-->
+    <!-- #ifdef MP-WEIXIN-->
+    <view
+      class="box-border pl-30rpx"
+      :style="{ marginTop: menuTop, paddingRight: `calc(${menuRightWidth} + 30rpx)` }"
+    >
+      <u-search
+        placeholder="搜索您想要的"
+        v-model="keyword"
+        :showAction="false"
+        :height="appStore.menuHeight"
+        bgColor="#FFF"
+      />
+    </view>
+    <!--#endif-->
     <view class="m-30rpx mb-20rpx p-30rpx bg-white flex-rows justify-around rounded-20rpx">
       <view
         class="flex-column"

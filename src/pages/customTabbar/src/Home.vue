@@ -42,7 +42,7 @@ const onJump = (title: string) => {
     case '企业风采':
       src = 'enterprisesDemeanour/index'
       break
-    case '园区导航':
+    case '园区导览':
       src = 'exhibition/index'
       break
     case '停车缴费':
@@ -123,7 +123,7 @@ onMounted(() => {
           class="position-absolute right-60rpx bottom-40rpx z-99"
           @click.stop="onJump('客服咨询')"
         >
-          <u-icon :name="getSvgURL('home', 'home-keyword')" :size="50" />
+          <u-icon :name="getSvgURL('home', 'home-keyword')" size="50rpx" />
         </view>
       </view>
 
@@ -139,7 +139,7 @@ onMounted(() => {
               <view class="text-14rpx text-#eaebed mix-blend-soft-light">VISITOR REGISTRATION</view>
             </view>
             <view class="my-auto pr-40rpx">
-              <u-icon :name="getSvgURL('home', 'home-register')" :size="70" />
+              <u-icon :name="getSvgURL('home', 'home-register')" size="140rpx" />
             </view>
           </view>
           <view
@@ -148,7 +148,7 @@ onMounted(() => {
             @click="onJump('停车缴费')"
           >
             <view class="flex justify-end p-20rpx">
-              <u-icon :name="getSvgURL('home', 'home-park')" :size="24" />
+              <u-icon :name="getSvgURL('home', 'home-park')" size="48rpx" />
             </view>
             <view class="text-white p-20rpx">
               <view class="text-30rpx mb-6rpx">停车缴费</view>
@@ -163,7 +163,7 @@ onMounted(() => {
             @click="onJump('会议预定')"
           >
             <view class="flex justify-end p-20rpx">
-              <u-icon :name="getSvgURL('home', 'home-conference')" :size="24" />
+              <u-icon :name="getSvgURL('home', 'home-conference')" size="48rpx" />
             </view>
             <view class="text-white p-20rpx">
               <view class="text-30rpx mb-6rpx">会议预定</view>
@@ -176,13 +176,13 @@ onMounted(() => {
             @click="onJump('报事报修')"
           >
             <view class="text-white p-20rpx">
-              <view class="text-30rpx mb-6rpx">报事报修123</view>
+              <view class="text-30rpx mb-6rpx">报事报修</view>
               <view class="text-14rpx text-#eaebed mix-blend-soft-light"
                 >REPORTING FOR REPAIRS</view
               >
             </view>
             <view class="h-[100%] flex items-center mr-[40rpx]">
-              <u-image :src="getImageURL('home', 'home-repairs')" width="70px" height="70px" />
+              <u-image :src="getImageURL('home', 'home-repairs')" width="140rpx" height="140rpx" />
             </view>
           </view>
         </view>
@@ -198,7 +198,7 @@ onMounted(() => {
             </view>
             <view class="h-[100%] flex items-center mr-[40rpx]">
               <!-- <up-image :show-loading="true" width="80px" height="80px" /> -->
-              <u-icon :name="getSvgURL('home', 'home-intelligent-life')" :size="70" />
+              <u-icon :name="getSvgURL('home', 'home-intelligent-life')" size="140rpx" />
             </view>
           </view>
           <view
@@ -207,7 +207,7 @@ onMounted(() => {
             @click="onJump('招商政策')"
           >
             <view class="flex justify-end p-20rpx">
-              <u-icon :name="getSvgURL('home', 'home-attract-business')" :size="24" />
+              <u-icon :name="getSvgURL('home', 'home-attract-business')" size="48rpx" />
             </view>
             <view class="text-white p-20rpx">
               <view class="text-30rpx mb-6rpx">招商政策</view>
@@ -222,7 +222,7 @@ onMounted(() => {
             @click="onJump('园区E闻')"
           >
             <view class="flex justify-end p-20rpx">
-              <u-icon :name="getSvgURL('home', 'home-Ecircle')" :size="24" />
+              <u-icon :name="getSvgURL('home', 'home-Ecircle')" size="48rpx" />
             </view>
             <view class="text-white p-20rpx">
               <view class="text-30rpx mb-6rpx">园区E闻</view>
@@ -252,13 +252,13 @@ onMounted(() => {
           <view
             class="w-335rpx h-180rpx rounded-20rpx flex flex-col justify-between"
             style="background: linear-gradient(353.74deg, #c8ebf1 0%, #82c5d8 100%)"
-            @click="onJump('园区导航')"
+            @click="onJump('园区导览')"
           >
             <view class="flex justify-end p-20rpx">
-              <u-icon :name="getSvgURL('home', 'home-exhibition')" :size="24" />
+              <u-icon :name="getSvgURL('home', 'home-exhibition')" size="48rpx" />
             </view>
             <view class="text-white p-20rpx">
-              <view class="text-30rpx mb-6rpx">园区导航</view>
+              <view class="text-30rpx mb-6rpx">园区导览</view>
               <view class="text-14rpx text-#eaebed mix-blend-soft-light">PARK NEWS </view>
             </view>
           </view>
@@ -268,7 +268,7 @@ onMounted(() => {
             @click="onJump('企业风采')"
           >
             <view class="flex justify-end p-20rpx">
-              <u-icon :name="getSvgURL('home', 'home-presence')" :size="24" />
+              <u-icon :name="getSvgURL('home', 'home-presence')" size="48rpx" />
             </view>
             <view class="text-white p-20rpx">
               <view class="text-30rpx mb-6rpx mb-6rpx">企业风采</view>
