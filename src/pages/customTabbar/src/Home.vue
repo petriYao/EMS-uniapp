@@ -42,7 +42,7 @@ const onJump = (title: string) => {
     case '企业风采':
       src = 'enterprisesDemeanour/index'
       break
-    case '园区展览':
+    case '园区导航':
       src = 'exhibition/index'
       break
     case '停车缴费':
@@ -60,6 +60,9 @@ const onJump = (title: string) => {
       break
     case '客服咨询':
       src = 'home/consult/index'
+      break
+    case '智慧生活':
+      src = 'home/intelligentLife/index'
       break
     default:
       uToastRef.value.show({
@@ -178,30 +181,24 @@ onMounted(() => {
                 >REPORTING FOR REPAIRS</view
               >
             </view>
-            <view class="my-auto pr-40rpx">
-              <u-icon :name="getSvgURL('home', 'home-repairs')" :size="70" />
+            <view class="h-[100%] flex items-center mr-[40rpx]">
+              <u-image :src="getImageURL('home', 'home-repairs')" width="70px" height="70px" />
             </view>
           </view>
         </view>
         <view class="my-20rpx mx-30rpx flex-rows justify-between">
           <view
-            class="rectangle flex flex-row justify-between h-full position-relative"
-            style="background: linear-gradient(355.63deg, #c9eaf1 0%, #83c4d8 100%)"
-            @click="onJump('园区简介')"
+            class="rectangle flex flex-row justify-between h-full"
+            style="background: linear-gradient(355.63deg, #48a3f4 0%, #2e63bf 100%)"
+            @click="onJump('智慧生活')"
           >
             <view class="text-white p-20rpx">
-              <view class="text-30rpx mb-6rpx">园区简介</view>
-              <view class="text-14rpx text-#eaebed mix-blend-soft-light">ADMISSION POLICY</view>
+              <view class="text-30rpx mb-6rpx">智慧生活</view>
+              <view class="text-14rpx text-#eaebed mix-blend-soft-light">INTELLIGENT LIFE</view>
             </view>
-            <view class="position-absolute bottom-[-6rpx] w-[inherit]">
-              <u-image
-                :show-loading="true"
-                width="100%"
-                height="180rpx"
-                rounded="20rpx"
-                :src="appStore.introductionBG"
-              />
-              <!-- <img class="w-full rounded-20rpx" :src="getImageURL('home', 'home-introduction')" /> -->
+            <view class="h-[100%] flex items-center mr-[40rpx]">
+              <!-- <up-image :show-loading="true" width="80px" height="80px" /> -->
+              <u-icon :name="getSvgURL('home', 'home-intelligent-life')" :size="70" />
             </view>
           </view>
           <view
@@ -222,27 +219,32 @@ onMounted(() => {
           <view
             class="square h-full flex flex-col justify-between"
             style="background: linear-gradient(348.98deg, #93e7c6 0%, #57bc9c 100%)"
-            @click="onJump('园区E圈')"
+            @click="onJump('园区E闻')"
           >
             <view class="flex justify-end p-20rpx">
               <u-icon :name="getSvgURL('home', 'home-Ecircle')" :size="24" />
             </view>
             <view class="text-white p-20rpx">
-              <view class="text-30rpx mb-6rpx">园区E圈</view>
+              <view class="text-30rpx mb-6rpx">园区E闻</view>
               <view class="text-14rpx text-#eaebed mix-blend-soft-light">PARK NEWS</view>
             </view>
           </view>
           <view
-            class="rectangle flex flex-row justify-between h-full"
-            style="background: linear-gradient(355.63deg, #48a3f4 0%, #2e63bf 100%)"
-            @click="onJump('园区E闻')"
+            class="rectangle relative flex flex-row justify-between h-full"
+            style="background: linear-gradient(355.63deg, #c9eaf1 0%, #83c4d8 100%)"
+            @click="onJump('园区简介')"
           >
             <view class="text-white p-20rpx">
-              <view class="text-30rpx mb-6rpx">园区E闻</view>
+              <view class="text-30rpx mb-6rpx">园区简介</view>
               <view class="text-14rpx text-#eaebed mix-blend-soft-light">PARK NEWS</view>
             </view>
-            <view class="my-auto pr-40rpx">
-              <u-icon :name="getSvgURL('home', 'home-Esmell')" :size="70" />
+            <view class="absolute w-100%">
+              <u-image
+                height="180rpx"
+                width="100%"
+                radius="20rpx"
+                :src="getImageURL('home', 'home-introduction')"
+              />
             </view>
           </view>
         </view>
@@ -250,13 +252,13 @@ onMounted(() => {
           <view
             class="w-335rpx h-180rpx rounded-20rpx flex flex-col justify-between"
             style="background: linear-gradient(353.74deg, #c8ebf1 0%, #82c5d8 100%)"
-            @click="onJump('园区展览')"
+            @click="onJump('园区导航')"
           >
             <view class="flex justify-end p-20rpx">
               <u-icon :name="getSvgURL('home', 'home-exhibition')" :size="24" />
             </view>
             <view class="text-white p-20rpx">
-              <view class="text-30rpx mb-6rpx">园区展览</view>
+              <view class="text-30rpx mb-6rpx">园区导航</view>
               <view class="text-14rpx text-#eaebed mix-blend-soft-light">PARK NEWS </view>
             </view>
           </view>

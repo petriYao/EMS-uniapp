@@ -122,6 +122,13 @@
       }
     },
     {
+      "path": "pages/home/intelligentLife/index",
+      "style": {
+        "navigationBarTitleText": "智慧生活",
+        "navigationStyle": "custom"
+      }
+    },
+    {
       "path": "pages/home/visitorRegistration/index",
       "style": {
         "navigationBarTitleText": "访客登记",
@@ -132,6 +139,13 @@
       "path": "pages/home/reportRepairs/index",
       "style": {
         "navigationBarTitleText": "报事报修",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/home/reportRepairs/AddReportRepairs",
+      "style": {
+        "navigationBarTitleText": "新增/编辑报事报修",
         "navigationStyle": "custom"
       }
     },

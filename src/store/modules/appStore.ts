@@ -87,6 +87,7 @@ const useAppStore = defineStore('app', {
       //#ifdef H5
       setAppStatusBarTitleColor(false)
       this.menuTop = Number(getAppStatusBarHeight()) || 0
+      this.notchHeight = this.menuTop
       //#endif
       //屏幕宽度
       const getWindowInfo = uni.getWindowInfo()
