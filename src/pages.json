@@ -136,14 +136,14 @@
       }
     },
     {
-      "path": "pages/home/reportRepairs/index",
+      "path": "pages/home/reportRepairs/ReportRepairsList",
       "style": {
         "navigationBarTitleText": "报事报修",
         "navigationStyle": "custom"
       }
     },
     {
-      "path": "pages/home/reportRepairs/AddReportRepairs",
+      "path": "pages/home/reportRepairs/ReportRepairsAdd",
       "style": {
         "navigationBarTitleText": "新增/编辑报事报修",
         "navigationStyle": "custom"

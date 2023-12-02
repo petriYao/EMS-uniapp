@@ -56,7 +56,7 @@ const onJump = (title: string) => {
       src = 'home/visitorRegistration/index'
       break
     case '报事报修':
-      src = 'home/reportRepairs/index'
+      src = 'home/reportRepairs/ReportRepairsList'
       break
     case '客服咨询':
       src = 'home/consult/index'

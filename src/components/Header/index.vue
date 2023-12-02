@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, useSlots } from 'vue'
+import { useSlots } from 'vue'
 import router from '../../router'
 import { useAppStore } from '@/store'
 

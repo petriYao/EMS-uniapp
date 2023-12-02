@@ -1,7 +1,14 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const props = defineProps({
+  background: {
+    type: String,
+    default: '#fff'
+  }
+})
+</script>
 
 <template>
-  <view class="box">
+  <view class="box" :style="{ background: props.background }">
     <slot></slot>
   </view>
 </template>
@@ -13,6 +20,6 @@
   width: 100%;
   padding-top: 20rpx;
   padding-bottom: 40rpx;
-  z-index: 99999;
+  z-index: 9;
 }
 </style>

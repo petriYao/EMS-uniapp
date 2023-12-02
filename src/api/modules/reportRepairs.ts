@@ -1,12 +1,28 @@
 import { useAxios } from '@/hooks/useAxios'
-import { AppSetInfoType, AppSetListType } from '@/types/commonModel'
+import { ReportRepairsInfoType, ReportRepairsListType } from '@/types/reportRepairsModel'
+import { number } from 'vue-types'
 
 const { post } = useAxios()
 
 /**
  * 添加报事报修
  */
-export const addReportRepairs = (data: any) => {
-  console.log('添加报事报修内容', data)
-  return post<AppSetInfoType>('report-repairs/add', { ...data })
+export const ReportRepairsAddApi = (data: any, reportRepairsId?: number) => {
+  return post<any>(`report-repairs/${reportRepairsId ? 'update' : 'add'}`, {
+    ...data,
+    reportRepairsId
+  })
+}
+
+/**报事报修列表 */
+export const ReportRepairsListApi = (reportRepairsStatus: number, page?: number, size?: number) => {
+  return post<{ list: ReportRepairsListType[]; total: number; page: number; size: number }>(
+    'report-repairs/list',
+    { reportRepairsStatus, page, size }
+  )
+}
+
+/**报事报修详情 */
+export const ReportRepairsInfoApi = (reportRepairsId: number) => {
+  return post<ReportRepairsInfoType>('report-repairs/info', { reportRepairsId })
 }
