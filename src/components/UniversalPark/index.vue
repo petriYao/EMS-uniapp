@@ -8,6 +8,10 @@ const props = defineProps({
   data: {
     type: Object as () => AppSetInfoType,
     default: {} as any
+  },
+  fixedHeightL: {
+    type: String,
+    default: ''
   }
 })
 
@@ -61,7 +65,7 @@ watch(
   <view v-if="swiperImgList && swiperImgList.length > 1">
     <u-swiper
       :list="swiperImgList"
-      :height="productHeight"
+      :height="props.fixedHeightL ?? productHeight"
       imgMode="heightFix"
       :autoplay="true"
       indicatorActiveColor="#9D9D9D"
@@ -85,7 +89,7 @@ watch(
     <u-image
       width="100%"
       mode="widthFix"
-      :height="getImageHeight(props.data?.imageArray[0])"
+      :height="props.fixedHeightL ?? getImageHeight(props.data?.imageArray[0])"
       :src="swiperImgList[0]"
       :show-loading="true"
     />
@@ -100,7 +104,7 @@ watch(
     <!-- eslint-disable vue/no-v-html -->
     <view v-html="htmlContent" />
   </view>
-  <view class="w-full h-[200rpx]" />
+  <!-- <view class="w-full h-[200rpx]" /> -->
 </template>
 
 <style lang="scss" scoped>
