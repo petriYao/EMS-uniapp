@@ -53,7 +53,8 @@ export const getIsPublic = (url: string | undefined) => {
     url === 'check-sms-code' ||
     url === 'app/app-info' ||
     url === 'app/app-list' ||
-    url === 'app/app-list-info'
+    url === 'app/app-list-info' ||
+    url === 'product/list'
   ) {
     // 公开接口
     return true
