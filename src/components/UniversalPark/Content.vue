@@ -30,6 +30,7 @@ watch(
   () => props.select,
   () => {
     inSelect.value = props.select
+    infoData.value = []
     getData()
   },
   {

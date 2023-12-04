@@ -38,14 +38,27 @@ const close = () => {
   useModal.clearData()
 }
 
+/**跳转登录界面 */
+const onLogin = () => {
+  //H5的时候跳转
+  // #ifdef H5
+  router.push({
+    url: '/pages/login/login'
+  })
+  // #endif
+  //微信的时候跳转
+  // #ifdef MP
+  router.push({
+    url: `/pages/login/login?isPhone=true`
+  })
+  // #endif
+}
+
 //确认
 const confirm = () => {
-  const isBind = useModal.modalData.type === 2 && useModal.modalData.title === '未绑定' ? 1 : 0
   close()
   if (useModal.modalData.type === 2) {
-    router.push({
-      url: `/packageLogin/login/Login?isBind=${isBind}`
-    })
+    onLogin()
   }
 }
 

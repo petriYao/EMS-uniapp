@@ -62,8 +62,14 @@ const onJump = (title: string) => {
       src = 'home/consult/index'
       break
     case '智慧生活':
-      src = 'home/intelligentLife/index'
-      break
+      appStore.bottomTabbarTitle = '服务'
+      setTimeout(() => {
+        uni.pageScrollTo({
+          scrollTop: 99999,
+          duration: 0
+        })
+      }, 100)
+      return
     default:
       uToastRef.value.show({
         type: 'default',
