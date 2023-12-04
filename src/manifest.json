@@ -71,7 +71,6 @@
           }
         }
       }
-    }
   },
   "mp-weixin": {
     "appid": "wxf2a7764f864b255c",
@@ -94,7 +93,6 @@
       }
     }
   },
-
   "uniStatistics": {
     "enable": false
   },
