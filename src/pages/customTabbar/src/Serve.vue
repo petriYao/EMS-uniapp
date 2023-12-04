@@ -11,6 +11,9 @@ import { getSvgURL } from '@/utils'
 // 轮播图
 const imgObj = ref({} as AppSetInfoType)
 
+// 轮播图
+const current = ref(0)
+
 const dataObj = [
   {
     title: '产业E家',
@@ -134,11 +137,13 @@ const dataObj = [
     ]
   }
 ]
-
+const swiperImgList = ref()
 const getParkProfile = async () => {
   const res = await AppSetInfoApi('serviceCarouselImage')
   if (res.success && res.value) {
     imgObj.value = res.value
+    console.log('imgObj', imgObj.value)
+    swiperImgList.value = res.value.imageArray.map((item: any) => item.previewUrl)
   }
 }
 
@@ -174,7 +179,26 @@ onMounted(() => {
         v-if="index === 1 && (imgObj.content || imgObj.imageArray || imgObj.title)"
         class="h-200rpx mx-20rpx"
       >
-        <UniversalPark :data="imgObj" fixedHeightL="200rpx" />
+        <u-swiper
+          :list="swiperImgList"
+          :height="`200rpx`"
+          imgMode="heightFix"
+          :autoplay="true"
+          indicatorActiveColor="#9D9D9D"
+          indicatorInactiveColor="#CACACA"
+          @change="(e:any) => (current = e.current)"
+        >
+          <template #indicator>
+            <view class="indicator" v-if="swiperImgList.length > 1">
+              <view
+                class="indicator__dot"
+                v-for="(_item, index) in swiperImgList"
+                :key="index"
+                :class="[index === current && 'indicator__dot--active']"
+              />
+            </view>
+          </template>
+        </u-swiper>
       </view>
     </template>
   </ContentWrap>

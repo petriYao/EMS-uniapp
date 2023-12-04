@@ -11,7 +11,7 @@ import noData from '@components/noData/NoData.vue'
 const dataObj = ref({} as AppSetInfoType)
 
 const getParkProfile = async () => {
-  const res = await AppSetInfoApi('parkWelfare')
+  const res = await AppSetInfoApi('welfareCarouselImage')
   if (res.success && res.value) {
     dataObj.value = res.value
   }
@@ -24,7 +24,6 @@ onMounted(() => {
 
 <template>
   <ContentWrap>
-    <Header :isLeftIcon="false" title="福利" />
     <!-- 头部结束 -->
     <view v-if="dataObj.content || dataObj.imageArray || dataObj.title">
       <UniversalPark :data="dataObj" />

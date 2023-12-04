@@ -2,7 +2,8 @@
 import { useAppStore } from '@/store'
 import { AppSetInfoType } from '@/types/commonModel'
 import { isEmpty } from '@/utils'
-import { ref, watch } from 'vue'
+import { reactive, ref, watch } from 'vue'
+import Content from './Content.vue'
 
 const props = defineProps({
   data: {
@@ -20,38 +21,19 @@ const appStore = useAppStore()
 // 轮播图
 const current = ref(0) //当前所在滑块的 index
 const swiperImgList = ref([] as string[]) //轮播图图片
-const htmlContent = ref('')
-const productHeight = ref()
 
-const getImageHeight = (imageItem: any) => {
-  if (imageItem.imageDim) {
-    return (imageItem.imageDim.height / imageItem.imageDim.width) * appStore.screenWidth
-  }
-  return ''
+const reactiveData = reactive({
+  select: 'xiaobaoWelfare'
+})
+
+const selectClick = (type: string) => {
+  reactiveData.select = type
 }
-
 watch(
   () => props.data,
   () => {
     if (!isEmpty(props.data)) {
-      htmlContent.value = props.data.content ?? ''
       swiperImgList.value = props.data?.imageArray?.map((item) => item.previewUrl) ?? []
-
-      //图片显示高度
-      const min = uni.upx2px(300)
-      const max = (appStore.screenWidth * 4) / 3
-      const screenWidth = appStore.screenWidth
-      let height = min
-      for (const item of props.data?.imageArray ?? []) {
-        if (item.imageDim) {
-          const temp = (item.imageDim.height / item.imageDim.width) * screenWidth
-          if (temp > height) {
-            height = temp
-          }
-        }
-      }
-      if (height > max) height = max
-      productHeight.value = height
     }
   },
   {
@@ -65,8 +47,8 @@ watch(
   <view v-if="swiperImgList && swiperImgList.length > 1">
     <u-swiper
       :list="swiperImgList"
-      :height="props.fixedHeightL ?? productHeight"
-      imgMode="heightFix"
+      :height="200"
+      imgMode="aspectFill"
       :autoplay="true"
       indicatorActiveColor="#9D9D9D"
       indicatorInactiveColor="#CACACA"
@@ -84,30 +66,53 @@ watch(
       </template>
     </u-swiper>
   </view>
-
   <view v-else-if="swiperImgList && swiperImgList.length === 1">
-    <u-image
-      width="100%"
-      mode="widthFix"
-      :height="props.fixedHeightL ?? getImageHeight(props.data?.imageArray[0])"
-      :src="swiperImgList[0]"
-      :show-loading="true"
-    />
+    <u-image width="100%" height="150" :src="swiperImgList[0]" :show-loading="true" />
   </view>
 
-  <view
-    class="p-3 mx-3 mt-3 bg-white rdouned-lg"
-    v-if="(props.data?.title && props.data?.title?.length > 0) || htmlContent.length > 0"
-  >
-    <view class="text-36rpx font-550 pb-4">{{ props.data?.title }}</view>
-    <!-- eslint-disable vue/no-v-text-v-html-on-component -->
-    <!-- eslint-disable vue/no-v-html -->
-    <view v-html="htmlContent" />
+  <view class="flex justify-between mx-20rpx mt-20rpx">
+    <view
+      class="button-title"
+      :class="reactiveData.select === 'xiaobaoWelfare' ? 'active' : ''"
+      @click="selectClick('xiaobaoWelfare')"
+      >小宝福利</view
+    >
+    <view
+      class="button-title"
+      :class="reactiveData.select === '1' ? 'active' : ''"
+      @click="selectClick('1')"
+      >线上特惠</view
+    >
+    <view
+      class="button-title"
+      :class="reactiveData.select === '2' ? 'active' : ''"
+      @click="selectClick('2')"
+      >包厢预约</view
+    >
   </view>
-  <!-- <view class="w-full h-[200rpx]" /> -->
+  <view class="mx-20rpx">
+    <Content :select="reactiveData.select" />
+  </view>
 </template>
 
 <style lang="scss" scoped>
+.button-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 70rpx;
+  width: 200rpx;
+  border-radius: 80rpx;
+  background: #fff;
+  border: 1px solid #9d9d9d;
+}
+
+.active {
+  color: #fff;
+  border-color: linear-gradient(to right, #1957e6, #5670f3);
+  background: linear-gradient(to right, #1957e6, #5670f3);
+}
+
 :deep(.u-swiper) {
   padding-bottom: 0 !important;
   background: #f6f7fb !important;

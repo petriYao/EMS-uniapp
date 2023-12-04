@@ -1,6 +1,5 @@
 import { useAxios } from '@/hooks/useAxios'
 import { ReportRepairsInfoType, ReportRepairsListType } from '@/types/reportRepairsModel'
-import { number } from 'vue-types'
 
 const { post } = useAxios()
 
