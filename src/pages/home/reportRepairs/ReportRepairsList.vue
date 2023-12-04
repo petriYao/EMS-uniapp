@@ -112,7 +112,6 @@ const onRefresherrefresh = () => {
 
 //上拉加载更多
 const onScrolltolower = async () => {
-  console.log('onScrolltolower')
   if (reactiveData.loadMore === 'loadmore') {
     reactiveData.loadMore = 'loading'
     page.value++
