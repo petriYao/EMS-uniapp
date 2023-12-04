@@ -1,5 +1,13 @@
 import { isDebug } from './config/config'
 
+//获取设配类型 android or ios
+export const getDeviceTypeByApp = () => {
+  if (isDebug()) {
+    return ''
+  }
+  return prompt('getDeviceType', 'getDeviceType')
+}
+
 //获取地址
 export const getLocationByApp = () => {
   if (isDebug()) {
