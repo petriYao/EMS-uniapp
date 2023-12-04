@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 
-import { AppSetInfoType } from '@/types/commonModel'
 import { AppSetInfoApi } from '@/api'
 
-import UniversalPark from '@components/UniversalPark/index.vue'
+import IndexTwo from '@components/UniversalPark/indexTwo.vue'
 import noData from '@components/noData/NoData.vue'
 
 // 轮播图
-const dataObj = ref({} as AppSetInfoType)
+const dataObj = ref()
 
 const getParkProfile = async () => {
   const res = await AppSetInfoApi('welfareCarouselImage')
@@ -24,9 +23,10 @@ onMounted(() => {
 
 <template>
   <ContentWrap>
+    <Header :isLeftIcon="false" title="福利" />
     <!-- 头部结束 -->
-    <view v-if="dataObj.content || dataObj.imageArray || dataObj.title">
-      <UniversalPark :data="dataObj" />
+    <view v-if="dataObj">
+      <IndexTwo :data="dataObj" />
     </view>
     <noData v-else />
   </ContentWrap>

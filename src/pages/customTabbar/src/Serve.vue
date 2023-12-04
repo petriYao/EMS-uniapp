@@ -1,18 +1,12 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 
-import { AppSetInfoType } from '@/types/commonModel'
-import { AppSetInfoApi } from '@/api'
-
-import UniversalPark from '@components/UniversalPark/index.vue'
-import noData from '@components/noData/NoData.vue'
 import { getSvgURL } from '@/utils'
-
-// 轮播图
-const imgObj = ref({} as AppSetInfoType)
+import { AppSetInfoApi } from '@/api'
 
 // 轮播图
 const current = ref(0)
+const swiperImgList = ref<string[]>([])
 
 const dataObj = [
   {
@@ -137,13 +131,10 @@ const dataObj = [
     ]
   }
 ]
-const swiperImgList = ref()
 const getParkProfile = async () => {
   const res = await AppSetInfoApi('serviceCarouselImage')
   if (res.success && res.value) {
-    imgObj.value = res.value
-    console.log('imgObj', imgObj.value)
-    swiperImgList.value = res.value.imageArray.map((item: any) => item.previewUrl)
+    swiperImgList.value = res.value.imageArray.map((item: any) => item.previewUrl) ?? []
   }
 }
 
@@ -175,10 +166,7 @@ onMounted(() => {
           </u-grid>
         </view>
       </view>
-      <view
-        v-if="index === 1 && (imgObj.content || imgObj.imageArray || imgObj.title)"
-        class="h-200rpx mx-20rpx"
-      >
+      <view v-if="index === 1 && swiperImgList.length > 0" class="h-200rpx mx-20rpx">
         <u-swiper
           :list="swiperImgList"
           :height="`200rpx`"
@@ -192,9 +180,9 @@ onMounted(() => {
             <view class="indicator" v-if="swiperImgList.length > 1">
               <view
                 class="indicator__dot"
-                v-for="(_item, index) in swiperImgList"
-                :key="index"
-                :class="[index === current && 'indicator__dot--active']"
+                v-for="(_item, index2) in swiperImgList"
+                :key="index2"
+                :class="[index2 === current && 'indicator__dot--active']"
               />
             </view>
           </template>
@@ -227,9 +215,6 @@ onMounted(() => {
   /* #ifndef H5 */
   box-sizing: border-box;
   /* #endif */
-}
-
-.p-20rpx {
 }
 
 .indicator {

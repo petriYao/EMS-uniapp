@@ -1,5 +1,4 @@
 import { useAxios } from '@/hooks/useAxios'
-import { ReportRepairsInfoType } from '@/types/reportRepairsModel'
 
 const { post } = useAxios()
 
