@@ -1,8 +1,8 @@
-import { isDebug } from './config/config'
+import { isCloseInteraction } from './config/config'
 
 //获取设配类型 android or ios
 export const getDeviceTypeByApp = () => {
-  if (isDebug()) {
+  if (isCloseInteraction) {
     return ''
   }
   return prompt('getDeviceType', 'getDeviceType')
@@ -10,7 +10,7 @@ export const getDeviceTypeByApp = () => {
 
 //获取地址
 export const getLocationByApp = () => {
-  if (isDebug()) {
+  if (isCloseInteraction) {
     return '119.247885,26.107134'
   }
   return prompt('getLocation', 'getLocation')
@@ -18,7 +18,7 @@ export const getLocationByApp = () => {
 
 //获取相机权限
 export const getCameraPermissionByApp = () => {
-  if (isDebug()) {
+  if (isCloseInteraction) {
     return true
   }
   return prompt('getCameraPermission', 'getCameraPermission') === '1'
@@ -26,7 +26,7 @@ export const getCameraPermissionByApp = () => {
 
 //获取录音权限
 export const getAudioPermissionByApp = () => {
-  if (isDebug()) {
+  if (isCloseInteraction) {
     return true
   }
   return prompt('getAudioPermission', 'getAudioPermission') === '1'
@@ -39,25 +39,25 @@ export const openAppSetting = () => {
 
 //设置App顶部状态栏的字体的颜色
 export const setAppStatusBarTitleColor = (isWhite: boolean) => {
-  if (isDebug()) return
+  if (isCloseInteraction) return
   prompt('setAppStatusBarTitleColor', 'setAppStatusBarTitleColor@' + (isWhite ? '1' : '0'))
 }
 
 //获取App顶部状态栏的高度
 export const getAppStatusBarHeight = () => {
-  if (isDebug()) return
+  if (isCloseInteraction) return
   return prompt('getStatusBarHeight', 'getStatusBarHeight') ?? 0
 }
 
 //更新版本
 export const openAppUpdater = (url: string) => {
-  if (isDebug()) return
+  if (isCloseInteraction) return
   prompt('openAppUpdater', 'openAppUpdater@' + url)
 }
 
 //获取密钥
 export const getPublicEncrypt = (str: string) => {
-  if (isDebug()) return
+  if (isCloseInteraction) return
   return prompt('getPublicEncrypt', 'getPublicEncrypt@' + str)
 }
 

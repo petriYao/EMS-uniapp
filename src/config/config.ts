@@ -8,6 +8,9 @@ export const isShowApiLog = false
 //是否显示聊天日志
 export const isShowChatLog = false
 
+//是否关闭交互
+export const isCloseInteraction = false
+
 //环境路径 false 线上，true 线下
 const debug = true
 

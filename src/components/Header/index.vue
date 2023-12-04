@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useSlots } from 'vue'
+import { ref, useSlots } from 'vue'
 import router from '../../router'
 import { useAppStore } from '@/store'
 
@@ -41,7 +41,10 @@ const props = defineProps({
 const slots = useSlots() //检查是否有插槽
 const appStore = useAppStore()
 
-const classHeight = appStore.menuTop + 'px'
+const classHeight = ref<string | null>(appStore.menuTop + 'px')
+if (appStore.deviceType == 'ios') {
+  classHeight.value = null
+}
 
 const onLeftClick = () => {
   router.back()

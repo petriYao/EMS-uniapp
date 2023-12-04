@@ -3,13 +3,15 @@ import { defineStore } from 'pinia'
 import { getUserIdentity } from '@/hooks/useCache'
 import router from '@/router'
 import { getImageURL } from '@/utils'
-import { getAppStatusBarHeight, setAppStatusBarTitleColor } from '@/interaction'
+import { getAppStatusBarHeight, getDeviceTypeByApp, setAppStatusBarTitleColor } from '@/interaction'
 
 const useAppStore = defineStore('app', {
   state: () => {
     return {
       //缓存图片
       cacheImageList: {} as any,
+      //
+      deviceType: '首页',
       //小程序胶囊菜单按钮的高度
       menuTop: 0 as number,
       //小程序胶囊菜单按钮的上边界坐标
@@ -93,6 +95,7 @@ const useAppStore = defineStore('app', {
       setAppStatusBarTitleColor(false)
       this.menuTop = Number(getAppStatusBarHeight()) || 0
       this.notchHeight = this.menuTop
+      this.deviceType = getDeviceTypeByApp() || ''
       //#endif
       //屏幕宽度
       const getWindowInfo = uni.getWindowInfo()
