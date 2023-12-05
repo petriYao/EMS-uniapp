@@ -15,7 +15,6 @@ const current = ref(0)
 
 const keyword = ref('')
 const swiperImgList = ref([getImageURL('home', 'home-carousel1')])
-const uToastRef = ref()
 
 const getHeadCarouselImage = async () => {
   const res = await AppSetInfoApi('headCarouselImage')
@@ -71,10 +70,10 @@ const onJump = (title: string) => {
       }, 100)
       return
     default:
-      uToastRef.value.show({
-        type: 'default',
-        title: '默认主题',
-        message: '待开发'
+      uni.showToast({
+        title: '待开发',
+        icon: 'success',
+        mask: true
       })
       return
   }
@@ -129,7 +128,7 @@ onMounted(() => {
           class="position-absolute right-60rpx bottom-40rpx z-99"
           @click.stop="onJump('客服咨询')"
         >
-          <u-icon :name="getSvgURL('home', 'home-keyword')" size="50rpx" />
+          <u-icon :name="getSvgURL('home', 'home-keyword')" size="60rpx" />
         </view>
       </view>
 
@@ -283,7 +282,6 @@ onMounted(() => {
           >
         </view>
       </view>
-      <u-toast ref="uToastRef" />
       <view class="w-full h-6vh" />
     </scroll-view>
   </ContentWrap>

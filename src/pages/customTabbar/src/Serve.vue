@@ -1,8 +1,14 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 
+import { useAppStore } from '@/store'
+import { useEmitt } from '@/hooks/useEmitt'
 import { getSvgURL } from '@/utils'
 import { AppSetInfoApi } from '@/api'
+import router from '@/router'
+
+const appStore = useAppStore()
+const { emitter } = useEmitt()
 
 // 轮播图
 const current = ref(0)
@@ -138,6 +144,51 @@ const getParkProfile = async () => {
   }
 }
 
+const onJump = (title: string) => {
+  let src = ''
+  switch (title) {
+    case '政策咨询':
+      src = 'investmentPolicies/investmentPoliciesList'
+      break
+    case '访客登记':
+      src = 'home/visitorRegistration/index'
+      break
+    case '停车缴费':
+      appStore.bottomTabbarTitle = '一码通'
+      emitter.emit('Qrcode:Change', 1)
+      return
+    case '报事报修':
+      src = 'home/reportRepairs/ReportRepairsList'
+      break
+    case '出行交通':
+      src = 'exhibition/index'
+      break
+    case '园区导览':
+      src = 'exhibition/index'
+      break
+    case '咨询建议':
+      src = 'home/consult/index'
+      break
+    case '社群活动':
+      break
+    case '园区E圈':
+      src = 'parkECircle/parkECircleList'
+      break
+    default:
+      uni.showToast({
+        title: '待开发',
+        icon: 'success',
+        mask: true
+      })
+      return
+  }
+  if (src.length > 0) {
+    router.push({
+      url: `/pages/${src}`
+    })
+  }
+}
+
 onMounted(() => {
   getParkProfile()
 })
@@ -155,6 +206,7 @@ onMounted(() => {
             <u-grid-item
               v-for="(baseListItem, baseListIndex) in item.baseList"
               :key="baseListIndex"
+              @click="onJump('停车缴费')"
             >
               <u-icon
                 :customStyle="{ paddingTop: 20 + 'rpx' }"
