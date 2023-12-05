@@ -206,7 +206,7 @@ onMounted(() => {
             <u-grid-item
               v-for="(baseListItem, baseListIndex) in item.baseList"
               :key="baseListIndex"
-              @click="onJump('停车缴费')"
+              @click="onJump(baseListItem.title)"
             >
               <u-icon
                 :customStyle="{ paddingTop: 20 + 'rpx' }"
