@@ -128,7 +128,7 @@ onMounted(() => {
           class="position-absolute right-60rpx bottom-40rpx z-99"
           @click.stop="onJump('客服咨询')"
         >
-          <u-icon :name="getSvgURL('home', 'home-keyword')" size="60rpx" />
+          <u-icon :name="getSvgURL('home', 'home-keyword')" size="70rpx" />
         </view>
       </view>
 
