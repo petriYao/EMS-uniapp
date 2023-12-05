@@ -37,9 +37,13 @@ onLoad((val: any) => {
 
 <template>
   <ContentWrap>
+    <img class="bg-img" :src="getImageURL('home', 'login-bg')" mode="contain" />
+
     <Header :placeholder="false" />
-    <img class="bg-img" :src="getImageURL('home', 'login-bg')" mode="heightFix" />
-    <view class="position-relative z-1 mt-250rpx">
+    <!-- <view class="bg-img">
+      <u-Image :src="getImageURL('home', 'login-bg')" height="100vh" width="100vw" />
+    </view> -->
+    <view class="relative z-1 mt-250rpx">
       <view class="pb-60rpx flex justify-center items-center flex-col">
         <view> <u-icon :name="getSvgURL('login', 'login-logo')" size="70" /></view>
         <view class="mt-40rpx text-42rpx font-600">您好，欢迎登录数小宝</view>
@@ -68,8 +72,6 @@ onLoad((val: any) => {
             </view>
           </view>
         </view>
-
-        <view class="w-100vw h-20vw" />
       </view>
     </view>
     <BottomButton>
@@ -100,9 +102,14 @@ onLoad((val: any) => {
 </template>
 
 <style lang="scss" scoped>
+page {
+  overflow: hidden;
+}
 .bg-img {
-  position: absolute;
+  position: fixed;
   height: 100vh;
+  width: 100%;
+  top: 0;
 }
 :deep(.u-status-bar) {
   background-color: unset !important;
