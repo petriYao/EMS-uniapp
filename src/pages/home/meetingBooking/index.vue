@@ -1,8 +1,15 @@
 <script setup lang="ts">
 import { onLoad } from '@dcloudio/uni-app'
 import { getImageURL } from '@/utils'
+import router from '@/router'
 
-// 轮播图
+// 预定会议室
+const addMeetingClick = () => {
+  //跳转
+  router.push({
+    url: `/pages/meeting/Reservation`
+  })
+}
 
 onLoad(async () => {})
 </script>
@@ -20,8 +27,8 @@ onLoad(async () => {})
       />
     </view>
     <view class="mx-20rpx">
-      <view
-        ><u-button
+      <view>
+        <u-button
           iconColor="#196CFF"
           :customStyle="{
             border: '0',
@@ -29,16 +36,19 @@ onLoad(async () => {})
           }"
           type="primary"
           text="预定会议室"
-      /></view>
-      <view class="mt-20rpx"
-        ><u-button
+          @click="addMeetingClick"
+        />
+      </view>
+      <view class="mt-20rpx">
+        <u-button
           :customStyle="{
             border: '0',
             color: '#196CFF'
           }"
           :plain="true"
           text="我的会议"
-      /></view>
+        />
+      </view>
     </view>
     <!-- 头部结束 -->
   </ContentWrap>

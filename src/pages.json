@@ -1,5 +1,6 @@
 {
   "easycom": {
+    "autoscan": true,
     "custom": {
       "^u-(.*)": "uview-plus/components/u-$1/u-$1.vue",
       "ContentWrap": "@/components/ContentWrap/index.vue",
@@ -153,6 +154,13 @@
       "path": "pages/home/consult/index",
       "style": {
         "navigationBarTitleText": "客服咨询",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/meeting/Reservation",
+      "style": {
+        "navigationBarTitleText": "预定会议室",
         "navigationStyle": "custom"
       }
     }
