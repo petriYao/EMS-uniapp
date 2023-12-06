@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
 import WeeklyCalendar from '@/components/weeklyCalendar/index.vue'
 import { MeetingReservationTimeList, MeetingReservationUpdate, MeetingRoomInfo } from '@/api'
 import { onLoad } from '@dcloudio/uni-app'
@@ -8,8 +8,9 @@ import { formatTime } from '@/utils'
 
 const reactiveData = reactive({
   infoData: {} as any,
+  meetingReservationDate: new Date(),
   setData: {
-    meetingReservationDate: new Date(), //日期
+    meetingReservationDate: '', //日期
     meetingReservationStartTime: '', //预约开始时间
     meetingReservationEndTime: '', //预约结束时间
     meetingReservationTitle: '', //会议主题
@@ -29,16 +30,32 @@ const getData = async () => {
 
   const timeRes = await MeetingReservationTimeList(
     reactiveData.setData.meetingRoomId,
-    reactiveData.setData.meetingReservationDate
+    reactiveData.meetingReservationDate
   )
   if (timeRes && timeRes.success) {
     reactiveData.list = timeRes.value.list
   }
 }
+const isSelect = ref(false)
+const selectTimeClick = (item: any) => {
+  console.log('item', item)
+  if (!isSelect.value) {
+    reactiveData.setData.meetingReservationStartTime = item.label
+    item.type = 2
+  } else {
+    reactiveData.setData.meetingReservationEndTime = item.label
+    item.type = 2
+  }
+  isSelect.value = !isSelect.value
+}
 
 //立即预定
 const submitClick = async () => {
   console.log('立即预定', reactiveData.setData)
+  reactiveData.setData.meetingReservationDate = formatTime(
+    reactiveData.meetingReservationDate,
+    'yyyy-MM-dd'
+  )
   const res = await MeetingReservationUpdate(reactiveData.setData)
   if (res && res.success) {
     //返回上一页
@@ -76,7 +93,7 @@ onLoad((val: any) => {
 
     <!-- 周历 -->
     <view id="weeklyCalendarId">
-      <WeeklyCalendar v-model="reactiveData.setData.meetingReservationDate" />
+      <WeeklyCalendar v-model="reactiveData.meetingReservationDate" />
     </view>
 
     <!-- 提示 -->
@@ -89,10 +106,17 @@ onLoad((val: any) => {
         :key="index"
         class="w-[16.66vw] flex justify-center items-center mb-20rpx"
         style="height: calc(16.66vw - 30rpx)"
+        @click="selectTimeClick(item)"
       >
         <view
           class="mx-15rpx w-[100%] h-[100%] flex justify-center items-center rounded-4rpx text-[#FFF] text-[24rpx]"
-          :style="item.type === 1 ? 'background-color: #3067E8' : 'background-color: #F1F1F1'"
+          :style="
+            item.type === 0
+              ? 'background-color: #DCE4F7;color:#9c9da2'
+              : item.type === 1
+              ? 'background-color: #3067E8'
+              : 'background-color: #FFC300'
+          "
         >
           {{ item.label }}
         </view>
@@ -102,8 +126,8 @@ onLoad((val: any) => {
     <view class="bg-[#FFF] p-20rpx flex text-[#9c9da2]" style="border-top: 1px solid #f2f2f2">
       <view>会议日期：</view>
       <view
-        >{{ formatTime(reactiveData.setData.meetingReservationDate, 'yyyy-MM-dd') }}
-        {{ reactiveData.weekdays[reactiveData.setData.meetingReservationDate.getDay()] }}</view
+        >{{ formatTime(reactiveData.meetingReservationDate, 'yyyy-MM-dd') }}
+        {{ reactiveData.weekdays[reactiveData.meetingReservationDate.getDay()] }}</view
       >
     </view>
     <view class="bg-[#FFF] p-20rpx flex text-[#9c9da2]" style="border-top: 1px solid #f2f2f2">
