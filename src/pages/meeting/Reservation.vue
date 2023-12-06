@@ -105,7 +105,7 @@ onMounted(() => {
 <template>
   <ContentWrap>
     <!-- 头部开始 -->
-    <Header title="预定会议室" />
+    <XWAHeader title="预定会议室" />
 
     <view class="flex justify-between">
       <view @click="goToSelectedWeek">{{ reactiveData.currentWeek.toLocaleDateString() }}</view>
@@ -146,7 +146,7 @@ onMounted(() => {
 
     <!-- 选择时间 -->
 
-    <!-- <u-calendar :show="reactiveData.calendarShow" /> -->
+    <u-calendar :show="reactiveData.calendarShow" />
   </ContentWrap>
 </template>
 

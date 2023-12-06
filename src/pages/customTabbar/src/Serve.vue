@@ -196,7 +196,7 @@ onMounted(() => {
 
 <template>
   <ContentWrap>
-    <Header :isLeftIcon="false" title="服务" />
+    <XWAHeader :isLeftIcon="false" title="服务" />
     <!-- 头部结束 -->
     <template v-for="(item, index) in dataObj" :key="index">
       <view class="bg-white py-10rpx m-20rpx">

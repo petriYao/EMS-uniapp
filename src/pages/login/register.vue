@@ -125,7 +125,7 @@ const onLogin = () => {
 
 <template>
   <ContentWrap>
-    <Header />
+    <XWAHeader />
     <view class="px-40rpx py-60rpx text-32rpx font-600">用户注册</view>
     <view class="px-30rpx">
       <u-form errorType="message" :model="fromData" :rules="rules" ref="formRef">

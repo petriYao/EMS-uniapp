@@ -7,7 +7,7 @@ const center = ref({
 })
 </script>
 <template>
-  <Header title="园区导览" />
+  <XWAHeader title="园区导览" />
 
   <view class="w-100% fixed">
     <map

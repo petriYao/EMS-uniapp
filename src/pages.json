@@ -4,7 +4,7 @@
     "custom": {
       "^u-(.*)": "uview-plus/components/u-$1/u-$1.vue",
       "ContentWrap": "@/components/ContentWrap/index.vue",
-      "Header": "@/components/Header/index.vue"
+      "XWAHeader": "@/components/Header/index.vue"
     }
   },
 

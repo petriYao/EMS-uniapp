@@ -19,7 +19,7 @@ onLoad(async (val: any) => {
   <ContentWrap>
     <!-- 在H5的时候显示 -->
     <!-- #ifdef H5 -->
-    <Header :title="title" />
+    <XWAHeader :title="title" />
     <!-- #endif -->
     <view>
       <web-view

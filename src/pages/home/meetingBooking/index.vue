@@ -17,7 +17,7 @@ onLoad(async () => {})
 <template>
   <ContentWrap>
     <!-- 头部开始 -->
-    <Header title="会议室预定" />
+    <XWAHeader title="会议室预定" />
     <view class="h-50vh flex items-center justify-center">
       <u-image
         width="100%"

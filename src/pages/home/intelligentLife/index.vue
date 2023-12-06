@@ -9,7 +9,7 @@ onLoad(async () => {})
 <template>
   <ContentWrap>
     <!-- 头部开始 -->
-    <Header title="智慧生活" />
+    <XWAHeader title="智慧生活" />
     <!-- 头部结束 -->
   </ContentWrap>
 </template>

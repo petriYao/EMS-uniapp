@@ -100,7 +100,7 @@ onMounted(() => {
 <template>
   <ContentWrap>
     <!-- 头部开始 -->
-    <Header :title="props.title" />
+    <XWAHeader :title="props.title" />
     <!-- 头部结束 -->
 
     <view v-if="listData.length > 0">

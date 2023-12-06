@@ -228,7 +228,7 @@ onLoad((val: any) => {
 <template>
   <ContentWrap>
     <!-- 头部开始 -->
-    <Header :title="headerTitle" />
+    <XWAHeader :title="headerTitle" />
     <!-- 头部结束 -->
 
     <scroll-view scroll-y :style="`height:calc(100vh - 120rpx - 44px - ${marginHeight})`">

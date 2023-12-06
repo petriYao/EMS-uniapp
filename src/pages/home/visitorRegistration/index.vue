@@ -9,7 +9,7 @@ onLoad(async () => {})
 <template>
   <ContentWrap>
     <!-- 头部开始 -->
-    <Header title="访客登记" />
+    <XWAHeader title="访客登记" />
     <!-- 头部结束 -->
   </ContentWrap>
 </template>

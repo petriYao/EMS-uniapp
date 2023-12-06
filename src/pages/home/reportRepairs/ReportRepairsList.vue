@@ -131,7 +131,7 @@ onShow(() => {})
 <template>
   <ContentWrap>
     <!-- 头部开始 -->
-    <Header title="报事报修" />
+    <XWAHeader title="报事报修" />
     <!-- 头部结束 -->
     <view>
       <view class="bg-[#FFF]">

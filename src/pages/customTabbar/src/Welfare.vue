@@ -31,7 +31,7 @@ onMounted(() => {
 
 <template>
   <ContentWrap>
-    <Header :isLeftIcon="false" title="福利" />
+    <XWAHeader :isLeftIcon="false" title="福利" />
     <!-- 头部结束 -->
     <view v-if="swiperImgList && swiperImgList.length > 0">
       <u-swiper

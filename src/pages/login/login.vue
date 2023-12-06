@@ -39,7 +39,7 @@ onLoad((val: any) => {
   <ContentWrap>
     <img class="bg-img" :src="getImageURL('home', 'login-bg')" mode="contain" />
 
-    <Header :placeholder="false" />
+    <XWAHeader :placeholder="false" />
     <!-- <view class="bg-img">
       <u-Image :src="getImageURL('home', 'login-bg')" height="100vh" width="100vw" />
     </view> -->

@@ -124,7 +124,7 @@ onLoad(() => {
 
 <template>
   <ContentWrap>
-    <Header title="个人资料" />
+    <XWAHeader title="个人资料" />
     <!-- 头部 -->
     <view class="m-30rpx p-30rpx bg-#FFF rounded-20rpx">
       <view class="flex-rows">

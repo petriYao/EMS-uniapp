@@ -32,7 +32,7 @@ onLoad(async (val: any) => {
 <template>
   <ContentWrap>
     <!-- 头部开始 -->
-    <Header :title="infoData.title" />
+    <XWAHeader :title="infoData.title" />
     <!-- 头部结束 -->
     <view v-if="dataObj.content || dataObj.imageArray || dataObj.title">
       <UniversalPark :data="dataObj" />

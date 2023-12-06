@@ -24,7 +24,7 @@ onLoad(async () => {
 <template>
   <ContentWrap>
     <!-- 头部开始 -->
-    <Header title="企业风采" />
+    <XWAHeader title="企业风采" />
     <!-- 头部结束 -->
     <view v-if="dataObj.content || dataObj.imageArray || dataObj.title">
       <UniversalPark :data="dataObj" />
