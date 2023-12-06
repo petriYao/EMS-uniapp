@@ -64,6 +64,27 @@ export type UserInfoApiType = {
   userInfo: UserInfoType
 }
 
+export type MeetingRoomListType = {
+  meetingRoomDes: string
+  meetingRoomId: string
+  meetingRoomName: string
+  meetingRoomStatus: number
+}
+
+export type optionsType = {
+  label: string
+  value: string | number
+  type?: number
+  isSelect?: boolean
+}
+
+export type MeetingReservationUpdateType = {
+  meetingReservationDate: string | Date
+  meetingReservationEndTime: string
+  meetingReservationStartTime: string
+  meetingReservationTitle: string
+  meetingRoomId: string | number
+}
 /**旧的 */
 // export type UserIdentityType = {
 //   sessionName?: string

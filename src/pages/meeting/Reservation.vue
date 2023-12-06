@@ -1,47 +1,89 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onBeforeMount, reactive, ref } from 'vue'
 import WeeklyCalendar from '@/components/weeklyCalendar/index.vue'
+import { MeetingRoomList } from '@/api'
+import { MeetingRoomListType } from '@/types/userModel'
+import { useAppStore } from '@/store'
+import router from '@/router'
 
-const timeList = ref([
-  { label: '09:00', value: '09:00' },
-  { label: '09:30', value: '09:30' },
-  { label: '10:00', value: '10:00' },
-  { label: '10:30', value: '10:30' },
-  { label: '11:00', value: '11:00' },
-  { label: '11:30', value: '11:30' },
-  { label: '12:00', value: '12:00' },
-  { label: '12:30', value: '12:30' },
-  { label: '13:00', value: '13:00' },
-  { label: '13:30', value: '13:30' },
-  { label: '14:00', value: '14:00' },
-  { label: '14:30', value: '14:30' },
-  { label: '15:00', value: '15:00' },
-  { label: '15:30', value: '15:30' },
-  { label: '16:00', value: '16:00' },
-  { label: '16:30', value: '16:30' },
-  { label: '17:00', value: '17:00' },
-  { label: '17:30', value: '17:30' },
-  { label: '18:00', value: '18:00' },
-  { label: '18:30', value: '18:30' },
-  { label: '19:00', value: '19:00' },
-  { label: '19:30', value: '19:30' },
-  { label: '20:00', value: '20:00' },
-  { label: '20:30', value: '20:30' }
-])
+const appStore = useAppStore()
 
-const time = ref(new Date())
+const reactiveData = reactive({
+  setData: {
+    date: new Date(), //日期
+    page: 1, //分页号码
+    size: 10 //分页数量
+  },
+  list: [] as MeetingRoomListType[],
+  weeklyCalendarHeight: ''
+})
+
+const getData = async () => {
+  const res = await MeetingRoomList(reactiveData.setData)
+  console.log('res', res)
+  if (res && res.success) {
+    reactiveData.list = res.value.list
+  }
+}
+
+const infoClick = (meetingRoomId: string) => {
+  router.push({
+    url: `/pages/meeting/MeetingInfo?meetingRoomId=${meetingRoomId}`
+  })
+}
+
+onBeforeMount(() => {
+  // uniapp根据id获取weeklyCalendarId高度
+  const query = uni.createSelectorQuery()
+
+  setTimeout(() => {
+    query
+      .select('#weeklyCalendarId')
+      .boundingClientRect((rect: any) => {
+        reactiveData.weeklyCalendarHeight = rect.height + appStore.notchHeight + 'px'
+      })
+      .exec()
+  }, 300)
+
+  getData()
+})
 </script>
 
 <template>
   <ContentWrap>
     <!-- 头部开始 -->
-    <XWAHeader title="预定会议室" />
-
-    <view>
-      <WeeklyCalendar v-model="time" />
+    <XWAHeader title="预约会议" />
+    <view class="h-20rpx" />
+    <view id="weeklyCalendarId">
+      <WeeklyCalendar v-model="reactiveData.setData.date" />
     </view>
 
-    <view class="flex flex-wrap py-20rpx bg-#FFF">
+    <scroll-view
+      scroll-y
+      :style="`height: calc(100vh - 44px - 40rpx - ${reactiveData.weeklyCalendarHeight});`"
+    >
+      <view class="h-20rpx" />
+      <view
+        v-for="(item, index) of reactiveData.list"
+        :key="index"
+        class="mb-20rpx flex justify-between bg-[#FFF] px-20rpx py-30rpx"
+      >
+        <view>
+          <view class="text-[30rpx] font-700">{{ item.meetingRoomName }}</view>
+          <view class="text-[28rpx] pt-20rpx text-#c1c2c7">{{ item.meetingRoomDes }}</view>
+        </view>
+        <view class="flex items-center">
+          <view
+            class="mr-30rpx w-100rpx h-40rpx flex items-center justify-center text-[22rpx]"
+            :class="item.meetingRoomStatus === 1 ? 'status-tag' : 'status-un-tag'"
+            >{{ item.meetingRoomStatus === 1 ? '可预约' : '已约满' }}</view
+          >
+          <view class="text-[#196CFF]" @click="infoClick(item.meetingRoomId)">查看</view>
+        </view>
+      </view>
+    </scroll-view>
+
+    <!-- <view class="flex flex-wrap py-20rpx bg-#FFF">
       <view
         v-for="item in timeList"
         :key="item.value"
@@ -54,30 +96,18 @@ const time = ref(new Date())
           {{ item.label }}
         </view>
       </view>
-    </view>
+    </view> -->
   </ContentWrap>
 </template>
 
 <style lang="scss" scoped>
-.week-date {
-  width: 80rpx;
-  height: 80rpx;
-  margin-top: 20rpx;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.status-tag {
+  background-color: #e8eefc;
+  color: #196cff;
 }
-.past {
+
+.status-un-tag {
   color: #c1c2c7;
-  background-color: #f0f1f2;
-}
-.today {
-  color: #fff;
-  background-color: #466bf3;
-}
-.future {
-  color: #2c2e43;
   background-color: #f0f1f2;
 }
 </style>

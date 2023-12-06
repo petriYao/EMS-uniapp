@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
+import { formatTime } from '@/utils'
 
 const props = defineProps({
   modelValue: {
@@ -103,9 +104,9 @@ onMounted(() => {
 </script>
 
 <template>
-  <view class="flex justify-between text-[#196CFF] bg-[#FFF] px-20rpx">
+  <view class="flex justify-between text-[#196CFF] bg-[#FFF] p-20rpx pb-0">
     <view @click="goToSelectedWeek" class="w-240rpx flex items-center">
-      <text class="mr-10rpx">{{ reactiveData.currentWeek.toLocaleDateString() }}</text>
+      <text class="mr-10rpx"> {{ formatTime(reactiveData.currentWeek, 'yyyy-MM-dd') }}</text>
       <u-icon name="arrow-right" color="#196CFF" />
     </view>
     <view @click="reactiveData.calendarShow = true" class="text-[#c1c2c7]">
