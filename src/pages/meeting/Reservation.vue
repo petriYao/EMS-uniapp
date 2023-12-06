@@ -1,14 +1,6 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
-
-// 预定会议室
-const reactiveData = reactive({
-  weekDays: [] as any, //周历
-  currentWeek: new Date(), //当前日期
-  nowMonth: 0, //当前月份
-  calendarShow: false
-})
-const selectedWeek = ref() //选择的日期
+import { ref } from 'vue'
+import WeeklyCalendar from '@/components/weeklyCalendar/index.vue'
 
 const timeList = ref([
   { label: '09:00', value: '09:00' },
@@ -37,69 +29,7 @@ const timeList = ref([
   { label: '20:30', value: '20:30' }
 ])
 
-const updateWeekDays = (offset = 0) => {
-  reactiveData.currentWeek.setDate(reactiveData.currentWeek.getDate() + offset * 7)
-  const now = new Date(reactiveData.currentWeek)
-  const dayOfWeek = now.getDay() || 7
-  now.setDate(now.getDate() + 1 - dayOfWeek)
-  reactiveData.nowMonth = now.getMonth() + 1 //当前月份
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  reactiveData.weekDays = []
-  for (let i = 0; i < 7; i++) {
-    const currentDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i)
-    currentDate.setHours(0, 0, 0, 0)
-    let status = ''
-
-    if (currentDate.getTime() < today.getTime()) {
-      status = 'past'
-    } else if (currentDate.getTime() > today.getTime()) {
-      status = 'future'
-    } else {
-      // 如果selectedWeek有值，不设置初始的today
-      if (!selectedWeek.value) {
-        status = 'today'
-      } else {
-        status = 'future'
-      }
-    }
-
-    // 如果当前日期等于selectedWeek，设置status为today
-    if (selectedWeek.value && currentDate.getTime() === selectedWeek.value.getTime()) {
-      status = 'today'
-    }
-
-    reactiveData.weekDays.push({
-      day: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'][i],
-      date: currentDate,
-      status: status
-    })
-  }
-}
-const goToSelectedWeek = () => {
-  reactiveData.currentWeek = new Date(selectedWeek.value)
-  updateWeekDays()
-}
-
-const selectDate = (item: any) => {
-  if (item.status !== 'past') {
-    reactiveData.currentWeek = new Date(item.date)
-    selectedWeek.value = new Date(item.date)
-    reactiveData.weekDays = reactiveData.weekDays.map((day: any) => {
-      if (day.status === 'today') {
-        day.status = 'future'
-      }
-      if (day.date === item.date) {
-        day.status = 'today'
-      }
-      return day
-    })
-  }
-}
-
-onMounted(() => {
-  updateWeekDays()
-})
+const time = ref(new Date())
 </script>
 
 <template>
@@ -107,26 +37,8 @@ onMounted(() => {
     <!-- 头部开始 -->
     <XWAHeader title="预定会议室" />
 
-    <view class="flex justify-between">
-      <view @click="goToSelectedWeek">{{ reactiveData.currentWeek.toLocaleDateString() }}</view>
-      <view @click="reactiveData.calendarShow = true">{{ reactiveData.nowMonth }}月</view>
-      <view class="flex">
-        <view class="mr-20rpx" @click="updateWeekDays(-1)">上周</view>
-        <view class="mr-20rpx" @click="updateWeekDays(1)">下周</view>
-      </view>
-    </view>
-    <!-- 添加日期和星期的显示 -->
-    <view class="flex justify-between p-20rpx bg-#FFF">
-      <view
-        v-for="(item, index) in reactiveData.weekDays"
-        :key="index"
-        class="flex flex-col items-center justify-center"
-      >
-        <view class="text-[#c1c2c7]">{{ item.day }}</view>
-        <view class="week-date" :class="item.status" @click="selectDate(item)">{{
-          item.date.getDate()
-        }}</view>
-      </view>
+    <view>
+      <WeeklyCalendar v-model="time" />
     </view>
 
     <view class="flex flex-wrap py-20rpx bg-#FFF">
@@ -143,10 +55,6 @@ onMounted(() => {
         </view>
       </view>
     </view>
-
-    <!-- 选择时间 -->
-
-    <u-calendar :show="reactiveData.calendarShow" />
   </ContentWrap>
 </template>
 
