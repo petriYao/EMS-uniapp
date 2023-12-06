@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue'
+import { reactive, watch } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 
 import { formatTime } from '@/utils'
@@ -11,6 +11,9 @@ import WeeklyCalendar from '@/components/weeklyCalendar/index.vue'
 const reactiveData = reactive({
   infoData: {} as any,
   meetingReservationDate: new Date(),
+  isSelect: false,
+  startIndex: -1,
+  endIndex: -1,
   setData: {
     meetingReservationDate: '', //日期
     meetingReservationStartTime: '', //预约开始时间
@@ -38,18 +41,48 @@ const getData = async () => {
     reactiveData.list = timeRes.value.list
   }
 }
-const isSelect = ref(false)
+
 const selectTimeClick = (index: number) => {
   const item = reactiveData.list[index]
-  console.log('item', item)
-  if (!isSelect.value) {
-    reactiveData.setData.meetingReservationStartTime = item.label
-    item.type = 2
-  } else {
-    reactiveData.setData.meetingReservationEndTime = item.label
-    item.type = 2
+  if (item.type === 0) {
+    return
   }
-  isSelect.value = !isSelect.value
+  if (reactiveData.isSelect) return
+  reactiveData.isSelect = true
+
+  if (item.type === 1) {
+    if (reactiveData.startIndex == -1 || index == reactiveData.startIndex - 1) {
+      reactiveData.startIndex = index
+      item.type = 2
+    } else if (reactiveData.endIndex == -1 && index == reactiveData.startIndex + 1) {
+      reactiveData.endIndex = index
+      item.type = 2
+    } else if (index == reactiveData.endIndex + 1) {
+      reactiveData.endIndex = index
+      item.type = 2
+    }
+  } else if (item.type === 2) {
+    if (index == reactiveData.startIndex) {
+      item.type = 1
+      if (reactiveData.endIndex > -1 && index + 1 <= reactiveData.endIndex) {
+        if (index + 1 == reactiveData.endIndex) {
+          reactiveData.endIndex = -1
+        }
+        reactiveData.startIndex = index + 1
+      } else {
+        reactiveData.startIndex = -1
+        reactiveData.endIndex = -1
+      }
+    } else if (index == reactiveData.endIndex) {
+      item.type = 1
+      if (index - 1 == reactiveData.startIndex) {
+        reactiveData.endIndex = -1
+      } else if (index - 1 > reactiveData.startIndex) {
+        reactiveData.endIndex = index - 1
+      }
+    }
+  }
+  reactiveData.isSelect = false
 }
 
 //立即预定
@@ -67,6 +100,32 @@ watch(
       reactiveData.meetingReservationDate,
       'yyyy-MM-dd'
     )
+  },
+  {
+    immediate: true,
+    deep: true
+  }
+)
+
+watch(
+  () => [reactiveData.startIndex, reactiveData.endIndex],
+  () => {
+    if (reactiveData.startIndex > -1) {
+      //开始时间
+      reactiveData.setData.meetingReservationStartTime =
+        reactiveData.list[reactiveData.startIndex].label
+
+      //结束时间
+      let endIndex = reactiveData.startIndex
+      if (reactiveData.endIndex > -1) {
+        endIndex = reactiveData.endIndex
+      }
+      if (endIndex == reactiveData.list.length) {
+        reactiveData.setData.meetingReservationEndTime = '21:00'
+      } else {
+        reactiveData.setData.meetingReservationEndTime = reactiveData.list[endIndex + 1].label
+      }
+    }
   },
   {
     immediate: true,
