@@ -8,6 +8,7 @@ import Content from './Content.vue'
 // 轮播图
 const current = ref(0) //当前所在滑块的 index
 const swiperImgList = ref([] as string[]) //轮播图图片
+const isLoad = ref(false)
 
 const reactiveData = reactive({
   select: 'xiaobaoWelfare'
@@ -18,6 +19,7 @@ const getParkProfile = async () => {
   if (res.success && res.value) {
     swiperImgList.value = res.value?.imageArray?.map((item) => item.previewUrl) ?? []
   }
+  isLoad.value = true
 }
 
 const selectClick = (type: string) => {
@@ -33,7 +35,7 @@ onMounted(() => {
   <ContentWrap>
     <XWAHeader :isLeftIcon="false" title="福利" />
     <!-- 头部结束 -->
-    <view v-if="swiperImgList && swiperImgList.length > 0">
+    <view v-if="!isLoad || (swiperImgList && swiperImgList.length > 0)" class="h-200px">
       <u-swiper
         :list="swiperImgList"
         :height="200"

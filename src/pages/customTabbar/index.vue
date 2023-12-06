@@ -81,13 +81,13 @@ const isShow = (name: string) => {
     <view v-show="isShow('服务')">
       <Serve />
     </view>
-    <view v-show="isShow('一码通')">
+    <view v-if="isShow('一码通')">
       <Qrcode />
     </view>
-    <view v-show="isShow('福利')">
+    <view v-if="isShow('福利')">
       <Welfare />
     </view>
-    <view v-show="isShow('我的')">
+    <view v-if="isShow('我的')">
       <My />
     </view>
 

@@ -46,7 +46,9 @@ const onJump = (title: string) => {
       break
     case '停车缴费':
       appStore.bottomTabbarTitle = '一码通'
-      emitter.emit('Qrcode:Change', 1)
+      setTimeout(() => {
+        emitter.emit('Qrcode:Change', 1)
+      }, 100)
       return
     case '会议预定':
       src = 'home/meetingBooking/index'

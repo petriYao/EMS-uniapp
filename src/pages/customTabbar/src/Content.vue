@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { reactive, ref, watch } from 'vue'
-import NoData from '@components/noData/NoData.vue'
-import { AppSetListApi, ProductListApi } from '@/api'
 import { onReachBottom } from '@dcloudio/uni-app'
 import { useAppStore } from '@/store'
+import { AppSetListApi, ProductListApi } from '@/api'
+import NoData from '@components/noData/NoData.vue'
 
 const props = defineProps({
   select: {
