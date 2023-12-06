@@ -163,6 +163,13 @@
         "navigationBarTitleText": "预定会议室",
         "navigationStyle": "custom"
       }
+    },
+    {
+      "path": "pages/meeting/MeetingInfo",
+      "style": {
+        "navigationBarTitleText": "预约会议",
+        "navigationStyle": "custom"
+      }
     }
   ],
   "subpackages": [],
