@@ -11,6 +11,13 @@ const addMeetingClick = () => {
   })
 }
 
+const myMeetingClick = () => {
+  //跳转
+  router.push({
+    url: `/pages/meeting/MyMeeting`
+  })
+}
+
 onLoad(async () => {})
 </script>
 
@@ -47,6 +54,7 @@ onLoad(async () => {})
           }"
           :plain="true"
           text="我的会议"
+          @click="myMeetingClick"
         />
       </view>
     </view>

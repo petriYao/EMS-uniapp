@@ -170,6 +170,13 @@
         "navigationBarTitleText": "预约会议",
         "navigationStyle": "custom"
       }
+    },
+    {
+      "path": "pages/meeting/MyMeeting",
+      "style": {
+        "navigationBarTitleText": "我的会议",
+        "navigationStyle": "custom"
+      }
     }
   ],
   "subpackages": [],

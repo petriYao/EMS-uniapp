@@ -46,6 +46,7 @@ const getData = async () => {
     }
   }
 }
+
 watch(
   () => props.select,
   () => {

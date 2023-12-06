@@ -38,6 +38,9 @@ const getData = async () => {
     reactiveData.meetingReservationDate
   )
   if (timeRes && timeRes.success) {
+    reactiveData.isSelect = false
+    reactiveData.startIndex = -1
+    reactiveData.endIndex = -1
     reactiveData.list = timeRes.value.list
   }
 }
@@ -95,11 +98,23 @@ const submitClick = async () => {
 
 watch(
   () => reactiveData.meetingReservationDate,
-  () => {
+  async () => {
+    console.log('日期改变了', reactiveData.meetingReservationDate)
     reactiveData.setData.meetingReservationDate = formatTime(
       reactiveData.meetingReservationDate,
       'yyyy-MM-dd'
     )
+
+    const timeRes = await MeetingReservationTimeList(
+      reactiveData.setData.meetingRoomId,
+      reactiveData.setData.meetingReservationDate
+    )
+    if (timeRes && timeRes.success) {
+      reactiveData.isSelect = false
+      reactiveData.startIndex = -1
+      reactiveData.endIndex = -1
+      reactiveData.list = timeRes.value.list
+    }
   },
   {
     immediate: true,
