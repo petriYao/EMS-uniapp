@@ -122,7 +122,7 @@ onLoad((val: any) => {
       </view>
     </view>
     <view class="h-120rpx" />
-    <view class="fixed w-100% box-border bottom-0 bg-[#F6F7FB] pb-20rpx px-20rpx">
+    <view class="fixed w-100% box-border bottom-0 bg-[#F6F7FB] pb-20rpx px-20rpx z-999">
       <view
         class="w-[100%] bg-[#466BF3] text-[#FFF] rounded-8rpx h-80rpx flex items-center justify-center"
         hover-class="button-spread"

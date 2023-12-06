@@ -155,7 +155,7 @@ onReachBottom(() => {
       />
     </view>
   </view>
-  <view>
+  <view v-else>
     <NoData
       text="抱歉，暂无数据哦！"
       :height="`calc(100vh - 200px - 90rpx - 180rpx - ${marginHeight})`"
