@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { onBeforeMount, reactive, ref } from 'vue'
-import WeeklyCalendar from '@/components/weeklyCalendar/index.vue'
-import { MeetingRoomList } from '@/api'
-import { MeetingRoomListType } from '@/types/userModel'
+import { reactive, onBeforeMount } from 'vue'
+
 import { useAppStore } from '@/store'
+import { MeetingRoomListType } from '@/types/userModel'
+import { MeetingRoomList } from '@/api'
 import router from '@/router'
+
+import WeeklyCalendar from '@/components/weeklyCalendar/index.vue'
 
 const appStore = useAppStore()
 
@@ -35,7 +37,6 @@ const infoClick = (meetingRoomId: string) => {
 onBeforeMount(() => {
   // uniapp根据id获取weeklyCalendarId高度
   const query = uni.createSelectorQuery()
-
   setTimeout(() => {
     query
       .select('#weeklyCalendarId')
