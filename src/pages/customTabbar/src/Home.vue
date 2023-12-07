@@ -136,10 +136,10 @@ onMounted(() => {
           </template>
         </u-input>
         <view
-          class="position-absolute right-40rpx bottom-30rpx z-99"
+          class="position-absolute right-40rpx bottom-40rpx z-99"
           @click.stop="onJump('咨询建议')"
         >
-          <u-icon :name="getSvgURL('home', 'home-keyword')" size="100rpx" />
+          <u-icon :name="getSvgURL('home', 'home-keyword')" size="80rpx" />
         </view>
       </view>
 
@@ -155,7 +155,13 @@ onMounted(() => {
               <view class="text-14rpx text-#eaebed mix-blend-soft-light">VISITOR REGISTRATION</view>
             </view>
             <view class="my-auto pr-40rpx">
-              <u-image :src="appStore.registerImage" width="127rpx" height="109rpx" :fade="false" />
+              <u-image
+                :src="appStore.registerImage"
+                width="127rpx"
+                height="109rpx"
+                :fade="false"
+                :showLoading="false"
+              />
               <!-- <u-icon :name="getSvgURL('home', 'home-register')" size="140rpx" /> -->
             </view>
           </view>
@@ -199,7 +205,13 @@ onMounted(() => {
               >
             </view>
             <view class="h-[100%] flex items-center mr-[40rpx]">
-              <u-image :src="appStore.repairsImage" width="121rpx" height="120rpx" :fade="false" />
+              <u-image
+                :src="appStore.repairsImage"
+                width="121rpx"
+                height="120rpx"
+                :fade="false"
+                :showLoading="false"
+              />
               <!-- <u-icon :name="getSvgURL('home', 'home-repairs')" size="140rpx" /> -->
             </view>
           </view>
@@ -220,6 +232,7 @@ onMounted(() => {
                 width="119rpx"
                 height="129rpx"
                 :fade="false"
+                :showLoading="false"
               />
               <!-- <u-icon :name="getSvgURL('home', 'home-intelligent-life')" size="140rpx" /> -->
             </view>
@@ -268,6 +281,7 @@ onMounted(() => {
                 radius="20rpx"
                 :src="appStore.introductionImage"
                 :fade="false"
+                :showLoading="false"
               />
             </view>
           </view>
