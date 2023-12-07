@@ -3,6 +3,7 @@ import { reactive, watch } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 
 import { formatTime } from '@/utils'
+import { useEmitt } from '@/hooks/useEmitt'
 import { optionsType } from '@/types/userModel'
 import {
   MeetingReservationTimeList,
@@ -10,18 +11,22 @@ import {
   MeetingRoomInfo,
   MeetingReservationInfo
 } from '@/api'
+import router from '@/router'
 
 import WeeklyCalendar from '@/components/weeklyCalendar/index.vue'
 
+const { emitter } = useEmitt()
+
 const reactiveData = reactive({
   infoData: {} as any,
-  meetingReservationDate: new Date(),
+  meetingReservationDate: null as any,
+  isLoad: false,
   isSelect: false,
   startIndex: -1,
   endIndex: -1,
-  meetingReservationId: '',
+  meetingReservationId: undefined,
   setData: {
-    meetingReservationDate: formatTime(new Date(), 'yyyy-MM-dd'), //日期
+    meetingReservationDate: '', //日期
     meetingReservationStartTime: '', //预定开始时间
     meetingReservationEndTime: '', //预定结束时间
     meetingReservationTitle: '', //会议主题
@@ -32,23 +37,64 @@ const reactiveData = reactive({
   weekdays: ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六']
 })
 
+//获取时间
+const getTimeList = async () => {
+  const timeRes = await MeetingReservationTimeList(
+    reactiveData.setData.meetingRoomId,
+    reactiveData.setData.meetingReservationDate
+  )
+  if (timeRes && timeRes.success) {
+    reactiveData.isSelect = false
+    reactiveData.startIndex = -1
+    reactiveData.endIndex = -1
+    reactiveData.list = timeRes.value.list
+    if (!reactiveData.isLoad) {
+      reactiveData.isLoad = true
+      if (
+        reactiveData.infoData.meetingReservationStartTime &&
+        reactiveData.infoData.meetingReservationEndTime
+      ) {
+        let isSelect = false
+        for (let index = 0; index <= reactiveData.list.length; index++) {
+          const item = reactiveData.list[index]
+          if (item.label == reactiveData.infoData.meetingReservationStartTime) {
+            reactiveData.startIndex = index
+            item.type = 2
+            isSelect = true
+          } else if (item.label == reactiveData.infoData.meetingReservationEndTime) {
+            reactiveData.endIndex = index - 1
+            break
+          } else if (isSelect) {
+            item.type = 2
+          }
+        }
+        if (reactiveData.endIndex == -1) {
+          reactiveData.endIndex = reactiveData.list.length - 1
+        } else if (reactiveData.endIndex == reactiveData.startIndex) {
+          reactiveData.endIndex = -1
+        }
+      }
+    }
+  }
+}
+
 //获取详情和预定时间列表
 const getRoomInfo = async () => {
   const res = await MeetingRoomInfo(reactiveData.setData.meetingRoomId)
   if (res && res.success) {
     reactiveData.infoData = res.value
+    reactiveData.meetingReservationDate = new Date()
   }
-  getTimeList()
 }
+
 //获取详情和预定时间列表
 const getReservationInfo = async () => {
-  console.log('获取详情和预定时间列表')
   const res = await MeetingReservationInfo(reactiveData.meetingReservationId)
-  console.log('res', res)
   if (res && res.success) {
     reactiveData.infoData = res.value
     reactiveData.setData.meetingRoomId = res.value.meetingRoomId
-    getTimeList()
+    reactiveData.setData.meetingReservationTitle = res.value.meetingReservationTitle
+    reactiveData.meetingReservationDate = new Date(reactiveData.infoData.meetingReservationDate)
   }
 }
 
@@ -97,29 +143,27 @@ const selectTimeClick = (index: number) => {
 
 //立即预定
 const submitClick = async () => {
-  const res = await MeetingReservationUpdate(reactiveData.setData)
-  if (res && res.success) {
-    //返回上一页
-  }
-}
-
-const getTimeList = async () => {
-  const timeRes = await MeetingReservationTimeList(
-    reactiveData.setData.meetingRoomId,
-    reactiveData.setData.meetingReservationDate
+  const res = await MeetingReservationUpdate(
+    reactiveData.setData,
+    reactiveData.meetingReservationId
   )
-  if (timeRes && timeRes.success) {
-    reactiveData.isSelect = false
-    reactiveData.startIndex = -1
-    reactiveData.endIndex = -1
-    reactiveData.list = timeRes.value.list
+  if (res && res.success) {
+    if (!reactiveData.meetingReservationId) {
+      router.push({
+        url: `/pages/meeting/MyMeeting`
+      })
+    } else {
+      //返回上一页
+      router.back()
+      emitter.emit('MyMeeting:update')
+    }
   }
 }
 
 watch(
   () => reactiveData.meetingReservationDate,
   async () => {
-    console.log('日期改变了', reactiveData.meetingReservationDate)
+    if (!reactiveData.meetingReservationDate) return
     reactiveData.setData.meetingReservationDate = formatTime(
       reactiveData.meetingReservationDate,
       'yyyy-MM-dd'
@@ -158,13 +202,12 @@ watch(
 )
 
 onLoad(async (val: any) => {
-  console.log('onLoad', val)
   if (val.meetingRoomId) {
     reactiveData.setData.meetingRoomId = Number(val.meetingRoomId)
-    getRoomInfo()
-  } else {
+    await getRoomInfo()
+  } else if (val.meetingReservationId) {
     reactiveData.meetingReservationId = val.meetingReservationId
-    getReservationInfo()
+    await getReservationInfo()
   }
 })
 </script>
@@ -228,7 +271,7 @@ onLoad(async (val: any) => {
       <view>会议日期：</view>
       <view
         >{{ reactiveData.setData.meetingReservationDate }}
-        {{ reactiveData.weekdays[reactiveData.meetingReservationDate.getDay()] }}</view
+        {{ reactiveData.weekdays?.[reactiveData.meetingReservationDate?.getDay()] ?? '' }}</view
       >
     </view>
     <view class="bg-[#FFF] p-20rpx flex text-[#9c9da2]" style="border-top: 1px solid #f2f2f2">

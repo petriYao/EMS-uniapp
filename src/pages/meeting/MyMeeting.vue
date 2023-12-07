@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import { onBeforeMount, reactive, ref } from 'vue'
+
+import { useAppStore } from '@/store'
+import { useEmitt } from '@/hooks/useEmitt'
 import { MeetingReservationList } from '@/api'
 import router from '@/router'
-import { useAppStore } from '@/store'
-// import { MeetingRoomListType } from '@/types/userModel'
-import { onBeforeMount, reactive, ref } from 'vue'
 
 const appStore = useAppStore()
 
@@ -90,6 +91,13 @@ const onRefresherrefresh = () => {
   })
 }
 
+useEmitt({
+  name: 'MyMeeting:update',
+  callback: () => {
+    getData()
+  }
+})
+
 onBeforeMount(() => {
   getData()
 })
@@ -123,7 +131,7 @@ onBeforeMount(() => {
           :key="index"
           class="mb-20rpx flex justify-between bg-[#FFF] px-20rpx py-30rpx"
         >
-          <view>
+          <view @click="infoClick(item.meetingReservationId)">
             <view class="text-[30rpx] pb-20rpx font-700">{{
               item.meetingReservationDateTime
             }}</view>
@@ -131,7 +139,7 @@ onBeforeMount(() => {
             <view class="text-[28rpx] pt-20rpx text-#c1c2c7">{{ item.meetingRoomName }}</view>
           </view>
           <view class="flex items-center">
-            <view class="text-[#196CFF]" @click="infoClick(item.meetingReservationId)">查看</view>
+            <view class="text-[#196CFF]">查看</view>
           </view>
         </view>
 

@@ -69,7 +69,7 @@ onBeforeMount(() => {
         :key="index"
         class="mb-20rpx flex justify-between bg-[#FFF] px-20rpx py-30rpx"
       >
-        <view>
+        <view @click="infoClick(item.meetingRoomId)">
           <view class="text-[30rpx] font-700">{{ item.meetingRoomName }}</view>
           <view class="text-[28rpx] pt-20rpx text-#c1c2c7">{{ item.meetingRoomDes }}</view>
         </view>
@@ -79,7 +79,7 @@ onBeforeMount(() => {
             :class="item.meetingRoomStatus === 1 ? 'status-tag' : 'status-un-tag'"
             >{{ item.meetingRoomStatus === 1 ? '可预定' : '已约满' }}</view
           >
-          <view class="text-[#196CFF]" @click="infoClick(item.meetingRoomId)">查看</view>
+          <view class="text-[#196CFF]">查看</view>
         </view>
       </view>
     </scroll-view>
