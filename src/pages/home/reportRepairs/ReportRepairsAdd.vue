@@ -198,7 +198,9 @@ onLoad((val: any) => {
         </view>
       </view>
       <view class="p-20rpx bg-#FFF info">
-        <view class="pb-15rpx font-600">提交人信息 *</view>
+        <view class="pb-15rpx font-600 flex items-center"
+          >提交人信息 <text class="text-[#f87171]">*</text></view
+        >
         <view class="flex flex-row items-center justify-between">
           <view class="py-15rpx text-#808080">联系人</view>
           <view class="mr-20rpx">

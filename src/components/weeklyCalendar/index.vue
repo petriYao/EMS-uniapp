@@ -96,9 +96,9 @@ const confirm = (val: any) => {
 }
 
 onMounted(() => {
-  // if (props.modelValue) {
-  //   reactiveData.currentWeek = props.modelValue
-  // }
+  if (props.modelValue) {
+    selectedWeek.value = reactiveData.currentWeek = props.modelValue
+  }
   updateWeekDays()
 })
 </script>
@@ -109,7 +109,7 @@ onMounted(() => {
       <text class="mr-10rpx"> {{ formatTime(reactiveData.currentWeek, 'yyyy-MM-dd') }}</text>
       <u-icon name="arrow-right" color="#196CFF" />
     </view>
-    <view @click="reactiveData.calendarShow = true" class="text-[#c1c2c7]">
+    <view @click="reactiveData.calendarShow = true" class="text-[#196CFF]">
       {{ reactiveData.nowMonth }}月
     </view>
     <view class="flex items-center justify-end w-240rpx">

@@ -7,10 +7,6 @@ import Serve from './src/Serve.vue'
 import Qrcode from './src/Qrcode.vue'
 import Welfare from './src/Welfare.vue'
 import My from './src/My.vue'
-import { onShow } from '@dcloudio/uni-app'
-import { getUserIdentity } from '@/hooks/useCache'
-import { ref } from 'vue'
-import { UserIdentityType } from '@/types/userModel'
 
 const appStore = useAppStore()
 // 底部导航栏
@@ -63,8 +59,8 @@ const tabBar = [
 ]
 
 // 底部导航栏切换
-const onChange = (name: string) => {
-  appStore.bottomTabbarTitle = name
+const onChange = (title: string) => {
+  appStore.bottomTabbarTitle = title
   uni.pageScrollTo({
     scrollTop: 0,
     duration: 0
@@ -72,15 +68,9 @@ const onChange = (name: string) => {
 }
 
 //是否显示
-const isShow = (name: string) => {
-  return appStore.bottomTabbarTitle === name
+const isShow = (title: string) => {
+  return appStore.bottomTabbarTitle === title
 }
-const userInfo = ref<UserIdentityType | null>()
-
-onShow(async () => {
-  userInfo.value = await getUserIdentity()
-  console.log('userInfo', userInfo.value)
-})
 </script>
 
 <template>
@@ -98,7 +88,7 @@ onShow(async () => {
       <Welfare />
     </view>
     <view v-if="isShow('我的')">
-      <My :myUserInfo="userInfo" />
+      <My />
     </view>
 
     <!-- 底部导航栏 -->

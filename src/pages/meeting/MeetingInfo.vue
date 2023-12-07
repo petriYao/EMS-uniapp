@@ -188,11 +188,14 @@ watch(
       if (reactiveData.endIndex > -1) {
         endIndex = reactiveData.endIndex
       }
-      if (endIndex == reactiveData.list.length) {
+      if (endIndex == reactiveData.list.length - 1) {
         reactiveData.setData.meetingReservationEndTime = '21:00'
       } else {
         reactiveData.setData.meetingReservationEndTime = reactiveData.list[endIndex + 1].label
       }
+    } else {
+      reactiveData.setData.meetingReservationStartTime = ''
+      reactiveData.setData.meetingReservationEndTime = ''
     }
   },
   {

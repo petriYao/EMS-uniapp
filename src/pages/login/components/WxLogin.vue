@@ -22,14 +22,17 @@ const loginClick = async () => {
       const loginRes = await wxLogin(res.code)
       if (loginRes && loginRes.success) {
         setUserIdentity(loginRes.value)
-        if (loginRes.value.userType === 'consumer') {
-          dialogData.loginShow = true
-        } else {
-          console.log('去首页')
-          router.back({
-            delta: props.navigateBack
-          })
-        }
+        // if (loginRes.value.userType === 'consumer') {
+        //   dialogData.loginShow = true
+        // } else {
+        //   console.log('去首页')
+        //   router.back({
+        //     delta: props.navigateBack
+        //   })
+        // }
+        router.back({
+          delta: props.navigateBack
+        })
       }
     }
   })

@@ -1,17 +1,12 @@
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue'
-import { clearUserIdentity } from '@/hooks/useCache'
+import { ref, reactive } from 'vue'
+import { clearUserIdentity, getUserIdentity } from '@/hooks/useCache'
 import { getImageURL, getSvgURL } from '@/utils'
-import router from '@/router'
 import { getAppName } from '@/config/config'
 import { UserIdentityType } from '@/types/userModel'
-const props = defineProps({
-  myUserInfo: {
-    type: Object as any,
-    default: () => {}
-  }
-})
-const userInfo = ref<UserIdentityType | null>()
+import router from '@/router'
+
+const userInfo = ref<UserIdentityType | null>(getUserIdentity() ?? null)
 
 const dialog = reactive({
   show: false,
@@ -85,17 +80,6 @@ const onSetting = (title: string) => {
     })
   }
 }
-
-watch(
-  () => props.myUserInfo,
-  () => {
-    userInfo.value = props.myUserInfo
-  },
-  {
-    immediate: true,
-    deep: true
-  }
-)
 </script>
 
 <template>
@@ -106,16 +90,16 @@ watch(
         style="background: linear-gradient(135.93deg, #def6f9 0%, #e1e8f9 100%)"
       />
       <view class="position-relative z-1">
-        <view class="pt-55px flex-rows pl-40rpx" @click="userInfo ? '' : onLogin()">
+        <view class="pt-55px flex-rows pl-40rpx" @click="userInfo?.userInfo ? '' : onLogin()">
           <view class="mr-20rpx">
             <u-avatar
               :src="userInfo?.userInfo?.avatarImage?.listUrl ?? getImageURL('home', 'my-avatar')"
               size="100rpx"
             />
           </view>
-          <view class="h-100rpx flex flex-col justify-around" v-if="userInfo">
-            <view class="text-30rpx font-600"> {{ userInfo.userInfo.userNickname }} </view>
-            <view class="text-22rpx"> {{ userInfo.userInfo.userPhoneNumber }} </view>
+          <view class="h-100rpx flex flex-col justify-around" v-if="userInfo?.userInfo">
+            <view class="text-30rpx font-600"> {{ userInfo?.userInfo?.userNickname }} </view>
+            <view class="text-22rpx"> {{ userInfo?.userInfo?.userPhoneNumber }} </view>
           </view>
           <view class="h-100rpx flex flex-col justify-around" v-else>
             <view class="text-30rpx font-600"> 未登录/请登录 </view>
@@ -157,7 +141,7 @@ watch(
       </view>
     </view>
 
-    <view v-if="userInfo" class="aa px-60rpx mt-30rpx">
+    <view v-if="userInfo?.userInfo" class="aa px-60rpx mt-30rpx">
       <view @click="onExit" class="bg-#dfe8f7 text-#1c59e6 h-90rpx flex-center rounded-999">
         退出
       </view>
