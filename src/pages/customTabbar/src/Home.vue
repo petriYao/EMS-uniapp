@@ -2,13 +2,11 @@
 import { ref, onMounted } from 'vue'
 
 import { useAppStore } from '@/store'
-import { useEmitt } from '@/hooks/useEmitt'
 import { getImageURL, getSvgURL } from '@/utils'
 import { AppSetInfoApi } from '@/api'
 import router from '@/router'
 
 const appStore = useAppStore()
-const { emitter } = useEmitt()
 
 // 轮播图
 const current = ref(0)
@@ -206,7 +204,7 @@ onMounted(() => {
             </view>
             <view class="h-[100%] flex items-center mr-[40rpx]">
               <!-- <u-image :src="getImageURL('home', 'home-repairs')" width="121rpx" height="120rpx" /> -->
-              <u-icon :name="getSvgURL('home', 'home-repairs')" size="140rpx" />
+              <!-- <u-icon :name="getSvgURL('home', 'home-repairs')" size="140rpx" /> -->
             </view>
           </view>
         </view>

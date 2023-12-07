@@ -20,7 +20,13 @@ import BottomButton from '@/components/BottomButton/index.vue'
 
 const headerTitle = ref('添加报事报修')
 const butTitle = ref('立即提交')
-const infoData = ref({} as ReportRepairsInfoType)
+const infoData = ref({
+  position: '', //所在位置
+  content: '', //问题描述
+  imageIdArray: '', //图片
+  reportRepairsType: 20, //所属分类
+  reservationAt: '' //预约时间
+} as ReportRepairsInfoType)
 const formDataRef = ref()
 const reactiveData = reactive({
   formData: [] as any[], //基础信息
@@ -99,108 +105,40 @@ const onFormData = () => {
       message: '问题描述不能为空',
       trigger: []
     },
-    imageArray: {
-      type: 'string',
-      required: true,
-      message: '图片不能为空',
-      trigger: []
-    },
     reportRepairsType: {
       type: 'string',
       required: true,
       message: '问题分类不能为空',
       trigger: []
     },
-    reservationAt: {
+    contactName: {
       type: 'string',
       required: true,
-      message: '期望服务时间不能为空',
+      message: '联系人不能为空',
+      trigger: []
+    },
+    contactPhone: {
+      type: 'string',
+      required: true,
+      message: '联系人号码不能为空',
       trigger: []
     }
   }
-  reactiveData.editData = {
-    position: '', //所在位置
-    content: '', //问题描述
-    imageIdArray: [], //图片
-    reportRepairsType: 0, //所属分类
-    reservationAt: '' //预约时间
-  }
+  reactiveData.editData.position = infoData.value.position
+  reactiveData.editData.content = infoData.value.content
+  reactiveData.editData.imageArray = infoData.value.imageArray
+  reactiveData.editData.imageIdArray = infoData.value.imageIdArray
+  reactiveData.editData.reportRepairsType = infoData.value.reportRepairsType
+  reactiveData.editData.reservationAt = infoData.value.reservationAt
+  reactiveData.contactName = infoData.value.contactName
+  reactiveData.contactPhone = infoData.value.contactPhone
 }
 
 const onGetInfo = async (id: number) => {
   const res = await ReportRepairsInfoApi(id)
   if (res.success && res.value) {
     infoData.value = res.value
-
-    reactiveData.formData = [
-      getInputColumn('位置', 'position', '请输入产品名称', { columnStyle: 'column-style' }),
-      getTextareaColumn('请输入问题描述', 'content', '', {
-        columnStyle: 'column-style',
-        inputStyle: 'input-style'
-      }),
-      getUploadPicturesColumn('上传图片', 'imageArray', 'imageIdArray', 9, 'reportRepairs', {
-        columnStyle: 'column-style-img'
-      }),
-      getSelectColumn(
-        '问题所属分类',
-        'reportRepairsType',
-        [
-          [
-            { label: '报事', value: 1 },
-            { label: '报修/其他', value: 20 }
-          ]
-        ],
-        '请选择分类',
-        {
-          columnStyle: 'column-style-select',
-          inputStyle: 'input-style-select'
-        }
-      ),
-      getCustomDateColumn('期望服务时间', 'reservationAt', '请选择时间', {
-        columnStyle: 'column-style-select',
-        inputStyle: 'input-style-select'
-      })
-    ]
-    reactiveData.rules = {
-      position: {
-        type: 'string',
-        required: true,
-        message: '位置不能为空',
-        trigger: []
-      },
-      content: {
-        type: 'string',
-        required: true,
-        message: '问题描述不能为空',
-        trigger: []
-      },
-      imageArray: {
-        type: 'string',
-        required: true,
-        message: '图片不能为空',
-        trigger: []
-      },
-      reportRepairsType: {
-        type: 'string',
-        required: true,
-        message: '问题分类不能为空',
-        trigger: []
-      },
-      reservationAt: {
-        type: 'string',
-        required: true,
-        message: '期望服务时间不能为空',
-        trigger: []
-      }
-    }
-    reactiveData.editData.position = infoData.value.position
-    reactiveData.editData.content = infoData.value.content
-    reactiveData.editData.imageArray = infoData.value.imageArray
-    reactiveData.editData.imageIdArray = infoData.value.imageIdArray
-    reactiveData.editData.reportRepairsType = infoData.value.reportRepairsType
-    reactiveData.editData.reservationAt = infoData.value.reservationAt
-    reactiveData.contactName = infoData.value.contactName
-    reactiveData.contactPhone = infoData.value.contactPhone
+    onFormData()
   }
 }
 
@@ -256,13 +194,17 @@ onLoad((val: any) => {
         <view class="flex flex-row items-center justify-between">
           <view class="py-15rpx text-#808080">联系人</view>
           <view class="mr-20rpx">
-            <u-input placeholder="请输入内容" border="none" v-model="reactiveData.contactName" />
+            <u-input placeholder="请输入联系人" border="none" v-model="reactiveData.contactName" />
           </view>
         </view>
         <view class="flex flex-row items-center justify-between">
           <view class="py-15rpx text-#808080">联系电话</view>
           <view class="mr-20rpx">
-            <u-input placeholder="请输入内容" border="none" v-model="reactiveData.contactPhone" />
+            <u-input
+              placeholder="请输入联系电话"
+              border="none"
+              v-model="reactiveData.contactPhone"
+            />
           </view>
         </view>
       </view>
