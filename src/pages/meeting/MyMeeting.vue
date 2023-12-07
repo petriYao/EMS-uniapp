@@ -32,7 +32,7 @@ const reactiveData = reactive({
     }
   ],
   setData: {
-    meetingReservationStatus: 0,
+    meetingReservationStatus: 1,
     page: 1,
     size: 10
   },
