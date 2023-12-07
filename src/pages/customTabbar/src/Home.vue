@@ -140,13 +140,13 @@ onMounted(() => {
           @click.stop="onJump('咨询建议')"
         >
           <u-image
-            :src="appStore.registerImage"
-            width="80rpx"
+            :src="appStore.keywordImage"
+            width="87rpx"
             height="80rpx"
             :fade="false"
             :showLoading="false"
           />
-          <u-icon :name="getSvgURL('home', 'home-keyword')" size="80rpx" />
+          <!-- <u-icon :name="getSvgURL('home', 'home-keyword')" size="80rpx" /> -->
         </view>
       </view>
 
