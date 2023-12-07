@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { onLoad } from '@dcloudio/uni-app'
 import { reactive, ref } from 'vue'
-// import UploadPicture from '@/components/upload/UploadPicture.vue'
-// import { ReportRepairsAddApi } from '@/api'
+import { onLoad } from '@dcloudio/uni-app'
+
 import {
   getCustomDateColumn,
   getInputColumn,
@@ -11,12 +10,19 @@ import {
   getUploadPicturesColumn
 } from '@/utils'
 import { useAppStore } from '@/store'
-import FormPartItem from '@/components/Form/FormPart.vue'
+import { useEmitt } from '@/hooks/useEmitt'
 import debounce, { isEmpty } from '@/utils/toolUtils'
-import { ReportRepairsAddApi, ReportRepairsInfoApi } from '@/api'
 import router from '@/router'
+import { ReportRepairsAddApi, ReportRepairsInfoApi } from '@/api'
 import { ReportRepairsInfoType } from '@/types/reportRepairsModel'
+
 import BottomButton from '@/components/BottomButton/index.vue'
+import FormPartItem from '@/components/Form/FormPart.vue'
+
+const appStore = useAppStore()
+const { emitter } = useEmitt()
+
+const marginHeight = ref(appStore.notchHeight + 'px')
 
 const headerTitle = ref('添加报事报修')
 const butTitle = ref('立即提交')
@@ -37,9 +43,6 @@ const reactiveData = reactive({
   reportRepairsId: undefined as undefined | number,
   disabled: false
 })
-const appStore = useAppStore()
-
-const marginHeight = ref(appStore.notchHeight + 'px')
 
 //提交
 const saveClick = () => {
@@ -55,11 +58,9 @@ const saveClick = () => {
     const res = await ReportRepairsAddApi(data, reactiveData.reportRepairsId)
     if (res.success) {
       router.back()
+      emitter.emit('ReportRepairsList:update')
     }
-    console.log('reactiveData.editData', res)
   })
-
-  //系统字段
 }
 
 const onFormData = () => {
@@ -138,6 +139,15 @@ const onGetInfo = async (id: number) => {
   const res = await ReportRepairsInfoApi(id)
   if (res.success && res.value) {
     infoData.value = res.value
+    infoData.value.imageIdArray = ''
+    if (res.value.imageArray) {
+      const ar = [] as number[]
+      for (const item of res.value.imageArray) {
+        ar.push(item.id)
+      }
+      infoData.value.imageIdArray = JSON.stringify(ar)
+    }
+
     onFormData()
   }
 }
@@ -158,8 +168,6 @@ onLoad((val: any) => {
     }
     onGetInfo(val.id)
   }
-
-  console.log('onLoad', isEmpty(val))
 })
 </script>
 
@@ -190,7 +198,7 @@ onLoad((val: any) => {
         </view>
       </view>
       <view class="p-20rpx bg-#FFF info">
-        <view class="pb-15rpx font-600">提交人信息</view>
+        <view class="pb-15rpx font-600">提交人信息 *</view>
         <view class="flex flex-row items-center justify-between">
           <view class="py-15rpx text-#808080">联系人</view>
           <view class="mr-20rpx">

@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { ReportRepairsListApi } from '@/api'
-import router from '@/router'
-import { useAppStore } from '@/store'
-import { ReportRepairsListType } from '@/types/reportRepairsModel'
-import { onLoad, onShow } from '@dcloudio/uni-app'
 import { reactive, ref } from 'vue'
+import { onLoad, onShow } from '@dcloudio/uni-app'
+
+import { useAppStore } from '@/store'
+import { useEmitt } from '@/hooks/useEmitt'
+import router from '@/router'
+import { ReportRepairsListType } from '@/types/reportRepairsModel'
+import { ReportRepairsListApi } from '@/api'
+
 import BottomButton from '@/components/BottomButton/index.vue'
 
 const appStore = useAppStore()
@@ -12,7 +15,7 @@ const appStore = useAppStore()
 const marginHeight = ref(appStore.notchHeight + 'px')
 
 const reactiveData = reactive({
-  tabsActive: 0,
+  tabsActive: 1,
   tabsList: [
     {
       name: '未分配',
@@ -65,7 +68,6 @@ const onChangeTabs = (tabItem: any) => {
   page.value = 1
   setScrollTop()
   getListData()
-  console.log('tabItem', tabItem)
 }
 
 /**获取列表数据 */
@@ -119,10 +121,15 @@ const onScrolltolower = async () => {
   }
 }
 
+useEmitt({
+  name: 'ReportRepairsList:update',
+  callback: () => {
+    getListData(true)
+  }
+})
+
 onLoad(async () => {
   getListData(true)
-
-  console.log('onLoad', appStore.notchHeight)
 })
 
 onShow(() => {})

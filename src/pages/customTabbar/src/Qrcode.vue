@@ -19,11 +19,6 @@ const buttonList = [
     iconSelect: 'people-access-select',
     title: '通行码'
   },
-  // {
-  //   icon: 'car-access',
-  //   iconSelect: 'car-access-select',
-  //   title: '车行码'
-  // },
   {
     icon: 'payment-code',
     iconSelect: 'payment-code-select',

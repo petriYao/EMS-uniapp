@@ -204,7 +204,7 @@ onMounted(() => {
             </view>
             <view class="h-[100%] flex items-center mr-[40rpx]">
               <!-- <u-image :src="getImageURL('home', 'home-repairs')" width="121rpx" height="120rpx" /> -->
-              <!-- <u-icon :name="getSvgURL('home', 'home-repairs')" size="140rpx" /> -->
+              <u-icon :name="getSvgURL('home', 'home-repairs')" size="140rpx" />
             </view>
           </view>
         </view>
