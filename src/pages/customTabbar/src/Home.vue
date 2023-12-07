@@ -159,8 +159,8 @@ onMounted(() => {
               <view class="text-14rpx text-#eaebed mix-blend-soft-light">VISITOR REGISTRATION</view>
             </view>
             <view class="my-auto pr-40rpx">
-              <!-- <u-image :src="getImageURL('home', 'home-register')" width="127rpx" height="109rpx" /> -->
-              <u-icon :name="getSvgURL('home', 'home-register')" size="140rpx" />
+              <u-image :src="getImageURL('home', 'home-register')" width="127rpx" height="109rpx" />
+              <!-- <u-icon :name="getSvgURL('home', 'home-register')" size="140rpx" /> -->
             </view>
           </view>
           <view
@@ -203,8 +203,8 @@ onMounted(() => {
               >
             </view>
             <view class="h-[100%] flex items-center mr-[40rpx]">
-              <!-- <u-image :src="getImageURL('home', 'home-repairs')" width="121rpx" height="120rpx" /> -->
-              <u-icon :name="getSvgURL('home', 'home-repairs')" size="140rpx" />
+              <u-image :src="getImageURL('home', 'home-repairs')" width="121rpx" height="120rpx" />
+              <!-- <u-icon :name="getSvgURL('home', 'home-repairs')" size="140rpx" /> -->
             </view>
           </view>
         </view>
@@ -219,12 +219,12 @@ onMounted(() => {
               <view class="text-14rpx text-#eaebed mix-blend-soft-light">INTELLIGENT LIFE</view>
             </view>
             <view class="h-[100%] flex items-center mr-[40rpx]">
-              <!-- <u-image
+              <u-image
                 :src="getImageURL('home', 'home-intelligent-life')"
                 width="119rpx"
                 height="129rpx"
-              /> -->
-              <u-icon :name="getSvgURL('home', 'home-intelligent-life')" size="140rpx" />
+              />
+              <!-- <u-icon :name="getSvgURL('home', 'home-intelligent-life')" size="140rpx" /> -->
             </view>
           </view>
           <view
