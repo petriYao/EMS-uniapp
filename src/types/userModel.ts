@@ -83,7 +83,7 @@ export type MeetingReservationUpdateType = {
   meetingReservationEndTime: string
   meetingReservationStartTime: string
   meetingReservationTitle: string
-  meetingRoomId: string | number
+  meetingRoomId: string | number | null
 }
 /**旧的 */
 // export type UserIdentityType = {

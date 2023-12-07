@@ -14,12 +14,13 @@ const reactiveData = reactive({
   isSelect: false,
   startIndex: -1,
   endIndex: -1,
+  meetingReservationId: '',
   setData: {
     meetingReservationDate: '', //日期
     meetingReservationStartTime: '', //预约开始时间
     meetingReservationEndTime: '', //预约结束时间
     meetingReservationTitle: '', //会议主题
-    meetingRoomId: 0
+    meetingRoomId: null as number | null
   },
   list: [] as optionsType[],
   // 将星期几转换为字符串
@@ -149,8 +150,12 @@ watch(
 )
 
 onLoad((val: any) => {
-  reactiveData.setData.meetingRoomId = Number(val.meetingRoomId)
-  getData()
+  if (val.meetingRoomId) {
+    reactiveData.setData.meetingRoomId = Number(val.meetingRoomId)
+    getData()
+  } else {
+    reactiveData.meetingReservationId = val.meetingReservationId
+  }
 })
 </script>
 
