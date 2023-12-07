@@ -50,8 +50,17 @@ const useAppStore = defineStore('app', {
     }
   },
   getters: {
-    introductionBG(state) {
-      return state.cacheImageList['introductionBG'] ?? ''
+    registerImage(state) {
+      return state.cacheImageList['register'] ?? ''
+    },
+    repairsImage(state) {
+      return state.cacheImageList['repairs'] ?? ''
+    },
+    intelligentLifeImage(state) {
+      return state.cacheImageList['intelligentLife'] ?? ''
+    },
+    introductionImage(state) {
+      return state.cacheImageList['introduction'] ?? ''
     },
     needLogin(state) {
       return !state.instituteType || state.instituteType == 'consumer'

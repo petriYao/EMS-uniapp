@@ -4,7 +4,10 @@ import { getImageURLNeedWl } from '@/utils'
 export const initCacheIamge = () => {
   const appStore = useAppStore()
   const imageArray = [
-    { name: 'introductionBG', image: getImageURLNeedWl('home', 'home-introduction') }
+    { name: 'register', image: getImageURLNeedWl('home', 'home-register') },
+    { name: 'repairs', image: getImageURLNeedWl('home', 'home-repairs') },
+    { name: 'intelligentLife', image: getImageURLNeedWl('home', 'home-intelligent-life') },
+    { name: 'introduction', image: getImageURLNeedWl('home', 'home-introduction') }
   ] as any[]
   for (const item of imageArray) {
     uni.downloadFile({

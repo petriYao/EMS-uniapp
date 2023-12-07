@@ -75,50 +75,59 @@ const isShow = (title: string) => {
 
 <template>
   <ContentWrap>
-    <view v-show="isShow('首页')">
-      <Home />
-    </view>
-    <view v-show="isShow('服务')">
-      <Serve />
-    </view>
-    <view v-if="isShow('一码通')">
-      <Qrcode />
-    </view>
-    <view v-if="isShow('福利')">
-      <Welfare />
-    </view>
-    <view v-if="isShow('我的')">
-      <My />
-    </view>
+    <view
+      v-show="
+        appStore.registerImage &&
+        appStore.repairsImage &&
+        appStore.intelligentLifeImage &&
+        appStore.introductionImage
+      "
+    >
+      <view v-show="isShow('首页')">
+        <Home />
+      </view>
+      <view v-show="isShow('服务')">
+        <Serve />
+      </view>
+      <view v-if="isShow('一码通')">
+        <Qrcode />
+      </view>
+      <view v-if="isShow('福利')">
+        <Welfare />
+      </view>
+      <view v-if="isShow('我的')">
+        <My />
+      </view>
 
-    <!-- 底部导航栏 -->
-    <view class="tabbar">
-      <view class="tabbar__content tabbar--fixed">
-        <view class="tabbar__content__item-wrapper">
-          <view
-            class="tabbar-item"
-            v-for="(item, index) in tabBar"
-            :key="index"
-            :class="item.title === '一码通' ? 'qr' : ''"
-            @click="onChange(item.title)"
-          >
-            <view class="tabbar-item__icon">
-              <u-icon
-                :name="getSvgURL('home', isShow(item.title) ? item.icon : item.onicon)"
-                :size="item.size"
-              />
-            </view>
+      <!-- 底部导航栏 -->
+      <view class="tabbar">
+        <view class="tabbar__content tabbar--fixed">
+          <view class="tabbar__content__item-wrapper">
             <view
-              class="tabbar-item__text"
-              :style="isShow(item.title) ? 'color:#03030D;' : 'color:#999999;'"
+              class="tabbar-item"
+              v-for="(item, index) in tabBar"
+              :key="index"
+              :class="item.title === '一码通' ? 'qr' : ''"
+              @click="onChange(item.title)"
             >
-              {{ item.title }}
+              <view class="tabbar-item__icon">
+                <u-icon
+                  :name="getSvgURL('home', isShow(item.title) ? item.icon : item.onicon)"
+                  :size="item.size"
+                />
+              </view>
+              <view
+                class="tabbar-item__text"
+                :style="isShow(item.title) ? 'color:#03030D;' : 'color:#999999;'"
+              >
+                {{ item.title }}
+              </view>
             </view>
           </view>
         </view>
       </view>
+      <view class="w-100vw h-180rpx" />
     </view>
-    <view class="w-100vw h-180rpx" />
   </ContentWrap>
 </template>
 
