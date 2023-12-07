@@ -4,6 +4,7 @@ import { getImageURLNeedWl } from '@/utils'
 export const initCacheIamge = () => {
   const appStore = useAppStore()
   const imageArray = [
+    { name: 'keyword', image: getImageURLNeedWl('home', 'home-keyword') },
     { name: 'register', image: getImageURLNeedWl('home', 'home-register') },
     { name: 'repairs', image: getImageURLNeedWl('home', 'home-repairs') },
     { name: 'intelligentLife', image: getImageURLNeedWl('home', 'home-intelligent-life') },

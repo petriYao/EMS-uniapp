@@ -50,6 +50,9 @@ const useAppStore = defineStore('app', {
     }
   },
   getters: {
+    keywordImage(state) {
+      return state.cacheImageList['keyword'] ?? ''
+    },
     registerImage(state) {
       return state.cacheImageList['register'] ?? ''
     },
