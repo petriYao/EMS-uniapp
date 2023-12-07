@@ -25,10 +25,10 @@ onLoad(async () => {})
   <ContentWrap>
     <!-- 头部开始 -->
     <XWAHeader title="会议室预定" />
-    <view class="h-50vh flex items-center justify-center">
+    <view class="h-50% flex items-center justify-center">
       <u-image
-        width="100%"
-        height="26vh"
+        width="400rpx"
+        height="400rpx"
         mode="heightFix"
         :src="getImageURL('home', 'meeting-booking-bg')"
       />
