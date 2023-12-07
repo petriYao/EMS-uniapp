@@ -35,7 +35,7 @@ const onJump = (title: string) => {
     case '园区E闻':
       src = 'parkENews/parkENewsList'
       break
-    case '园区E圈':
+    case '社群活动':
       src = 'parkECircle/parkECircleList'
       break
     case '企业风采':
@@ -45,11 +45,12 @@ const onJump = (title: string) => {
       src = 'exhibition/index'
       break
     case '停车缴费':
-      appStore.bottomTabbarTitle = '一码通'
-      setTimeout(() => {
-        emitter.emit('Qrcode:Change', 1)
-      }, 100)
-      return
+      // appStore.bottomTabbarTitle = '一码通'
+      // setTimeout(() => {
+      //   emitter.emit('Qrcode:Change', 1)
+      // }, 100)
+      src = 'home/parkingFee/index'
+      break
     case '会议预定':
       src = 'home/meetingBooking/index'
       break
@@ -59,7 +60,7 @@ const onJump = (title: string) => {
     case '报事报修':
       src = 'home/reportRepairs/ReportRepairsList'
       break
-    case '客服咨询':
+    case '咨询建议':
       src = 'home/consult/index'
       break
     case '智慧生活':
@@ -85,7 +86,14 @@ const onJump = (title: string) => {
     })
   }
 }
-
+//扫二维码
+const scanQRclick = () => {
+  uni.scanCode({
+    success(res) {
+      console.log('条码类型:', res)
+    }
+  })
+}
 onMounted(() => {
   getHeadCarouselImage()
 })
@@ -118,19 +126,26 @@ onMounted(() => {
         </u-swiper>
       </view>
       <!-- 搜索框 -->
-      <view class="position-relative px-30rpx py-20rpx bg-base">
-        <u-search
+      <view class="position-relative mx-30rpx my-20rpx bg-[#FFF] rounded-10rpx">
+        <u-input
           placeholder="搜索您想要的"
           v-model="keyword"
           shape="square"
           :showAction="false"
           :searchIconSize="0"
-        />
-        <view
-          class="position-absolute right-60rpx bottom-40rpx z-99"
-          @click.stop="onJump('客服咨询')"
         >
-          <u-icon :name="getSvgURL('home', 'home-keyword')" size="70rpx" />
+          <template #prefix>
+            <view class="flex items-center">
+              <u-icon name="scan" color="#0C0608" size="28" @click="scanQRclick" />
+              <view class="bg-[#999999] h-[14px] w-1px mx-4px" />
+            </view>
+          </template>
+        </u-input>
+        <view
+          class="position-absolute right-40rpx bottom-40rpx z-99"
+          @click.stop="onJump('咨询建议')"
+        >
+          <u-icon :name="getSvgURL('home', 'home-keyword')" size="100rpx" />
         </view>
       </view>
 

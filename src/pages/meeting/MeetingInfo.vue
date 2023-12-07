@@ -4,7 +4,12 @@ import { onLoad } from '@dcloudio/uni-app'
 
 import { formatTime } from '@/utils'
 import { optionsType } from '@/types/userModel'
-import { MeetingReservationTimeList, MeetingReservationUpdate, MeetingRoomInfo } from '@/api'
+import {
+  MeetingReservationTimeList,
+  MeetingReservationUpdate,
+  MeetingRoomInfo,
+  MeetingReservationInfo
+} from '@/api'
 
 import WeeklyCalendar from '@/components/weeklyCalendar/index.vue'
 
@@ -16,9 +21,9 @@ const reactiveData = reactive({
   endIndex: -1,
   meetingReservationId: '',
   setData: {
-    meetingReservationDate: '', //日期
-    meetingReservationStartTime: '', //预约开始时间
-    meetingReservationEndTime: '', //预约结束时间
+    meetingReservationDate: formatTime(new Date(), 'yyyy-MM-dd'), //日期
+    meetingReservationStartTime: '', //预定开始时间
+    meetingReservationEndTime: '', //预定结束时间
     meetingReservationTitle: '', //会议主题
     meetingRoomId: null as number | null
   },
@@ -27,22 +32,23 @@ const reactiveData = reactive({
   weekdays: ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六']
 })
 
-//获取详情和预约时间列表
-const getData = async () => {
+//获取详情和预定时间列表
+const getRoomInfo = async () => {
   const res = await MeetingRoomInfo(reactiveData.setData.meetingRoomId)
   if (res && res.success) {
     reactiveData.infoData = res.value
   }
-
-  const timeRes = await MeetingReservationTimeList(
-    reactiveData.setData.meetingRoomId,
-    reactiveData.meetingReservationDate
-  )
-  if (timeRes && timeRes.success) {
-    reactiveData.isSelect = false
-    reactiveData.startIndex = -1
-    reactiveData.endIndex = -1
-    reactiveData.list = timeRes.value.list
+  getTimeList()
+}
+//获取详情和预定时间列表
+const getReservationInfo = async () => {
+  console.log('获取详情和预定时间列表')
+  const res = await MeetingReservationInfo(reactiveData.meetingReservationId)
+  console.log('res', res)
+  if (res && res.success) {
+    reactiveData.infoData = res.value
+    reactiveData.setData.meetingRoomId = res.value.meetingRoomId
+    getTimeList()
   }
 }
 
@@ -97,6 +103,19 @@ const submitClick = async () => {
   }
 }
 
+const getTimeList = async () => {
+  const timeRes = await MeetingReservationTimeList(
+    reactiveData.setData.meetingRoomId,
+    reactiveData.setData.meetingReservationDate
+  )
+  if (timeRes && timeRes.success) {
+    reactiveData.isSelect = false
+    reactiveData.startIndex = -1
+    reactiveData.endIndex = -1
+    reactiveData.list = timeRes.value.list
+  }
+}
+
 watch(
   () => reactiveData.meetingReservationDate,
   async () => {
@@ -105,20 +124,9 @@ watch(
       reactiveData.meetingReservationDate,
       'yyyy-MM-dd'
     )
-
-    const timeRes = await MeetingReservationTimeList(
-      reactiveData.setData.meetingRoomId,
-      reactiveData.setData.meetingReservationDate
-    )
-    if (timeRes && timeRes.success) {
-      reactiveData.isSelect = false
-      reactiveData.startIndex = -1
-      reactiveData.endIndex = -1
-      reactiveData.list = timeRes.value.list
-    }
+    getTimeList()
   },
   {
-    immediate: true,
     deep: true
   }
 )
@@ -149,12 +157,14 @@ watch(
   }
 )
 
-onLoad((val: any) => {
+onLoad(async (val: any) => {
+  console.log('onLoad', val)
   if (val.meetingRoomId) {
     reactiveData.setData.meetingRoomId = Number(val.meetingRoomId)
-    getData()
+    getRoomInfo()
   } else {
     reactiveData.meetingReservationId = val.meetingReservationId
+    getReservationInfo()
   }
 })
 </script>
@@ -162,7 +172,7 @@ onLoad((val: any) => {
 <template>
   <ContentWrap>
     <!-- 头部开始 -->
-    <XWAHeader title="预约会议" />
+    <XWAHeader title="预定会议" />
 
     <!-- 会议室信息 -->
     <view class="flex my-20rpx bg-[#FFF] py-30rpx px-20rpx">
@@ -188,9 +198,9 @@ onLoad((val: any) => {
     </view>
 
     <!-- 提示 -->
-    <view class="time-tip"> 点击小方块进行预约，每个方块30分钟，一个小时划分2个方块 </view>
+    <view class="time-tip"> 点击小方块进行预定，每个方块30分钟，一个小时划分2个方块 </view>
 
-    <!-- 预约时间段 -->
+    <!-- 预定时间段 -->
     <view class="flex flex-wrap py-20rpx bg-#FFF w-100%">
       <view
         v-for="(item, index) in reactiveData.list"
@@ -246,7 +256,7 @@ onLoad((val: any) => {
         class="w-[100%] bg-[#466BF3] text-[#FFF] rounded-8rpx h-80rpx flex items-center justify-center"
         hover-class="button-spread"
         @click="submitClick"
-        >立即预约</view
+        >立即预定</view
       >
     </view>
   </ContentWrap>

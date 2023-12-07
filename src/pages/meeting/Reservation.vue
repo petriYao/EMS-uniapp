@@ -53,7 +53,7 @@ onBeforeMount(() => {
 <template>
   <ContentWrap>
     <!-- 头部开始 -->
-    <XWAHeader title="预约会议" />
+    <XWAHeader title="预定会议" />
     <view class="h-20rpx" />
     <view id="weeklyCalendarId">
       <WeeklyCalendar v-model="reactiveData.setData.date" />
@@ -77,7 +77,7 @@ onBeforeMount(() => {
           <view
             class="mr-30rpx w-100rpx h-40rpx flex items-center justify-center text-[22rpx]"
             :class="item.meetingRoomStatus === 1 ? 'status-tag' : 'status-un-tag'"
-            >{{ item.meetingRoomStatus === 1 ? '可预约' : '已约满' }}</view
+            >{{ item.meetingRoomStatus === 1 ? '可预定' : '已约满' }}</view
           >
           <view class="text-[#196CFF]" @click="infoClick(item.meetingRoomId)">查看</view>
         </view>

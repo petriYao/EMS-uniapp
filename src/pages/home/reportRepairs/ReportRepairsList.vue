@@ -15,10 +15,6 @@ const reactiveData = reactive({
   tabsActive: 0,
   tabsList: [
     {
-      name: '全部',
-      value: 0
-    },
-    {
       name: '未分配',
       value: 1
     },
@@ -29,6 +25,10 @@ const reactiveData = reactive({
     {
       name: '已完成',
       value: 30
+    },
+    {
+      name: '全部',
+      value: 0
     }
   ],
   page: 1,

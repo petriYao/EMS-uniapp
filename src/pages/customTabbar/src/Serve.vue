@@ -132,7 +132,7 @@ const dataObj = [
       },
       {
         icon: 'serve_Park_ECircle',
-        title: '园区E圈'
+        title: '园区E闻'
       }
     ]
   }
@@ -161,7 +161,7 @@ const onJump = (title: string) => {
       src = 'home/reportRepairs/ReportRepairsList'
       break
     case '出行交通':
-      src = 'exhibition/index'
+      src = 'exhibition/index?title=出行交通'
       break
     case '园区导览':
       src = 'exhibition/index'
@@ -170,10 +170,15 @@ const onJump = (title: string) => {
       src = 'home/consult/index'
       break
     case '社群活动':
-      break
-    case '园区E圈':
       src = 'parkECircle/parkECircleList'
       break
+    case '园区E闻':
+      src = 'parkENews/parkENewsList'
+      break
+    case '房源咨询':
+      src = 'home/consult/index?title=房源咨询'
+      break
+
     default:
       uni.showToast({
         title: '待开发',

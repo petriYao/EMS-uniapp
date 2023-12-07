@@ -12,6 +12,10 @@ onLaunch(async () => {
 })
 
 onShow(() => {
+  uni.setNavigationBarTitle({
+    title: ''
+  })
+
   //统计数据
   if (isLaunch.value) getHomeIndex()
   isLaunch.value = true

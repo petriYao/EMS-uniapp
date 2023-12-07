@@ -18,7 +18,7 @@ export const MeetingReservationTimeList = (meetingRoomId: any, date: any) => {
   return post<any>('meeting-reservation/time-list', { meetingRoomId, date })
 }
 
-/**会议预约添加编辑 */
+/**会议预定添加编辑 */
 export const MeetingReservationUpdate = (
   data: MeetingReservationUpdateType,
   meetingReservationId?: number
@@ -30,12 +30,12 @@ export const MeetingReservationUpdate = (
   }
 }
 
-/**会议预约列表 */
+/**会议预定列表 */
 export const MeetingReservationList = (data: any) => {
   return post<any>('meeting-reservation/list', { ...data })
 }
 
-/**会议预约详情 */
+/**会议预定详情 */
 export const MeetingReservationInfo = (meetingReservationId: any) => {
   return post<any>('meeting-reservation/info', { meetingReservationId })
 }

@@ -28,6 +28,12 @@ export const isURLDebug = () => {
   return urlDebug
 }
 
+//应用名称
+export const getAppName = () => {
+  const val = uni.getSystemInfoSync()
+  return val.appName
+}
+
 //版本号
 export const getVersion = () => {
   const val = uni.getSystemInfoSync()

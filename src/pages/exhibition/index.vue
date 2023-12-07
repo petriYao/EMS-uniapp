@@ -1,13 +1,21 @@
 <script setup lang="ts">
+import { onLoad } from '@dcloudio/uni-app'
 import { ref } from 'vue'
 
 const center = ref({
   lng: 119.25033152103425,
   lat: 26.11648445651557
 })
+
+const title = ref('园区导览')
+onLoad((val: any) => {
+  if (val.title) {
+    title.value = val.title
+  }
+})
 </script>
 <template>
-  <XWAHeader title="园区导览" />
+  <XWAHeader :title="title" />
 
   <view class="w-100% fixed">
     <map

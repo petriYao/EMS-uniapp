@@ -1,20 +1,15 @@
 <script setup lang="ts">
 import { onLoad } from '@dcloudio/uni-app'
-import { ref } from 'vue'
 
 // 轮播图
-const title = ref('咨询建议')
-onLoad(async (val: any) => {
-  if (val.title) {
-    title.value = val.title
-  }
-})
+
+onLoad(async () => {})
 </script>
 
 <template>
   <ContentWrap>
     <!-- 头部开始 -->
-    <XWAHeader :title="title" />
+    <XWAHeader title="停车缴费" />
     <!-- 头部结束 -->
   </ContentWrap>
 </template>

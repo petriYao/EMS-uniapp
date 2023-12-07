@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { getUserInfoApi, updateUserApi, uploadFileApi } from '@/api'
+import { setUserIdentity } from '@/hooks/useCache'
 import { UserHeadType, UserInfoType } from '@/types/userModel'
 import { onLoad } from '@dcloudio/uni-app'
 import { reactive } from 'vue'
@@ -28,6 +29,8 @@ const sheetSex = reactive({
 const getUserInfo = async () => {
   const res = await getUserInfoApi()
   if (res.success) {
+    setUserIdentity(res.value)
+
     userHead.value = res.value?.userHead
     userInfo.value = res.value?.userInfo
   }

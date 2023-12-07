@@ -15,10 +15,6 @@ const reactiveData = reactive({
   scrollTop: 0,
   tabList: [
     {
-      name: '全部 ',
-      value: 0
-    },
-    {
       name: '未处理',
       value: 1
     },
@@ -29,6 +25,10 @@ const reactiveData = reactive({
     {
       name: '已拒绝',
       value: 30
+    },
+    {
+      name: '已逾期 ',
+      value: 31
     }
   ],
   setData: {
@@ -67,9 +67,9 @@ const tabsChange = (val: any) => {
   getData()
 }
 
-const infoClick = (meetingRoomId: string) => {
+const infoClick = (meetingReservationId: string) => {
   router.push({
-    url: `/pages/meeting/MeetingInfo?meetingRoomId=${meetingRoomId}`
+    url: `/pages/meeting/MeetingInfo?meetingReservationId=${meetingReservationId}`
   })
 }
 

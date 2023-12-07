@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import router from '@/router'
 import { loginApi } from '@/api'
 import { setUserIdentity } from '@/hooks/useCache'
+import { getAppName } from '@/config/config'
 
 const fromData = ref({
   username: '',
@@ -27,7 +28,7 @@ const rules = {
     type: 'array',
     min: 1,
     required: true,
-    message: '请选阅读并同意数小宝用户协议',
+    message: `请选阅读并同意${getAppName()}用户协议`,
     trigger: ['change']
   }
 }
@@ -98,7 +99,7 @@ const onSubmit = () => {
                 :customStyle="{ marginRight: '16px' }"
                 label="我已阅读并同意"
               />
-              <view class="text-24rpx">数小宝用户协议</view>
+              <view class="text-24rpx">{{ getAppName() }}用户协议</view>
             </view>
           </u-checkbox-group>
         </u-form-item>

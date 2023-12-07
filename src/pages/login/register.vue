@@ -4,7 +4,7 @@ import BottomButton from '@/components/BottomButton/index.vue'
 import { setUserIdentity } from '@/hooks/useCache'
 import router from '@/router'
 import { ref } from 'vue'
-
+import { getAppName } from '@/config/config'
 const fromData = ref({
   userPhoneNumber: '',
   phoneCode: '',
@@ -60,7 +60,7 @@ const rules = {
     type: 'array',
     min: 1,
     required: true,
-    message: '请选阅读并同意数小宝用户协议',
+    message: `请选阅读并同意${getAppName()}用户协议`,
     trigger: ['change']
   }
 }
@@ -197,7 +197,7 @@ const onLogin = () => {
                 :customStyle="{ marginRight: '16px' }"
                 label="我已阅读并同意"
               />
-              <view class="text-24rpx">数小宝用户协议</view>
+              <view class="text-24rpx">{{ getAppName() }}用户协议</view>
             </view>
           </u-checkbox-group>
         </u-form-item>

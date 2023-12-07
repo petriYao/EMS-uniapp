@@ -5,6 +5,7 @@ import WxLogin from './components/WxLogin.vue'
 import { getImageURL, getSvgURL } from '@/utils'
 import { onLoad } from '@dcloudio/uni-app'
 import { reactive, ref } from 'vue'
+import { getAppName } from '@/config/config'
 
 const reactiveData = reactive({
   isPhone: false, //是否是手机号登录
@@ -46,7 +47,7 @@ onLoad((val: any) => {
     <view class="relative z-1 mt-250rpx">
       <view class="pb-60rpx flex justify-center items-center flex-col">
         <view> <u-icon :name="getSvgURL('login', 'login-logo')" size="70" /></view>
-        <view class="mt-40rpx text-42rpx font-600">您好，欢迎登录数小宝</view>
+        <view class="mt-40rpx text-42rpx font-600">您好，欢迎登录{{ getAppName() }}</view>
       </view>
       <view class="bg-#fff">
         <view class="phone" v-show="!reactiveData.isPhone">
@@ -66,7 +67,7 @@ onLoad((val: any) => {
                     :customStyle="{ marginRight: '16px' }"
                     label="我已阅读并同意"
                   />
-                  <view class="text-24rpx">数小宝用户协议</view>
+                  <view class="text-24rpx">{{ getAppName() }}用户协议</view>
                 </view>
               </u-checkbox-group>
             </view>

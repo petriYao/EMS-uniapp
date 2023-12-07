@@ -7,6 +7,10 @@ import Serve from './src/Serve.vue'
 import Qrcode from './src/Qrcode.vue'
 import Welfare from './src/Welfare.vue'
 import My from './src/My.vue'
+import { onShow } from '@dcloudio/uni-app'
+import { getUserIdentity } from '@/hooks/useCache'
+import { ref } from 'vue'
+import { UserIdentityType } from '@/types/userModel'
 
 const appStore = useAppStore()
 // 底部导航栏
@@ -71,6 +75,12 @@ const onChange = (name: string) => {
 const isShow = (name: string) => {
   return appStore.bottomTabbarTitle === name
 }
+const userInfo = ref<UserIdentityType | null>()
+
+onShow(async () => {
+  userInfo.value = await getUserIdentity()
+  console.log('userInfo', userInfo.value)
+})
 </script>
 
 <template>
@@ -88,7 +98,7 @@ const isShow = (name: string) => {
       <Welfare />
     </view>
     <view v-if="isShow('我的')">
-      <My />
+      <My :myUserInfo="userInfo" />
     </view>
 
     <!-- 底部导航栏 -->

@@ -17,13 +17,13 @@ const buttonList = [
   {
     icon: 'people-access',
     iconSelect: 'people-access-select',
-    title: '人行码'
+    title: '通行码'
   },
-  {
-    icon: 'car-access',
-    iconSelect: 'car-access-select',
-    title: '车行码'
-  },
+  // {
+  //   icon: 'car-access',
+  //   iconSelect: 'car-access-select',
+  //   title: '车行码'
+  // },
   {
     icon: 'payment-code',
     iconSelect: 'payment-code-select',

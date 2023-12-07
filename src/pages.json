@@ -137,6 +137,13 @@
       }
     },
     {
+      "path": "pages/home/parkingFee/index",
+      "style": {
+        "navigationBarTitleText": "停车缴费",
+        "navigationStyle": "custom"
+      }
+    },
+    {
       "path": "pages/home/reportRepairs/ReportRepairsList",
       "style": {
         "navigationBarTitleText": "报事报修",
@@ -153,7 +160,7 @@
     {
       "path": "pages/home/consult/index",
       "style": {
-        "navigationBarTitleText": "客服咨询",
+        "navigationBarTitleText": "咨询建议",
         "navigationStyle": "custom"
       }
     },
@@ -167,7 +174,7 @@
     {
       "path": "pages/meeting/MeetingInfo",
       "style": {
-        "navigationBarTitleText": "预约会议",
+        "navigationBarTitleText": "预定会议",
         "navigationStyle": "custom"
       }
     },

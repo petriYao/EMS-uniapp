@@ -1,13 +1,18 @@
 <script setup lang="ts">
-import { ref, reactive, onBeforeMount } from 'vue'
-import { onShow } from '@dcloudio/uni-app'
-
-import { clearUserIdentity, getUserIdentity } from '@/hooks/useCache'
+import { ref, reactive, watch } from 'vue'
+import { clearUserIdentity } from '@/hooks/useCache'
 import { getImageURL, getSvgURL } from '@/utils'
-import { UserIdentityType } from '@/types/userModel'
 import router from '@/router'
-
+import { getAppName } from '@/config/config'
+import { UserIdentityType } from '@/types/userModel'
+const props = defineProps({
+  myUserInfo: {
+    type: Object as any,
+    default: () => {}
+  }
+})
 const userInfo = ref<UserIdentityType | null>()
+
 const dialog = reactive({
   show: false,
   title: '提示',
@@ -27,7 +32,7 @@ const cellLisr = [
   },
   {
     icon: 'my-about',
-    title: '关于数小宝',
+    title: `关于${getAppName()}`,
     value: '2023111401'
   },
   {
@@ -81,13 +86,16 @@ const onSetting = (title: string) => {
   }
 }
 
-onBeforeMount(async () => {
-  userInfo.value = await getUserIdentity()
-})
-
-onShow(async () => {
-  userInfo.value = await getUserIdentity()
-})
+watch(
+  () => props.myUserInfo,
+  () => {
+    userInfo.value = props.myUserInfo
+  },
+  {
+    immediate: true,
+    deep: true
+  }
+)
 </script>
 
 <template>
@@ -115,15 +123,15 @@ onShow(async () => {
         </view>
         <view class="flex-rows justify-around py-60rpx">
           <view class="flex-column text-#333333">
-            <view class="text-36rpx font-600 mb-10rpx">10</view>
+            <view class="text-36rpx font-600 mb-10rpx">0</view>
             <view class="text-26rpx">我的订单</view>
           </view>
           <view class="flex-column text-#333333">
-            <view class="text-36rpx font-600 mb-10rpx">5</view>
+            <view class="text-36rpx font-600 mb-10rpx">0</view>
             <view class="text-26rpx">会员权益</view>
           </view>
           <view class="flex-column text-#333333">
-            <view class="text-36rpx font-600 mb-10rpx">5996</view>
+            <view class="text-36rpx font-600 mb-10rpx">0</view>
             <view class="text-26rpx">积分兑换</view>
           </view>
         </view>
