@@ -37,7 +37,7 @@ const getData = async () => {
 const infoClick = (meetingRoomId: string) => {
   const date = formatTime(reactiveData.date, 'yyyy-MM-dd')
   router.push({
-    url: `/pages/meeting/MeetingInfo?meetingRoomId=${meetingRoomId}&date=${date}`
+    url: `/packageHome/meeting/MeetingInfo?meetingRoomId=${meetingRoomId}&date=${date}`
   })
 }
 

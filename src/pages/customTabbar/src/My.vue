@@ -41,13 +41,13 @@ const onLogin = () => {
   //H5的时候跳转
   // #ifdef H5
   router.push({
-    url: '/pages/login/login'
+    url: '/packageHome/login/login'
   })
   // #endif
   //微信的时候跳转
   // #ifdef MP
   router.push({
-    url: `/pages/login/login?isPhone=true`
+    url: `/packageHome/login/login?isPhone=true`
   })
   // #endif
 }
@@ -76,7 +76,7 @@ const onSetting = (title: string) => {
   }
   if (title === '个人资料') {
     router.push({
-      url: '/pages/personalData/index'
+      url: '/packageHome/personalData/index'
     })
   }
 }

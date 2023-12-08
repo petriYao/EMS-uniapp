@@ -51,13 +51,13 @@ const size = ref(10)
 
 const onAdd = () => {
   router.push({
-    url: `/pages/home/reportRepairs/ReportRepairsAdd`
+    url: `/packageHome/reportRepairs/ReportRepairsAdd`
   })
 }
 
 const onInfo = (id: number, status: number) => {
   router.push({
-    url: `/pages/home/reportRepairs/ReportRepairsAdd?id=${id}&status=${status}`
+    url: `/packageHome/reportRepairs/ReportRepairsAdd?id=${id}&status=${status}`
   })
 }
 

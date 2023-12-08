@@ -23,170 +23,183 @@
         "navigationBarTitleText": "",
         "navigationStyle": "custom"
       }
-    },
-    {
-      "path": "pages/personalData/index",
-      "style": {
-        "navigationBarTitleText": "",
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/introduction/index",
-      "style": {
-        "navigationBarTitleText": "",
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/listInfo/index",
-      "style": {
-        "navigationBarTitleText": "",
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/listInfo/JumpUrl",
-      "style": {
-        "navigationBarTitleText": "",
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/exhibition/index",
-      "style": {
-        "navigationBarTitleText": "",
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/enterprisesDemeanour/index",
-      "style": {
-        "navigationBarTitleText": "",
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/parkENews/parkENewsList",
-      "style": {
-        "navigationBarTitleText": "",
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/parkECircle/parkECircleList",
-      "style": {
-        "navigationBarTitleText": "",
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/investmentPolicies/investmentPoliciesList",
-      "style": {
-        "navigationBarTitleText": "",
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/login/login",
-      "style": {
-        "navigationBarTitleText": "",
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/login/register",
-      "style": {
-        "navigationBarTitleText": "",
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/login/forgotPassword",
-      "style": {
-        "navigationBarTitleText": "",
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/login/resetPassword",
-      "style": {
-        "navigationBarTitleText": "",
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/home/meetingBooking/index",
-      "style": {
-        "navigationBarTitleText": "会议室预定",
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/home/intelligentLife/index",
-      "style": {
-        "navigationBarTitleText": "智慧生活",
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/home/visitorRegistration/index",
-      "style": {
-        "navigationBarTitleText": "访客登记",
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/home/parkingFee/index",
-      "style": {
-        "navigationBarTitleText": "停车缴费",
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/home/reportRepairs/ReportRepairsList",
-      "style": {
-        "navigationBarTitleText": "报事报修",
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/home/reportRepairs/ReportRepairsAdd",
-      "style": {
-        "navigationBarTitleText": "新增/编辑报事报修",
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/home/consult/index",
-      "style": {
-        "navigationBarTitleText": "咨询建议",
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/meeting/Reservation",
-      "style": {
-        "navigationBarTitleText": "预定会议室",
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/meeting/MeetingInfo",
-      "style": {
-        "navigationBarTitleText": "预定会议",
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/meeting/MyMeeting",
-      "style": {
-        "navigationBarTitleText": "我的会议",
-        "navigationStyle": "custom"
-      }
     }
   ],
-  "subpackages": [],
+  "subpackages": [
+    {
+      "root": "packageChat",
+      "name": "packageChat",
+      "pages": [
+        {
+          "path": "consult/index",
+          "style": {
+            "navigationBarTitleText": "咨询建议",
+            "navigationStyle": "custom"
+          }
+        }
+      ]
+    },
+    {
+      "root": "packageHome",
+      "name": "packageHome",
+      "pages": [
+        {
+          "path": "personalData/index",
+          "style": {
+            "navigationBarTitleText": "个人资料",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "introduction/index",
+          "style": {
+            "navigationBarTitleText": "园区简介",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "listInfo/index",
+          "style": {
+            "navigationBarTitleText": "",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "listInfo/JumpUrl",
+          "style": {
+            "navigationBarTitleText": "",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "exhibition/index",
+          "style": {
+            "navigationBarTitleText": "园区导览",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "enterprisesDemeanour/index",
+          "style": {
+            "navigationBarTitleText": "企业风采",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "parkENews/parkENewsList",
+          "style": {
+            "navigationBarTitleText": "园区E闻",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "parkECircle/parkECircleList",
+          "style": {
+            "navigationBarTitleText": "社群活动",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "investmentPolicies/investmentPoliciesList",
+          "style": {
+            "navigationBarTitleText": "招商政策",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "login/login",
+          "style": {
+            "navigationBarTitleText": "",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "login/register",
+          "style": {
+            "navigationBarTitleText": "",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "login/forgotPassword",
+          "style": {
+            "navigationBarTitleText": "",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "login/resetPassword",
+          "style": {
+            "navigationBarTitleText": "",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "meeting/Reservation",
+          "style": {
+            "navigationBarTitleText": "预定会议室",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "meeting/MeetingInfo",
+          "style": {
+            "navigationBarTitleText": "预定会议",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "meeting/MyMeeting",
+          "style": {
+            "navigationBarTitleText": "我的会议",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "meetingBooking/index",
+          "style": {
+            "navigationBarTitleText": "会议室预定",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "intelligentLife/index",
+          "style": {
+            "navigationBarTitleText": "智慧生活",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "visitorRegistration/index",
+          "style": {
+            "navigationBarTitleText": "访客登记",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "parkingFee/index",
+          "style": {
+            "navigationBarTitleText": "停车缴费",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "reportRepairs/ReportRepairsList",
+          "style": {
+            "navigationBarTitleText": "报事报修",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "reportRepairs/ReportRepairsAdd",
+          "style": {
+            "navigationBarTitleText": "新增/编辑报事报修",
+            "navigationStyle": "custom"
+          }
+        }
+      ]
+    }
+  ],
   "preloadRule": {},
   "globalStyle": {
     "navigationBarTitleText": "uni-app",

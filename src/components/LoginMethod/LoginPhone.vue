@@ -38,14 +38,14 @@ const formRef = ref()
 /**注册 */
 const onRegister = () => {
   router.push({
-    url: '/pages/login/register'
+    url: '/packageHome/login/register'
   })
 }
 
 /**忘记密码 */
 const onForgotPassword = () => {
   router.push({
-    url: '/pages/login/forgotPassword'
+    url: '/packageHome/login/forgotPassword'
   })
 }
 

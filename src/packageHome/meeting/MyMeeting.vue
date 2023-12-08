@@ -70,7 +70,7 @@ const tabsChange = (val: any) => {
 
 const infoClick = (meetingReservationId: string) => {
   router.push({
-    url: `/pages/meeting/MeetingInfo?meetingReservationId=${meetingReservationId}`
+    url: `/packageHome/meeting/MeetingInfo?meetingReservationId=${meetingReservationId}`
   })
 }
 

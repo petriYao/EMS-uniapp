@@ -7,14 +7,14 @@ import router from '@/router'
 const addMeetingClick = () => {
   //跳转
   router.push({
-    url: `/pages/meeting/Reservation`
+    url: `/packageHome/meeting/Reservation`
   })
 }
 
 const myMeetingClick = () => {
   //跳转
   router.push({
-    url: `/pages/meeting/MyMeeting`
+    url: `/packageHome/meeting/MyMeeting`
   })
 }
 

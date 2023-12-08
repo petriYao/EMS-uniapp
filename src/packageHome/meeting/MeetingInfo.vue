@@ -146,7 +146,7 @@ const submitClick = async () => {
   if (res && res.success) {
     if (!reactiveData.meetingReservationId) {
       router.push({
-        url: `/pages/meeting/MyMeeting`
+        url: `/packageHome/meeting/MyMeeting`
       })
     } else {
       //返回上一页

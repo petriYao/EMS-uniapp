@@ -25,37 +25,37 @@ const onJump = (title: string) => {
   let src = ''
   switch (title) {
     case '园区简介':
-      src = 'introduction/index'
+      src = '/packageHome/introduction/index'
       break
     case '招商政策':
-      src = 'investmentPolicies/investmentPoliciesList'
+      src = '/packageHome/investmentPolicies/investmentPoliciesList'
       break
     case '园区E闻':
-      src = 'parkENews/parkENewsList'
+      src = '/packageHome/parkENews/parkENewsList'
       break
     case '社群活动':
-      src = 'parkECircle/parkECircleList'
+      src = '/packageHome/parkECircle/parkECircleList'
       break
     case '企业风采':
-      src = 'enterprisesDemeanour/index'
+      src = '/packageHome/enterprisesDemeanour/index'
       break
     case '园区导览':
-      src = 'exhibition/index'
+      src = '/packageHome/exhibition/index'
       break
     case '停车缴费':
-      src = 'home/parkingFee/index'
+      src = '/packageHome/parkingFee/index'
       break
     case '会议预定':
-      src = 'home/meetingBooking/index'
+      src = '/packageHome/meetingBooking/index'
       break
     case '访客登记':
-      src = 'home/visitorRegistration/index'
+      src = '/packageHome/visitorRegistration/index'
       break
     case '报事报修':
-      src = 'home/reportRepairs/ReportRepairsList'
+      src = '/packageHome/reportRepairs/ReportRepairsList'
       break
     case '咨询建议':
-      src = 'home/consult/index'
+      src = '/packageChat/consult/index'
       break
     case '智慧生活':
       appStore.bottomTabbarTitle = '服务'
@@ -76,7 +76,7 @@ const onJump = (title: string) => {
   }
   if (src.length > 0) {
     router.push({
-      url: `/pages/${src}`
+      url: `${src}`
     })
   }
 }

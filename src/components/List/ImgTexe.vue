@@ -24,11 +24,11 @@ const htmlContent = ref()
 const infoClick = () => {
   if (dataObj.value.jumpUrl && dataObj.value.jumpUrl.length > 0) {
     router.push({
-      url: `/pages/listInfo/JumpUrl?title=${props.title}&id=${dataObj.value.id}`
+      url: `/packageHome/listInfo/JumpUrl?title=${props.title}&id=${dataObj.value.id}`
     })
   } else {
     router.push({
-      url: `/pages/listInfo/index?title=${props.title}&id=${dataObj.value.id}`
+      url: `/packageHome/listInfo/index?title=${props.title}&id=${dataObj.value.id}`
     })
   }
 }

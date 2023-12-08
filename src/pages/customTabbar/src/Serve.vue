@@ -148,35 +148,35 @@ const onJump = (title: string) => {
   let src = ''
   switch (title) {
     case '政策咨询':
-      src = 'investmentPolicies/investmentPoliciesList'
+      src = '/packageHome/investmentPolicies/investmentPoliciesList'
       break
     case '访客登记':
-      src = 'home/visitorRegistration/index'
+      src = '/packageHome/visitorRegistration/index'
       break
     case '停车缴费':
       appStore.bottomTabbarTitle = '一码通'
       emitter.emit('Qrcode:Change', 1)
       return
     case '报事报修':
-      src = 'home/reportRepairs/ReportRepairsList'
+      src = '/packageHome/reportRepairs/ReportRepairsList'
       break
     case '出行交通':
-      src = 'exhibition/index?title=出行交通'
+      src = '/packageHome/exhibition/index?title=出行交通'
       break
     case '园区导览':
-      src = 'exhibition/index'
+      src = '/packageHome/exhibition/index'
       break
     case '咨询建议':
-      src = 'home/consult/index'
+      src = '/packageHome/consult/index'
       break
     case '社群活动':
-      src = 'parkECircle/parkECircleList'
+      src = '/packageHome/parkECircle/parkECircleList'
       break
     case '园区E闻':
-      src = 'parkENews/parkENewsList'
+      src = '/packageHome/parkENews/parkENewsList'
       break
     case '房源咨询':
-      src = 'home/consult/index?title=房源咨询'
+      src = '/packageHome/consult/index?title=房源咨询'
       break
 
     default:
@@ -189,7 +189,7 @@ const onJump = (title: string) => {
   }
   if (src.length > 0) {
     router.push({
-      url: `/pages/${src}`
+      url: `${src}`
     })
   }
 }
