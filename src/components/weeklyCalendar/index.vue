@@ -25,6 +25,7 @@ const selectedWeek = ref() //选择的日期
 
 const updateWeekDays = (offset = 0) => {
   reactiveData.currentWeek.setDate(reactiveData.currentWeek.getDate() + offset * 7)
+
   const now = new Date(reactiveData.currentWeek)
   const dayOfWeek = now.getDay() || 7
   now.setDate(now.getDate() + 1 - dayOfWeek)
@@ -107,8 +108,8 @@ onMounted(() => {
 <template>
   <view class="flex justify-between text-[#196CFF] bg-[#FFF] p-20rpx pb-0">
     <view @click="goToSelectedWeek" class="w-240rpx flex items-center">
-      <text class="mr-10rpx"> {{ formatTime(reactiveData.currentWeek, 'yyyy-MM-dd') }}</text>
-      <u-icon name="arrow-right" color="#196CFF" />
+      <text class="mr-10rpx"> {{ formatTime(selectedWeek, 'yyyy-MM-dd') }}</text>
+      <!-- <u-icon name="arrow-right" color="#196CFF" /> -->
     </view>
     <view @click="reactiveData.calendarShow = true" class="text-[#196CFF]">
       {{ reactiveData.nowMonth }}月

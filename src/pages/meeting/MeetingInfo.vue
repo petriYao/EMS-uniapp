@@ -80,7 +80,6 @@ const getRoomInfo = async () => {
   const res = await MeetingRoomInfo(reactiveData.setData.meetingRoomId)
   if (res && res.success) {
     reactiveData.infoData = res.value
-    reactiveData.meetingReservationDate = new Date()
   }
 }
 
@@ -203,6 +202,9 @@ watch(
 onLoad(async (val: any) => {
   if (val.meetingRoomId) {
     reactiveData.setData.meetingRoomId = Number(val.meetingRoomId)
+    if (val.date) {
+      reactiveData.meetingReservationDate = new Date(val.date)
+    }
     await getRoomInfo()
   } else if (val.meetingReservationId) {
     reactiveData.meetingReservationId = val.meetingReservationId
