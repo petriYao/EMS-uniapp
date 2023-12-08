@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onBeforeMount, reactive, ref } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 
 import { useAppStore } from '@/store'
 import { useEmitt } from '@/hooks/useEmitt'
@@ -94,11 +95,15 @@ const onRefresherrefresh = () => {
 useEmitt({
   name: 'MyMeeting:update',
   callback: () => {
-    getData()
+    // getData()
   }
 })
 
 onBeforeMount(() => {
+  // getData()
+})
+
+onShow(() => {
   getData()
 })
 </script>
@@ -106,7 +111,7 @@ onBeforeMount(() => {
 <template>
   <ContentWrap>
     <!-- 头部开始 -->
-    <XWAHeader title="会议室预定" />
+    <XWAHeader title="我的会议" />
     <view class="w-[100%] bg-[#FFF]">
       <u-tabs
         :list="reactiveData.tabList"
@@ -130,8 +135,9 @@ onBeforeMount(() => {
           v-for="(item, index) of reactiveData.list"
           :key="index"
           class="mb-20rpx flex justify-between bg-[#FFF] px-20rpx py-30rpx"
+          @click="infoClick(item.meetingReservationId)"
         >
-          <view @click="infoClick(item.meetingReservationId)">
+          <view>
             <view class="text-[30rpx] pb-20rpx font-700">{{
               item.meetingReservationDateTime
             }}</view>

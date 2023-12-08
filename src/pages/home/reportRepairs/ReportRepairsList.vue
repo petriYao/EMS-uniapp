@@ -124,15 +124,17 @@ const onScrolltolower = async () => {
 useEmitt({
   name: 'ReportRepairsList:update',
   callback: () => {
-    getListData(true)
+    // getListData(true)
   }
 })
 
 onLoad(async () => {
-  getListData(true)
+  // getListData(true)
 })
 
-onShow(() => {})
+onShow(() => {
+  getListData(true)
+})
 </script>
 
 <template>

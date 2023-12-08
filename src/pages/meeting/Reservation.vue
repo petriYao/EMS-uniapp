@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { reactive, onBeforeMount } from 'vue'
+import { reactive } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 
 import { useAppStore } from '@/store'
 import { MeetingRoomListType } from '@/types/userModel'
@@ -34,7 +35,7 @@ const infoClick = (meetingRoomId: string) => {
   })
 }
 
-onBeforeMount(() => {
+const initData = () => {
   // uniapp根据id获取weeklyCalendarId高度
   const query = uni.createSelectorQuery()
   setTimeout(() => {
@@ -47,6 +48,10 @@ onBeforeMount(() => {
   }, 300)
 
   getData()
+}
+
+onShow(() => {
+  initData()
 })
 </script>
 
@@ -68,8 +73,9 @@ onBeforeMount(() => {
         v-for="(item, index) of reactiveData.list"
         :key="index"
         class="mb-20rpx flex justify-between bg-[#FFF] px-20rpx py-30rpx"
+        @tap.stop="infoClick(item.meetingRoomId)"
       >
-        <view @click="infoClick(item.meetingRoomId)">
+        <view>
           <view class="text-[30rpx] font-700">{{ item.meetingRoomName }}</view>
           <view class="text-[28rpx] pt-20rpx text-#c1c2c7">{{ item.meetingRoomDes }}</view>
         </view>
