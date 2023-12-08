@@ -10,7 +10,6 @@ import {
   getUploadPicturesColumn
 } from '@/utils'
 import { useAppStore } from '@/store'
-import { useEmitt } from '@/hooks/useEmitt'
 import debounce, { isEmpty } from '@/utils/toolUtils'
 import router from '@/router'
 import { ReportRepairsAddApi, ReportRepairsInfoApi } from '@/api'
@@ -20,7 +19,6 @@ import BottomButton from '@/components/BottomButton/index.vue'
 import FormPartItem from '@/components/Form/FormPart.vue'
 
 const appStore = useAppStore()
-const { emitter } = useEmitt()
 
 const marginHeight = ref(appStore.notchHeight + 'px')
 
@@ -58,7 +56,6 @@ const saveClick = () => {
     const res = await ReportRepairsAddApi(data, reactiveData.reportRepairsId)
     if (res.success) {
       router.back()
-      emitter.emit('ReportRepairsList:update')
     }
   })
 }

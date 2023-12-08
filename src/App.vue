@@ -12,10 +12,11 @@ onLaunch(async () => {
 })
 
 onShow(() => {
+  //#ifdef MP-WEIXIN
   uni.setNavigationBarTitle({
     title: ''
   })
-
+  //#endif
   //统计数据
   if (isLaunch.value) getHomeIndex()
   isLaunch.value = true

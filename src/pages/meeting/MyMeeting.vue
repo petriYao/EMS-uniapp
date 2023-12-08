@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { onBeforeMount, reactive, ref } from 'vue'
+import { reactive, ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 
 import { useAppStore } from '@/store'
-import { useEmitt } from '@/hooks/useEmitt'
 import { MeetingReservationList } from '@/api'
 import router from '@/router'
 
@@ -91,17 +90,6 @@ const onRefresherrefresh = () => {
     reactiveData.triggered = false
   })
 }
-
-useEmitt({
-  name: 'MyMeeting:update',
-  callback: () => {
-    // getData()
-  }
-})
-
-onBeforeMount(() => {
-  // getData()
-})
 
 onShow(() => {
   getData()

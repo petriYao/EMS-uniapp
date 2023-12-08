@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import { onLoad, onShow } from '@dcloudio/uni-app'
+import { onShow } from '@dcloudio/uni-app'
 
 import { useAppStore } from '@/store'
-import { useEmitt } from '@/hooks/useEmitt'
 import router from '@/router'
 import { ReportRepairsListType } from '@/types/reportRepairsModel'
 import { ReportRepairsListApi } from '@/api'
@@ -120,17 +119,6 @@ const onScrolltolower = async () => {
     await getListData()
   }
 }
-
-useEmitt({
-  name: 'ReportRepairsList:update',
-  callback: () => {
-    // getListData(true)
-  }
-})
-
-onLoad(async () => {
-  // getListData(true)
-})
 
 onShow(() => {
   getListData(true)

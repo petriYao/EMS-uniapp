@@ -3,7 +3,6 @@ import { reactive, watch } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 
 import { formatTime } from '@/utils'
-import { useEmitt } from '@/hooks/useEmitt'
 import { optionsType } from '@/types/userModel'
 import {
   MeetingReservationTimeList,
@@ -14,8 +13,6 @@ import {
 import router from '@/router'
 
 import WeeklyCalendar from '@/components/weeklyCalendar/index.vue'
-
-const { emitter } = useEmitt()
 
 const reactiveData = reactive({
   infoData: {} as any,
@@ -155,7 +152,6 @@ const submitClick = async () => {
     } else {
       //返回上一页
       router.back()
-      emitter.emit('MyMeeting:update')
     }
   }
 }
