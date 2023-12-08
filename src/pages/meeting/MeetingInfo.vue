@@ -52,7 +52,7 @@ const getTimeList = async () => {
         reactiveData.infoData.meetingReservationEndTime
       ) {
         let isSelect = false
-        for (let index = 0; index <= reactiveData.list.length; index++) {
+        for (let index = 0; index < reactiveData.list.length; index++) {
           const item = reactiveData.list[index]
           if (item.label == reactiveData.infoData.meetingReservationStartTime) {
             reactiveData.startIndex = index
@@ -283,12 +283,13 @@ onLoad(async (val: any) => {
     </view>
 
     <view class="mt-20rpx bg-[#FFF] p-20rpx flex items-center">
-      <view>会议主题：</view>
+      <view>会议主题<text class="text-[#f87171]">*</text></view>
       <view class="flex-1">
         <u-input
           placeholder="请输入会议主题"
           border="surround"
           v-model="reactiveData.setData.meetingReservationTitle"
+          inputAlign="right"
         />
       </view>
     </view>

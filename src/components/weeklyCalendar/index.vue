@@ -97,7 +97,8 @@ const confirm = (val: any) => {
 
 onMounted(() => {
   if (props.modelValue) {
-    selectedWeek.value = reactiveData.currentWeek = props.modelValue
+    reactiveData.currentWeek = new Date(props.modelValue)
+    selectedWeek.value = new Date(props.modelValue)
   }
   updateWeekDays()
 })

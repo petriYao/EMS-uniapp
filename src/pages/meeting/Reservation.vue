@@ -3,29 +3,34 @@ import { reactive } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 
 import { useAppStore } from '@/store'
+import { formatTime } from '@/utils'
 import { MeetingRoomListType } from '@/types/userModel'
 import { MeetingRoomList } from '@/api'
 import router from '@/router'
 
 import WeeklyCalendar from '@/components/weeklyCalendar/index.vue'
+import { watch } from 'vue'
 
 const appStore = useAppStore()
 
 const reactiveData = reactive({
+  date: new Date(),
   setData: {
-    date: new Date(), //日期
+    date: '', //日期
     page: 1, //分页号码
-    size: 10 //分页数量
+    size: 99 //分页数量
   },
   list: [] as MeetingRoomListType[],
   weeklyCalendarHeight: ''
 })
 
 const getData = async () => {
+  reactiveData.setData.date = formatTime(reactiveData.date, 'yyyy-MM-dd')
   const res = await MeetingRoomList(reactiveData.setData)
-  console.log('res', res)
   if (res && res.success) {
     reactiveData.list = res.value.list
+  } else {
+    reactiveData.list = []
   }
 }
 
@@ -50,6 +55,16 @@ const initData = () => {
   getData()
 }
 
+watch(
+  () => reactiveData.date,
+  () => {
+    getData()
+  },
+  {
+    deep: true
+  }
+)
+
 onShow(() => {
   initData()
 })
@@ -61,7 +76,7 @@ onShow(() => {
     <XWAHeader title="预定会议" />
     <view class="h-20rpx" />
     <view id="weeklyCalendarId">
-      <WeeklyCalendar v-model="reactiveData.setData.date" />
+      <WeeklyCalendar v-model="reactiveData.date" />
     </view>
 
     <scroll-view
