@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, watch, computed, onMounted, onUnmounted } from 'vue'
+import { reactive, watch, computed, onMounted, onUnmounted, ref } from 'vue'
 
 import { useChatStore } from '@/store'
 import { useEmitt } from '@/hooks/useEmitt'
@@ -9,9 +9,14 @@ import { CurrentTypeEnum } from '@/types/chatModel'
 import emojiList from './components/emoji.json'
 import voiceBtn from './components/voiceBtn.vue'
 import funBtn from './components/funBtn.vue'
+import { ReplyAdd, ReplyAutomaticList } from '@/api'
 
 const props = defineProps({
   recvId: {
+    type: String,
+    default: ''
+  },
+  title: {
     type: String,
     default: ''
   }
@@ -20,6 +25,21 @@ const props = defineProps({
 const { emitter } = useEmitt()
 
 const useStore = useChatStore()
+
+const chatList = ref([
+  '测试',
+  '查看',
+  '详情',
+  '测试1',
+  '查看1',
+  '详情1',
+  '测试2',
+  '查看2',
+  '详情2',
+  '测试3',
+  '查看3',
+  '详情3'
+] as any[])
 
 const textHeight = computed(
   () =>
@@ -33,6 +53,7 @@ const panelHeight = computed(() => useStore.panelHeight)
 
 //参数
 const state = reactive({
+  replyType: props.title === '房源咨询' ? 2 : 1,
   content: '', //输入内容
   showPanel: false, //是否显示面板
   showSubmitBtn: false, //是否显示发送按钮
@@ -200,10 +221,34 @@ const onKeyboardHeightChange = (res: any) => {
 }
 
 //发送消息
-const sendMessage = () => {
+const sendMessage = async () => {
   if (!state.content) return
   const tempText = state.content
-  state.content = ''
+  const res = await ReplyAdd({
+    replyType: state.replyType,
+    text: tempText
+  })
+  if (res && res.success) {
+    state.content = ''
+    emitter.emit('update:chatList')
+  }
+}
+
+//自动回复
+const getChatList = async () => {
+  const res = await ReplyAutomaticList(state.replyType)
+  if (res && res.success) {
+    console.log('自动回复', res)
+  }
+}
+const itemClick = async (item: string) => {
+  const res = await ReplyAdd({
+    replyType: state.replyType,
+    text: item
+  })
+  if (res && res.success) {
+    emitter.emit('update:chatList')
+  }
 }
 
 useEmitt({
@@ -237,6 +282,7 @@ watch(
 //加载后
 onMounted(() => {
   uni.onKeyboardHeightChange(onKeyboardHeightChange)
+  getChatList()
 })
 
 //释放
@@ -249,6 +295,20 @@ onUnmounted(() => {
 </script>
 
 <template>
+  <view class="h-80rpx flex items-center px-20rpx bg-[#EDEDED]">
+    <scroll-view scroll-x>
+      <view class="flex">
+        <view
+          v-for="(item, index) of chatList"
+          :key="index"
+          class="mr-20rpx rounded-50 bg-[#FFF] py-6rpx px-20rpx whitespace-nowrap"
+          @click="itemClick(item)"
+        >
+          {{ item }}
+        </view>
+      </view>
+    </scroll-view>
+  </view>
   <view
     class="input-container"
     :style="`height:${textHeight}px`"
@@ -296,7 +356,7 @@ onUnmounted(() => {
       </scroll-view>
     </view>
     <view v-else class="voice_title mx-20rpx flex-1 h-70rpx">
-      <voice-btn />
+      <voice-btn :replyType="state.replyType" />
     </view>
 
     <view class="text-0 flex justify-center items-end h-100%">
@@ -355,7 +415,7 @@ onUnmounted(() => {
       </view>
     </view>
     <view v-else>
-      <funBtn />
+      <funBtn :replyType="state.replyType" />
     </view>
   </view>
 </template>

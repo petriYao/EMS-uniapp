@@ -1,39 +1,19 @@
-<template>
-  <view>
-    <view
-      style="width: 100%"
-      @touchstart.stop.prevent="startVoice"
-      @touchmove.stop.prevent="moveVoice"
-      @touchend.stop="endVoice"
-      @touchcancel.stop="cancelVoice"
-      :style="{ background: recording ? '#c7c6c6' : '#FFFFFF' }"
-    >
-      {{ voiceTitle }}
-    </view>
-    <!-- 语音动画 -->
-    <view class="voice_an" v-if="recording">
-      <view class="voice_an_icon">
-        <view id="one" class="wave" />
-        <view id="two" class="wave" />
-        <view id="three" class="wave" />
-        <view id="four" class="wave" />
-        <view id="five" class="wave" />
-        <view id="six" class="wave" />
-        <view id="seven" class="wave" />
-      </view>
-      <view class="text">{{ voiceIconText }}</view>
-    </view>
-  </view>
-</template>
-
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { useChatStore } from '@/store'
+// import { useChatStore } from '@/store'
 import { uploadFileApi } from '@/api/modules/common'
+import { ReplyAdd } from '@/api'
+import { useEmitt } from '@/hooks/useEmitt'
 
-const useStore = useChatStore()
-
+// const useStore = useChatStore()
+const props = defineProps({
+  replyType: {
+    type: Number,
+    default: 1
+  }
+})
+const { emitter } = useEmitt()
 const Recorder = ref(uni.getRecorderManager())
 const isStopVoice = ref(false) //标识是否正在录音
 const recording = ref(false) //加锁 防止点击过快引起的当录音正在准备(还没有开始录音)的时候,却调用了stop方法但并不能阻止录音的问题
@@ -151,13 +131,46 @@ const handleRecorder = ({ tempFilePath, _duration }: any) => {
 const uploadVoice = async (tempFilePath: any, duration: number) => {
   uni.showLoading({ title: '上传中...' })
   const res: any = await uploadFileApi('chatVoice', tempFilePath, tempFilePath, duration)
+  console.log('res', res)
   uni.hideLoading()
   if (!res || !res.success || !res.value) {
     uni.showToast({ title: '上传语音失败', icon: 'error' })
     return
+  } else {
+    const addRes = await ReplyAdd({ replyType: props.replyType, voiceId: res.value.id })
+    if (addRes && addRes.success) {
+      emitter.emit('update:chatList')
+    }
   }
 }
 </script>
+<template>
+  <view>
+    <view
+      style="width: 100%"
+      @touchstart.stop.prevent="startVoice"
+      @touchmove.stop.prevent="moveVoice"
+      @touchend.stop="endVoice"
+      @touchcancel.stop="cancelVoice"
+      :style="{ background: recording ? '#c7c6c6' : '#FFFFFF' }"
+    >
+      {{ voiceTitle }}
+    </view>
+    <!-- 语音动画 -->
+    <view class="voice_an" v-if="recording">
+      <view class="voice_an_icon">
+        <view id="one" class="wave" />
+        <view id="two" class="wave" />
+        <view id="three" class="wave" />
+        <view id="four" class="wave" />
+        <view id="five" class="wave" />
+        <view id="six" class="wave" />
+        <view id="seven" class="wave" />
+      </view>
+      <view class="text">{{ voiceIconText }}</view>
+    </view>
+  </view>
+</template>
 
 <style lang="scss" scoped>
 .voice_an {

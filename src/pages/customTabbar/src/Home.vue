@@ -55,7 +55,7 @@ const onJump = (title: string) => {
       src = '/packageHome/reportRepairs/ReportRepairsList'
       break
     case '咨询建议':
-      src = '/packageChat/consult/index'
+      src = '/packageChat/consult/index?title=咨询建议'
       break
     case '智慧生活':
       appStore.bottomTabbarTitle = '服务'

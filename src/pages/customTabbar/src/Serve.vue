@@ -167,7 +167,7 @@ const onJump = (title: string) => {
       src = '/packageHome/exhibition/index'
       break
     case '咨询建议':
-      src = '/packageHome/consult/index'
+      src = '/packageChat/consult/index?title=咨询建议'
       break
     case '社群活动':
       src = '/packageHome/parkECircle/parkECircleList'
@@ -176,7 +176,7 @@ const onJump = (title: string) => {
       src = '/packageHome/parkENews/parkENewsList'
       break
     case '房源咨询':
-      src = '/packageHome/consult/index?title=房源咨询'
+      src = '/packageChat/consult/index?title=房源咨询'
       break
 
     default:

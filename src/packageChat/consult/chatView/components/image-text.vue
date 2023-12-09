@@ -8,7 +8,7 @@
     @load="success"
     :lazy-load="true"
     mode="heightFix"
-    :src="item.pictureElem?.snapshotPicture.url"
+    :src="item.replyContent.image.url"
   />
 </template>
 
@@ -31,7 +31,7 @@ const success = () => {
 }
 
 const showImage = () => {
-  if (!props.item?.pictureElem?.bigPicture.url) return
+  if (!props.item?.replyContent.image.url) return
   const sources = [] as UniApp.MediaSource[]
   let current = 0
   // for (const chatitem of useStore.chatList) {

@@ -2,6 +2,7 @@
 import type { PropType } from 'vue'
 import { getChatTime } from '@/utils'
 import ImageText from './components/image-text.vue'
+import AudioText from './components/audio-text.vue'
 import { useEmitt } from '@/hooks/useEmitt'
 
 const props = defineProps({
@@ -11,24 +12,14 @@ const props = defineProps({
     // eslint-disable-next-line vue/require-valid-default-prop
     default: {}
   },
-  //当前聊天用户
-  recvId: {
-    type: String,
-    default: () => ''
-  },
-  //当前聊天用户名
-  title: {
-    type: String,
-    default: ''
-  },
-  //是否组聊天
-  groupFlag: {
-    type: Boolean,
-    default: false
-  },
+
   showTime: {
     type: Boolean,
     default: false
+  },
+  avatar: {
+    type: String,
+    default: ''
   },
   // eslint-disable-next-line vue/prop-name-casing
   Audio: {
@@ -40,10 +31,10 @@ const { emitter } = useEmitt()
 
 //是否他人消息
 const leftFlag = (item: any): boolean => {
-  if (item.sendID == props.recvId) {
-    return true
+  if (item.isMy == 1) {
+    return false
   }
-  return false
+  return true
 }
 
 const contentReplace = (content: string): string => {
@@ -51,7 +42,7 @@ const contentReplace = (content: string): string => {
 }
 
 const revokeText = (): string => {
-  let text = leftFlag(props.item) ? props.title : '你'
+  let text = leftFlag(props.item) ? '对方' : '你'
   return text + '撤回了一条消息'
 }
 
@@ -64,9 +55,10 @@ const reeditClick = () => {
   emitter.emit('Comment:reedit', props.item.content)
 }
 
+// 消息撤回
 const longpress = () => {
-  if (leftFlag(props.item) || !props.item.createTime) return
-  if (Date.now() - props.item.createTime > 2 * 60 * 1000) return
+  if (leftFlag(props.item) || !props.item.replyTime) return
+  if (Date.now() - props.item.replyTime > 2 * 60 * 1000) return
   uni.showModal({
     title: '撤销提示',
     content: '是否撤销该消息?',
@@ -92,8 +84,10 @@ const longpress = () => {
 
 <template>
   <view class="chat-time" v-if="showTime">
-    <text>{{ getChatTime(item.createTime ?? 0) }}</text>
+    <text>{{ getChatTime(item.replyTime ?? 0) }}</text>
   </view>
+
+  <!-- 撤回消息 -->
   <view class="chat-revoke" v-if="item.contentType === 111">
     <text>{{ revokeText() }}</text>
     <text v-if="isTest()" class="!text-#196CFF" @tap.stop="reeditClick">重新编辑</text>
@@ -103,21 +97,13 @@ const longpress = () => {
     class="chat-image-body"
     :class="leftFlag(item) ? 'chat-left' : 'chat-right'"
     @longpress="longpress"
-    v-else-if="item.contentType === 102"
+    v-else-if="item.replyContent.image"
   >
     <view class="chat-header mx-20rpx">
       <image class="message-avatar" :src="item.senderFaceUrl" />
     </view>
     <view class="msg">
       <image-text :item="item" />
-    </view>
-    <view class="readType ml-20rpx">
-      <view v-if="item.status === 3">
-        <van-icon name="warning" size="30rpx" color="#FB5255" />
-      </view>
-      <view v-else-if="item.status === 1">
-        <u-loading-icon color="#196CFF" size="30rpx" />
-      </view>
     </view>
   </view>
 
@@ -128,37 +114,26 @@ const longpress = () => {
     @longpress="longpress"
   >
     <view class="chat-header">
-      <image class="message-avatar" :src="item.senderFaceUrl" />
+      <image class="message-avatar" :src="props.avatar" />
     </view>
     <view class="box" :class="leftFlag(item) ? 'left' : 'right'" />
     <view class="msg">
       <rich-text
+        v-if="item.replyContent.text"
         style="
           line-height: 44rpx;
           letter-spacing: 3rpx;
           word-break: break-all;
           white-space: pre-line;
         "
-        v-if="item.contentType === 101"
-        :nodes="contentReplace(item.content ?? '')"
+        :nodes="contentReplace(item.replyContent.text ?? '')"
       />
-      <audio-text
-        v-if="item.contentType === 103"
+      <AudioText
+        v-if="item.replyContent.voice"
         :Audio="Audio"
         :item="item"
         :leftFlag="leftFlag(item)"
       />
-    </view>
-    <view class="readType">
-      <view v-if="item.status === 3" class="mr-20rpx">
-        <van-icon name="warning" size="30rpx" color="#FB5255" />
-      </view>
-      <view v-else-if="item.status === 1" class="mr-20rpx">
-        <u-loading-icon color="#196CFF" size="30rpx" />
-      </view>
-      <text class="font-size-four text-#999999" v-else-if="!leftFlag(item) && !item.isRead">
-        未读
-      </text>
     </view>
   </view>
 </template>
@@ -249,13 +224,6 @@ view.chat-body {
       min-width: 250rpx;
       max-width: 100%;
     }
-  }
-
-  view.readType {
-    margin-right: 10rpx;
-    color: #b07474;
-    display: flex;
-    align-items: center;
   }
 
   view.chat-header {

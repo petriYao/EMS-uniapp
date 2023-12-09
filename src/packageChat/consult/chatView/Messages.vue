@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { ref, onUnmounted } from 'vue'
+import { ref, reactive, onBeforeMount } from 'vue'
 import { useEmitt } from '@/hooks/useEmitt'
-
+import { ReplyList } from '@/api'
+import { getSvgURL } from '@/utils'
 import chatItem from './chatItem.vue'
+import { getUserIdentity } from '@/hooks/useCache'
 
 const props = defineProps({
   recvId: {
@@ -14,8 +16,17 @@ const props = defineProps({
     default: ''
   }
 })
+
+const setData = reactive({
+  replyType: props.title === '房源咨询' ? 2 : 1,
+  replyId: null as any,
+  order: 1
+})
 //聊天内容
 const chatList = ref([] as any)
+
+//自己的头像
+const myAvatar = ref('')
 
 //显示
 const isShow = ref<boolean>(false)
@@ -28,16 +39,15 @@ const scrollIntoView = ref('')
 
 //是否展示时间
 const showTime = (index: number): boolean => {
-  // if (index === 0) {
-  //   return true
-  // }
-  // if (index > 0) {
-  //   const timeDifference =
-  //     useStore.chatList[index].createTime! - useStore.chatList[index - 1].createTime!
-  //   if (Math.abs(timeDifference) > 5 * 60 * 1000) {
-  //     return true
-  //   }
-  // }
+  if (index === 0) {
+    return true
+  }
+  if (index > 0) {
+    const timeDifference = chatList.value[index].createTime! - chatList.value[index - 1].createTime!
+    if (Math.abs(timeDifference) > 5 * 60 * 1000) {
+      return true
+    }
+  }
   return false
 }
 
@@ -57,6 +67,8 @@ const getHistoryMessageListData = async (isScrollToUpper = false) => {
 //反向获取历史消息
 const getHistoryMessageListReverseData = async () => {
   console.log('反向获取历史消息')
+  setData.replyId = chatList.value[chatList.value.length - 1].replyId
+  getData()
 }
 
 //下拉加载历史消息
@@ -81,56 +93,80 @@ const scrolltolower = async () => {
 useEmitt({
   name: 'Messages:setScrollToBottom',
   callback: () => {
+    console.log('滚到底部通知')
     scrollIntoView.value = ''
     setTimeout(() => {
       // scrollToIndex(useStore.chatList.length - 1)
+      setData.replyId = chatList.value[chatList.value.length - 1].replyId
+      getData()
     }, 100)
   }
 })
+//发送成功更新
+useEmitt({
+  name: 'update:chatList',
+  callback: () => {
+    getData()
+  }
+})
 
+const getData = async () => {
+  const res = await ReplyList(setData)
+  if (res && res.success) {
+    console.log('res', res)
+    chatList.value = res.value.list
+    lowerLoadMore.value = 'loadmore'
+  }
+}
 //释放
-onUnmounted(() => {})
+onBeforeMount(() => {
+  getData()
+  myAvatar.value = getUserIdentity().userInfo.avatarImage.listUrl
+  console.log('myAvatar.value', myAvatar.value)
+})
 </script>
 
 <template>
-  <scroll-view
-    v-show="isShow"
-    :scroll-into-view="scrollIntoView"
-    @scrolltoupper="scrollToUpper"
-    :upper-threshold="50"
-    @scrolltolower="scrolltolower"
-    :lower-threshold="50"
-    :scroll-y="true"
-    :scroll-top="scrollTop"
-  >
-    <!-- 状态 -->
-    <u-loadmore
-      loadmore-text="下拉加载历史消息"
-      loading-text="正在加载..."
-      nomore-text="没有更多历史消息了"
-      :status="loadMore"
-    />
-    <view
-      class="item"
-      :id="'item_' + item.clientMsgID"
-      :key="item.clientMsgID"
-      v-for="(item, index) in chatList"
+  <view class="h-[inherit]">
+    <scroll-view
+      :scroll-into-view="scrollIntoView"
+      @scrolltoupper="scrollToUpper"
+      :upper-threshold="50"
+      @scrolltolower="scrolltolower"
+      :lower-threshold="50"
+      :scroll-y="true"
+      :scroll-top="scrollTop"
     >
-      <chat-item
-        :showTime="showTime(index)"
-        :recvId="props.recvId"
-        :title="props.title"
-        :item="item"
+      <!-- 状态 -->
+      <view class="h-1px" />
+      <u-loadmore
+        loadmore-text="下拉加载历史消息"
+        loading-text="正在加载..."
+        nomore-text="没有更多历史消息了"
+        :status="loadMore"
       />
-    </view>
-    <u-loadmore
-      v-if="lowerLoadMore == 'loading'"
-      loadmore-text="上拉加载消息"
-      loading-text="正在加载..."
-      nomore-text="没有更多消息了"
-      :status="lowerLoadMore"
-    />
-  </scroll-view>
+      <view
+        class="item"
+        v-for="(item, index) in chatList"
+        :id="'item_' + item.replyId"
+        :key="item.replyId"
+      >
+        <chat-item
+          :showTime="showTime(index)"
+          :item="item"
+          :avatar="item.isMy === 1 ? myAvatar : getSvgURL('home', 'home-keyword')"
+        />
+      </view>
+
+      <u-loadmore
+        v-if="lowerLoadMore == 'loading'"
+        loadmore-text="上拉加载消息"
+        loading-text="正在加载..."
+        nomore-text="没有更多消息了"
+        :status="lowerLoadMore"
+      />
+    </scroll-view>
+  </view>
 </template>
 
 <style lang="scss" scoped>
@@ -141,7 +177,7 @@ scroll-view {
   overflow: hidden;
   max-height: fit-content;
   transition: height 0.2s ease-out;
-  padding-bottom: 20rpx;
+  // padding-bottom: 20rpx;
 }
 
 .item {

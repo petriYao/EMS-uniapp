@@ -85,6 +85,21 @@ export type MeetingReservationUpdateType = {
   meetingReservationTitle: string
   meetingRoomId: string | number | null
 }
+
+export type ReplyAddType = {
+  replyType: number
+  imageId?: string
+  text?: string
+  voiceId?: number
+}
+
+export type ReplyListType = {
+  replyType: number
+  replyId?: any
+  order?: number
+  size?: number
+}
+
 /**旧的 */
 // export type UserIdentityType = {
 //   sessionName?: string

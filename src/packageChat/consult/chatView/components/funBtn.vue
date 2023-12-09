@@ -2,9 +2,18 @@
 import { ref } from 'vue'
 import { getImageURL } from '@/utils'
 import { uploadFileApi } from '@/api/modules/common'
-import { useChatStore } from '@/store'
+// import { useChatStore } from '@/store'
+import { useEmitt } from '@/hooks/useEmitt'
+import { ReplyAdd } from '@/api'
 
-const useStore = useChatStore()
+const props = defineProps({
+  replyType: {
+    type: Number,
+    default: 1
+  }
+})
+// const useStore = useChatStore()
+const { emitter } = useEmitt()
 
 //常用工具
 const frequentlyList = ref([
@@ -68,6 +77,11 @@ const uploadImage = async (tempFiles: any, tempFilePaths?: any) => {
   if (!res || !res.success || !res.value) {
     uni.showToast({ title: '上传图片失败', icon: 'error' })
     return
+  } else {
+    const addRes = await ReplyAdd({ replyType: props.replyType, imageId: res.value.id })
+    if (addRes && addRes.success) {
+      emitter.emit('update:chatList')
+    }
   }
 }
 </script>

@@ -14,7 +14,7 @@ const chatStore = useChatStore()
 
 const marginHeight = ref(appStore.notchHeight + 'px')
 // 轮播图
-const title = ref('咨询建议')
+const title = ref('')
 
 //消息显示高度
 const subMessagesHeight = ref(0)
@@ -86,16 +86,15 @@ onLoad(async (val: any) => {
     <!-- 头部结束 -->
 
     <!-- 内容 -->
-    <view
-      @tap="messagesClick"
-      class="bg-#f4f5f7 flex flex-col justify-between"
-      :style="`height: calc(100vh - ${subMessagesHeight}px);padding-bottom: 0;`"
-    >
-      <Messages />
+    <view @tap="messagesClick" class="bg-#f4f5f7 flex flex-col justify-between">
+      <Messages
+        :title="title"
+        :style="`height: calc(100vh - ${subMessagesHeight}px - 80rpx);padding-bottom: 0;`"
+      />
     </view>
 
     <!-- 底部 -->
-    <Comment />
+    <Comment :title="title" />
   </ContentWrap>
 </template>
 
