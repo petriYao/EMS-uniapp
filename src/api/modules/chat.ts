@@ -9,7 +9,7 @@ export const ReplyAdd = (data: ReplyAddType) => {
 }
 
 /**列表 */
-export const ReplyList = (data: ReplyListType) => {
+export const getReplyList = (data: ReplyListType) => {
   return post<any>('reply/list', { ...data })
 }
 /**自动回复列表 */

@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { ref, reactive, nextTick, onBeforeMount } from 'vue'
+import { ref, nextTick, onBeforeMount, onUnmounted } from 'vue'
 import { useChatStore } from '@/store'
 import { useEmitt } from '@/hooks/useEmitt'
 import { getUserIdentity } from '@/hooks/useCache'
 import { getSvgURL } from '@/utils'
-import { ReplyList } from '@/api'
-import { IChatParams, IChatMessage } from '@/types/chatModel'
+import { getReplyList } from '@/api'
+import { IChatParams, IChatMessage, PlayCodeEnum } from '@/types/chatModel'
 
 import ChatItem from './chatItem.vue'
 
@@ -22,23 +22,46 @@ const props = defineProps({
   }
 })
 
-const setData = reactive({
-  replyId: 0,
-  replyType: props.title === '房源咨询' ? 2 : 1,
-  size: 12
-} as IChatParams)
+const replyType = props.title === '房源咨询' ? 2 : 1
 
 //自己的头像
 const myAvatar = ref('')
-
 //显示
-const isShow = ref<boolean>(true)
+const isShow = ref<boolean>(false)
 //加载
 const loadMore = ref<string>('loadmore')
 const lowerLoadMore = ref<string>('loadmore')
 //滚动条 滚动位置
 const scrollTop = ref(0)
 const scrollIntoView = ref('')
+
+//关闭音频播放
+const closeAudioAnmition = () => {
+  if (useStore.currentAudio && useStore.currentAudio.anmitionPlay) {
+    useStore.currentAudio.anmitionPlay = PlayCodeEnum.inactive
+  }
+}
+
+//播放音频
+// 是否使用 WebAudio 作为底层音频驱动，默认关闭。对于短音频、播放频繁的音频建议开启此选项，开启后将获得更优的性能表现。由于开启此选项后也会带来一定的内存增长，因此对于长音频建议关闭此选项
+const innerAudioContext = uni.createInnerAudioContext()
+
+//监听音频播放进度更新事件
+innerAudioContext.onTimeUpdate(() => {
+  if (useStore.currentAudio) {
+    useStore.currentAudio.anmitionPlay = PlayCodeEnum.active
+  }
+})
+
+//监听音频播放结束
+innerAudioContext.onEnded(() => {
+  closeAudioAnmition()
+})
+
+//监听音频播放错误
+innerAudioContext.onError(() => {
+  closeAudioAnmition()
+})
 
 //是否展示时间
 const showTime = (index: number): boolean => {
@@ -67,10 +90,16 @@ const scrollToIndex = async (index: number) => {
 //获取历史消息
 const getHistoryMessageListData = async (isScrollToUpper = false) => {
   console.log('获取历史消息', isScrollToUpper)
+  const data = {
+    replyType,
+    order: 0,
+    size: 12,
+    replyId: 0
+  } as IChatParams
   if (useStore.chatList.length > 0) {
-    setData.replyId = useStore.chatList[0].replyId
+    data.replyId = useStore.chatList[0].replyId
   }
-  const res = await ReplyList({ ...setData, order: 0 })
+  const res = await getReplyList(data)
   if (res && res.success) {
     const list = (res.value.list ?? []) as IChatMessage[]
     if (list.length > 0) {
@@ -97,10 +126,16 @@ const getHistoryMessageListData = async (isScrollToUpper = false) => {
 }
 
 const getNewMessageListData = async () => {
+  const data = {
+    replyType,
+    order: 1,
+    size: 12,
+    replyId: 0
+  } as IChatParams
   if (useStore.chatList.length > 0) {
-    setData.replyId = useStore.chatList[useStore.chatList.length - 1].replyId
+    data.replyId = useStore.chatList[useStore.chatList.length - 1].replyId
   }
-  const res = await ReplyList({ ...setData, order: 1 })
+  const res = await getReplyList(data)
   if (res && res.success && res.value.list) {
     const list = res.value.list ?? []
     useStore.chatList.push(...list)
@@ -135,7 +170,7 @@ const setNewMessageListTime = () => {
   setTimeout(async () => {
     await scrolltolower()
     setNewMessageListTime()
-  }, 5000)
+  }, 10000)
 }
 
 //滚到底部通知
@@ -165,6 +200,12 @@ onBeforeMount(() => {
   useStore.chatList = []
   getHistoryMessageListData()
   setNewMessageListTime()
+})
+
+//释放
+onUnmounted(() => {
+  innerAudioContext.destroy()
+  useStore.chatList = []
 })
 </script>
 
@@ -197,16 +238,9 @@ onBeforeMount(() => {
           :showTime="showTime(index)"
           :item="item"
           :avatar="item.isMy === 1 ? myAvatar : getSvgURL('home', 'home-keyword')"
+          :Audio="innerAudioContext"
         />
       </view>
-
-      <u-loadmore
-        v-if="lowerLoadMore == 'loading'"
-        loadmore-text="上拉加载消息"
-        loading-text="正在加载..."
-        nomore-text="没有更多消息了"
-        :status="lowerLoadMore"
-      />
     </scroll-view>
   </view>
 </template>

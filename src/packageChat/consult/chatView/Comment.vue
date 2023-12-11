@@ -5,11 +5,11 @@ import { useChatStore } from '@/store'
 import { useEmitt } from '@/hooks/useEmitt'
 import { getSvgURL } from '@/utils'
 import { CurrentTypeEnum } from '@/types/chatModel'
+import { ReplyAdd, ReplyAutomaticList } from '@/api'
 
 import emojiList from './components/emoji.json'
 import voiceBtn from './components/voiceBtn.vue'
 import funBtn from './components/funBtn.vue'
-import { ReplyAdd, ReplyAutomaticList } from '@/api'
 
 const props = defineProps({
   recvId: {
@@ -26,21 +26,6 @@ const { emitter } = useEmitt()
 
 const useStore = useChatStore()
 
-const chatList = ref([
-  '测试',
-  '查看',
-  '详情',
-  '测试1',
-  '查看1',
-  '详情1',
-  '测试2',
-  '查看2',
-  '详情2',
-  '测试3',
-  '查看3',
-  '详情3'
-] as any[])
-
 const textHeight = computed(
   () =>
     (state.currentType == CurrentTypeEnum.record
@@ -50,6 +35,8 @@ const textHeight = computed(
 
 //原始高度
 const panelHeight = computed(() => useStore.panelHeight)
+
+const automaticList = ref([] as string[])
 
 //参数
 const state = reactive({
@@ -235,10 +222,11 @@ const sendMessage = async () => {
 }
 
 //自动回复列表
-const getChatList = async () => {
+const getAutomaticList = async () => {
   const res = await ReplyAutomaticList(state.replyType)
-  if (res && res.success) {
+  if (res && res.success && res.value && res.value?.list) {
     console.log('自动回复', res)
+    automaticList.value = res.value?.list
   }
 }
 
@@ -284,7 +272,7 @@ watch(
 //加载后
 onMounted(() => {
   uni.onKeyboardHeightChange(onKeyboardHeightChange)
-  getChatList()
+  getAutomaticList()
 })
 
 //释放
@@ -297,11 +285,11 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <view class="h-80rpx flex items-center px-20rpx bg-[#EDEDED]">
+  <view class="h-80rpx flex items-center px-20rpx bg-[#EDEDED]" v-if="automaticList?.length > 0">
     <scroll-view scroll-x>
       <view class="flex">
         <view
-          v-for="(item, index) of chatList"
+          v-for="(item, index) of automaticList"
           :key="index"
           class="mr-20rpx rounded-50 bg-[#FFF] py-6rpx px-20rpx whitespace-nowrap"
           @click="itemClick(item)"

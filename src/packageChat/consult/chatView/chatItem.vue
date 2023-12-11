@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import type { PropType } from 'vue'
 import { getChatTime } from '@/utils'
-import ImageText from './components/image-text.vue'
-import AudioText from './components/audio-text.vue'
 import { useEmitt } from '@/hooks/useEmitt'
 import { IChatMessage } from '@/types/chatModel'
+
+import ImageText from './components/image-text.vue'
+import AudioText from './components/audio-text.vue'
 
 const props = defineProps({
   item: {
@@ -60,7 +61,7 @@ const reeditClick = () => {
 const longpress = () => {
   if (leftFlag(props.item) || !props.item.replyTime) return
   const now = new Date()
-  if (now.getTime() - props.item.replyTime > 2 * 60 * 1000) return
+  if (now.getTime() - new Date(props.item.replyTime).getTime() > 2 * 60 * 1000) return
   uni.showModal({
     title: '撤销提示',
     content: '是否撤销该消息?',
@@ -71,7 +72,7 @@ const longpress = () => {
 
 <template>
   <view class="chat-time" v-if="showTime">
-    <text>{{ getChatTime(item.replyTime ?? 0) }}</text>
+    <text>{{ getChatTime(item.replyTime ? new Date(item.replyTime).getTime() : 0) }}</text>
   </view>
 
   <!-- 撤回消息 -->
@@ -90,7 +91,7 @@ const longpress = () => {
       <image class="message-avatar" :src="item.replyContent.image.listUrl" />
     </view>
     <view class="msg">
-      <image-text :item="item" />
+      <ImageText :item="item" />
     </view>
   </view>
 

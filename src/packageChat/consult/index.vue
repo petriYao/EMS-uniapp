@@ -1,18 +1,24 @@
 <script setup lang="ts">
-import { useAppStore, useChatStore } from '@/store'
-import { onLoad } from '@dcloudio/uni-app'
 import { onBeforeMount, ref } from 'vue'
+import { onLoad, onShow } from '@dcloudio/uni-app'
+
+import { useAppStore, useChatStore } from '@/store'
+import { getUserIdentity } from '@/hooks/useCache'
+import { useEmitt } from '@/hooks/useEmitt'
 import { debounce, getSvgURL } from '@/utils'
+import router from '@/router'
+
 import Messages from './chatView/Messages.vue'
 import Comment from './chatView/Comment.vue'
-import { useEmitt } from '@/hooks/useEmitt'
-import router from '@/router'
 
 const { emitter } = useEmitt()
 const appStore = useAppStore()
 const chatStore = useChatStore()
 
 const marginHeight = ref(appStore.notchHeight + 'px')
+
+//显示
+const isShow = ref<boolean>(false)
 // 轮播图
 const title = ref('')
 
@@ -68,6 +74,15 @@ onLoad(async (val: any) => {
     title.value = val.title
   }
 })
+
+onShow(() => {
+  const identity = getUserIdentity()
+  if (!identity || !identity.userInfo) {
+    isShow.value = false
+  } else {
+    isShow.value = true
+  }
+})
 </script>
 
 <template>
@@ -84,17 +99,17 @@ onLoad(async (val: any) => {
       <view>{{ title }}</view>
     </view>
     <!-- 头部结束 -->
-
-    <!-- 内容 -->
-    <view @tap="messagesClick" class="bg-#f4f5f7 flex flex-col justify-between">
-      <Messages
-        :title="title"
-        :style="`height: calc(100vh - ${subMessagesHeight}px - 80rpx);padding-bottom: 0;`"
-      />
+    <view v-if="isShow">
+      <!-- 内容 -->
+      <view @tap="messagesClick" class="bg-#f4f5f7 flex flex-col justify-between">
+        <Messages
+          :title="title"
+          :style="`height: calc(100vh - ${subMessagesHeight}px - 80rpx);padding-bottom: 0;`"
+        />
+      </view>
+      <!-- 底部 -->
+      <Comment :title="title" />
     </view>
-
-    <!-- 底部 -->
-    <Comment :title="title" />
   </ContentWrap>
 </template>
 
