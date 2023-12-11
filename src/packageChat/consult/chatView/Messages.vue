@@ -238,7 +238,7 @@ onUnmounted(() => {
     >
       <!-- 状态 -->
       <view class="h-1px" />
-      <view v-if="useStore.chatList.length > 12">
+      <view v-if="useStore.chatList.length >= 12">
         <u-loadmore
           loadmore-text="下拉加载历史消息"
           loading-text="正在加载..."
