@@ -4,8 +4,9 @@ import { IChatMessage, RecordCodeEnum } from '@/types/chatModel'
 const useChatStore = defineStore('chat', {
   state: () => {
     return {
-      commentHeight: 65,
       defCommentHeight: 65,
+      commentHeight: 65,
+      automaticHeight: '0',
       panelHeight: 300,
       keyboardHeight: 0,
       userID: '',
