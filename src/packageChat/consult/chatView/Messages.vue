@@ -238,12 +238,14 @@ onUnmounted(() => {
     >
       <!-- 状态 -->
       <view class="h-1px" />
-      <u-loadmore
-        loadmore-text="下拉加载历史消息"
-        loading-text="正在加载..."
-        nomore-text="没有更多历史消息了"
-        :status="loadMore"
-      />
+      <view v-if="useStore.chatList.length > 12">
+        <u-loadmore
+          loadmore-text="下拉加载历史消息"
+          loading-text="正在加载..."
+          nomore-text="没有更多历史消息了"
+          :status="loadMore"
+        />
+      </view>
       <view
         class="item"
         v-for="(item, index) in useStore.chatList"
