@@ -14,10 +14,14 @@
 
 <script setup lang="ts">
 import { ref, PropType } from 'vue'
+import { useChatStore } from '@/store'
+import { IChatMessage } from '@/types/chatModel'
+
+const useStore = useChatStore()
 
 const props = defineProps({
   item: {
-    type: Object as PropType<any>,
+    type: Object as PropType<IChatMessage>,
     // eslint-disable-next-line vue/require-valid-default-prop
     default: {}
   }
@@ -34,19 +38,19 @@ const showImage = () => {
   if (!props.item?.replyContent.image.url) return
   const sources = [] as UniApp.MediaSource[]
   let current = 0
-  // for (const chatitem of useStore.chatList) {
-  //   if (chatitem.contentType === 102) {
-  //     if (!chatitem.pictureElem?.bigPicture.url) continue
-  //     if (chatitem.clientMsgID === props.item.clientMsgID) {
-  //       current = sources.length
-  //     }
-  //     sources.push({
-  //       url: chatitem.pictureElem.bigPicture.url,
-  //       poster: chatitem.pictureElem.bigPicture.url,
-  //       type: 'image'
-  //     })
-  //   }
-  // }
+  for (const chatitem of useStore.chatList) {
+    if (chatitem.replyContent.image) {
+      if (!chatitem.replyContent.image.previewUrl) continue
+      if (chatitem.replyId === props.item.replyId) {
+        current = sources.length
+      }
+      sources.push({
+        url: chatitem.replyContent.image.previewUrl,
+        poster: chatitem.replyContent.image.previewUrl,
+        type: 'image'
+      })
+    }
+  }
   uni.previewMedia({
     sources,
     current

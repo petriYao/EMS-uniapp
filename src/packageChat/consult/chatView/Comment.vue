@@ -234,13 +234,15 @@ const sendMessage = async () => {
   }
 }
 
-//自动回复
+//自动回复列表
 const getChatList = async () => {
   const res = await ReplyAutomaticList(state.replyType)
   if (res && res.success) {
     console.log('自动回复', res)
   }
 }
+
+//自动回复
 const itemClick = async (item: string) => {
   const res = await ReplyAdd({
     replyType: state.replyType,

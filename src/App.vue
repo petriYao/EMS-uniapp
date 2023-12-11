@@ -7,16 +7,16 @@ const isLaunch = ref(false)
 
 //APP实例，打开小程序的时候运行
 onLaunch(async () => {
-  initCacheIamge()
-  await initApp()
-})
-
-onShow(() => {
   //#ifdef MP-WEIXIN
   uni.setNavigationBarTitle({
     title: ''
   })
   //#endif
+  initCacheIamge()
+  await initApp()
+})
+
+onShow(() => {
   //统计数据
   if (isLaunch.value) getHomeIndex()
   isLaunch.value = true

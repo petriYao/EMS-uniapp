@@ -1,10 +1,15 @@
 <script setup lang="ts">
-import { ref, reactive, onBeforeMount } from 'vue'
+import { ref, reactive, nextTick, onBeforeMount } from 'vue'
+import { useChatStore } from '@/store'
 import { useEmitt } from '@/hooks/useEmitt'
-import { ReplyList } from '@/api'
-import { getSvgURL } from '@/utils'
-import chatItem from './chatItem.vue'
 import { getUserIdentity } from '@/hooks/useCache'
+import { getSvgURL } from '@/utils'
+import { ReplyList } from '@/api'
+import { IChatParams, IChatMessage } from '@/types/chatModel'
+
+import ChatItem from './chatItem.vue'
+
+const useStore = useChatStore()
 
 const props = defineProps({
   recvId: {
@@ -18,18 +23,16 @@ const props = defineProps({
 })
 
 const setData = reactive({
+  replyId: 0,
   replyType: props.title === '房源咨询' ? 2 : 1,
-  replyId: null as any,
-  order: 1
-})
-//聊天内容
-const chatList = ref([] as any)
+  size: 12
+} as IChatParams)
 
 //自己的头像
 const myAvatar = ref('')
 
 //显示
-const isShow = ref<boolean>(false)
+const isShow = ref<boolean>(true)
 //加载
 const loadMore = ref<string>('loadmore')
 const lowerLoadMore = ref<string>('loadmore')
@@ -43,7 +46,9 @@ const showTime = (index: number): boolean => {
     return true
   }
   if (index > 0) {
-    const timeDifference = chatList.value[index].createTime! - chatList.value[index - 1].createTime!
+    const timeDifference =
+      new Date(useStore.chatList[index].replyTime).getTime() -
+      new Date(useStore.chatList[index - 1].replyTime).getTime()
     if (Math.abs(timeDifference) > 5 * 60 * 1000) {
       return true
     }
@@ -53,26 +58,63 @@ const showTime = (index: number): boolean => {
 
 //滚动到指定位置
 const scrollToIndex = async (index: number) => {
-  // const id = useStore.chatList[index]?.clientMsgID
-  // nextTick(() => {
-  //   scrollIntoView.value = 'item_' + id
-  // })
+  const id = useStore.chatList[index]?.replyId
+  nextTick(() => {
+    scrollIntoView.value = 'item_' + id
+  })
 }
 
 //获取历史消息
 const getHistoryMessageListData = async (isScrollToUpper = false) => {
   console.log('获取历史消息', isScrollToUpper)
+  if (useStore.chatList.length > 0) {
+    setData.replyId = useStore.chatList[0].replyId
+  }
+  const res = await ReplyList({ ...setData, order: 0 })
+  if (res && res.success) {
+    const list = (res.value.list ?? []) as IChatMessage[]
+    if (list.length > 0) {
+      for (const item of list) {
+        useStore.chatList.unshift(item)
+      }
+      //设置滚动条位置
+      if (isScrollToUpper) {
+        scrollIntoView.value = 'item_' + list[0].replyId
+      } else {
+        setTimeout(() => {
+          if (scrollTop.value == 99999) scrollTop.value = 99998
+          else scrollTop.value = 99999
+          isShow.value = true
+        }, 300)
+      }
+      //设置状态
+      loadMore.value = 'loadmore'
+    } else {
+      loadMore.value = 'nomore'
+      isShow.value = true
+    }
+  }
 }
 
-//反向获取历史消息
-const getHistoryMessageListReverseData = async () => {
-  console.log('反向获取历史消息')
-  setData.replyId = chatList.value[chatList.value.length - 1].replyId
-  getData()
+const getNewMessageListData = async () => {
+  if (useStore.chatList.length > 0) {
+    setData.replyId = useStore.chatList[useStore.chatList.length - 1].replyId
+  }
+  const res = await ReplyList({ ...setData, order: 1 })
+  if (res && res.success && res.value.list) {
+    const list = res.value.list ?? []
+    useStore.chatList.push(...list)
+    setTimeout(() => {
+      if (scrollTop.value == 99999) scrollTop.value = 99998
+      else scrollTop.value = 99999
+    }, 300)
+  }
+  lowerLoadMore.value = 'loadmore'
 }
 
 //下拉加载历史消息
 const scrollToUpper = async () => {
+  console.log('scrollToUpper', loadMore.value, lowerLoadMore.value)
   if (loadMore.value === 'loadmore' && lowerLoadMore.value != 'loading') {
     loadMore.value = 'loading'
     //加载消息
@@ -84,9 +126,16 @@ const scrollToUpper = async () => {
 const scrolltolower = async () => {
   if (lowerLoadMore.value === 'loadmore' && loadMore.value != 'loading') {
     lowerLoadMore.value = 'loading'
-    //加载消息
-    getHistoryMessageListReverseData()
+    await getNewMessageListData()
   }
+}
+
+//更新定时器
+const setNewMessageListTime = () => {
+  setTimeout(async () => {
+    await scrolltolower()
+    setNewMessageListTime()
+  }, 5000)
 }
 
 //滚到底部通知
@@ -96,38 +145,31 @@ useEmitt({
     console.log('滚到底部通知')
     scrollIntoView.value = ''
     setTimeout(() => {
-      // scrollToIndex(useStore.chatList.length - 1)
-      setData.replyId = chatList.value[chatList.value.length - 1].replyId
-      getData()
+      scrollToIndex(useStore.chatList.length - 1)
     }, 100)
   }
 })
+
 //发送成功更新
 useEmitt({
   name: 'update:chatList',
   callback: () => {
-    getData()
+    getNewMessageListData()
   }
 })
 
-const getData = async () => {
-  const res = await ReplyList(setData)
-  if (res && res.success) {
-    console.log('res', res)
-    chatList.value = res.value.list
-    lowerLoadMore.value = 'loadmore'
-  }
-}
-//释放
 onBeforeMount(() => {
-  getData()
-  myAvatar.value = getUserIdentity().userInfo.avatarImage.listUrl
-  console.log('myAvatar.value', myAvatar.value)
+  const identity = getUserIdentity()
+  if (!identity || !identity.userInfo) return
+  myAvatar.value = getUserIdentity().userInfo?.avatarImage?.listUrl
+  useStore.chatList = []
+  getHistoryMessageListData()
+  setNewMessageListTime()
 })
 </script>
 
 <template>
-  <view class="h-[inherit]">
+  <view class="h-[inherit]" v-if="isShow">
     <scroll-view
       :scroll-into-view="scrollIntoView"
       @scrolltoupper="scrollToUpper"
@@ -147,11 +189,11 @@ onBeforeMount(() => {
       />
       <view
         class="item"
-        v-for="(item, index) in chatList"
+        v-for="(item, index) in useStore.chatList"
         :id="'item_' + item.replyId"
         :key="item.replyId"
       >
-        <chat-item
+        <ChatItem
           :showTime="showTime(index)"
           :item="item"
           :avatar="item.isMy === 1 ? myAvatar : getSvgURL('home', 'home-keyword')"

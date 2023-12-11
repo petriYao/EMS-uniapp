@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { PropType } from 'vue'
-import { IChatAudio, PlayCodeEnum } from '@/types/chatModel'
+import { PlayCodeEnum, IChatMessage } from '@/types/chatModel'
 import { useChatStore } from '@/store'
 import { getSvgURL } from '@/utils'
 
@@ -8,8 +8,8 @@ const useStore = useChatStore()
 
 const props = defineProps({
   item: {
-    type: Object as PropType<any>,
-    default: {} as any
+    type: Object as PropType<IChatMessage>,
+    default: {} as IChatMessage
   },
   leftFlag: {
     //是否左边消息
@@ -23,7 +23,7 @@ const props = defineProps({
 })
 
 //消息
-const msg = props.item.replyContent.voice as IChatAudio
+const msg = props.item.replyContent.voice
 
 //播放声音
 const handleAudio = () => {
@@ -31,8 +31,8 @@ const handleAudio = () => {
   stopAudio()
   if (
     !useStore.currentAudio ||
-    useStore.currentAudio.clientMsgID != props.item.clientMsgID ||
-    (useStore.currentAudio.clientMsgID == props.item.clientMsgID && !inPlay)
+    useStore.currentAudio.replyId != props.item.replyId ||
+    (useStore.currentAudio.replyId == props.item.replyId && !inPlay)
   ) {
     useStore.currentAudio = props.item
     playAudio()
@@ -41,9 +41,9 @@ const handleAudio = () => {
 
 //播放音频
 const playAudio = () => {
-  if (!useStore.currentAudio?.soundElem) return
+  if (!useStore.currentAudio?.replyContent.voice) return
   useStore.currentAudio.anmitionPlay = PlayCodeEnum.loading
-  props.Audio!.src = useStore.currentAudio.soundElem?.sourceUrl
+  props.Audio!.src = useStore.currentAudio.replyContent?.voice.url
   props.Audio!.play()
 }
 

@@ -4,11 +4,12 @@ import { getChatTime } from '@/utils'
 import ImageText from './components/image-text.vue'
 import AudioText from './components/audio-text.vue'
 import { useEmitt } from '@/hooks/useEmitt'
+import { IChatMessage } from '@/types/chatModel'
 
 const props = defineProps({
   item: {
     // 页码
-    type: Object as PropType<any>,
+    type: Object as PropType<IChatMessage>,
     // eslint-disable-next-line vue/require-valid-default-prop
     default: {}
   },
@@ -47,37 +48,23 @@ const revokeText = (): string => {
 }
 
 const isTest = () => {
-  return props.item.seq === 0 && props.item.content?.indexOf('{\\"') === -1
+  return props.item.replyContent.text?.length > 0
 }
 
 //重新编辑
 const reeditClick = () => {
-  emitter.emit('Comment:reedit', props.item.content)
+  emitter.emit('Comment:reedit', props.item.replyContent.text)
 }
 
 // 消息撤回
 const longpress = () => {
   if (leftFlag(props.item) || !props.item.replyTime) return
-  if (Date.now() - props.item.replyTime > 2 * 60 * 1000) return
+  const now = new Date()
+  if (now.getTime() - props.item.replyTime > 2 * 60 * 1000) return
   uni.showModal({
     title: '撤销提示',
     content: '是否撤销该消息?',
-    success: async function (ress: any) {
-      // if (ress.confirm) {
-      //   const data = JSON.stringify(props.item)
-      //   revokeMessage(data, (cRes: any) => {
-      //     if (cRes && cRes.errCode == 0) {
-      //       const temp = JSON.parse(data) as IChatMessage
-      //       temp.contentType = 111
-      //       updateConversation(temp)
-      //     } else {
-      //       setTimeout(() => {
-      //         uni.showToast({ title: '撤销消息失败！', icon: 'error' })
-      //       }, 300)
-      //     }
-      //   })
-      // }
-    }
+    success: async function (_ress: any) {}
   })
 }
 </script>
@@ -100,7 +87,7 @@ const longpress = () => {
     v-else-if="item.replyContent.image"
   >
     <view class="chat-header mx-20rpx">
-      <image class="message-avatar" :src="item.senderFaceUrl" />
+      <image class="message-avatar" :src="item.replyContent.image.listUrl" />
     </view>
     <view class="msg">
       <image-text :item="item" />

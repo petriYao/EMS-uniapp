@@ -23,15 +23,6 @@ const useChatStore = defineStore('chat', {
     }
   },
   getters: {
-    loginStatusTitle(state) {
-      switch (state.loginStatus) {
-        case 0:
-          return '微讯未连接，请检查是否已登入'
-        case 2:
-          return '微讯重连接中...第' + state.loginNumber + '次'
-      }
-      return ''
-    },
     recordCodeTitle(state) {
       switch (state.recordCode) {
         case RecordCodeEnum.active:
@@ -51,12 +42,6 @@ const useChatStore = defineStore('chat', {
         this.chatSdk.destroy()
         this.chatSdk = null
       }
-    },
-    updateTotalUnreadMsgCount() {
-      if (this.loginStatus != 1) return
-      this.chatSdk?.getTotalUnreadMsgCount().then((res) => {
-        this.totalUnreadMsgCount = res.data == 0 ? null : res.data > 99 ? '99+' : res.data
-      })
     },
     setPanelHeight(panelHeight: number) {
       this.panelHeight = panelHeight

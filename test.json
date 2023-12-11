@@ -1,0 +1,43 @@
+{
+    "code": 0,
+    "data": {
+      "list": [
+        {
+          "isMy": 0,
+          "replyContent": {
+            "image": {
+              "duration": 0,
+              "id": 0,
+              "imageDim": {
+                "height": 0,
+                "width": 0
+              },
+              "listUrl": "string",
+              "name": "string",
+              "previewUrl": "string",
+              "url": "string"
+            },
+            "text": "string",
+            "voice": {
+              "duration": 0,
+              "id": 0,
+              "imageDim": {
+                "height": 0,
+                "width": 0
+              },
+              "listUrl": "string",
+              "name": "string",
+              "previewUrl": "string",
+              "url": "string"
+            }
+          },
+          "replyId": 0,
+          "replyTime": "string"
+        }
+      ],
+      "page": 0,
+      "size": 0,
+      "total": 0
+    },
+    "message": "string"
+  }

@@ -41,38 +41,39 @@ export interface IChat {
 }
 
 export interface IChatParams {
-  recvId: string //
-  startClientMsgID?: string //
+  order: number
+  replyId: number
+  replyType: number
+  size: number
 }
 
 export interface IChatMessage {
-  clientMsgID: string // 标识
-  sendID?: string // 发送者
-  recvID?: string // 接收者
-  senderFaceUrl?: string // 头像
-  senderNickname?: string
-  contentType?: number // 消息类型
-  status?: number // 消息状态
-  createTime?: number //时间
-  content?: string // 消息内容
-  pictureElem?: IChatImage //图片
-  soundElem?: IChatAudio //语音
-  isRead: boolean
-  seq?: number
+  isMy: number
+  replyContent: ReplyContent
+  contentType: number
+  replyId: number
+  replyTime: number
   /** 以下是渲染使用参数 */
   anmitionPlay?: PlayCodeEnum //语音消息使用
 }
 
-export interface IChatImage {
-  snapshotPicture: IChatImageBean //
-  bigPicture: IChatImageBean //
+export interface ReplyContent {
+  image: Image
+  text: string
+  voice: Image
 }
 
-export interface IChatImageBean {
-  url: string //
+export interface Image {
+  duration: number
+  id: number
+  imageDim: ImageDim
+  listUrl: string
+  name: string
+  previewUrl: string
+  url: string
 }
 
-export interface IChatAudio {
-  sourceUrl: string //
-  duration: number //
+export interface ImageDim {
+  height: number
+  width: number
 }
