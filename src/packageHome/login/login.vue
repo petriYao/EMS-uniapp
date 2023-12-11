@@ -23,7 +23,7 @@ const onLoginMethod = () => {
 //微信登录
 const wxLoginClick = () => {
   if (!reactiveData.protocol) {
-    return wx.showToast({ title: '请阅读并勾选协议', icon: 'none' })
+    return uni.showToast({ title: '请阅读并勾选协议', icon: 'none' })
   }
   wxLoginRef.value.loginClick()
 }

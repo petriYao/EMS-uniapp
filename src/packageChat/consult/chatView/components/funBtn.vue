@@ -24,7 +24,7 @@ const frequentlyList = ref([
 const clickFrequently = (type: string) => {
   switch (type) {
     case '相册':
-      wx.chooseMedia({
+      uni.chooseMedia({
         count: 9,
         mediaType: ['image'], //, 'video'
         sourceType: ['album'],
@@ -40,7 +40,7 @@ const clickFrequently = (type: string) => {
       })
       break
     case '拍摄':
-      wx.chooseMedia({
+      uni.chooseMedia({
         count: 1, // 选择的文件数量，最多可选择1个
         mediaType: ['image'], // 可选择的文件类型，可以是'image'、'video'或'image/video'（默认）
         sourceType: ['camera'], // 文件的来源，可以是'album'、'camera'或'album,camera'（默认）
@@ -61,7 +61,7 @@ const clickFrequently = (type: string) => {
       })
       break
     default:
-      wx.showToast({
+      uni.showToast({
         title: '开发中!', // 标题
         icon: 'success', // 图标类型，默认success
         duration: 1500 // 提示窗停留时间，默认1500ms

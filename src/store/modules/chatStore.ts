@@ -5,9 +5,9 @@ const useChatStore = defineStore('chat', {
   state: () => {
     return {
       defCommentHeight: 65,
-      commentHeight: 65,
-      automaticHeight: '0',
       panelHeight: 300,
+      commentHeight: 65,
+      automaticHeight: 0,
       keyboardHeight: 0,
       userID: '',
       recvId: '',
@@ -37,6 +37,7 @@ const useChatStore = defineStore('chat', {
       uni.hideKeyboard()
       this.commentHeight = this.defCommentHeight
       this.keyboardHeight = 0
+      this.automaticHeight = 0
     },
     initChat() {
       if (this.chatSdk) {

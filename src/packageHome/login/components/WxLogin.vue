@@ -17,7 +17,7 @@ const dialogData = reactive({
 })
 //微信登录
 const loginClick = async () => {
-  wx.login({
+  uni.login({
     success: async (res) => {
       const loginRes = await wxLogin(res.code)
       if (loginRes && loginRes.success) {

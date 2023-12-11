@@ -36,7 +36,7 @@ const inputDataChange = () => {
 }
 
 const addressClick = () => {
-  wx.chooseLocation({
+  uni.chooseLocation({
     success: function (res) {
       // 用户选择位置成功后的回调函数
       if (res?.name) {

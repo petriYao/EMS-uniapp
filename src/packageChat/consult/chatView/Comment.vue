@@ -225,9 +225,10 @@ const sendMessage = async () => {
 const getAutomaticList = async () => {
   const res = await getReplyAutomaticList(state.replyType)
   if (res && res.success && res.value && res.value?.list) {
-    console.log('自动回复', res)
     automaticList.value = res.value?.list
   }
+  useStore.automaticHeight = automaticList.value.length > 0 ? uni.upx2px(80) : 0
+  updateHeight()
 }
 
 //自动回复

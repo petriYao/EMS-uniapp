@@ -26,7 +26,7 @@ const subMessagesHeight = ref(0)
 
 //计算高度
 const getHeight = (panelHeight: number) => {
-  return appStore.navbarHeight + panelHeight
+  return appStore.navbarHeight + panelHeight + chatStore.automaticHeight
 }
 
 //更新高度
@@ -102,7 +102,7 @@ onShow(() => {
     <view @tap="messagesClick" class="bg-#f4f5f7 flex flex-col justify-between">
       <Messages
         :title="title"
-        :style="`height: calc(100vh - ${subMessagesHeight}px - 80rpx);padding-bottom: 0;`"
+        :style="`height: calc(100vh - ${subMessagesHeight}px);padding-bottom: 0;`"
       />
     </view>
     <!-- 底部 -->
