@@ -13,6 +13,6 @@ export const getReplyList = (data: ReplyListType) => {
   return post<any>('reply/list', { ...data })
 }
 /**自动回复列表 */
-export const ReplyAutomaticList = (replyType: number) => {
+export const getReplyAutomaticList = (replyType: number) => {
   return post<any>('reply/automatic-list', { replyType })
 }

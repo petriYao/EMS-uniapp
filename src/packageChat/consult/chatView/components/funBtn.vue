@@ -80,7 +80,7 @@ const uploadImage = async (tempFiles: any, tempFilePaths?: any) => {
   } else {
     const addRes = await ReplyAdd({ replyType: props.replyType, imageId: res.value.id })
     if (addRes && addRes.success) {
-      emitter.emit('update:chatList')
+      emitter.emit('Messages:getNewData')
     }
   }
 }

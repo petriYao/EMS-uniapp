@@ -139,7 +139,7 @@ const uploadVoice = async (tempFilePath: any, duration: number) => {
   } else {
     const addRes = await ReplyAdd({ replyType: props.replyType, voiceId: res.value.id })
     if (addRes && addRes.success) {
-      emitter.emit('update:chatList')
+      emitter.emit('Messages:getNewData')
     }
   }
 }

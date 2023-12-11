@@ -123,6 +123,7 @@ const getHistoryMessageListData = async (isScrollToUpper = false) => {
       isShow.value = true
     }
   }
+  return res
 }
 
 const getNewMessageListData = async () => {
@@ -147,6 +148,17 @@ const getNewMessageListData = async () => {
   lowerLoadMore.value = 'loadmore'
 }
 
+const initData = async () => {
+  useStore.chatList = []
+  const identity = getUserIdentity()
+  if (!identity || !identity.userInfo) return
+  myAvatar.value = getUserIdentity().userInfo?.avatarImage?.listUrl
+  const res = await getHistoryMessageListData()
+  if (res.success) {
+    setNewMessageListTime()
+  }
+}
+
 //下拉加载历史消息
 const scrollToUpper = async () => {
   console.log('scrollToUpper', loadMore.value, lowerLoadMore.value)
@@ -167,6 +179,8 @@ const scrolltolower = async () => {
 
 //更新定时器
 const setNewMessageListTime = () => {
+  const identity = getUserIdentity()
+  if (!identity || !identity.userInfo) return
   setTimeout(async () => {
     await scrolltolower()
     setNewMessageListTime()
@@ -187,19 +201,22 @@ useEmitt({
 
 //发送成功更新
 useEmitt({
-  name: 'update:chatList',
+  name: 'Messages:getNewData',
   callback: () => {
     getNewMessageListData()
   }
 })
 
+useEmitt({
+  name: 'Messages:initData',
+  callback: () => {
+    useStore.chatList = []
+    initData()
+  }
+})
+
 onBeforeMount(() => {
-  const identity = getUserIdentity()
-  if (!identity || !identity.userInfo) return
-  myAvatar.value = getUserIdentity().userInfo?.avatarImage?.listUrl
-  useStore.chatList = []
-  getHistoryMessageListData()
-  setNewMessageListTime()
+  initData()
 })
 
 //释放

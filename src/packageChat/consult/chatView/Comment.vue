@@ -5,7 +5,7 @@ import { useChatStore } from '@/store'
 import { useEmitt } from '@/hooks/useEmitt'
 import { getSvgURL } from '@/utils'
 import { CurrentTypeEnum } from '@/types/chatModel'
-import { ReplyAdd, ReplyAutomaticList } from '@/api'
+import { ReplyAdd, getReplyAutomaticList } from '@/api'
 
 import emojiList from './components/emoji.json'
 import voiceBtn from './components/voiceBtn.vue'
@@ -217,13 +217,13 @@ const sendMessage = async () => {
   })
   if (res && res.success) {
     state.content = ''
-    emitter.emit('update:chatList')
+    emitter.emit('Messages:getNewData')
   }
 }
 
 //自动回复列表
 const getAutomaticList = async () => {
-  const res = await ReplyAutomaticList(state.replyType)
+  const res = await getReplyAutomaticList(state.replyType)
   if (res && res.success && res.value && res.value?.list) {
     console.log('自动回复', res)
     automaticList.value = res.value?.list
@@ -237,7 +237,7 @@ const itemClick = async (item: string) => {
     text: item
   })
   if (res && res.success) {
-    emitter.emit('update:chatList')
+    emitter.emit('Messages:getNewData')
   }
 }
 
@@ -258,6 +258,13 @@ useEmitt({
     } else {
       showKeyboardTwo()
     }
+  }
+})
+
+useEmitt({
+  name: 'Comment:getAutomaticList',
+  callback: () => {
+    getAutomaticList()
   }
 })
 

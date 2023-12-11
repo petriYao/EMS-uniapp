@@ -3,7 +3,6 @@ import { onBeforeMount, ref } from 'vue'
 import { onLoad, onShow } from '@dcloudio/uni-app'
 
 import { useAppStore, useChatStore } from '@/store'
-import { getUserIdentity } from '@/hooks/useCache'
 import { useEmitt } from '@/hooks/useEmitt'
 import { debounce, getSvgURL } from '@/utils'
 import router from '@/router'
@@ -54,6 +53,7 @@ const messagesClick = () => {
 const leftClick = () => {
   router.back()
 }
+
 useEmitt({
   name: 'MChat:updateHeight',
   callback: (panelHeight: number) => {
@@ -76,12 +76,11 @@ onLoad(async (val: any) => {
 })
 
 onShow(() => {
-  const identity = getUserIdentity()
-  if (!identity || !identity.userInfo) {
-    isShow.value = false
-  } else {
-    isShow.value = true
+  if (isShow.value) {
+    emitter.emit('Messages:initData')
+    emitter.emit('Comment:getAutomaticList')
   }
+  isShow.value = true
 })
 </script>
 
@@ -99,17 +98,15 @@ onShow(() => {
       <view>{{ title }}</view>
     </view>
     <!-- 头部结束 -->
-    <view v-if="isShow">
-      <!-- 内容 -->
-      <view @tap="messagesClick" class="bg-#f4f5f7 flex flex-col justify-between">
-        <Messages
-          :title="title"
-          :style="`height: calc(100vh - ${subMessagesHeight}px - 80rpx);padding-bottom: 0;`"
-        />
-      </view>
-      <!-- 底部 -->
-      <Comment :title="title" />
+    <!-- 内容 -->
+    <view @tap="messagesClick" class="bg-#f4f5f7 flex flex-col justify-between">
+      <Messages
+        :title="title"
+        :style="`height: calc(100vh - ${subMessagesHeight}px - 80rpx);padding-bottom: 0;`"
+      />
     </view>
+    <!-- 底部 -->
+    <Comment :title="title" />
   </ContentWrap>
 </template>
 
