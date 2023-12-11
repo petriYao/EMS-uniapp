@@ -15,7 +15,7 @@ export const isCloseInteraction = false
 const debug = true
 
 //图片svg路径 false 线上，true 线下
-const urlDebug = true
+const urlDebug = false
 
 //是否调试
 export const isDebug = () => {
