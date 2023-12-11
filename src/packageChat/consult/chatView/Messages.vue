@@ -12,20 +12,16 @@ import ChatItem from './chatItem.vue'
 const useStore = useChatStore()
 
 const props = defineProps({
-  recvId: {
-    type: String,
-    default: ''
-  },
-  title: {
-    type: String,
-    default: ''
+  replyType: {
+    type: Number,
+    default: 1
   }
 })
 
-const replyType = props.title === '房源咨询' ? 2 : 1
-
 //自己的头像
 const myAvatar = ref('')
+//定时器
+const newReplyInterval = ref(null as any)
 //显示
 const isShow = ref<boolean>(false)
 //加载
@@ -91,7 +87,7 @@ const scrollToIndex = async (index: number) => {
 const getHistoryMessageListData = async (isScrollToUpper = false) => {
   console.log('获取历史消息', isScrollToUpper)
   const data = {
-    replyType,
+    replyType: props.replyType,
     order: 0,
     size: 12,
     replyId: 0
@@ -128,7 +124,7 @@ const getHistoryMessageListData = async (isScrollToUpper = false) => {
 
 const getNewMessageListData = async () => {
   const data = {
-    replyType,
+    replyType: props.replyType,
     order: 1,
     size: 12,
     replyId: 0
@@ -181,9 +177,9 @@ const scrolltolower = async () => {
 const setNewMessageListTime = () => {
   const identity = getUserIdentity()
   if (!identity || !identity.userInfo) return
-  setTimeout(async () => {
+  if (newReplyInterval.value) return
+  newReplyInterval.value = setInterval(async () => {
     await scrolltolower()
-    setNewMessageListTime()
   }, 10000)
 }
 
@@ -223,6 +219,9 @@ onBeforeMount(() => {
 onUnmounted(() => {
   innerAudioContext.destroy()
   useStore.chatList = []
+  if (newReplyInterval.value) {
+    clearInterval(newReplyInterval.value)
+  }
 })
 </script>
 
