@@ -3,7 +3,7 @@ import { ref, nextTick, onBeforeMount, onUnmounted } from 'vue'
 import { useChatStore } from '@/store'
 import { useEmitt } from '@/hooks/useEmitt'
 import { getUserIdentity } from '@/hooks/useCache'
-import { getSvgURL } from '@/utils'
+import { getImageURL } from '@/utils'
 import { getReplyList } from '@/api'
 import { IChatParams, IChatMessage, PlayCodeEnum } from '@/types/chatModel'
 
@@ -255,7 +255,7 @@ onUnmounted(() => {
         <ChatItem
           :showTime="showTime(index)"
           :item="item"
-          :avatar="item.isMy === 1 ? myAvatar : getSvgURL('home', 'home-keyword')"
+          :avatar="item.isMy === 1 ? myAvatar : getImageURL('home', 'home-keyword')"
           :Audio="innerAudioContext"
         />
       </view>

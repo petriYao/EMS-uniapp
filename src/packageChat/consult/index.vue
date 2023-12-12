@@ -4,7 +4,7 @@ import { onLoad, onShow } from '@dcloudio/uni-app'
 
 import { useAppStore, useChatStore } from '@/store'
 import { useEmitt } from '@/hooks/useEmitt'
-import { debounce, getSvgURL } from '@/utils'
+import { debounce, getImageURL } from '@/utils'
 import router from '@/router'
 
 import Messages from './chatView/Messages.vue'
@@ -96,7 +96,7 @@ onShow(() => {
     >
       <view class="mr-10rpx" @click="leftClick"><u-icon name="arrow-left" size="34rpx" /></view>
       <view class="mr-10rpx">
-        <u-icon :name="getSvgURL('home', 'home-keyword')" size="60rpx" />
+        <u-icon :name="getImageURL('home', 'home-keyword')" size="60rpx" />
       </view>
       <view>{{ title }}</view>
     </view>

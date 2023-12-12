@@ -30,8 +30,11 @@ const useAppStore = defineStore('app', {
       bottomHeight: 0,
       //底部整个的高度 rpx
       bottomTabbarHeight: 0,
+
       //rpx
       screenWidth: 0,
+      //屏幕整个高度
+      screenHeight: 0,
       //底部显示的值
       bottomTabbarTitle: '首页',
       //加载
@@ -102,7 +105,7 @@ const useAppStore = defineStore('app', {
       this.notchHeight = safeAreaInsets?.top ?? 0
       this.bottomHeight = safeAreaInsets?.bottom ?? 0
       this.bottomTabbarHeight = this.bottomHeight + 120
-
+      console.log(this.bottomTabbarHeight)
       //#ifdef H5
       setAppStatusBarTitleColor(false)
       this.menuTop = Number(getAppStatusBarHeight()) || 0
@@ -112,6 +115,8 @@ const useAppStore = defineStore('app', {
       //屏幕宽度
       const getWindowInfo = uni.getWindowInfo()
       this.screenWidth = getWindowInfo.screenWidth
+      //屏幕高度
+      this.screenHeight = getWindowInfo.screenHeight
 
       //身份信息
       const userIdentity = getUserIdentity()

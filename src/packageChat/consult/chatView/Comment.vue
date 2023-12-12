@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive, watch, computed, onMounted, onUnmounted, ref } from 'vue'
 
-import { useChatStore } from '@/store'
+import { useChatStore, useAppStore } from '@/store'
 import { useEmitt } from '@/hooks/useEmitt'
 import { getSvgURL } from '@/utils'
 import { CurrentTypeEnum } from '@/types/chatModel'
@@ -10,6 +10,10 @@ import { ReplyAdd, getReplyAutomaticList } from '@/api'
 import emojiList from './components/emoji.json'
 import voiceBtn from './components/voiceBtn.vue'
 import funBtn from './components/funBtn.vue'
+import {
+  registerAppKeyboardHeightListener,
+  unregisterAppKeyboardHeightListener
+} from '@/interaction'
 
 const props = defineProps({
   replyType: {
@@ -21,6 +25,7 @@ const props = defineProps({
 const { emitter } = useEmitt()
 
 const useStore = useChatStore()
+const appStore = useAppStore()
 
 const textHeight = computed(
   () =>
@@ -278,6 +283,12 @@ onMounted(() => {
   //#ifdef MP-WEIXIN
   uni.onKeyboardHeightChange(onKeyboardHeightChange)
   //#endif
+  //#ifdef H5
+  registerAppKeyboardHeightListener((height: string) => {
+    const res = { height: Number(height) * appStore.screenHeight }
+    onKeyboardHeightChange(res)
+  })
+  //#endif
   getAutomaticList()
 })
 
@@ -286,6 +297,10 @@ onUnmounted(() => {
   //取消键盘监听
   //#ifdef MP-WEIXIN
   uni.offKeyboardHeightChange(onKeyboardHeightChange)
+  //#endif
+
+  //#ifdef H5
+  unregisterAppKeyboardHeightListener()
   //#endif
   //初始化高度
   useStore.initHeight()
