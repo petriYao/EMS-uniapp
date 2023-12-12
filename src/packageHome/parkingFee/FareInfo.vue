@@ -41,12 +41,7 @@ onLoad(async () => {})
     <!-- 头部结束 -->
     <view>
       <view>
-        <u-image
-          :src="getImageURL('parkingFee', 'bg')"
-          width="100%"
-          height="400rpx"
-          mode="heightFix"
-        />
+        <u-image :src="getImageURL('parkingFee', 'bg')" width="100%" height="300rpx" />
       </view>
       <view
         class="bg-[#FFF] mt-[-60rpx] mx-20rpx rounded-10rpx px-20rpx py-40rpx relative z-11 box"
@@ -113,9 +108,9 @@ onLoad(async () => {})
           class="flex justify-between text-[28rpx] py-20rpx"
         >
           <view>{{ item.label }}</view>
-          <view class="font-bold" :style="item.label === '累计扣减' ? 'color:#EE4848' : ''">{{
-            item.value
-          }}</view>
+          <view class="font-bold" :style="item.label === '累计扣减' ? 'color:#EE4848' : ''">
+            {{ item.value }}
+          </view>
         </view>
       </view>
     </view>

@@ -40,6 +40,21 @@ const payTheBillClick = () => {
     url: `/packageHome/parkingFee/FareInfo`
   })
 }
+
+const selectClick = (type: string) => {
+  switch (type) {
+    case '车牌管理':
+      router.push({
+        url: `/packageHome/parkingFee/CarNumberManage`
+      })
+      break
+    case '停车记录':
+      router.push({
+        url: `/packageHome/parkingFee/PaymentRecords`
+      })
+      break
+  }
+}
 onLoad(async () => {})
 </script>
 
@@ -54,6 +69,7 @@ onLoad(async () => {})
         <view
           v-for="(item, index) in reactiveData.manageList"
           :key="index"
+          @click="selectClick(item.label)"
           class="flex flex-col justify-center items-center w-25%"
         >
           <view><u-icon :name="getSvgURL('parkingFee', item.img)" size="60rpx" /></view>
@@ -98,10 +114,11 @@ onLoad(async () => {})
           </view>
         </view>
       </view>
+      <view class="h-130rpx" />
     </view>
-    <view class="fixed bottom-0 w-100% box-border px-80rpx">
+    <view class="fixed bottom-0 w-100% box-border px-80rpx bg-[#F6F7FB] pt-20rpx">
       <view
-        class="mb-20rpx bg-[#1957E6] text-[#FFF] flex justify-center items-center h-80rpx rounded-10rpx"
+        class="mb-20rpx h-80rpx bg-[#1957E6] text-[#FFF] flex justify-center items-center rounded-10rpx"
       >
         <u-icon name="scan" size="40rpx" color="#FFF" />
         <text class="ml-10rpx">扫码缴费</text>

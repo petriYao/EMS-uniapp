@@ -191,6 +191,20 @@
           }
         },
         {
+          "path": "parkingFee/CarNumberManage",
+          "style": {
+            "navigationBarTitleText": "车牌管理",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "parkingFee/PaymentRecords",
+          "style": {
+            "navigationBarTitleText": "停车缴费记录",
+            "navigationStyle": "custom"
+          }
+        },
+        {
           "path": "reportRepairs/ReportRepairsList",
           "style": {
             "navigationBarTitleText": "报事报修",
