@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { isEmpty } from 'lodash-es'
-import { onMounted, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 
 const props = defineProps({
   modelValue: {
@@ -36,7 +36,7 @@ const confirm = (event: any) => {
 
 const showClick = () => {
   if (props.disabled) {
-    wx.showToast({
+    uni.showToast({
       title: '该项不可修改!', // 标题
       icon: 'error', // 图标类型，默认success
       duration: 1500 // 提示窗停留时间，默认1500ms
@@ -44,7 +44,7 @@ const showClick = () => {
     return
   }
   if (isEmpty(props.options)) {
-    wx.showToast({
+    uni.showToast({
       title: '暂无选项数据!', // 标题
       icon: 'error', // 图标类型，默认success
       duration: 1500 // 提示窗停留时间，默认1500ms

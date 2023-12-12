@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { isEmpty } from 'lodash-es'
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref } from 'vue'
 
 const props = defineProps({
   modelValue: {
@@ -32,7 +31,7 @@ const showClick = () => {
   if (!props.disabled) {
     show.value = true
   } else {
-    wx.showToast({
+    uni.showToast({
       title: '该项不可修改!', // 标题
       icon: 'error', // 图标类型，默认success
       duration: 1500 // 提示窗停留时间，默认1500ms

@@ -18,15 +18,17 @@ const marginHeight = ref(appStore.notchHeight + 'px')
 
 //显示
 const isShow = ref<boolean>(false)
-// 轮播图
+//标题
 const title = ref('')
+//类型
+const replyType = ref(0)
 
 //消息显示高度
 const subMessagesHeight = ref(0)
 
 //计算高度
 const getHeight = (panelHeight: number) => {
-  return appStore.navbarHeight + panelHeight
+  return appStore.navbarHeight + panelHeight + chatStore.automaticHeight
 }
 
 //更新高度
@@ -72,6 +74,7 @@ onBeforeMount(() => {
 onLoad(async (val: any) => {
   if (val.title) {
     title.value = val.title
+    replyType.value = val.title == '房源咨询' ? 2 : 1
   }
 })
 
@@ -99,14 +102,16 @@ onShow(() => {
     </view>
     <!-- 头部结束 -->
     <!-- 内容 -->
-    <view @tap="messagesClick" class="bg-#f4f5f7 flex flex-col justify-between">
-      <Messages
-        :title="title"
-        :style="`height: calc(100vh - ${subMessagesHeight}px - 80rpx);padding-bottom: 0;`"
-      />
+    <view v-if="replyType > 0">
+      <view @tap="messagesClick" class="bg-#f4f5f7 flex flex-col justify-between">
+        <Messages
+          :replyType="replyType"
+          :style="`height: calc(100vh - ${subMessagesHeight}px);padding-bottom: 0;`"
+        />
+      </view>
+      <!-- 底部 -->
+      <Comment :replyType="replyType" />
     </view>
-    <!-- 底部 -->
-    <Comment :title="title" />
   </ContentWrap>
 </template>
 

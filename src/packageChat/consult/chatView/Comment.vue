@@ -12,13 +12,9 @@ import voiceBtn from './components/voiceBtn.vue'
 import funBtn from './components/funBtn.vue'
 
 const props = defineProps({
-  recvId: {
-    type: String,
-    default: ''
-  },
-  title: {
-    type: String,
-    default: ''
+  replyType: {
+    type: Number,
+    default: 1
   }
 })
 
@@ -40,7 +36,7 @@ const automaticList = ref([] as string[])
 
 //参数
 const state = reactive({
-  replyType: props.title === '房源咨询' ? 2 : 1,
+  replyType: props.replyType,
   content: '', //输入内容
   showPanel: false, //是否显示面板
   showSubmitBtn: false, //是否显示发送按钮
@@ -224,10 +220,11 @@ const sendMessage = async () => {
 //自动回复列表
 const getAutomaticList = async () => {
   const res = await getReplyAutomaticList(state.replyType)
-  if (res && res.success && res.value && res.value?.list) {
-    console.log('自动回复', res)
-    automaticList.value = res.value?.list
+  if (res && res.success && res.value) {
+    automaticList.value = res.value?.list ?? []
   }
+  useStore.automaticHeight = automaticList.value.length > 0 ? uni.upx2px(80) : 0
+  updateHeight()
 }
 
 //自动回复
