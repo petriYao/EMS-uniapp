@@ -184,6 +184,13 @@
           }
         },
         {
+          "path": "parkingFee/FareInfo",
+          "style": {
+            "navigationBarTitleText": "车费详情",
+            "navigationStyle": "custom"
+          }
+        },
+        {
           "path": "reportRepairs/ReportRepairsList",
           "style": {
             "navigationBarTitleText": "报事报修",

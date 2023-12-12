@@ -278,14 +278,18 @@ watch(
 
 //加载后
 onMounted(() => {
+  //#ifdef MP-WEIXIN
   uni.onKeyboardHeightChange(onKeyboardHeightChange)
+  //#endif
   getAutomaticList()
 })
 
 //释放
 onUnmounted(() => {
   //取消键盘监听
+  //#ifdef MP-WEIXIN
   uni.offKeyboardHeightChange(onKeyboardHeightChange)
+  //#endif
   //初始化高度
   useStore.initHeight()
 })
@@ -421,9 +425,6 @@ onUnmounted(() => {
 .inputScroll {
   max-height: 280rpx;
 }
-::v-deep .u-textarea__field {
-  margin: -9px !important;
-}
 
 .voice_title {
   text-align: center;
@@ -431,6 +432,12 @@ onUnmounted(() => {
   min-height: 70rpx;
   line-height: 70rpx;
 }
+
+//#ifdef MP-WEIXIN
+::v-deep .u-textarea__field {
+  margin: -9px !important;
+}
+//#endif
 
 .input-container {
   width: 100%;

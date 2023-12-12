@@ -9,7 +9,7 @@ export const isShowApiLog = false
 export const isShowChatLog = false
 
 //是否关闭交互
-export const isCloseInteraction = false
+export const isCloseInteraction = true
 
 //环境路径 false 线上，true 线下
 const debug = true
