@@ -180,7 +180,29 @@ const clickIcon = (name: string) => {
 }
 
 const onLinechange = (e: any) => {
+  console.log('gao', e)
   let commentHeight = e.detail.height + uni.upx2px(40) + 18
+  const maxHeight = uni.upx2px(280 + 40)
+  if (commentHeight > maxHeight) {
+    useStore.commentHeight = maxHeight
+  } else if (commentHeight > useStore.defCommentHeight) {
+    useStore.commentHeight = commentHeight
+  } else {
+    useStore.commentHeight = useStore.defCommentHeight
+  }
+  //滚动条
+  //reactiveInput.scrollTop = commentHeight > maxHeight ? commentHeight - maxHeight : 0
+  updateHeight()
+}
+
+const onInputTextarea = (e: any) => {
+  let regex = /\n/g
+  let count = (e.detail.value.match(regex) || []).length
+  if (count > 3) {
+    count = 3
+  }
+
+  let commentHeight = count * 28 + uni.upx2px(40) + 18
   const maxHeight = uni.upx2px(280 + 40)
   if (commentHeight > maxHeight) {
     useStore.commentHeight = maxHeight
@@ -350,6 +372,7 @@ onUnmounted(() => {
     >
       <scroll-view scroll-y class="inputScroll flex-1">
         <view>
+          <!-- #ifdef MP-WEIXIN -->
           <u-textarea
             ref="textRef"
             v-model="state.content"
@@ -365,6 +388,19 @@ onUnmounted(() => {
             placeholder="输入消息"
             confirm-type="newLine"
           />
+          <!-- #endif -->
+          <!-- #ifdef H5 -->
+          <view class="px-10rpx">
+            <textarea
+              v-model="state.content"
+              placeholder="输入消息"
+              placeholder-class="textarea-placeholder"
+              auto-height
+              style="width: 100%; max-height: 180rpx; font-size: 28rpx"
+              @input="onInputTextarea"
+            ></textarea>
+          </view>
+          <!-- #endif -->
         </view>
       </scroll-view>
     </view>
