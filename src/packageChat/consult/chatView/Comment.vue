@@ -54,9 +54,10 @@ const reactiveInput = reactive({
   //输入框的焦点
   focus: false as unknown | boolean,
   //光标的位置
-  cursor: 0
+  cursor: 0,
   // //滚动条位置
   // scrollTop: 0
+  oldInputCount: 0
 })
 
 //添加表情
@@ -202,6 +203,8 @@ const onInputTextarea = (e: any) => {
     count = 3
   }
 
+  if (reactiveInput.oldInputCount === count) return
+  reactiveInput.oldInputCount = count
   let commentHeight = count * 28 + uni.upx2px(40) + 18
   const maxHeight = uni.upx2px(280 + 40)
   if (commentHeight > maxHeight) {
