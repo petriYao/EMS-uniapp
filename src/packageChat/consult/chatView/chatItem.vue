@@ -88,7 +88,7 @@ const longpress = () => {
     v-else-if="item.replyContent.image"
   >
     <view class="chat-header mx-20rpx">
-      <image class="message-avatar" :src="item.replyContent.image.listUrl" />
+      <image class="message-avatar" :src="props.avatar" />
     </view>
     <view class="msg">
       <ImageText :item="item" />

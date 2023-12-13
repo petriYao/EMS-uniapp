@@ -24,6 +24,7 @@ const frequentlyList = ref([
 const clickFrequently = (type: string) => {
   switch (type) {
     case '相册':
+      //  #ifdef MP-WEIXIN
       uni.chooseMedia({
         count: 9,
         mediaType: ['image'], //, 'video'
@@ -38,8 +39,24 @@ const clickFrequently = (type: string) => {
           }
         }
       })
+      //  #endif
+
+      // #ifdef H5
+      uni.chooseImage({
+        count: 9,
+        sizeType: ['original', 'compressed'],
+        sourceType: ['album'],
+        success: function (res: any) {
+          console.log('res.tempFiles', res.tempFiles)
+          for (const item of res.tempFiles) {
+            uploadImage(item, item.path)
+          }
+        }
+      })
+      //  #endif
       break
     case '拍摄':
+      //  #ifdef MP-WEIXIN
       uni.chooseMedia({
         count: 1, // 选择的文件数量，最多可选择1个
         mediaType: ['image'], // 可选择的文件类型，可以是'image'、'video'或'image/video'（默认）
@@ -59,6 +76,20 @@ const clickFrequently = (type: string) => {
           console.error('选择文件失败', error)
         }
       })
+      //  #endif
+
+      // #ifdef H5
+      uni.chooseImage({
+        count: 1,
+        sourceType: ['camera'],
+        success: function (res: any) {
+          console.log('res.tempFiles', res.tempFiles)
+          for (const item of res.tempFiles) {
+            uploadImage(item, item.path)
+          }
+        }
+      })
+      //  #endif
       break
     default:
       uni.showToast({
