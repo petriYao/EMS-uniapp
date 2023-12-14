@@ -18,7 +18,6 @@ const deletePic = (event: any) => {
 }
 
 const afterRead = (event: any) => {
-  console.log('上传', event)
   for (const item of event.file) {
     reactiveData.fileList.push({ url: item.url })
   }
@@ -50,7 +49,7 @@ defineExpose({
   <view>
     <u-upload
       :fileList="reactiveData.fileList"
-      @afterRead="afterRead"
+      @after-read="afterRead"
       @delete="deletePic"
       multiple
       :maxCount="8"

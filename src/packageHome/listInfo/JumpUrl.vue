@@ -9,7 +9,6 @@ const title = ref('')
 const appStore = useAppStore()
 
 onLoad(async (val: any) => {
-  console.log('onLoad', val)
   title.value = val.title
   id.value = val.id
 })

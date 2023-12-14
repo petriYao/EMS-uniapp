@@ -33,7 +33,6 @@ watch(
     if (!val) return
     data.value = val
     timeValue.value = val
-    console.log('data.value', data.value)
   },
   {
     immediate: true,

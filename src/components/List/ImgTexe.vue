@@ -41,7 +41,6 @@ const setContent = () => {
     .in(instance)
     .select('#titleID')
     .boundingClientRect(function (rect: any) {
-      console.log('titleID', rect, maxHeight)
       if (rect?.height > maxHeight) {
         htmlContent.value = ''
       }

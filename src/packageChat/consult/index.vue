@@ -33,7 +33,6 @@ const getHeight = (panelHeight: number) => {
 
 //更新高度
 const updateHeight = (panelHeight: number) => {
-  console.log('更新高度1', subMessagesHeight.value)
   subMessagesHeight.value = getHeight(panelHeight)
   if (panelHeight > chatStore.defCommentHeight) {
     emitter.emit('Messages:setScrollToBottom')
@@ -42,7 +41,6 @@ const updateHeight = (panelHeight: number) => {
 
 //防抖更新高度
 const updateHeightDebounce = debounce((panelHeight) => {
-  console.log('防抖更新高度')
   updateHeight(panelHeight)
 }, 100)
 
@@ -59,7 +57,6 @@ const leftClick = () => {
 useEmitt({
   name: 'MChat:updateHeight',
   callback: (panelHeight: number) => {
-    console.log('updateHeight', panelHeight)
     updateHeightDebounce(panelHeight)
   }
 })

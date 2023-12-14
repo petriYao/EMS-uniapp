@@ -5,6 +5,7 @@ import { getImageURL, getSvgURL } from '@/utils'
 import { getAppName } from '@/config/config'
 import { UserIdentityType } from '@/types/userModel'
 import router from '@/router'
+import { getVersion } from '@/config/config'
 
 const userInfo = ref<UserIdentityType | null>(getUserIdentity() ?? null)
 
@@ -23,12 +24,12 @@ const cellLisr = [
   },
   {
     icon: 'my-address',
-    title: '我的地址'
+    title: '我的访客'
   },
   {
     icon: 'my-about',
     title: `关于${getAppName()}`,
-    value: '2023111401'
+    value: getVersion()
   },
   {
     icon: 'my-contact',
@@ -65,7 +66,18 @@ const onConfirm = async () => {
   dialog.show = false
 }
 
-const onSetting = (title: string) => {
+const onSetting = (item: any) => {
+  if (item.title === `关于${getAppName()}`) {
+    //uniapp模态框提示
+    uni.showModal({
+      title: '版本号',
+      content: item.value,
+      showCancel: false,
+      confirmText: '确认',
+      success: function (_res) {}
+    })
+    return
+  }
   if (!userInfo.value) {
     uToastRef.value.show({
       type: 'default',
@@ -74,7 +86,7 @@ const onSetting = (title: string) => {
     })
     return
   }
-  if (title === '个人资料') {
+  if (item.title === '个人资料') {
     router.push({
       url: '/packageHome/personalData/index'
     })
@@ -128,7 +140,7 @@ const onSetting = (title: string) => {
           v-for="(item, index) in cellLisr"
           :key="index"
           class="table-item flex-rows justify-between p-40rpx"
-          @click="onSetting(item.title)"
+          @click="onSetting(item)"
         >
           <view class="flex-rows">
             <view class="mr-20rpx mt-5rpx"

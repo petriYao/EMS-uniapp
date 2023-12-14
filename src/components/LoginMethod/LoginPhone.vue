@@ -59,9 +59,7 @@ const onSubmit = () => {
         router.back()
       }
     })
-    .catch((_errors: any) => {
-      console.log('校验失败')
-    })
+    .catch((_errors: any) => {})
 }
 </script>
 

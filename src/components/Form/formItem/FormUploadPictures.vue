@@ -34,8 +34,6 @@ const computedFileList = computed(() => {
 })
 
 const afterRead = (event: any) => {
-  console.log('event', event)
-
   const list = event.file
   for (const item of list) {
     upload(undefined, item.url)
@@ -53,8 +51,6 @@ const deleteFileList = (event: any) => {
 //上传图片
 const upload = async (tempFile: any, tempFilePath: string) => {
   const res = await uploadFileApi(props.category, tempFile, tempFilePath)
-  console.log('上传图片', res)
-
   if (res && res.success) {
     if (props.count > 1 && fileList.value.length < props.count) {
       fileList.value = fileList.value.concat({
@@ -111,7 +107,7 @@ onBeforeMount(() => {
       accept="image"
       imageMode="aspectFill"
       :fileList="computedFileList"
-      @afterRead="afterRead"
+      @after-read="afterRead"
       @delete="deleteFileList"
     />
   </view>

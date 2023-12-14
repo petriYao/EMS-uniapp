@@ -105,7 +105,6 @@ const useAppStore = defineStore('app', {
       this.notchHeight = safeAreaInsets?.top ?? 0
       this.bottomHeight = safeAreaInsets?.bottom ?? 0
       this.bottomTabbarHeight = this.bottomHeight + 120
-      console.log(this.bottomTabbarHeight)
       //#ifdef H5
       setAppStatusBarTitleColor(false)
       this.menuTop = Number(getAppStatusBarHeight()) || 0

@@ -83,8 +83,8 @@ const onJump = (title: string) => {
 //扫二维码
 const scanQRclick = () => {
   uni.scanCode({
-    success(res) {
-      console.log('条码类型:', res)
+    success(_res) {
+      // console.log('条码类型:', res)
     }
   })
 }

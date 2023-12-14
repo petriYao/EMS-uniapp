@@ -47,8 +47,6 @@ export function getInputColumn(
   }
   column['formSchema'] = formSchema
 
-  console.log('columncolumncolumn', column)
-
   return column
 }
 

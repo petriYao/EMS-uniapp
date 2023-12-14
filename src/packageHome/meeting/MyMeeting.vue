@@ -42,7 +42,6 @@ const reactiveData = reactive({
 
 const getData = async () => {
   const res = await MeetingReservationList(reactiveData.setData)
-  console.log('res', res)
   if (res && res.success && res.value?.page == reactiveData.setData.page) {
     if (res.value?.page == 1) {
       reactiveData.list = res.value.list ?? []

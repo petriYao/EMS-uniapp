@@ -47,7 +47,6 @@ const clickFrequently = (type: string) => {
         sizeType: ['original', 'compressed'],
         sourceType: ['album'],
         success: function (res: any) {
-          console.log('res.tempFiles', res.tempFiles)
           for (const item of res.tempFiles) {
             uploadImage(item, item.path)
           }
@@ -83,7 +82,6 @@ const clickFrequently = (type: string) => {
         count: 1,
         sourceType: ['camera'],
         success: function (res: any) {
-          console.log('res.tempFiles', res.tempFiles)
           for (const item of res.tempFiles) {
             uploadImage(item, item.path)
           }

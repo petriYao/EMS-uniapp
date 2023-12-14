@@ -650,7 +650,6 @@ export default {
             }
           })
           .catch((err) => {
-            console.log(err)
             if (this.drawDelegate) {
               /* 高频重绘纠正 */
               let delegate = this.drawDelegate

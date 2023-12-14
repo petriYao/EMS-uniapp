@@ -22,7 +22,6 @@ const getParkProfile = async () => {
 }
 
 onLoad(async (val: any) => {
-  console.log('onLoad', val)
   infoData.value.id = val.id
   infoData.value.title = val.title + '详情'
   getParkProfile()

@@ -23,7 +23,6 @@ const appStore = useAppStore()
 
 const height = computed(() => {
   const h = appStore.menuTop + 44
-  console.log('menuTop', appStore.menuTop, h)
   return `calc(100vh - ${h}px)`
 })
 
@@ -84,7 +83,6 @@ const onRefresherrefresh = () => {
 
 //上拉加载更多
 const onScrolltolower = async () => {
-  console.log('onScrolltolower')
   if (reactiveData.loadMore === 'loadmore') {
     reactiveData.loadMore = 'loading'
     page.value++

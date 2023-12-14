@@ -35,7 +35,6 @@ const reactiveData = reactive({
 })
 //去缴费
 const payTheBillClick = () => {
-  console.log('点击')
   router.push({
     url: `/packageHome/parkingFee/FareInfo`
   })

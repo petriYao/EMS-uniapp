@@ -110,9 +110,7 @@ const onSubmit = () => {
         }
       }
     })
-    .catch((_errors: any) => {
-      console.log('校验失败')
-    })
+    .catch((_errors: any) => {})
 }
 
 const onLogin = () => {

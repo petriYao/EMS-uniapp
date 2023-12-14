@@ -13,10 +13,6 @@ const reactiveData = reactive({
 
 const plateNumber = ref(['', '', '', '', '', '', ''])
 
-// const plateChange = (e: any) => {
-//   console.log('e', e)
-// }
-
 const popupSaveClick = () => {
   let plate = {
     str: '',
@@ -32,7 +28,6 @@ const popupSaveClick = () => {
         plate.str += ' · '
       }
     }
-    console.log('plate', plate)
   }
 
   reactiveData.infoData.push(plate)

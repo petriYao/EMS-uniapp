@@ -84,8 +84,6 @@ onBeforeMount(() => {})
 watch(
   () => props.formData,
   () => {
-    console.log('props.formData', props.formData)
-
     if (isEmpty(props.formData)) return
     const obj = {} as any
     if (props.editData) {

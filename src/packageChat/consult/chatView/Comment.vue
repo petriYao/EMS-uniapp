@@ -80,7 +80,6 @@ const updateHeight = () => {
     heightTemp += useStore.commentHeight
   }
 
-  console.log('发送', heightTemp)
   emitter.emit('MChat:updateHeight', heightTemp)
 }
 
@@ -181,7 +180,6 @@ const clickIcon = (name: string) => {
 }
 
 const onLinechange = (e: any) => {
-  console.log('gao', e)
   let commentHeight = e.detail.height + uni.upx2px(40) + 18
   const maxHeight = uni.upx2px(280 + 40)
   if (commentHeight > maxHeight) {

@@ -85,7 +85,6 @@ const scrollToIndex = async (index: number) => {
 
 //获取历史消息
 const getHistoryMessageListData = async (isScrollToUpper = false) => {
-  console.log('获取历史消息', isScrollToUpper)
   const data = {
     replyType: props.replyType,
     order: 0,
@@ -157,7 +156,6 @@ const initData = async () => {
 
 //下拉加载历史消息
 const scrollToUpper = async () => {
-  console.log('scrollToUpper', loadMore.value, lowerLoadMore.value)
   if (loadMore.value === 'loadmore' && lowerLoadMore.value != 'loading') {
     loadMore.value = 'loading'
     //加载消息
@@ -187,7 +185,6 @@ const setNewMessageListTime = () => {
 useEmitt({
   name: 'Messages:setScrollToBottom',
   callback: () => {
-    console.log('滚到底部通知')
     scrollIntoView.value = ''
     setTimeout(() => {
       scrollToIndex(useStore.chatList.length - 1)

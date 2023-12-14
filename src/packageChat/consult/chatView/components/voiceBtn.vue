@@ -131,7 +131,6 @@ const handleRecorder = ({ tempFilePath, _duration }: any) => {
 const uploadVoice = async (tempFilePath: any, duration: number) => {
   uni.showLoading({ title: '上传中...' })
   const res: any = await uploadFileApi('chatVoice', tempFilePath, tempFilePath, duration)
-  console.log('res', res)
   uni.hideLoading()
   if (!res || !res.success || !res.value) {
     uni.showToast({ title: '上传语音失败', icon: 'error' })

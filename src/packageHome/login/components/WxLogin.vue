@@ -40,7 +40,6 @@ const loginClick = async () => {
 
 //确定获取手机号
 const onGetPhoneNumber = async (e: any) => {
-  console.log('确定获取手机号', e)
   dialogData.loginShow = false
   if (e.detail.errMsg === 'getPhoneNumber:ok') {
     const loginRes = await wxBindAccount(e.detail.code)
