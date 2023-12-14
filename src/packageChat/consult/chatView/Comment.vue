@@ -406,7 +406,12 @@ onUnmounted(() => {
       </scroll-view>
     </view>
     <view v-else class="voice_title mx-20rpx flex-1 h-70rpx">
+      <!-- #ifdef MP-WEIXIN -->
       <voice-btn :replyType="state.replyType" />
+      <!-- #endif -->
+      <!-- #ifdef H5 -->
+      <view class="bg-[#FFF]" />
+      <!-- #endif -->
     </view>
 
     <view class="text-0 flex justify-center items-end h-100%">
