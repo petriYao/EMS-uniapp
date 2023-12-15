@@ -227,6 +227,9 @@ const screenshot = () => {
   background-color: transparent !important;
   color: #fff !important;
 }
+:deep(.u-status-bar) {
+  background-color: transparent !important;
+}
 .box {
   box-shadow: 6px 0px 10px rgba(0, 0, 0, 0.2);
 }

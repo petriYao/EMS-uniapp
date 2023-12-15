@@ -19,10 +19,10 @@ const onFormData = () => {
     reactiveData.editData = JSON.parse(val)
   }
   reactiveData.formData = [
-    getInputColumn('受访问人公司', 'company', '请输入受访问人公司', {
+    getInputColumn('受访人公司', 'company', '请输入受访人公司', {
       columnStyle: 'column-style'
     }),
-    getInputColumn('受访问人', 'name', '请输入访问人', { columnStyle: 'column-style' }),
+    getInputColumn('受访人', 'name', '请输入访人', { columnStyle: 'column-style' }),
     getCustomDateColumn('预约来访时间', 'time', '请输入预约来访时间', {
       columnStyle: 'column-style'
     }),
@@ -56,24 +56,24 @@ const submitClick = () => {
   console.log('data', data)
   if (!data.name) {
     uni.showToast({
-      title: '受访问人不能为空',
+      title: '受访人不能为空',
       icon: 'none'
     })
     return
   } else if (!data.company) {
     uni.showToast({
-      title: '受访问人公司不能为空',
+      title: '受访人公司不能为空',
       icon: 'none'
     })
     return
   } else if (!data.time) {
     uni.showToast({
-      title: '受访问人公司不能为空',
+      title: '受访人公司不能为空',
       icon: 'none'
     })
     return
   }
-  data['type'] = 0
+  data['type'] = 20
   reactiveData.editData.push(data)
   setLocal(visitorRequestkey, JSON.stringify(reactiveData.editData))
   router.back()

@@ -101,7 +101,7 @@ onBeforeMount(() => {
 <template>
   <ContentWrap>
     <!-- 头部开始 -->
-    <XWAHeader title="申请记录" />
+    <XWAHeader title="我的访客" />
 
     <!-- 头部结束 -->
     <view class="bg-[#FFF]">
@@ -118,7 +118,7 @@ onBeforeMount(() => {
     <scroll-view
       refresher-enabled
       scroll-y
-      :style="`height: calc(100vh - 188px - ${marginHeight});`"
+      :style="`height: calc(100vh - 88px - ${marginHeight} - 140rpx);`"
     >
       <view v-for="(item, index) in reactiveData.editData" :key="index" @click="editClick(item)">
         <view

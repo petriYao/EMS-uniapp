@@ -2,7 +2,7 @@
 import { onLoad } from '@dcloudio/uni-app'
 import FormCustomDate from '@/components/Form/formItem/FormCustomDate.vue'
 import { ref } from 'vue'
-import { findIndex } from '@/utils'
+import { findIndex, formatTime } from '@/utils'
 import router from '@/router'
 
 const popupShow = ref(false)
@@ -11,7 +11,7 @@ const infoData = ref({
   phone: '',
   company: '',
   reason: '',
-  time: '',
+  time: formatTime(new Date(), 'yyyy-MM-dd HH:mm'),
   waterGate: '1#闸口'
 } as any)
 
@@ -129,7 +129,7 @@ onLoad((val: any) => {
           </view>
           <view
             v-else-if="item.component === 'select'"
-            class="pr-20rpx h-36px flex items-center justify-end"
+            class="h-36px flex items-center justify-end"
             @click="popupShowClick"
           >
             <view> {{ infoData[item.value] }}</view>
@@ -188,7 +188,7 @@ onLoad((val: any) => {
         class="w-[50%] bg-[#1957E6] text-[#FFF] rounded-8rpx h-80rpx flex items-center justify-center ml-10rpx"
         hover-class="button-spread"
         @click="editClick('look')"
-        >保存并查看</view
+        >保存并生成二维码</view
       >
     </view>
   </ContentWrap>

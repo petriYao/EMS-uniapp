@@ -46,12 +46,13 @@ onShow(async () => {
   <ContentWrap>
     <!-- 头部开始 -->
     <XWAHeader title="访客登记" leftColor="#FFF" />
+
     <view class="fixed top-0 w-100%">
       <u-image :src="getImageURL('visitorRegistration', 'bg')" width="100%" height="400rpx" />
     </view>
     <!-- 头部结束 -->
     <view
-      class="relative mt-60rpx z-11 rounded-t-lg p-20rpx text-[#555555]"
+      class="relative mt-60rpx z-11 rounded-t-40rpx p-30rpx text-[#555555]"
       style="background: linear-gradient(to bottom, #f0f7fc, #f4f7f9)"
       v-if="reactiveData.editData && reactiveData.editData.name"
     >
@@ -59,7 +60,7 @@ onShow(async () => {
       <view class="bg-[#FFF] rounded-10rpx p-20rpx box">
         <view class="text-[34rpx] font-bold flex items-center">
           <view>{{ reactiveData.editData.name }}</view>
-          <view class="ml-10rpx">
+          <view class="ml-10rpx" @click="pathClick('联系人')">
             <u-icon :name="getSvgURL('visitorRegistration', 'edit')" size="30rpx" />
           </view>
         </view>
@@ -120,6 +121,9 @@ onShow(async () => {
 :deep(.u-navbar__content) {
   background-color: transparent !important;
   color: #fff !important;
+}
+:deep(.u-status-bar) {
+  background-color: transparent !important;
 }
 .box {
   box-shadow: 6px 0px 10px rgba(0, 0, 0, 0.2);
