@@ -32,16 +32,22 @@ const popupList = [
   { label: '3#闸口', value: 3 }
 ]
 
-const editClick = () => {
+const editClick = (type: string) => {
   console.log('item', infoData.value)
-  if (!infoData.value.name || !infoData.value.time || !infoData.value.waterGate) {
-    uni.showToast({
-      title: '请填写必填项',
-      icon: 'none'
-    })
-    return
+  if (type === 'save') {
+    if (!infoData.value.name || !infoData.value.time || !infoData.value.waterGate) {
+      uni.showToast({
+        title: '请填写必填项',
+        icon: 'none'
+      })
+      return
+    } else {
+      router.back()
+    }
   } else {
-    router.back()
+    router.push({
+      url: `/packageHome/visitorRegistration/QRcode/index`
+    })
   }
 }
 
@@ -175,14 +181,14 @@ onLoad((val: any) => {
       <view
         class="w-[50%] bg-[#1957E6] text-[#FFF] rounded-8rpx h-80rpx flex items-center justify-center mr-10rpx"
         hover-class="button-spread"
-        @click="editClick"
+        @click="editClick('save')"
         >保存</view
       >
       <view
         class="w-[50%] bg-[#1957E6] text-[#FFF] rounded-8rpx h-80rpx flex items-center justify-center ml-10rpx"
         hover-class="button-spread"
-        @click="editClick"
-        >保存并分享</view
+        @click="editClick('look')"
+        >保存并查看</view
       >
     </view>
   </ContentWrap>
