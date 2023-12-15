@@ -42,19 +42,12 @@ watch(
 </script>
 <template>
   <view class="relative">
-    <!-- APP上加了readonly，就没有点击效果了 -->
-    <!-- #ifdef H5 -->
-    <view class="absolute w-100% h-100% top-0 z-99" />
-    <!-- #endif -->
-    <view @tap.stop="show = true">
-      <u-input
-        readonly
-        v-model="data"
-        border="none"
-        :placeholder="placeholder"
-        suffixIcon="arrow-right"
-        suffixIconStyle="color: #909399"
-      />
+    <view @click="show = true" class="h-24px flex items-center justify-between text-[14px]">
+      <view>
+        <text v-if="data">{{ data }}</text>
+        <text v-else class="text-[#C0C4CC]">{{ placeholder }}</text>
+      </view>
+      <view><u-icon name="arrow-right" size="14" /></view>
     </view>
     <u-datetime-picker
       :show="show"

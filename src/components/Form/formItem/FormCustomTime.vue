@@ -21,6 +21,7 @@ const data = ref()
 const pickerShow = ref(false)
 const pickerData = ref(new Date() as any)
 const pickerShowClick = () => {
+  console.log('点击')
   pickerShow.value = true
   data.value
 }
@@ -28,6 +29,7 @@ const pickerShowClick = () => {
 const confirm = (event: any) => {
   pickerData.value = event.detail
   data.value = formatTime(pickerData.value, 'yyyy-MM-dd HH:mm')
+  console.log('data', event)
   pickerShow.value = false
   emit('update:modelValue', data.value)
 }
@@ -45,19 +47,11 @@ watch(
 </script>
 
 <template>
-  <view @tap.stop="pickerShowClick">
-    <u-input readonly v-model="data" border="none" :placeholder="placeholder" />
+  <view @click="pickerShowClick" class="h-24px flex items-center text-[14px]">
+    <text v-if="data">{{ data }}</text>
+    <text v-else class="text-[#C0C4CC]">{{ placeholder }}</text>
   </view>
   <view>
-    <van-action-sheet :show="pickerShow">
-      <van-datetime-picker
-        :min-date="new Date('1970-01-01')"
-        :max-date="new Date('2100-12-31')"
-        :value="pickerData"
-        @confirm="confirm"
-        @cancel="pickerShow = false"
-        type="datetime"
-      />
-    </van-action-sheet>
+    <u-calendar :show="pickerShow" @confirm="confirm" />
   </view>
 </template>

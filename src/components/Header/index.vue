@@ -28,6 +28,10 @@ const props = defineProps({
     type: Boolean,
     default: true
   },
+  leftColor: {
+    type: String,
+    default: ''
+  },
   placeholder: {
     type: Boolean,
     default: true
@@ -62,7 +66,7 @@ const onLeftClick = () => {
     <template #left>
       <slot name="left">
         <view>
-          <u-icon name="arrow-left" size="36rpx" v-if="props.isLeftIcon" />
+          <u-icon name="arrow-left" size="36rpx" v-if="props.isLeftIcon" :color="props.leftColor" />
         </view>
       </slot>
     </template>

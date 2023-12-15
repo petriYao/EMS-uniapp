@@ -177,6 +177,34 @@
           }
         },
         {
+          "path": "visitorRegistration/addVisitor/index",
+          "style": {
+            "navigationBarTitleText": "添加申请人信息",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "visitorRegistration/visitorRequest/index",
+          "style": {
+            "navigationBarTitleText": "访客申请",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "visitorRegistration/requestRecord/index",
+          "style": {
+            "navigationBarTitleText": "申请记录",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "visitorRegistration/QRcode/index",
+          "style": {
+            "navigationBarTitleText": "访客预约二维码",
+            "navigationStyle": "custom"
+          }
+        },
+        {
           "path": "parkingFee/index",
           "style": {
             "navigationBarTitleText": "停车缴费",

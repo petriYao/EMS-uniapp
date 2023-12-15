@@ -61,7 +61,7 @@ defineExpose({ saveClick, validate })
   <div>
     <PartTitle v-if="props.category" :processTitle="props.category" />
     <view class="bg-#f4f5f7">
-      <view class="bg-#FFF rounded-20rpx" :class="props.formStyle">
+      <view class="bg-#FFF" :class="props.formStyle">
         <FormPartItem
           ref="formPartItemRef"
           :formData="formData"

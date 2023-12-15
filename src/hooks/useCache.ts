@@ -8,6 +8,9 @@ const userIdentitykey = 'userIdentitykey'
 const userIdentityListkey = 'userIdentityListkey'
 const qrCodeListkey = 'qrCodeListkey'
 const areaDatakey = 'areaDatakey_20231026'
+//设置本地缓存暂用
+export const visitorApplicatKey = 'visitorApplicatKey' //访客 申请人key
+export const visitorRequestkey = 'visitorRequestkey' //访客申请key
 
 //上传至本地缓存
 export function setLocal(name: string, data: any) {
