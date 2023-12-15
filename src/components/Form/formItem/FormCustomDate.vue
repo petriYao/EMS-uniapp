@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, reactive } from 'vue'
+import { ref, watch } from 'vue'
 import { formatTime } from '@/utils'
 
 const props = defineProps({
@@ -41,13 +41,13 @@ watch(
 )
 </script>
 <template>
-  <view class="relative">
-    <view @click="show = true" class="h-24px flex items-center justify-between text-[14px]">
+  <view class="relative w-100%">
+    <view @click="show = true" class="form-custom-date">
       <view>
         <text v-if="data">{{ data }}</text>
         <text v-else class="text-[#C0C4CC]">{{ placeholder }}</text>
       </view>
-      <view><u-icon name="arrow-right" size="14" /></view>
+      <view><u-icon name="arrow-right" size="14" color="#C0C4CC" /></view>
     </view>
     <u-datetime-picker
       :show="show"
@@ -58,3 +58,12 @@ watch(
     />
   </view>
 </template>
+<style lang="scss" scoped>
+.form-custom-date {
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+}
+</style>

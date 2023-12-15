@@ -82,12 +82,35 @@ const onJump = (title: string) => {
 }
 //扫二维码
 const scanQRclick = () => {
+  // #ifdef MP-WEIXIN
   uni.scanCode({
-    success(_res) {
-      // console.log('条码类型:', res)
+    success(res) {
+      router.push({
+        url: `/packageHome/parkingFee/FareInfo`
+      })
+      setTimeout(() => {
+        uni.showToast({
+          title: '扫码成功' + res.result,
+          icon: 'none'
+        })
+      }, 300)
+    },
+    fail(err) {
+      console.log(err)
+      uni.showToast({
+        title: '扫码失败',
+        icon: 'none'
+      })
     }
   })
+  // #endif
+  // #ifdef H5
+  router.push({
+    url: `/packageHome/parkingFee/FareInfo`
+  })
+  // #endif
 }
+
 onMounted(() => {
   getHeadCarouselImage()
 })

@@ -54,6 +54,38 @@ const selectClick = (type: string) => {
       break
   }
 }
+
+//扫二维码
+const scanCode = () => {
+  // #ifdef MP-WEIXIN
+  uni.scanCode({
+    success(res) {
+      router.push({
+        url: `/packageHome/parkingFee/FareInfo`
+      })
+      setTimeout(() => {
+        uni.showToast({
+          title: '扫码成功' + res.result,
+          icon: 'none'
+        })
+      }, 300)
+    },
+    fail(err) {
+      console.log(err)
+      uni.showToast({
+        title: '扫码失败',
+        icon: 'none'
+      })
+    }
+  })
+  // #endif
+  // #ifdef H5
+  router.push({
+    url: `/packageHome/parkingFee/FareInfo`
+  })
+  // #endif
+}
+
 onLoad(async () => {})
 </script>
 
@@ -118,6 +150,7 @@ onLoad(async () => {})
     <view class="fixed bottom-0 w-100% box-border px-80rpx bg-[#F6F7FB] pt-20rpx">
       <view
         class="mb-20rpx h-80rpx bg-[#1957E6] text-[#FFF] flex justify-center items-center rounded-10rpx"
+        @click="scanCode"
       >
         <u-icon name="scan" size="40rpx" color="#FFF" />
         <text class="ml-10rpx">扫码缴费</text>

@@ -90,6 +90,10 @@ const onSetting = (item: any) => {
     router.push({
       url: '/packageHome/personalData/index'
     })
+  } else if (item.title === '我的访客') {
+    router.push({
+      url: '/packageHome/visitorRegistration/myVisitor/index'
+    })
   }
 }
 </script>

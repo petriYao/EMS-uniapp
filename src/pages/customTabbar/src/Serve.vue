@@ -98,7 +98,7 @@ const dataObj = [
       },
       {
         icon: 'serve_shared_meeting',
-        title: '共享会议'
+        title: '会议预定'
       },
       {
         icon: 'serve_electronic_invoice',
@@ -178,7 +178,9 @@ const onJump = (title: string) => {
     case '房源咨询':
       src = '/packageChat/consult/index?title=房源咨询'
       break
-
+    case '会议预定':
+      src = '/packageHome/meetingBooking/index'
+      break
     default:
       uni.showToast({
         title: '待开发',

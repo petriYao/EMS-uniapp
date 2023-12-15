@@ -205,6 +205,20 @@
           }
         },
         {
+          "path": "visitorRegistration/myVisitor/index",
+          "style": {
+            "navigationBarTitleText": "我的访客",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "visitorRegistration/myVisitor/info",
+          "style": {
+            "navigationBarTitleText": "访客详情",
+            "navigationStyle": "custom"
+          }
+        },
+        {
           "path": "parkingFee/index",
           "style": {
             "navigationBarTitleText": "停车缴费",
