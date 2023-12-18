@@ -3,8 +3,12 @@ import { onShow } from '@dcloudio/uni-app'
 import { getImageURL, getSvgURL } from '@/utils'
 import { reactive } from 'vue'
 import router from '@/router'
+import { useAppStore } from '@/store'
+import { useEmitt } from '@/hooks/useEmitt'
 import { getLocal, visitorApplicatKey } from '@/hooks/useCache'
 
+const appStore = useAppStore()
+const { emitter } = useEmitt()
 // 轮播图
 const reactiveData = reactive({
   editData: {} as any
@@ -28,9 +32,16 @@ const pathClick = (type: string) => {
       })
       break
     case '二维码':
+      // router.push({
+      //   url: `/packageHome/visitorRegistration/QRcode/index`
+      // })
+
       router.push({
-        url: `/packageHome/visitorRegistration/QRcode/index`
+        url: `/pages/customTabbar/index`
       })
+      //去首页二维码
+      appStore.bottomTabbarTitle = '一码通'
+      emitter.emit('Qrcode:Change', 1)
       break
   }
 }

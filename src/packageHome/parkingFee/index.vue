@@ -52,6 +52,11 @@ const selectClick = (type: string) => {
         url: `/packageHome/parkingFee/PaymentRecords`
       })
       break
+    case '电子发票':
+      router.push({
+        url: `/packageHome/parkingFee/ElectronicInvoice`
+      })
+      break
   }
 }
 

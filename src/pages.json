@@ -197,6 +197,7 @@
             "navigationStyle": "custom"
           }
         },
+
         {
           "path": "visitorRegistration/QRcode/index",
           "style": {
@@ -236,6 +237,20 @@
           "path": "parkingFee/CarNumberManage",
           "style": {
             "navigationBarTitleText": "车牌管理",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "parkingFee/ElectronicInvoice",
+          "style": {
+            "navigationBarTitleText": "电子发票",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "parkingFee/InvoiceRecords",
+          "style": {
+            "navigationBarTitleText": "开票记录",
             "navigationStyle": "custom"
           }
         },
