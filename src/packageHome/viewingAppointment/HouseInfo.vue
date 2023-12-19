@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // import { getSvgURL } from '@/utils'
 import { reactive, ref } from 'vue'
-import { HouseInfo, HouseReservationUpdate } from '@/api'
+import { HouseInfo, HouseReservationUpdate, HouseReservationInfo } from '@/api'
 import { onLoad } from '@dcloudio/uni-app'
 import FormCustomDate from '@/components/Form/formItem/FormCustomDate.vue'
 
@@ -54,6 +54,14 @@ const getData = async () => {
   }
 }
 
+const getHouseReservationInfo = async () => {
+  const res = await HouseReservationInfo(reactiveData.houseReservationId)
+  console.log('res', res)
+  if (res && res.success) {
+    reactiveData.setData = res.value
+  }
+}
+
 const saveClick = async () => {
   const res = await HouseReservationUpdate(reactiveData.setData, reactiveData.houseReservationId)
   console.log('res', res)
@@ -64,13 +72,21 @@ const saveClick = async () => {
 }
 
 onLoad((val: any) => {
+  console.log('val', val)
   reactiveData.setData.houseId = val.houseId
+  reactiveData.houseReservationId = val.houseReservationId
+  if (val.houseReservationId) {
+    getHouseReservationInfo()
+  }
   getData()
 })
 </script>
 
 <template>
   <ContentWrap>
+    <view class="fixed z-99">
+      <XWAHeader />
+    </view>
     <view>
       <u-swiper
         :list="reactiveData.swiperImgList"
@@ -148,6 +164,10 @@ onLoad((val: any) => {
 </template>
 
 <style lang="scss" scoped>
+:deep(.u-navbar__content) {
+  background-color: transparent !important;
+  color: #fff !important;
+}
 ::v-deep .form-custom-date {
   justify-content: flex-end;
 }

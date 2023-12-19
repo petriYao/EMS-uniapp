@@ -3,7 +3,7 @@ import { reactive, ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 
 import { useAppStore } from '@/store'
-import { MeetingReservationList } from '@/api'
+import { MeetingReservationList, MeetingReservationDelete } from '@/api'
 import router from '@/router'
 
 const appStore = useAppStore()
@@ -90,6 +90,28 @@ const onRefresherrefresh = () => {
   })
 }
 
+const delClick = (item: any) => {
+  // 提示你确定要删除吗
+  uni.showModal({
+    title: '提示',
+    content: `确定要删除${item.meetingReservationTitle}吗`,
+    success: async function (res) {
+      if (res.confirm) {
+        // 删除
+        const res = await MeetingReservationDelete(item.meetingReservationId)
+        if (res && res.success) {
+          // 提示删除成功
+          uni.showToast({
+            title: '删除成功',
+            icon: 'none'
+          })
+          getData()
+        }
+      }
+    }
+  })
+}
+
 onShow(() => {
   getData()
 })
@@ -123,6 +145,7 @@ onShow(() => {
           :key="index"
           class="mb-20rpx flex justify-between bg-[#FFF] px-20rpx py-30rpx"
           @click="infoClick(item.meetingReservationId)"
+          @longpress="delClick(item)"
         >
           <view>
             <view class="text-[30rpx] pb-20rpx font-700">{{

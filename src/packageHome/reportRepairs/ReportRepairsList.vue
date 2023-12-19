@@ -5,7 +5,7 @@ import { onShow } from '@dcloudio/uni-app'
 import { useAppStore } from '@/store'
 import router from '@/router'
 import { ReportRepairsListType } from '@/types/reportRepairsModel'
-import { ReportRepairsListApi } from '@/api'
+import { ReportRepairsListApi, ReportRepairsDelete } from '@/api'
 
 import BottomButton from '@/components/BottomButton/index.vue'
 
@@ -61,6 +61,26 @@ const onInfo = (id: number, status: number) => {
   })
 }
 
+const delClick = (item: any) => {
+  console.log('item', item)
+  // 提示你确定要删除吗
+  uni.showModal({
+    title: '提示',
+    content: `确定要删除${item.reportRepairsTypeTitle}吗?`,
+    success: async function (res) {
+      if (res.confirm) {
+        const res = await ReportRepairsDelete(item.reportRepairsId)
+        if (res && res.success) {
+          uni.showToast({
+            title: '删除成功',
+            icon: 'none'
+          })
+          getListData(true)
+        }
+      }
+    }
+  })
+}
 /**标签修改 */
 const onChangeTabs = (tabItem: any) => {
   reactiveData.tabsActive = tabItem.value
@@ -154,6 +174,7 @@ onShow(() => {
           <view
             class="bg-#fff my-20rpx p-20rpx"
             @click="onInfo(item.reportRepairsId, item.reportRepairsStatus)"
+            @longpress="delClick(item)"
           >
             <view class="flex flex-row items-center justify-between pb-20rpx line">
               <view class="flex flex-row items-center">

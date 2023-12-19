@@ -170,6 +170,13 @@
           }
         },
         {
+          "path": "partyBuilding/index",
+          "style": {
+            "navigationBarTitleText": "智慧党建",
+            "navigationStyle": "custom"
+          }
+        },
+        {
           "path": "visitorRegistration/index",
           "style": {
             "navigationBarTitleText": "访客登记",

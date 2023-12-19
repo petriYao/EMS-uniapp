@@ -34,3 +34,15 @@ export const HouseReservationUpdate = (data: any, houseReservationId: string) =>
     return post<any>('house-reservation/add', { ...data })
   }
 }
+
+/**看房预约详情 */
+export const HouseReservationInfo = (houseReservationId: string) => {
+  return post<any>('house-reservation/info', { houseReservationId })
+}
+
+/**看房预约删除 */
+export const HouseReservationDelete = (houseReservationId: string) => {
+  return post<any>('house-reservation/delete', { houseReservationId })
+}
+
+/**智慧党建 */

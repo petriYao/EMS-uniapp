@@ -21,6 +21,11 @@ export const ReportRepairsListApi = (reportRepairsStatus: number, page?: number,
   )
 }
 
+/**报事报修删除 */
+export const ReportRepairsDelete = (reportRepairsId: number) => {
+  return post<ReportRepairsInfoType>('report-repairs/delete', { reportRepairsId })
+}
+
 /**报事报修详情 */
 export const ReportRepairsInfoApi = (reportRepairsId: number) => {
   return post<ReportRepairsInfoType>('report-repairs/info', { reportRepairsId })

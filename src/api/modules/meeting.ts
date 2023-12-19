@@ -39,3 +39,8 @@ export const MeetingReservationList = (data: any) => {
 export const MeetingReservationInfo = (meetingReservationId: any) => {
   return post<any>('meeting-reservation/info', { meetingReservationId })
 }
+
+/**会议预定详情 */
+export const MeetingReservationDelete = (meetingReservationId: any) => {
+  return post<any>('meeting-reservation/delete', { meetingReservationId })
+}

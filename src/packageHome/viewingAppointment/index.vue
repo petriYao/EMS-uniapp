@@ -3,7 +3,7 @@
 import { reactive, ref, onBeforeMount } from 'vue'
 import { useAppStore } from '@/store'
 import router from '@/router'
-import { HouseList } from '@/api'
+import { HouseList, HouseReservationDelete } from '@/api'
 
 const appStore = useAppStore()
 
@@ -91,9 +91,36 @@ const onScrolltolower = async () => {
   }
 }
 
+//长按删除
+const delClick = (item: any) => {
+  console.log('item', item)
+
+  //提示确认要删除吗
+  uni.showModal({
+    title: '提示',
+    content: `确认要删除${item.houseName}的预约吗?`,
+    success: async function (res) {
+      if (res.confirm) {
+        console.log('用户点击确定')
+        const res = await HouseReservationDelete(item.houseReservationId)
+        if (res && res.success) {
+          //提示删除成功
+          uni.showToast({
+            title: '删除成功',
+            icon: 'none'
+          })
+          getData()
+        }
+      }
+    }
+  })
+}
+
 const payTheBillClick = (item: any) => {
   router.push({
-    url: `/packageHome/viewingAppointment/HouseInfo?houseId=${item.houseId}`
+    url: `/packageHome/viewingAppointment/HouseInfo?houseId=${item.houseId}&houseReservationId=${
+      item.houseReservationId || ''
+    }`
   })
 }
 onBeforeMount(() => {
@@ -156,6 +183,8 @@ onBeforeMount(() => {
           :key="index"
           class="p-20rpx bg-[#FFF] mt-20rpx"
           style="border-bottom: 1px solid #f5f5f6"
+          @longpress="delClick(item)"
+          @click="item.houseReservationStatus === 1 ? payTheBillClick(item) : ''"
         >
           <view
             class="flex justify-between pb-20rpx text-28rpx"

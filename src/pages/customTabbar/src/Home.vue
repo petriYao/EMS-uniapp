@@ -28,7 +28,8 @@ const onJump = (title: string) => {
       src = '/packageHome/introduction/index'
       break
     case '招商政策':
-      src = '/packageHome/investmentPolicies/investmentPoliciesList'
+      src =
+        '/packageHome/investmentPolicies/investmentPoliciesList?title=招商政策&name=investmentPolicies'
       break
     case '园区E闻':
       src = '/packageHome/parkENews/parkENewsList'
