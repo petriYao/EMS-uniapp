@@ -184,6 +184,9 @@ const onJump = (title: string) => {
     case '电子发票':
       src = `/packageHome/parkingFee/ElectronicInvoice`
       break
+    case '看房预约':
+      src = `/packageHome/viewingAppointment/index`
+      break
     default:
       uni.showToast({
         title: '待开发',

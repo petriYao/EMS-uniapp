@@ -254,6 +254,7 @@
             "navigationStyle": "custom"
           }
         },
+
         {
           "path": "parkingFee/PaymentRecords",
           "style": {
@@ -272,6 +273,20 @@
           "path": "reportRepairs/ReportRepairsAdd",
           "style": {
             "navigationBarTitleText": "新增/编辑报事报修",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "viewingAppointment/index",
+          "style": {
+            "navigationBarTitleText": "看房预约",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "viewingAppointment/HouseInfo",
+          "style": {
+            "navigationBarTitleText": "预约详情",
             "navigationStyle": "custom"
           }
         }
