@@ -168,6 +168,10 @@ onLoad((val: any) => {
   background-color: transparent !important;
   color: #fff !important;
 }
+:deep(.u-status-bar) {
+  background-color: transparent !important;
+}
+
 ::v-deep .form-custom-date {
   justify-content: flex-end;
 }

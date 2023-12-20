@@ -31,6 +31,24 @@ const reactiveData = reactive({
   ]
 })
 
+const delClick = (item: any, index: number) => {
+  // 提示你确定要删除吗
+  uni.showModal({
+    title: '提示',
+    content: `确定要删除${item.infoData.carNumber}这条记录吗`,
+    success: async function (res) {
+      if (res.confirm) {
+        reactiveData.list.splice(index, 1)
+        // 提示删除成功
+        uni.showToast({
+          title: '删除成功',
+          icon: 'none'
+        })
+      }
+    }
+  })
+}
+
 onLoad(async () => {})
 </script>
 
@@ -45,6 +63,7 @@ onLoad(async () => {})
         v-for="(item, index) of reactiveData.list"
         :key="index"
         class="bg-[#FFF] rounded-10rpx px-20rpx py-30rpx box mb-20rpx"
+        @longpress="delClick(item, index)"
       >
         <view class="font-bold text-[34rpx]">{{ item.infoData.carNumber }}</view>
         <view

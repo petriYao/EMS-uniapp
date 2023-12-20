@@ -93,6 +93,24 @@ const editClick = (item?: any) => {
   })
 }
 
+const delClick = (item: any, index: number) => {
+  // 提示你确定要删除吗
+  uni.showModal({
+    title: '提示',
+    content: `确定要删除${item.name}这条记录吗`,
+    success: async function (res) {
+      if (res.confirm) {
+        reactiveData.editData.splice(index, 1)
+        // 提示删除成功
+        uni.showToast({
+          title: '删除成功',
+          icon: 'none'
+        })
+      }
+    }
+  })
+}
+
 onBeforeMount(() => {
   onFormData()
 })
@@ -120,7 +138,12 @@ onBeforeMount(() => {
       scroll-y
       :style="`height: calc(100vh - 88px - ${marginHeight} - 140rpx);`"
     >
-      <view v-for="(item, index) in reactiveData.editData" :key="index" @click="editClick(item)">
+      <view
+        v-for="(item, index) in reactiveData.editData"
+        :key="index"
+        @click="editClick(item)"
+        @longpress="delClick(item, index)"
+      >
         <view
           class="bg-[#FFF] mx-20rpx mt-20rpx rounded-10rpx px-20rpx"
           v-if="Number(item.type) === reactiveData.tabActive || reactiveData.tabActive === 0"
