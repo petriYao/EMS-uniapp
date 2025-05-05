@@ -8,4 +8,19 @@ const debounceSave = (f: (...args: any) => any) => {
   return debounce(f, 300)
 }
 
-export { debounce, debounceDef, debounceSave, throttle, cloneDeep, isEmpty, set, isEqual, isString }
+const throttleSave = (f: (...args: any) => any, p0?: number) => {
+  return throttle(f, 500)
+}
+
+export {
+  debounce,
+  debounceDef,
+  debounceSave,
+  throttleSave,
+  throttle,
+  cloneDeep,
+  isEmpty,
+  set,
+  isEqual,
+  isString
+}

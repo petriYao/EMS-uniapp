@@ -1,0 +1,18 @@
+{
+	"acctID": "6726d8cc633a5a",
+	// "acctID": "67242c1a0a2c06",
+	"SCGDFromID": "keea23626f14c43d3ba833b4a351f138a",
+	"XT_SCHBDFromID": "7b6d6a04-4bdf-470c-a48d-b31052f9b2a1",
+	"XT_GXJJDFromID": "48524dbb-4df2-4b40-828b-bf67dc425a84",
+	"TM_SJDFromID":"k6b783a3edd54430688add6bcd9cd0565",
+	"GXFromID": "ALMA_GX",
+	"ZBFromID": "BD_Department",
+	"GXJJDFromID": "ALMA_GXJJD",
+	"SCHBDFromID": "k4acda49896104c5a9d4ae575ae09cf2d",
+	"MATERIAL":"BD_MATERIAL",
+	"ALMAJCGYLX":"ALMA_JC_GYLX",
+	"Empinfo":"BD_Empinfo",
+	"PDAVERSION":"QADV_PDAVERSION",
+	"PDAUser":"QADV_PDAUser",
+	"PDARole":"QADV_PDARole"
+}

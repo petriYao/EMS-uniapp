@@ -1,152 +1,270 @@
-import { getUserIdentity } from '@/hooks/useCache'
-import { useAxios } from '@/hooks/useAxios'
-import { UserIdentityType, UserInfoApiType, UserInfoType } from '@/types/userModel'
-// import { AppSetInfoType } from '@/types/commonModel'
+import FromData from '@/common/FromIDs.json'
+import { AttachmentUpLoadType } from '@/types/commonModel'
+import {
+  executeBillQueryApi,
+  saveApi,
+  subitApi,
+  auditApi,
+  unAuditApi,
+  attachmentDownLoadApi,
+  attachmentUpLoadApi,
+  viewApi,
+  attachmentDeleteApi
+} from '@/api/commonHttp'
 
-const { post } = useAxios()
-/**
- * 注册
- */
-export const registerApi = (userPhoneNumber: string, phoneCode: string, userPassword: string) => {
-  return post<UserIdentityType>('register', {
-    userPhoneNumber,
-    phoneCode,
-    userPassword
-  })
+//获取FId
+export function getAuxiliary(fidValue: string, FParentId?: string) {
+  const Filter = FParentId ? `FParentId = '${FParentId}' AND FId = '${fidValue}'` : `FId = '${fidValue}'`
+  const data = {
+    parameters: [
+      {
+        FormId: `${FromData.Auxiliary}`,
+        FieldKeys: 'FNumber,FDataValue,FMASTERID',
+        FilterString: Filter + ` AND FDocumentStatus = 'C' AND FForbidStatus = 'A'`,
+        OrderString: '',
+        TopRowCount: 0,
+        StartRow: 0,
+        Limit: 2000,
+        SubSystemId: ''
+      }
+    ]
+  }
+  return executeBillQueryApi(data)
 }
 
-/**
- * 登录
- */
-export const loginApi = (userPhoneNumber: string, userPassword: string): any => {
-  return post<UserIdentityType>('login', {
-    userPhoneNumber,
-    userPassword
-  })
-}
-/**
- * 微信登录
- */
-export function wxLogin(loginCode: string): any {
-  return post<any>('wx-login', {
-    loginCode
-  })
-}
-
-/**
- * 微信绑定账号
- */
-export function wxBindAccount(phoneCode: string): any {
-  return post<any>('wx-bind-account', {
-    phoneCode
-  })
-}
-
-/**
- * 获取验证码
- * @param phone 手机号
- */
-export const sendSmsCodeApi = (userPhoneNumber: string, operateType: number) => {
-  return post<any>('send-sms-code', {
-    userPhoneNumber,
-    operateType
-  })
+//通用保存
+export function SaveClient(formid: string, Model: any) {
+  console.log('通用保存', Model)
+  const data = {
+    formid: formid,
+    data: {
+      NeedUpDateFields: [],
+      NeedReturnFields: [],
+      IsDeleteEntry: 'true',
+      SubSystemId: '',
+      IsVerifyBaseDataField: 'false',
+      IsEntryBatchFill: false,
+      ValidateFlag: 'true',
+      NumberSearch: 'true',
+      IsAutoAdjustField: 'false',
+      InterationFlags: '',
+      IgnoreInterationFlag: '',
+      IsControlPrecision: 'false',
+      ValidateRepeatJson: 'false',
+      Model: Model
+    }
+  }
+  console.log('保存', data)
+  return saveApi(data)
 }
 
-/**
- * 验证验证码
- */
-export const checkSmsCodeApi = (
-  userPhoneNumber: string,
-  operateType: number,
-  phoneCode: string
-) => {
-  return post<any>('check-sms-code', {
-    userPhoneNumber,
-    operateType,
-    phoneCode
-  })
+//通用提交
+export function SubmitClient(formid: string, Numbers: any) {
+  const data = {
+    formid: formid,
+    data: {
+      CreateOrgId: 0,
+      Numbers: Numbers,
+      Ids: '',
+      SelectedPostId: 0,
+      NetworkCtrl: '',
+      IgnoreInterationFlag: ''
+    }
+  }
+
+  return subitApi(data)
+}
+//通用审核
+export function AuditApiClient(formid: string, Numbers: any) {
+  const data = {
+    FormId: formid,
+    data: {
+      CreateOrgId: 0,
+      Numbers: Numbers,
+      InterationFlags: '',
+      NetworkCtrl: '',
+      IsVerifyProcInst: '',
+      IgnoreInterationFlag: '',
+      UseBatControlTimes: 'false'
+    }
+  }
+
+  return auditApi(data)
 }
 
-/**
- * 找回密码
- */
-export const findPasswordApi = (
-  userPhoneNumber: string,
-  phoneCode: string,
-  userPassword: string
-) => {
-  return post<any>('user/find-password', {
-    userPhoneNumber,
-    phoneCode,
-    userPassword
-  })
+//反审核unAuditApi
+export function UnAuditApiClient(formid: string, Numbers: any) {
+  const data = {
+    FormId: formid,
+    data: {
+      CreateOrgId: 0,
+      Numbers: Numbers,
+      InterationFlags: '',
+      NetworkCtrl: '',
+      IsVerifyProcInst: '',
+      IgnoreInterationFlag: '',
+      UseBatControlTimes: 'false'
+    }
+  }
+
+  return unAuditApi(data)
 }
 
-/**
- * 当前登录用户信息
- */
-export const getUserInfoApi = () => {
-  const val = getUserIdentity()
-  return post<UserInfoApiType>('user/info', {
-    params: val
-  })
+//用户列表
+export function getUserList(FieldKeys: string, FilterString: any) {
+  const data = {
+    parameters: [
+      {
+        FormId: `${FromData.User}`,
+        FieldKeys,
+        FilterString,
+        OrderString: '',
+        TopRowCount: 0,
+        StartRow: 0,
+        Limit: 2000,
+        SubSystemId: ''
+      }
+    ]
+  }
+  return executeBillQueryApi(data)
 }
 
-/**
- * 修改用户信息
- */
-export const updateUserApi = (data: UserInfoType) => {
-  return post<any>('user/update', data)
+//员工列表
+export function getStaffList(FieldKeys: string, FilterString: any) {
+  const data = {
+    parameters: [
+      {
+        FormId: `${FromData.Empinfo}`,
+        FieldKeys,
+        FilterString,
+        OrderString: '',
+        TopRowCount: 0,
+        StartRow: 0,
+        Limit: 2000,
+        SubSystemId: ''
+      }
+    ]
+  }
+  return executeBillQueryApi(data)
 }
 
-/**
- * 退出登录
- */
-export const logoutApi = (): any => {
-  return post<any>('logout', {})
+//查看部门
+export function lookDepartment(Id: string) {
+  const data = {
+    FormId: `${FromData.Department}`,
+    data: {
+      CreateOrgId: 0,
+      Number: '',
+      Id,
+      IsSortBySeq: 'false'
+    }
+  }
+  return viewApi(data)
 }
 
-/**
- * 微信登录
- */
-export const wxLoginApi = (loginCode: string): any => {
-  return post<any>('wx-login', {
-    loginCode
-  })
+//上传附件
+export function setFileList(filedata: AttachmentUpLoadType) {
+  console.log('上传附件', filedata)
+  const data = {
+    data: filedata
+  }
+  return attachmentUpLoadApi(data)
 }
 
-/**
- * 微信绑定账号
- */
-export const wxBindAccountApi = (phoneCode: string): any => {
-  return post<any>('wx-bind-account', {
-    phoneCode
-  })
+//删除附件
+export function deleteFileList(FileId: string) {
+  const data = {
+    "parameters": [
+      FileId
+    ]
+  }
+  return attachmentDeleteApi(data)
 }
 
-/**
- * 账号绑定微信
- */
-export const accountBindWxApi = (bindCode: string): any => {
-  return post<any>('account-bind-wx', {
-    bindCode
-  })
+//汇率
+export function getexchange(filterstring = "FCyForID = 7 AND FCyToID = 1") {
+  const data = {
+    parameters: [
+      {
+        FormId: `${FromData.ExchangeRate}`,
+        FieldKeys: 'FExchangeRate,FReverseExRate',
+        FilterString: filterstring,
+        OrderString: '',
+        TopRowCount: 0,
+        StartRow: 0,
+        Limit: 2000,
+        SubSystemId: ''
+      }
+    ]
+  }
+  return executeBillQueryApi(data)
 }
 
-/**
- * 修改密码
- */
-export const updatePasswordApi = (oldUserPassword: string, userPassword: string) => {
-  return post<any>('user/update-password', {
-    oldUserPassword,
-    userPassword
-  })
+//产品等级
+export function getProductGrade(FilterString: any) {
+  const data = {
+    parameters: [
+      {
+        FormId: `${FromData.NXJGCLB}`,
+        FieldKeys: 'F_QADV_CPDJ,F_QADV_JJBX',
+        FilterString: FilterString,
+        OrderString: '',
+        TopRowCount: 0,
+        StartRow: 0,
+        Limit: 2000,
+        SubSystemId: ''
+      }
+    ]
+  }
+  return executeBillQueryApi(data)
 }
 
-/**
- * 获取地址列表
- */
-export const getAreaDataApi = () => {
-  return post<any>('area-data')
+//下载附件
+export function getFileList(FileId: string) {
+  const data = {
+    data: {
+      FileId,
+      StartIndex: 0
+    }
+  }
+  return attachmentDownLoadApi(data)
+}
+
+//查看附件管理
+export function getAttachmentList(FieldKeys: string, FilterString: any) {
+  const data = {
+    parameters: [
+      {
+        FormId: `${FromData.Attachment}`,
+        FieldKeys,
+        FilterString,
+        OrderString: '',
+        TopRowCount: 0,
+        StartRow: 0,
+        Limit: 2000,
+        SubSystemId: ''
+      }
+    ]
+  }
+  return executeBillQueryApi(data)
+}
+
+//辅助资料 `FID in (${Filter})` 'FNumber,FDataValue,FMASTERID' 
+export function getAuxiliaryMaterials(FieldKeys:string,Filter?: string) {
+  console.log('辅助资料',Filter)
+  const data = {
+    parameters: [
+      {
+        FormId: `BOS_ASSISTANTDATA_DETAIL`,
+        FieldKeys:FieldKeys,
+        FilterString:  Filter,
+        OrderString: '',
+        TopRowCount: 0,
+        StartRow: 0,
+        Limit: 2000,
+        SubSystemId: ''
+      }
+    ]
+  }
+  return executeBillQueryApi(data)
 }

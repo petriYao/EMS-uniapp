@@ -20,6 +20,7 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src'),
       '@components': path.resolve(__dirname, './src/components'),
+      'uview-plus': path.resolve(__dirname, './node_modules/uview-plus')
     }
   },
   css: {

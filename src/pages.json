@@ -3,7 +3,6 @@
     "autoscan": true,
     "custom": {
       "^u-(.*)": "uview-plus/components/u-$1/u-$1.vue",
-      "ContentWrap": "@/components/ContentWrap/index.vue",
       "XWAHeader": "@/components/Header/index.vue"
     }
   },
@@ -18,295 +17,105 @@
   },
   "pages": [
     {
-      "path": "pages/customTabbar/index",
+      "path": "pages/login/login",
       "style": {
-        "navigationBarTitleText": "",
+        "navigationBarTitleText": "登录",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationBarTitleText": "首页"
+      }
+    },
+    {
+      "path": "pages/my/my",
+      "style": {
+        "navigationBarTitleText": "我的",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/product/product",
+      "style": {
+        "navigationBarTitleText": "产品",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/productionorder/productionorder",
+      "style": {
+        "navigationBarTitleText": "生产工单",
+        "enablePullDownRefresh": false,
+        "navigationStyle": "custom",
+        "navigationBarTextStyle": "black"
+      }
+    },
+    {
+      "path": "pages/productionreporting/productionreporting",
+      "style": {
+        "navigationBarTitleText": "生产报工",
+        "enablePullDownRefresh": false,
+        "navigationStyle": "custom",
+        "navigationBarTextStyle": "black"
+      }
+    },
+    {
+      "path": "pages/processlist/processlist",
+      "style": {
+        "navigationBarTitleText": "工序列表",
+        "enablePullDownRefresh": false,
+        "navigationStyle": "custom",
+        "navigationBarTextStyle": "white"
+      }
+    },
+    {
+      "path": "pages/saleOrder/OutboundOrder",
+      "style": {
+        "navigationBarTitleText": "出库单详情"
+      }
+    },
+    {
+      "path": "pages/storage/storage",
+      "style": {
+        "navigationBarTitleText": "入库",
         "navigationStyle": "custom"
       }
     }
+    
   ],
-  "subpackages": [
-    {
-      "root": "packageChat",
-      "name": "packageChat",
-      "pages": [
-        {
-          "path": "consult/index",
-          "style": {
-            "navigationBarTitleText": "咨询建议",
-            "navigationStyle": "custom"
-          }
-        }
-      ]
-    },
-    {
-      "root": "packageHome",
-      "name": "packageHome",
-      "pages": [
-        {
-          "path": "personalData/index",
-          "style": {
-            "navigationBarTitleText": "个人资料",
-            "navigationStyle": "custom"
-          }
-        },
-        {
-          "path": "introduction/index",
-          "style": {
-            "navigationBarTitleText": "园区简介",
-            "navigationStyle": "custom"
-          }
-        },
-        {
-          "path": "listInfo/index",
-          "style": {
-            "navigationBarTitleText": "",
-            "navigationStyle": "custom"
-          }
-        },
-        {
-          "path": "listInfo/JumpUrl",
-          "style": {
-            "navigationBarTitleText": "",
-            "navigationStyle": "custom"
-          }
-        },
-        {
-          "path": "exhibition/index",
-          "style": {
-            "navigationBarTitleText": "园区导览",
-            "navigationStyle": "custom"
-          }
-        },
-        {
-          "path": "enterprisesDemeanour/index",
-          "style": {
-            "navigationBarTitleText": "企业风采",
-            "navigationStyle": "custom"
-          }
-        },
-        {
-          "path": "parkENews/parkENewsList",
-          "style": {
-            "navigationBarTitleText": "园区E闻",
-            "navigationStyle": "custom"
-          }
-        },
-        {
-          "path": "parkECircle/parkECircleList",
-          "style": {
-            "navigationBarTitleText": "社群活动",
-            "navigationStyle": "custom"
-          }
-        },
-        {
-          "path": "investmentPolicies/investmentPoliciesList",
-          "style": {
-            "navigationBarTitleText": "招商政策",
-            "navigationStyle": "custom"
-          }
-        },
-        {
-          "path": "login/login",
-          "style": {
-            "navigationBarTitleText": "",
-            "navigationStyle": "custom"
-          }
-        },
-        {
-          "path": "login/register",
-          "style": {
-            "navigationBarTitleText": "",
-            "navigationStyle": "custom"
-          }
-        },
-        {
-          "path": "login/forgotPassword",
-          "style": {
-            "navigationBarTitleText": "",
-            "navigationStyle": "custom"
-          }
-        },
-        {
-          "path": "login/resetPassword",
-          "style": {
-            "navigationBarTitleText": "",
-            "navigationStyle": "custom"
-          }
-        },
-        {
-          "path": "meeting/Reservation",
-          "style": {
-            "navigationBarTitleText": "预定会议室",
-            "navigationStyle": "custom"
-          }
-        },
-        {
-          "path": "meeting/MeetingInfo",
-          "style": {
-            "navigationBarTitleText": "预定会议",
-            "navigationStyle": "custom"
-          }
-        },
-        {
-          "path": "meeting/MyMeeting",
-          "style": {
-            "navigationBarTitleText": "我的会议",
-            "navigationStyle": "custom"
-          }
-        },
-        {
-          "path": "meetingBooking/index",
-          "style": {
-            "navigationBarTitleText": "会议室预定",
-            "navigationStyle": "custom"
-          }
-        },
-        {
-          "path": "intelligentLife/index",
-          "style": {
-            "navigationBarTitleText": "智慧生活",
-            "navigationStyle": "custom"
-          }
-        },
-        {
-          "path": "partyBuilding/index",
-          "style": {
-            "navigationBarTitleText": "智慧党建",
-            "navigationStyle": "custom"
-          }
-        },
-        {
-          "path": "visitorRegistration/index",
-          "style": {
-            "navigationBarTitleText": "访客登记",
-            "navigationStyle": "custom"
-          }
-        },
-        {
-          "path": "visitorRegistration/addVisitor/index",
-          "style": {
-            "navigationBarTitleText": "添加申请人信息",
-            "navigationStyle": "custom"
-          }
-        },
-        {
-          "path": "visitorRegistration/visitorRequest/index",
-          "style": {
-            "navigationBarTitleText": "访客申请",
-            "navigationStyle": "custom"
-          }
-        },
-        {
-          "path": "visitorRegistration/requestRecord/index",
-          "style": {
-            "navigationBarTitleText": "申请记录",
-            "navigationStyle": "custom"
-          }
-        },
-
-        {
-          "path": "visitorRegistration/QRcode/index",
-          "style": {
-            "navigationBarTitleText": "访客预约二维码",
-            "navigationStyle": "custom"
-          }
-        },
-        {
-          "path": "visitorRegistration/myVisitor/index",
-          "style": {
-            "navigationBarTitleText": "我的访客",
-            "navigationStyle": "custom"
-          }
-        },
-        {
-          "path": "visitorRegistration/myVisitor/info",
-          "style": {
-            "navigationBarTitleText": "访客详情",
-            "navigationStyle": "custom"
-          }
-        },
-        {
-          "path": "parkingFee/index",
-          "style": {
-            "navigationBarTitleText": "停车缴费",
-            "navigationStyle": "custom"
-          }
-        },
-        {
-          "path": "parkingFee/FareInfo",
-          "style": {
-            "navigationBarTitleText": "车费详情",
-            "navigationStyle": "custom"
-          }
-        },
-        {
-          "path": "parkingFee/CarNumberManage",
-          "style": {
-            "navigationBarTitleText": "车牌管理",
-            "navigationStyle": "custom"
-          }
-        },
-        {
-          "path": "parkingFee/ElectronicInvoice",
-          "style": {
-            "navigationBarTitleText": "电子发票",
-            "navigationStyle": "custom"
-          }
-        },
-        {
-          "path": "parkingFee/InvoiceRecords",
-          "style": {
-            "navigationBarTitleText": "开票记录",
-            "navigationStyle": "custom"
-          }
-        },
-
-        {
-          "path": "parkingFee/PaymentRecords",
-          "style": {
-            "navigationBarTitleText": "停车缴费记录",
-            "navigationStyle": "custom"
-          }
-        },
-        {
-          "path": "reportRepairs/ReportRepairsList",
-          "style": {
-            "navigationBarTitleText": "报事报修",
-            "navigationStyle": "custom"
-          }
-        },
-        {
-          "path": "reportRepairs/ReportRepairsAdd",
-          "style": {
-            "navigationBarTitleText": "新增/编辑报事报修",
-            "navigationStyle": "custom"
-          }
-        },
-        {
-          "path": "viewingAppointment/index",
-          "style": {
-            "navigationBarTitleText": "看房预约",
-            "navigationStyle": "custom"
-          }
-        },
-        {
-          "path": "viewingAppointment/HouseInfo",
-          "style": {
-            "navigationBarTitleText": "预约详情",
-            "navigationStyle": "custom"
-          }
-        }
-      ]
-    }
-  ],
-  "preloadRule": {},
-  "globalStyle": {
-    "navigationBarTitleText": "uni-app",
-    "backgroundColor": "#f4f5f7",
-    "navigationBarTextStyle": "black",
-    "navigationBarBackgroundColor": "#FFF",
-    "usingComponents": {}
+  "tabBar": {
+    "color": "#606266",
+    "selectedColor": "#f7403f",
+    "borderStyle": "black",
+    "backgroundColor": "#ffffff",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "iconPath": "static/index/home.png",
+        "selectedIconPath": "static/index/homefill.png",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/product/product",
+        "iconPath": "static/index/home.png",
+        "selectedIconPath": "static/index/myfill.png",
+        "text": "产品"
+      },
+      {
+        "pagePath": "pages/my/my",
+        "iconPath": "static/index/my.png",
+        "selectedIconPath": "static/index/myfill.png",
+        "text": "我的"
+      }
+    ]
   },
-  "usingComponts": true
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "uni-app",
+    "navigationBarBackgroundColor": "#F8F8F8",
+    "backgroundColor": "#F8F8F8"
+  },
+  "uniIdRouter": {}
 }
