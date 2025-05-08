@@ -53,7 +53,7 @@ const groupChange = () => {
   //将选择储存到本地缓存
   uni.setStorageSync('scanCodeType', reacticeData.scanCodeType)
   emit('update:scanCodeType', reacticeData.scanCodeType)
-  // reacticeData.rightTitleShow = !reacticeData.rightTitleShow
+  reacticeData.rightTitleShow = !reacticeData.rightTitleShow
 }
 
 onBeforeMount(() => {

@@ -106,7 +106,7 @@ export function queryStorage() {
       {
         FormId: `BD_STOCK`,
         FieldKeys: 'FName,FNumber',
-        FilterString: [],
+        FilterString: "FDocumentStatus = 'C' AND FForbidStatus = 'A' ",
         OrderString: 'FNumber',
         TopRowCount: 0,
         StartRow: 0,
@@ -143,6 +143,24 @@ export function getProductionOrder(Number: any) {
     }
   }
   return viewApi(data) as any
+}
+//即时库存单据查询接口
+export function lowerCamelCase(FilterString: string) {
+  const data = {
+    parameters: [
+      {
+        FormId: `STK_Inventory`,
+        FieldKeys: 'FStockLocId.FF100001.FNumber',
+        FilterString: FilterString,
+        OrderString: '',
+        TopRowCount: 0,
+        StartRow: 0,
+        Limit: 2000,
+        SubSystemId: ''
+      }
+    ]
+  }
+  return executeBillQueryApi(data)
 }
 
 //生产入库单保存

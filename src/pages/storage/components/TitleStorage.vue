@@ -2,7 +2,7 @@
 import { reactive, watch, onBeforeMount, ref, onBeforeUnmount } from 'vue'
 import { debounceSave } from '@/utils'
 import { productionGetData, getInboundOrder } from '@/common/storage/production'
-import { productionOrder } from '@/api/modules/storage'
+import { productionOrder, lowerCamelCase } from '@/api/modules/storage'
 import { queryStorage, lookqueryStorage, barcodeStatus } from '@/api/modules/storage'
 const props = defineProps({
   title: {
@@ -13,15 +13,7 @@ const props = defineProps({
     type: String,
     default: ''
   },
-  stoFocusIndex: {
-    type: Number,
-    default: 0
-  },
   stoCurrentWarehouse: {
-    type: Object,
-    default: () => ({})
-  },
-  stoCurrentWarehousePosition: {
     type: Object,
     default: () => ({})
   }
@@ -34,8 +26,11 @@ const focusIndex = ref(0) // 当前焦点索引
 
 //仓库选择器
 const pickerShow = ref(false)
-//仓位选择器
+//表头仓位选择器
 const pickerShow2 = ref(false)
+//表体仓位选择器显示
+const pickerShow3 = ref(false)
+
 //当前仓库
 const currentWarehouse = reactive({
   name: '',
@@ -67,7 +62,7 @@ const warehousePositionList = ref([] as any)
 
 const reactiveData = reactive({
   // searchValue: 'AC2004N04TEX+MO000004+1',
-  searchValue: '',
+  searchValue: 'SCRK00000115',
   fid: 0,
   titleList: [
     {
@@ -111,6 +106,8 @@ const searchChange = async () => {
     if (reactiveData.searchValue === '') {
       return
     }
+    focusIndex.value = 22
+
     /*在单码双扫的情况下第一次扫描单号*********************************/
     if (props.scanCodeType === '单码双扫') {
       if (reactiveData.titleList[0].value === '') {
@@ -134,17 +131,18 @@ const searchChange = async () => {
             },
             false
           )
-          setTimeout(() => {
-            focusIndex.value = 0
-          }, 500)
         }
         reactiveData.searchValue = ''
-        changeFocus()
+        reactiveData.curNow = 0
+        console.log('报错')
+        setTimeout(() => {
+          focusIndex.value = 0
+        }, 1000)
         return
       }
     }
     let exitMethod = false
-    /*判断之前是否扫过************************************************/
+    /*判断条码是否重复扫面************************************************/
     reactiveData.detailsList.forEach((element: any) => {
       const index = element.barCodeList.findIndex((item: any) => {
         return item.F_BARCODENO === reactiveData.searchValue
@@ -152,12 +150,11 @@ const searchChange = async () => {
       console.log('判断之前是否扫过', index)
       if (index !== -1) {
         exitMethod = true
-        focusIndex.value = 20
         setTimeout(() => {
           focusIndex.value = 0
         }, 500)
         uni.showToast({
-          title: '条码已扫过',
+          title: '重复扫描',
           icon: 'none'
         })
         return
@@ -168,14 +165,16 @@ const searchChange = async () => {
       return
     }
     loading.value = true
+    /*获取条码数据************************************************* */
     const res: any = await productionGetData(
       reactiveData.searchValue,
-      currentWarehousePosition.number
+      currentWarehousePosition.number,
+      props.scanCodeType === '单码双扫'
     )
     console.log('res', res)
     if (!res) {
       loading.value = false
-      focusIndex.value = 22
+      console.log('查看')
       setTimeout(() => {
         reactiveData.searchValue = ''
         focusIndex.value = 0
@@ -187,26 +186,87 @@ const searchChange = async () => {
     if (reactiveData.detailsList.length !== 0) {
       const index = reactiveData.detailsList.findIndex((item: any) => {
         console.log('判断之前是否有一样的', item, res)
-        return (
-          item.MaterialCode === res.MaterialCode &&
-          item.SourceOrderNo === res.SourceOrderNo &&
-          item.SourceOrderLineNo === res.SourceOrderLineNo &&
-          item.Lot === res.Lot &&
-          item.WarehousePosition === currentWarehousePosition.number
-        )
+        if (props.scanCodeType === '单码双扫') {
+          return (
+            item.MaterialCode === res.MaterialCode &&
+            item.SourceOrderNo === res.SourceOrderNo &&
+            item.SourceOrderLineNo === res.SourceOrderLineNo
+          )
+        } else {
+          return (
+            item.MaterialCode === res.MaterialCode &&
+            item.SourceOrderNo === res.SourceOrderNo &&
+            item.SourceOrderLineNo === res.SourceOrderLineNo &&
+            item.Lot === res.Lot &&
+            item.WarehousePosition === currentWarehousePosition.number
+          )
+        }
       })
       console.log('index', index)
-
       if (index !== -1) {
+        /*1.在单码双扫时：如果仓位不一样需要复制一行相同编码的，批号不一样无法添加（所以在这里做这两个判断）*/
+        if (props.scanCodeType === '单码双扫') {
+          if (reactiveData.detailsList[index].Lot !== res.Lot) {
+            uni.showToast({
+              title: '批号不一样无法添加',
+              icon: 'none'
+            })
+            reactiveData.searchValue = ''
+            reactiveData.curNow = 0
+            loading.value = false
+            return
+          }
+          console.log(
+            '仓位',
+            reactiveData.detailsList[index].WarehousePosition,
+            res.WarehousePosition
+          )
+          // if (
+          //   reactiveData.detailsList[index].WarehousePosition &&
+          //   reactiveData.detailsList[index].WarehousePosition !== res.WarehousePosition
+          // ) {
+          //   //仓位不一样需要复制一行相同编码的
+          //   let data = JSON.parse(JSON.stringify(reactiveData.detailsList[index])) //深拷贝
+          //   data['WarehousePosition'] = res.WarehousePosition //仓位
+          //   data['Quantity2'] = res.Quantity2 //数量
+          //   data.barCodeList = res.barCodeList //条码
+          //   reactiveData.detailsList.push(data)
+          //   console.log('复制的值', data)
+          //   reactiveData.searchValue = ''
+          //   reactiveData.curNow = 0
+          //   loading.value = false
+          //   return
+          // }
+        }
+        reactiveData.datailsIndex = index
+
         res.barCodeList[0].one = reactiveData.detailsList[index].barCodeList.length + 1
         reactiveData.detailsList[index].barCodeList.push(res.barCodeList[0]) //条码
         reactiveData.detailsList[index].Quantity++ //件数
 
         console.log('选中的明细', reactiveData.detailsList[index])
+        /**更新之前的数据 */
         reactiveData.detailsList[index].IsSplit = res.IsSplit //是否分装
+
         if (reactiveData.detailsList[index].IsSplit) {
           //分装的情况下
-          console.log('分装的情况下', res.SplitCode, res.Quantity2)
+
+          if (!reactiveData.detailsList[index].packagingData) {
+            // reactiveData.detailsList[index].packagingData = res.packagingData //分装数据
+            reactiveData.detailsList[index].packagingSig = res.packagingSig //分装名称
+            let packagingData = {} as any
+            for (const item of res.packagingSig) {
+              packagingData[item] = {
+                quantity: 0,
+                unitQty: 0,
+                finishedQty: 0
+              }
+              reactiveData.detailsList[index].packagingData = packagingData
+            }
+
+            console.log('分装的情况下', reactiveData.detailsList[index])
+          }
+          console.log('分装的情况下', res.SplitCode, reactiveData.detailsList[index].packagingData)
           reactiveData.detailsList[index].packagingData[res.SplitCode]['quantity'] += res.SplitValue //数量
           reactiveData.detailsList[index].packagingData[res.SplitCode]['unitQty'] = res.UnitQty //单位用量
           reactiveData.detailsList[index].packagingData[res.SplitCode]['finishedQty'] =
@@ -240,16 +300,9 @@ const searchChange = async () => {
           reactiveData.detailsList[index].isInteger =
             productsQuantity % 1 === 0 && productsQuantity !== 0
           console.log('判断成套', reactiveData.detailsList[index].isInteger)
-          console.log(
-            '判断成套2',
-            productsQuantity,
-            productsQuantity % 1 === 0,
-            productsQuantity !== 0
-          )
           reactiveData.detailsList[index].Quantity2 = Math.floor(productsQuantity) // 数量取整
           reactiveData.detailsList[index].currentList[12].value =
             reactiveData.detailsList[index].Quantity2
-
           totalBoxNum.value = Math.floor(productsQuantity) //总箱数
         } else {
           //非分装情况下
@@ -258,18 +311,52 @@ const searchChange = async () => {
             reactiveData.detailsList[index].Quantity2 //数量
 
           totalBoxNum.value = reactiveData.detailsList[index].Quantity2 //总箱数
+          reactiveData.detailsList[index].isInteger = true //是否整数
         }
       } else {
-        // res.currentList[0].value = reactiveData.detailsList.length + 1 //序号
         console.log('不重复', res)
-        reactiveData.detailsList.push(res)
+
+        //不重复的情况下，在单码双扫时提示条码与源单无相符数据
+        if (props.scanCodeType === '单码双扫') {
+          //提示无相符数据
+          uni.showToast({
+            title: '条码与源单无相符数据',
+            icon: 'none'
+          })
+        } else {
+          //获取推荐仓位（根据物料编码、批号、仓库查库存表）
+          const FMaterialId = res.MaterialCode //物料编码FMaterialId.Fnumber
+          const FLot = res.Lot //批号FLot
+          const FStockId = currentWarehouse.number //仓库FStockId.Fname
+
+          const lowerRes = await lowerCamelCase(`
+            FMaterialId.Fnumber = '${FMaterialId}' AND FLot.Fnumber = '${FLot}' AND FStockId.Fnumber = '${FStockId}'
+          `)
+          console.log('lowerRes', lowerRes)
+
+          reactiveData.detailsList.push(res)
+          reactiveData.curNow = 0
+          reactiveData.datailsIndex = reactiveData.detailsList.length - 1
+        }
       }
     } else {
       console.log('第一次的值', res)
+
+      //获取推荐仓位（根据物料编码、批号、仓库查库存表）
+      const FMaterialId = res.MaterialCode //物料编码FMaterialId.Fnumber
+      const FLot = res.Lot //批号FLot
+      const FStockId = currentWarehouse.number //仓库FStockId.Fname
+      const FilterString = `FMaterialId.Fnumber = '${FMaterialId}' AND FLot.Fnumber = '${FLot}' AND FStockId.Fnumber = '${FStockId}' AND FBaseQty > 0`
+      const lowerRes: any = await lowerCamelCase(FilterString)
+      console.log('lowerRes', lowerRes)
+      if (lowerRes && lowerRes.data && lowerRes.data.length > 0) {
+        res.currentList[10].value = lowerRes.data.map((item: any) => item[0]).join(',') //推荐仓位
+      }
       reactiveData.detailsList.push(res)
+      reactiveData.curNow = 0
+      reactiveData.datailsIndex = reactiveData.detailsList.length - 1
     }
 
-    reactiveData.datailsIndex = reactiveData.detailsList.length - 1
     reactiveData.searchValue = ''
 
     loading.value = false
@@ -305,7 +392,6 @@ const getWarehouseList = async () => {
       }
     })
     pageLoading.value = false
-    focusIndex.value = 2
   }
 }
 //扫码获取数据
@@ -348,7 +434,16 @@ const warehouseChange = debounceSave(
     if (iswarehouse) {
       //获取仓库id替换为仓库名称
       const warehouseId: any = warehouseList.value.find((item: any) => item.value === val)
-      console.log('warehouseId', warehouseId)
+      console.log('warehouseId1', warehouseId)
+      if (!warehouseId && val != '') {
+        //提示仓库不存在
+        uni.showToast({
+          title: '仓库不存在',
+          icon: 'none'
+        })
+        reactiveData.titleList[2].value = ''
+        return
+      }
       reactiveData.titleList[2].value = warehouseId.text
       currentWarehouse.name = warehouseId.text
       currentWarehouse.number = warehouseId.value
@@ -357,6 +452,15 @@ const warehouseChange = debounceSave(
       //获取仓位id替换为仓位名称
       if (warehousePositionList.value.length !== 0) {
         const warehouseId: any = warehousePositionList.value.find((item: any) => item.value === val)
+        if (!warehouseId && val != '') {
+          //提示仓位不存在
+          uni.showToast({
+            title: '仓位不存在',
+            icon: 'none'
+          })
+          reactiveData.titleList[3].value = ''
+          return
+        }
         if (reactiveData.detailsList.length !== 0) {
           reactiveData.detailsList[reactiveData.datailsIndex].currentList[12].value =
             warehouseId.text
@@ -414,7 +518,7 @@ const warehouseClick = async (val: any) => {
         setTimeout(() => {
           console.log('到我')
           focusIndex.value = 3
-        }, 500)
+        }, 200)
       }
       handleFocus()
       console.log('focusIndex', focusIndex.value)
@@ -433,24 +537,28 @@ const pickerConfirm = async (val: any) => {
   pickerShow.value = false
   console.log('pickerShow.value ', warehousePositionList.value)
 }
-//仓位选择器确认
+//仓位选择器确认(iswarehousePosition为true时，表示表头仓位选择器，否则为当前仓位选择器)
 const pickerConfirm2 = (val: any, iswarehousePosition?: boolean) => {
-  console.log('选择仓位2', reactiveData.detailsList, reactiveData.datailsIndex)
-  if (reactiveData.detailsList.length !== 0) {
-    reactiveData.detailsList[reactiveData.datailsIndex].currentList[12].value = val.text
-  }
-  if (!iswarehousePosition) {
+  console.log('选择仓位2', iswarehousePosition)
+
+  if (iswarehousePosition) {
     reactiveData.titleList[3].value = val.value
     currentWarehousePosition.name = val.text
     currentWarehousePosition.number = val.value
+    console.log('仓位', reactiveData.detailsList)
+  } else {
+    //无论选择哪个，有明细时都是会变的
     if (reactiveData.detailsList.length !== 0) {
+      console.log('报错1', reactiveData.detailsList[reactiveData.datailsIndex])
+      reactiveData.detailsList[reactiveData.datailsIndex].currentList[12].value = val.text
+      console.log('报错2')
       reactiveData.detailsList[reactiveData.datailsIndex].WarehousePosition = val.value
     }
-    console.log('仓位', reactiveData.detailsList)
   }
   handleFocus()
   focusIndex.value = 0
   pickerShow2.value = false
+  pickerShow3.value = false
 }
 
 //长按事件 删除明细
@@ -477,9 +585,29 @@ const longpressClick = (item: any, index: number) => {
   })
 }
 //长按事件 删除条码明细
+let startX = 0
+let startY = 0
+let isMoved = false
+
+const handleTouchStart = (e: TouchEvent) => {
+  startX = e.touches[0].clientX
+  startY = e.touches[0].clientY
+  isMoved = false
+}
+
+const handleTouchMove = (e: TouchEvent) => {
+  const moveX = Math.abs(e.touches[0].clientX - startX)
+  const moveY = Math.abs(e.touches[0].clientY - startY)
+
+  // 如果移动超过5px就认为是在滑动
+  if (moveX > 5 || moveY > 5) {
+    isMoved = true
+  }
+}
+
 const longpressDetailsClick = (item: any, index: number) => {
-  console.log('长按事件', item, index)
-  //弹出删除提示框
+  if (isMoved) return // 如果有移动，不触发长按事件
+
   uni.showModal({
     title: '提示',
     content: '是否删除当前条码明细',
@@ -489,11 +617,15 @@ const longpressDetailsClick = (item: any, index: number) => {
         //删除当前明细
         if (reactiveData.detailsList[reactiveData.datailsIndex].IsSplit) {
           //分装情况下
-
+          reactiveData.detailsList[reactiveData.datailsIndex].Quantity--
           //减去数量
           reactiveData.detailsList[reactiveData.datailsIndex].packagingData[item.F_FZNO][
             'quantity'
-          ] -= item.F_QADV_Decimal_h1g //数量
+          ] -= item.F_UNITQTY //数量
+          console.log(
+            '删除的值1',
+            reactiveData.detailsList[reactiveData.datailsIndex].packagingData[item.F_FZNO]
+          )
           //重新计算最小值
           reactiveData.detailsList[reactiveData.datailsIndex].packagingData[item.F_FZNO][
             'finishedQty'
@@ -504,6 +636,11 @@ const longpressDetailsClick = (item: any, index: number) => {
             reactiveData.detailsList[reactiveData.datailsIndex].packagingData[item.F_FZNO][
               'unitQty'
             ]
+
+          console.log(
+            '删除的值2',
+            reactiveData.detailsList[reactiveData.datailsIndex].packagingData
+          )
           //判断是否有成品
           // productsQuantity保留最小值
           const packagingSig = reactiveData.detailsList[reactiveData.datailsIndex].packagingSig
@@ -629,188 +766,192 @@ const backClick = async () => {
   }
 
   let dataList = [] as any
-  let integer = {
-    isInteger: true,
-    Name: ''
-  }
-
   //表头生产车间
   let SCCJ = 'BM000001'
 
+  let isError = false //是否有错误
   // 使用Promise.all等待所有异步操作完成
   await Promise.all(
     reactiveData.detailsList.map(async (item: any, index: number) => {
-      try {
-        console.log('item', item)
-        if (!item.isInteger) {
-          integer.isInteger = false //如果有一个不是整数就返回false
-          integer.Name = item.Name
-          //提示不配套
-
-          throw new Error(`第${index + 1}行不配套`)
-        }
-
-        if (currentWarehouse.number === '') {
-          throw new Error('请先选择仓库')
-        }
-        if (currentWarehousePosition.number === '' && !reactiveData.titleList[3].disabled) {
-          throw new Error('请先选择仓位')
-        }
-
-        // if (item.Quantity2 > item.canReceive) {
-        //   throw new Error('应收数量大于可收数量')
-        // }
-        if (res && res.data && res.data.length > 0) {
-          //查找相同
-          const index = orderData.findIndex((item1: any) => {
-            return item1[1] === item.SourceOrderNo && item1[2] === item.SourceOrderLineNo
-          })
-          if (index === -1) return
-          //单据内码
-          const documentInnerCode = orderData[index][0] //单据内码
-          //分录内码
-          const entryInnerCode = orderData[index][3] //分录内码
-          //应收数量
-          const mustQty = orderData[index][4] //应收数量
-
-          //表头生产车间赋值
-          if (item.ProductionDepartment) {
-            SCCJ = item.ProductionDepartment
+      console.log('item', item)
+      if (!item.isInteger) {
+        //提示不配套
+        throw new Error(`第${index + 1}行不配套`)
+      } else if (item.IsSplit) {
+        let finishedQty = item.packagingData[item.packagingSig[0]].finishedQty //成品数量
+        console.log('成品数量', finishedQty)
+        item.packagingSig.forEach((element: any) => {
+          console.log('成品数量值', item.packagingData[element].finishedQty)
+          if (item.packagingData[element].finishedQty !== finishedQty) {
+            throw new Error(`第${index + 1}行不配套`)
           }
-          // 构建 data 对象（同上）
-          let data = {
-            FSrcEntryId: entryInnerCode, //源单分录内码
-            FIsNew: false, //是否新增行
-            FMaterialId: {
-              //物料编码
-              FNumber: item.MaterialCode
-            },
-            FProductType: '1', //产品类型
-            FInStockType: '1', //入库类型
-            FREQSRC: 1, //需求来源
-            FReqBillNo: item.SourceOrderNo, //需求单据
-            FReqBillId: item.SourceOrderFID, //需求单据内码
-            FReqEntrySeq: item.SourceOrderLineNo, //需求单据行号
-            FUnitID: {
-              //单位
-              FNumber: item.Unit
-            },
-            FMustQty: mustQty, //应收数量
-            FRealQty: item.Quantity2, //实收数量
-            FCostRate: 100.0, //成本权重
-            FBaseUnitId: {
-              //基本单位
-              FNumber: item.Unit
-            },
-            FBaseMustQty: mustQty, //基本单位应收数量
-            FBaseRealQty: item.Quantity2, //基本单位库存实收数量
-            FOwnerTypeId: 'BD_OwnerOrg', //货主类型
-            FOwnerId: {
-              //货主
-              FNumber: '100'
-            },
-            FStockId: {
-              //仓库
-              FNumber: currentWarehouse.number
-            },
-            FStockLocId: {
-              //仓位
-              FSTOCKLOCID__FF100001: {
-                FNumber: item.WarehousePosition
-              }
-            },
-            FLot: {
-              FNumber: item.Lot
-            },
-            FISBACKFLUSH: true, //倒冲领料
-            FWorkShopId1: {
-              //生产车间
-              FNumber: orderData[index][5]
-            },
-            FMoBillNo: item.SourceOrderNo, //生产订单编号
-            FMoId: documentInnerCode, //生产订单内码
-            FMoEntryId: entryInnerCode, //生产订单分录内码
-            FMoEntrySeq: item.SourceOrderLineNo, //生产订单行号
-            FMemo: item.otherData.FMemo, //备注
-            FStockUnitId: {
-              //库存单位
-              FNumber: item.Unit
-            },
-            FStockRealQty: item.Quantity2, //库存单位实收数量
-            FSecRealQty: 0.0, //辅助单位实收数量
-            FSrcBillType: 'PRD_MO', //源单类型
-            FSrcInterId: documentInnerCode, //源单内码
-            FSrcBillNo: item.SourceOrderNo, //源单编号
-            FBasePrdRealQty: item.Quantity2, //基本单位生产实收数量
-            FIsFinished: false, //完工
-            FStockStatusId: {
-              //库存状态
-              FNumber: 'KCZT01_SYS'
-            },
-            FSrcEntrySeq: item.SourceOrderLineNo, //源单行号
-            FMOMAINENTRYID: entryInnerCode, //生产订单主产品分录
-            FKeeperTypeId: 'BD_KeeperOrg', //保管者类型
-            FKeeperId: {
-              //保管者
-              FNumber: '100'
-            },
-            FSelReStkQty: 0.0, //退库选单数
-            FBaseSelReStkQty: 0.0, //基本单位退库选单数量
-            F_ALMA_SCANQTY: 0.0, //扫描数量
-            FIsOverLegalOrg: false, //组织间结算跨法人
-            F_QADV_KH: {
-              //客户
-              FNUMBER: item.otherData.F_QADV_KH
-            },
-            F_QADV_TIQTY: orderData[index][6], //累计入库数量(合格品入库数量)
-
-            F_QADV_HTNO: item.otherData.F_QADV_HTNO, //合同号
-            F_BARSubEntity: item.barCodeList,
-            FEntity_Link: [
-              {
-                FEntity_Link_FRuleId: 'PRD_MO2INSTOCK',
-                FEntity_Link_FSTableName: 'T_PRD_MOENTRY',
-                FEntity_Link_FSBillId: documentInnerCode,
-                FEntity_Link_FSId: entryInnerCode,
-                FEntity_Link_FFlowId: 'f11b462a-8733-40bd-8f29-0906afc6a201',
-                FEntity_Link_FFlowLineId: '5',
-                FEntity_Link_FBasePrdRealQtyOld: mustQty,
-                FEntity_Link_FBasePrdRealQty: item.Quantity2
-              }
-            ],
-            FBFLowId: {
-              FID: 'f11b462a-8733-40bd-8f29-0906afc6a201'
-            } //流转单ID
-          }
-          console.log('测试1', data)
-
-          console.log('测试2', JSON.stringify(data))
-          if (item.Quantity2 !== 0) {
-            dataList.push(data)
-          }
-        }
-      } catch (error: any) {
-        console.error(`处理项出错:`, error)
-        uni.showToast({
-          title: error.message,
-          icon: 'none'
         })
-        return Promise.reject(error) // 返回拒绝的 Promise
+      }
+
+      if (currentWarehouse.number === '') {
+        throw new Error('请先选择仓库')
+      }
+      if (currentWarehousePosition.number === '' && !reactiveData.titleList[3].disabled) {
+        throw new Error('请先选择仓位')
+      }
+
+      // if (item.Quantity2 > item.canReceive) {
+      //   throw new Error('应收数量大于可收数量')
+      // }
+      if (res && res.data && res.data.length > 0) {
+        //查找相同
+        const index = orderData.findIndex((item1: any) => {
+          return item1[1] === item.SourceOrderNo && item1[2] === item.SourceOrderLineNo
+        })
+        if (index === -1) return
+        //单据内码
+        const documentInnerCode = orderData[index][0] //单据内码
+        //分录内码
+        const entryInnerCode = orderData[index][3] //分录内码
+        //应收数量
+        const mustQty = orderData[index][4] //应收数量
+
+        //表头生产车间赋值
+        if (item.ProductionDepartment) {
+          SCCJ = item.ProductionDepartment
+        }
+        // 构建 data 对象（同上）
+        let data = {
+          FSrcEntryId: entryInnerCode, //源单分录内码
+          FIsNew: false, //是否新增行
+          FMaterialId: {
+            //物料编码
+            FNumber: item.MaterialCode
+          },
+          FProductType: '1', //产品类型
+          FInStockType: '1', //入库类型
+          FREQSRC: item.SourceOrderType, //需求来源
+          FReqBillNo: item.SourceOrderNo2, //需求单据
+          //FReqBillId: item.SourceOrderNo2, //需求单据内码
+          FReqEntrySeq: item.SourceOrderLineNo2, //需求单据行号
+          FUnitID: {
+            //单位
+            FNumber: item.Unit
+          },
+          FMustQty: mustQty, //应收数量
+          FRealQty: item.Quantity2, //实收数量
+          FCostRate: 100.0, //成本权重
+          FBaseUnitId: {
+            //基本单位
+            FNumber: item.Unit
+          },
+          FBaseMustQty: mustQty, //基本单位应收数量
+          FBaseRealQty: item.Quantity2, //基本单位库存实收数量
+          FOwnerTypeId: 'BD_OwnerOrg', //货主类型
+          FOwnerId: {
+            //货主
+            FNumber: '100'
+          },
+          FStockId: {
+            //仓库
+            FNumber: currentWarehouse.number
+          },
+          FStockLocId: {
+            //仓位
+            FSTOCKLOCID__FF100001: {
+              FNumber: item.WarehousePosition
+            }
+          },
+          FLot: {
+            FNumber: item.Lot
+          },
+          FISBACKFLUSH: true, //倒冲领料
+          FWorkShopId1: {
+            //生产车间
+            FNumber: orderData[index][5]
+          },
+          FMoBillNo: item.SourceOrderNo, //生产订单编号
+          FMoId: documentInnerCode, //生产订单内码
+          FMoEntryId: entryInnerCode, //生产订单分录内码
+          FMoEntrySeq: item.SourceOrderLineNo, //生产订单行号
+          FMemo: item.otherData.FMemo, //备注
+          FStockUnitId: {
+            //库存单位
+            FNumber: item.Unit
+          },
+          FStockRealQty: item.Quantity2, //库存单位实收数量
+          FSecRealQty: 0.0, //辅助单位实收数量
+          FSrcBillType: 'PRD_MO', //源单类型
+          FSrcInterId: documentInnerCode, //源单内码
+          FSrcBillNo: item.SourceOrderNo, //源单编号
+          FBasePrdRealQty: item.Quantity2, //基本单位生产实收数量
+          FIsFinished: false, //完工
+          FStockStatusId: {
+            //库存状态
+            FNumber: 'KCZT01_SYS'
+          },
+          FSrcEntrySeq: item.SourceOrderLineNo, //源单行号
+          FMOMAINENTRYID: entryInnerCode, //生产订单主产品分录
+          FKeeperTypeId: 'BD_KeeperOrg', //保管者类型
+          FKeeperId: {
+            //保管者
+            FNumber: '100'
+          },
+          FSelReStkQty: 0.0, //退库选单数
+          FBaseSelReStkQty: 0.0, //基本单位退库选单数量
+          F_ALMA_SCANQTY: 0.0, //扫描数量
+          FIsOverLegalOrg: false, //组织间结算跨法人
+          F_QADV_KH: {
+            //客户
+            FNUMBER: item.otherData.F_QADV_KH
+          },
+          F_QADV_TIQTY: orderData[index][6], //累计入库数量(合格品入库数量)
+
+          F_QADV_HTNO: item.otherData.F_QADV_HTNO, //合同号
+          F_BARSubEntity: item.barCodeList,
+          FEntity_Link: [
+            {
+              FEntity_Link_FRuleId: 'PRD_MO2INSTOCK',
+              FEntity_Link_FSTableName: 'T_PRD_MOENTRY',
+              FEntity_Link_FSBillId: documentInnerCode,
+              FEntity_Link_FSId: entryInnerCode,
+              FEntity_Link_FFlowId: 'f11b462a-8733-40bd-8f29-0906afc6a201',
+              FEntity_Link_FFlowLineId: '5',
+              FEntity_Link_FBasePrdRealQtyOld: mustQty,
+              FEntity_Link_FBasePrdRealQty: item.Quantity2
+            }
+          ],
+          FBFLowId: {
+            FID: 'f11b462a-8733-40bd-8f29-0906afc6a201'
+          } //流转单ID
+        }
+        console.log('测试1', data)
+
+        console.log('测试2', JSON.stringify(data))
+        if (item.Quantity2 !== 0) {
+          dataList.push(data)
+        }
       }
     })
-  )
+  ).catch((error) => {
+    isError = true //有错误
+    console.error(`处理项出错:`, error)
+    uni.showToast({
+      title: error.message,
+      icon: 'none'
+    })
+    return null
+  })
+
   let currentData = {
     currentWarehouseName: currentWarehouse.name,
     currentWarehouseNumber: currentWarehouse.number,
     currentWarehousePositionName: currentWarehousePosition.name,
-    currentWarehousePositionNumber: currentWarehousePosition.number
+    currentWarehousePositionNumber: currentWarehousePosition.number,
+    warehousePositionList: warehousePositionList.value,
+    curNow: reactiveData.curNow
   }
   console.log('当前仓库', currentData)
   return {
     dataList,
     fid: reactiveData.fid,
-    integer,
     SCCJ,
+    isError,
     currentData
   } // 返回填充后的数据
 }
@@ -826,26 +967,20 @@ watch(
     } else if (val === '单码双扫') {
       focusIndex.value = 0
       reactiveData.titleList[0].display = false //显示单号
+      //隐藏仓位
+      reactiveData.titleList[3].display = true
       reactiveData.subsectionList = ['当前', '明细', '条码']
       reactiveData.curNow = 1
+      focusIndex.value = 0
     } else {
       reactiveData.subsectionList = ['当前', '明细', '条码']
       reactiveData.curNow = 1
+      focusIndex.value = 2
     }
   },
   { immediate: true, deep: true }
 )
 
-watch(
-  () => props.stoFocusIndex,
-  (val) => {
-    console.log('props.stoFocusIndex', val)
-    setTimeout(() => {
-      focusIndex.value = val
-    }, 200)
-  },
-  { immediate: true, deep: true }
-)
 watch(
   () => props.stoCurrentWarehouse,
   () => {
@@ -853,10 +988,18 @@ watch(
     if (props.stoCurrentWarehouse.name === '') return
     currentWarehouse.name = props.stoCurrentWarehouse.name
     currentWarehouse.number = props.stoCurrentWarehouse.number
-    currentWarehousePosition.name = props.stoCurrentWarehousePosition.name
-    currentWarehousePosition.number = props.stoCurrentWarehousePosition.number
+    warehousePositionList.value = props.stoCurrentWarehouse.warehousePositionList //仓位
+    reactiveData.curNow = props.stoCurrentWarehouse.curNow
     reactiveData.titleList[2].value = currentWarehouse.name
-    reactiveData.titleList[3].value = currentWarehousePosition.name
+    reactiveData.titleList[3].disabled = props.stoCurrentWarehouse.number == ''
+
+    if (reactiveData.titleList[3].disabled) {
+      focusIndex.value = 0
+    } else {
+      setTimeout(() => {
+        focusIndex.value = 3
+      }, 200)
+    }
   },
   { immediate: true, deep: true }
 )
@@ -907,7 +1050,7 @@ defineExpose({
       class="flex items-center pb-4px"
       v-show="!item.display"
     >
-      <view class="w-80px flex justify-center">{{ item.label }}</view>
+      <view class="w-50px flex justify-center">{{ item.label }}</view>
       <view class="flex-1 mr-20rpx" style="border: 1px solid #f8f8f8" v-if="!item.select">
         <u-input
           v-model="item.value"
@@ -1015,7 +1158,7 @@ defineExpose({
                         class="flex justify-center py-10rpx"
                         style="border-bottom: 1px solid #f8f8f8"
                         v-if="warehouseItem.value.indexOf(item.scValue2 || '') !== -1"
-                        @tap="pickerConfirm2(warehouseItem, false)"
+                        @tap="pickerConfirm2(warehouseItem, true)"
                       >
                         {{ warehouseItem.text }}
                       </view>
@@ -1032,7 +1175,7 @@ defineExpose({
   <view v-if="loading" class="bg-#FFF h-300rpx flex items-center justify-center">
     <u-loading-icon text="加载中" textSize="18" />
   </view>
-  <view v-else class="bg-#FFF">
+  <view v-else class="bg-#FFF content-input">
     <u-subsection
       :list="reactiveData.subsectionList"
       :current="reactiveData.curNow"
@@ -1071,22 +1214,22 @@ defineExpose({
               @change="warehouseChange($event, item.label == '仓库', true)"
             >
               <template #suffix>
-                <view @click="pickerShow2 = true">
+                <view @click="pickerShow3 = true">
                   <u-icon name="arrow-down" size="20" />
                 </view>
                 <view>
                   <u-action-sheet
-                    :show="pickerShow2"
+                    :show="pickerShow3"
                     round="10"
                     :closeOnClickOverlay="true"
                     :closeOnClickAction="true"
-                    @close="pickerShow2 = false"
+                    @close="pickerShow3 = false"
                   >
                     <view
                       class="flex items-center p-20rpx"
                       style="border-bottom: 1px solid #f8f8f8"
                     >
-                      <view @tap="pickerShow2 = false">搜索 </view>
+                      <view @tap="pickerShow3 = false">搜索 </view>
                       <view class="flex-1">
                         <u-input
                           id="searchInput2"
@@ -1111,7 +1254,7 @@ defineExpose({
                             class="flex justify-center py-10rpx"
                             style="border-bottom: 1px solid #f8f8f8"
                             v-if="warehouseItem.value.indexOf(item.scValue2 || '') !== -1"
-                            @tap="pickerConfirm2(warehouseItem, true)"
+                            @tap="pickerConfirm2(warehouseItem, false)"
                           >
                             {{ warehouseItem.text }}
                           </view>
@@ -1126,16 +1269,23 @@ defineExpose({
         </view>
         <view v-if="reactiveData.detailsList.length > 0" class="w-100%">
           <view class="flex w-100%">
-            <view class="w-50% flex">
-              <view>本箱数</view> <view class="ml-20px">{{ boxNum }}</view>
+            <view class="w-50% flex items-center">
+              <view>本箱数</view>
+              <view class="ml-20px text-18px">{{
+                reactiveData.detailsList[reactiveData.datailsIndex]?.barCodeList[
+                  reactiveData.detailsList[reactiveData.datailsIndex].barCodeList.length - 1
+                ]?.F_UNITQTY
+              }}</view>
             </view>
-            <view class="w-50% flex">
+            <view class="w-50% flex items-center">
               <view>合计</view>
-              <view class="ml-20px"> {{ totalBoxNum }}</view>
+              <view class="ml-20px text-18px">
+                {{ reactiveData.detailsList[reactiveData.datailsIndex]?.Quantity2 }}</view
+              >
             </view>
           </view>
           <view
-            class="flex py-10px text-#90BBF5"
+            class="flex items-center text-#90BBF5"
             v-if="reactiveData.detailsList[reactiveData.datailsIndex]?.IsSplit"
           >
             <view class="text-center">{{
@@ -1167,9 +1317,9 @@ defineExpose({
           <view class="w-20px flex justify-center">{{ index + 1 }}</view>
           <view class="flex-1 mr-20rpx">
             <view class="flex">
-              <view class="w-60%"> 编码： {{ item.MaterialCode }}</view>
-              <view class="w-40%"> 批号： {{ item.Lot }}</view>
+              <view class=""> 编码： {{ item.MaterialCode }}</view>
             </view>
+            <view class=""> 批号： {{ item.Lot }}</view>
             <view> 名称： {{ item.Name }}</view>
             <view> 规格： {{ item.Specification }}</view>
             <view class="flex">
@@ -1198,15 +1348,17 @@ defineExpose({
             ?.barCodeList || []"
           :key="index"
           @longpress="longpressDetailsClick(item, index)"
+          @touchstart="handleTouchStart"
+          @touchmove="handleTouchMove"
         >
           <view class="flex py-10rpx" :style="index % 2 == 1 ? 'background-color:#f2f2f2' : ''">
             <view class="w-15% flex items-center justify-center">{{ index + 1 }}</view>
             <view class="w-75%" style="overflow-wrap: break-word">
               <view> {{ item.F_BARCODENO }}</view>
-              <view class="flex">
+              <view class="flex items-center">
                 <view class="">{{ item.F_FZNO }}</view>
                 <view class="ml-8px">{{ item.F_BJNAME }}</view>
-                <view class="ml-8px">{{ item.F_BJNAME }}</view>
+                <view class="ml-8px">用量：{{ item.F_JUNITQTY === 0 ? '' : item.F_JUNITQTY }}</view>
               </view>
             </view>
             <view class="w-10% flex items-center justify-center">{{ item.F_UNITQTY }}</view>
@@ -1223,9 +1375,14 @@ defineExpose({
 ::v-deep .u-input__content__field-wrapper__field {
   line-height: 34px;
 }
-
 ::v-deep .u-input {
   height: 28px;
   padding: 2px 9px !important;
+}
+.content-input {
+  ::v-deep .u-input {
+    height: 22px;
+    padding: 2px 9px !important;
+  }
 }
 </style>

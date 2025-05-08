@@ -16,7 +16,7 @@ export const getInboundOrder = async (searchValue: any) => {
     console.log('条码单数据2', res.data.Result?.ResponseStatus?.IsSuccess)
     if (res.data.Result?.ResponseStatus?.IsSuccess === false) {
       uni.showToast({
-        title: res.data.Result?.ResponseStatus?.Errors[0].Message,
+        title: '生产入库单不存在',
         icon: 'none'
       })
       return { dataList: [], fid: 0 }
@@ -107,7 +107,7 @@ export const getInboundOrder = async (searchValue: any) => {
             style: { width: '70%' }
           },
           {
-            label: '订单数',
+            label: '批量',
             value: item.MustQty,
             disabled: true,
             type: 'input',
@@ -143,14 +143,6 @@ export const getInboundOrder = async (searchValue: any) => {
             type: 'input',
             style: { width: '30%' }
           },
-
-          {
-            label: '数量',
-            value: 0,
-            disabled: true,
-            type: 'input',
-            style: { width: '100%' }
-          },
           {
             label: '仓位',
             value: item.StockLocId?.F100001?.Number,
@@ -171,7 +163,7 @@ export const getInboundOrder = async (searchValue: any) => {
         BarCode: searchValue,
         */
         //是否整数
-        isInteger: true,
+        isInteger: false,
         //生产部门
         ProductionDepartment: item.WorkShopId?.Number,
         //物料编码
@@ -180,8 +172,14 @@ export const getInboundOrder = async (searchValue: any) => {
         SourceOrderNo: item.SrcBillNo,
         //源单行号
         SourceOrderLineNo: item.SrcEntrySeq,
+        //需求来源
+        SourceOrderType: item.ReqSrc,
+        //需求单号
+        SourceOrderNo2: item.ReqBillNo,
+        //需求行号
+        SourceOrderLineNo2: item.ReqEntrySeq,
         //批号
-        Lot: item.Lot_Text,
+        Lot: item.Lot_Text === ' ' ? '' : item.Lot_Text,
         //名称
         Name: item.MaterialId.Name[0].Value,
         //规格型号
@@ -209,8 +207,9 @@ export const getInboundOrder = async (searchValue: any) => {
         SplitValue: '',
         Unit: item.BaseUnitId.Name[0].Value,
         //分装批次号
-        packagingData: packagingData,
-        packagingSig: packagingSig
+        // packagiingData: [],
+        packagiingData: packagingData,
+        packagngSig: packagingSig
       }
       dataList.push(data)
       console.log('生产入库明细数据', data)
@@ -219,8 +218,12 @@ export const getInboundOrder = async (searchValue: any) => {
   return { dataList, fid }
 }
 
-//生产入库
-export const productionGetData = async (searchValue: any, warehousePosition: any) => {
+//生产入库-扫描条码
+export const productionGetData = async (
+  searchValue: any,
+  warehousePosition: any,
+  scanCodeType: boolean
+) => {
   const res = await lookBarCode(searchValue)
   if (res && res.data) {
     //生产订单-明细
@@ -241,6 +244,16 @@ export const productionGetData = async (searchValue: any, warehousePosition: any
       })
       return null
     }
+    console.log('条码类型', barCodeData.F_BARTYPE)
+    //条码类型为唯一
+    if (barCodeData.F_BARTYPE === '2') {
+      uni.showToast({
+        title: '条码类型非唯一',
+        icon: 'none'
+      })
+      return null
+    }
+
     //源单类型非生产订单
     if (barCodeData.F_YVRT_YDLX !== '生产订单') {
       uni.showToast({
@@ -249,22 +262,16 @@ export const productionGetData = async (searchValue: any, warehousePosition: any
       })
       return null
     }
-    //条码类型为唯一
-    if (barCodeData.F_BARTYPE !== '1') {
-      uni.showToast({
-        title: '条码类型非唯一',
-        icon: 'none'
-      })
-      return null
-    }
+
     //生产部门不可为空
-    if (!barCodeData.F_ALMA_BM) {
+    if (!barCodeData.F_ALMA_BM && !scanCodeType) {
       uni.showToast({
         title: '生产部门不可为空',
         icon: 'none'
       })
       return null
     }
+
     //源单号，行号不能为空
     if (
       !barCodeData.F_SourceFbillno ||
@@ -374,7 +381,7 @@ export const productionGetData = async (searchValue: any, warehousePosition: any
           style: { width: '70%' }
         },
         {
-          label: '订单数',
+          label: '批量',
           value: barCodeData.F_POQTY,
           disabled: true,
           type: 'input',
@@ -460,14 +467,21 @@ export const productionGetData = async (searchValue: any, warehousePosition: any
       SourceOrderNo: barCodeData.F_SourceFbillno,
       //源单行号
       SourceOrderLineNo: barCodeData.F_SourceEntry * 1,
+      //需求来源
+      SourceOrderType: barCodeData.F_QADV_XQLY,
+      //需求单号
+      SourceOrderNo2: barCodeData.F_YVRT_XQDJ,
+      //需求行号
+      SourceOrderLineNo2: barCodeData.F_YVRT_YDSeq,
+
       //批号
-      Lot: barCodeData.F_WLLOT,
+      Lot: barCodeData.F_WLLOT === ' ' ? '' : barCodeData.F_WLLOT,
       //名称
       Name: barCodeData.F_NUMBER.Name[0].Value,
       //规格型号
       Specification: barCodeData.F_NUMBER.MultiLanguageText[0].Specification,
       //是否整数
-      isInteger: true,
+      isInteger: !barCodeData.F_CHECKBOXFZ,
       //件数
       Quantity: 1,
       //数量
@@ -506,7 +520,7 @@ export const getcamelCase = async (searchValue: any) => {
     console.log('条码单数据2', res.data.Result?.ResponseStatus?.IsSuccess)
     if (res.data.Result?.ResponseStatus?.IsSuccess === false) {
       uni.showToast({
-        title: res.data.Result?.ResponseStatus?.Errors[0].Message,
+        title: '生产入库单不存在',
         icon: 'none'
       })
       return { dataList: [], fid: 0 }
@@ -575,7 +589,7 @@ export const getcamelCase = async (searchValue: any) => {
             style: { width: '70%' }
           },
           {
-            label: '订单数',
+            label: '批量',
             value: item.MustQty,
             disabled: true,
             type: 'input',
@@ -618,7 +632,6 @@ export const getcamelCase = async (searchValue: any) => {
             type: 'select',
             style: { width: '100%' }
           },
-
           {
             label: '数量',
             value: item.RealQty,
@@ -660,7 +673,7 @@ export const getcamelCase = async (searchValue: any) => {
         //源单行号
         SourceOrderLineNo: item.SrcEntrySeq,
         //批号
-        Lot: item.Lot_Text,
+        Lot: item.Lot_Text === ' ' ? '' : item.Lot_Text,
         //名称
         Name: item.MaterialId.Name[0].Value,
         //规格型号
@@ -694,8 +707,6 @@ export const camelCaseProduction = async (searchValue: any, warehousePosition: a
   if (res && res.data) {
     //生产订单-明细
     const barCodeData = res.data.Result.Result
-    console.log('生产订单行数据', barCodeData)
-
     if (barCodeData == null) {
       uni.showToast({
         title: '条码单不存在',
@@ -704,125 +715,16 @@ export const camelCaseProduction = async (searchValue: any, warehousePosition: a
       return null
     }
     //条码类型为唯一
-    if (barCodeData.F_BARTYPE !== '2') {
+    if (barCodeData.F_BARTYPE === '1') {
       uni.showToast({
         title: '条码类型非通用类型',
         icon: 'none'
       })
       return null
     }
-    //查找最大可收货数量
-    const res2: any = await productionOrder(
-      `FBillNo = '${barCodeData.F_SourceFbillno}' AND FTreeEntity_FSeq = ${barCodeData.F_SourceEntry}`,
-      `FBillNo,FNoStockInQty`
-    )
-    console.log('生产订单行数据2', res2.data)
+
     const data = {
-      currentList: [
-        {
-          label: '部门',
-          value: barCodeData.F_ALMA_BM?.Name[0].Value,
-          disabled: true,
-          type: 'input',
-          style: { width: '100%' }
-        },
-        {
-          label: '源单',
-          value: barCodeData.F_SourceFbillno + '-' + barCodeData.F_SourceEntry,
-          disabled: true,
-          type: 'input',
-          style: { width: '100%' }
-        },
-        {
-          label: '编码',
-          value: barCodeData.F_NUMBER.Number,
-          disabled: true,
-          type: 'input',
-          style: { width: '100%' }
-        },
-        {
-          label: '名称',
-          value: barCodeData.F_NUMBER.Name[0].Value,
-          disabled: true,
-          type: 'input',
-          style: { width: '100%' }
-        },
-        {
-          label: '规格',
-          value: barCodeData.F_NUMBER.MultiLanguageText[0].Specification,
-          disabled: true,
-          type: 'input',
-          style: { width: '100%' }
-        },
-        {
-          label: '批号',
-          value: barCodeData.F_WLLOT,
-          disabled: true,
-          type: 'input',
-          style: { width: '100%' }
-        },
-
-        {
-          label: '合同',
-          value: barCodeData.F_HTNO + '-' + barCodeData.F_QADV_HTENTRYID,
-          disabled: true,
-          type: 'input',
-          style: { width: '70%' }
-        },
-        {
-          label: '订单数',
-          value: barCodeData.F_POQTY,
-          disabled: true,
-          type: 'input',
-          style: { width: '30%' }
-        },
-
-        {
-          label: '客户',
-          value: barCodeData.FCUSTID?.Name?.[0]?.Value,
-          disabled: true,
-          type: 'input',
-          style: { width: '70%' }
-        },
-        {
-          label: '总箱数',
-          value: barCodeData.F_TOTALCARTONQTY,
-          disabled: true,
-          type: 'input',
-          style: { width: '30%' }
-        },
-
-        {
-          label: '推荐',
-          // value: barCodeData.F_UNITQTY,
-          value: '',
-          disabled: true,
-          type: 'input',
-          style: { width: '70%' }
-        },
-        {
-          label: '单位',
-          value: barCodeData.F_NUMBER.MaterialBase[0].BaseUnitId.Name[0].Value,
-          disabled: true,
-          type: 'input',
-          style: { width: '30%' }
-        },
-        {
-          label: '仓位',
-          value: warehousePosition,
-          disabled: false,
-          type: 'select',
-          style: { width: '100%' }
-        },
-
-        {
-          label: '数量',
-          value: barCodeData.F_UNITQTY,
-          disabled: false,
-          type: 'input',
-          style: { width: '100%' }
-        }
-      ],
+      currentList: [],
       otherData: {
         FMemo: barCodeData?.Description?.[0]?.Value, //备注
         F_QADV_KH: barCodeData.FCUSTID?.Number, //客户
@@ -839,16 +741,20 @@ export const camelCaseProduction = async (searchValue: any, warehousePosition: a
       SourceOrderNo: barCodeData.F_SourceFbillno,
       //源单行号
       SourceOrderLineNo: barCodeData.F_SourceEntry * 1,
+      //需求来源
+      SourceOrderType: barCodeData.ReqSrc,
+      //需求单号
+      SourceOrderNo2: barCodeData.ReqBillNo,
+      //需求行号
+      SourceOrderLineNo2: barCodeData.ReqEntrySeq,
       //批号
-      Lot: barCodeData.F_WLLOT,
+      Lot: barCodeData.F_WLLOT === ' ' ? '' : barCodeData.F_WLLOT,
       //名称
       Name: barCodeData.F_NUMBER.Name[0].Value,
       //规格型号
       Specification: barCodeData.F_NUMBER.MultiLanguageText[0].Specification,
       //数量
       Quantity2: barCodeData.F_UNITQTY,
-      //可收货数量
-      canReceive: res2.data[0][1],
       //仓位
       WarehousePosition: warehousePosition,
       //部件单位用量

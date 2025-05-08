@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, onBeforeMount, ref } from 'vue'
+import { reactive, onBeforeMount, ref, onBeforeUnmount } from 'vue'
 import { debounceSave } from '@/utils'
 import { camelCaseProduction, getcamelCase } from '@/common/storage/production'
 import { productionOrder } from '@/api/modules/storage'
@@ -14,7 +14,7 @@ const props = defineProps({
 //加载
 const loading = ref(false)
 const pageLoading = ref(true)
-const focusIndex = ref() // 当前焦点索引
+const focusIndex = ref(0) // 当前焦点索引
 
 //仓库选择器
 const pickerShow = ref(false)
@@ -38,8 +38,7 @@ const warehouseList = ref([] as any)
 const warehousePositionList = ref([] as any)
 
 const reactiveData = reactive({
-  // searchValue: 'AC2004N04TEX+MO000004+1',
-  searchValue: '',
+  searchValue: 'SCRK00000115',
   fid: 0,
   titleList: [
     {
@@ -59,7 +58,7 @@ const reactiveData = reactive({
     { label: '源单号', value: '', disabled: true, select: false },
     { label: '批号', value: '', disabled: true, select: false },
     { label: '客户', value: '', disabled: true, select: false },
-    { label: '订单数', value: '', disabled: true, select: false },
+    { label: '批量', value: '', disabled: true, select: false },
     { label: '总箱数', value: '', disabled: true, select: false },
     { label: '物料编码', value: '', disabled: true, select: false },
     { label: '物料名称', value: '', disabled: true, select: false },
@@ -77,6 +76,8 @@ const searchInput = ref()
 //订单号输入框
 const searchChange = async () => {
   setTimeout(async () => {
+    handleFocus()
+
     if (reactiveData.searchValue === '') {
       return
     }
@@ -88,7 +89,7 @@ const searchChange = async () => {
 
       console.log('单据内容', reactiveData.detailsList)
       if (reactiveData.detailsList.length !== 0) {
-        reactiveData.titleList[0].value = reactiveData.detailsList[0].MaterialCode
+        reactiveData.titleList[0].value = reactiveData.searchValue
         reactiveData.titleList[2].value = reactiveData.detailsList[0].WarehouseName
         console.log('仓库', reactiveData.titleList)
         //仓库
@@ -120,6 +121,7 @@ const searchChange = async () => {
     )
     console.log('res', res)
     if (!res) {
+      reactiveData.searchValue = ''
       loading.value = false
       return
     }
@@ -171,7 +173,6 @@ const getWarehouseList = async () => {
       }
     })
     pageLoading.value = false
-    focusIndex.value = 2
   }
 }
 //扫码获取数据
@@ -204,6 +205,14 @@ const warehouseChange = debounceSave(
       //获取仓库id替换为仓库名称
       const warehouseId: any = warehouseList.value.find((item: any) => item.value === val)
       console.log('warehouseId', warehouseId)
+      if (!warehouseId) {
+        //提示仓库不存在
+        uni.showToast({
+          title: '仓库不存在',
+          icon: 'none'
+        })
+        return
+      }
       reactiveData.titleList[2].value = warehouseId.text
       currentWarehouse.name = warehouseId.text
       currentWarehouse.number = warehouseId.value
@@ -212,6 +221,14 @@ const warehouseChange = debounceSave(
       //获取仓位id替换为仓位名称
       if (warehousePositionList.value.length !== 0) {
         const warehouseId: any = warehousePositionList.value.find((item: any) => item.value === val)
+        if (!warehouseId) {
+          //提示仓位不存在
+          uni.showToast({
+            title: '仓位不存在',
+            icon: 'none'
+          })
+          return
+        }
         if (reactiveData.detailsList.length !== 0) {
           reactiveData.detailsList[reactiveData.datailsIndex].currentList[12].value =
             warehouseId.text
@@ -331,12 +348,25 @@ const longpressClick = (item: any, index: number) => {
     }
   })
 }
-
-//隐藏软键盘
-const hideKeyboard = () => {
-  uni.hideKeyboard() // 隐藏软键盘
+const hideTimer = ref<number | null>(null)
+const handleFocus = () => {
+  // clearTimer()
+  uni.hideKeyboard()
+  // 设置定时器
+  if (!hideTimer.value) {
+    hideTimer.value = setInterval(() => {
+      uni.hideKeyboard()
+    }, 50) as unknown as number
+  }
 }
-
+const clearTimer = () => {
+  // 清除定时器
+  if (hideTimer.value) {
+    clearInterval(hideTimer.value)
+    hideTimer.value = null
+  }
+  console.log('清除定时器', hideTimer.value)
+}
 //返回到父组件
 const backClick = async () => {
   // 声明为异步函数
@@ -482,10 +512,13 @@ const backClick = async () => {
               //客户
               FNUMBER: item.otherData.F_QADV_KH
             },
-            F_QADV_TIQTY: 0.0, //累计入库数量
+            F_QADV_TIQTY: orderData[index][6], //累计入库数量
             F_QADV_HTNO: item.otherData.F_QADV_HTNO, //合同号
             F_BARSubEntity: item.barCodeList,
-            FEntity_Link: item.FEntity_Link
+            FEntity_Link: item.FEntity_Link,
+            FBFLowId: {
+              FID: 'f11b462a-8733-40bd-8f29-0906afc6a201'
+            } //流转单ID
           }
           console.log('测试1', data)
 
@@ -506,10 +539,15 @@ const backClick = async () => {
   )
   return { dataList, fid: reactiveData.fid, integer, SCCJ } // 返回填充后的数据
 }
-
+// 组件卸载时清理
+onBeforeUnmount(() => {
+  console.log('离开')
+  clearTimer()
+})
 onBeforeMount(() => {
   // 组件挂载前的逻辑
   console.log('组件即将挂载')
+  handleFocus()
   getWarehouseList()
 })
 
@@ -527,7 +565,7 @@ defineExpose({
     <view class="w-50px flex justify-center" @click="searchClick">
       <u-icon name="scan" size="24" />
     </view>
-    <view class="flex-1 mr-20rpx" style="border: 1px solid #f8f8f8">
+    <view class="flex-1 mr-20rpx" style="border: 1px solid #f8f8f8" @click="clearTimer">
       <u-input
         ref="searchInput"
         v-model="reactiveData.searchValue"
@@ -537,7 +575,6 @@ defineExpose({
         placeholder="请输入搜索关键词"
         :focus="focusIndex == 0"
         @blur="searchChange"
-        @focus="hideKeyboard"
       />
     </view>
   </view>
@@ -558,10 +595,9 @@ defineExpose({
           shape="round"
           placeholder=""
           :focus="index == focusIndex"
-          @focus="focusIndex = 0"
         />
       </view>
-      <view class="flex-1 mr-20rpx" style="border: 1px solid #f8f8f8" v-else>
+      <view class="flex-1 mr-20rpx" style="border: 1px solid #f8f8f8" v-else @click="clearTimer">
         <u-input
           v-model="item.value"
           :showAction="false"
@@ -570,7 +606,7 @@ defineExpose({
           placeholder=""
           :focus="index == focusIndex"
           @change="warehouseChange($event, item.label == '仓库')"
-          @focus="hideKeyboard"
+          @blur="handleFocus"
         >
           <template #suffix>
             <view @click="item.label == '仓库' ? (pickerShow = true) : (pickerShow2 = true)">
@@ -586,15 +622,14 @@ defineExpose({
               >
                 <view class="flex items-center p-20rpx" style="border-bottom: 1px solid #f8f8f8">
                   <view @tap="pickerShow = false">搜索 </view>
-                  <view class="flex-1">
+                  <view class="flex-1" @click="clearTimer">
                     <u-input
                       id="searchInput1"
                       v-model="item.scValue"
                       :showAction="false"
-                      :focus="true"
                       shape="round"
                       placeholder="请输入搜索关键词"
-                      @focus="hideKeyboard"
+                      @blur="handleFocus"
                     />
                   </view>
                 </view>
@@ -625,15 +660,14 @@ defineExpose({
               >
                 <view class="flex items-center p-20rpx" style="border-bottom: 1px solid #f8f8f8">
                   <view @tap="pickerShow2 = false">搜索123 </view>
-                  <view class="flex-1">
+                  <view class="flex-1" @click="clearTimer">
                     <u-input
                       id="searchInput2"
                       v-model="item.scValue2"
                       :showAction="false"
-                      :focus="true"
                       shape="round"
                       placeholder="请输入搜索关键词"
-                      @focus="hideKeyboard"
+                      @blur="handleFocus"
                     />
                   </view>
                 </view>
@@ -722,15 +756,14 @@ defineExpose({
                       style="border-bottom: 1px solid #f8f8f8"
                     >
                       <view @tap="pickerShow3 = false">搜索 </view>
-                      <view class="flex-1">
+                      <view class="flex-1" @click="clearTimer">
                         <u-input
                           id="searchInput2"
                           v-model="item.scValue2"
                           :showAction="false"
-                          :focus="true"
                           shape="round"
                           placeholder="请输入搜索关键词"
-                          @focus="hideKeyboard"
+                          @blur="handleFocus"
                         />
                       </view>
                     </view>
