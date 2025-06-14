@@ -1,8 +1,8 @@
 // import { useAppStore } from '@/store'
 // 定义请求地址
-// const BASE_URL = 'http://localhost/' //澳马正式环境
+const BASE_URL = 'http://localhost:80/' //澳马正式环境
 // const BASE_URL = 'http://125z0344r3.oicp.vip/' //澳马正式环境
-const BASE_URL = 'http://172.16.50.156/' //澳马正式环境
+// const BASE_URL = 'http://172.16.50.131/' //澳马正式环境
 // 封装请求方法
 const request = (obj: any) => {
   // const appStore = useAppStore()
@@ -26,19 +26,19 @@ const request = (obj: any) => {
       },
       success: (res: any) => {
         console.log('请求成功', res)
-        resolve(res)
 
         // console.log('requsetRes',res)
-        // console.log('obj.data',obj.data)
         if (
           res.statusCode == 404 ||
-          res?.data?.[0]?.[0]?.Result?.ResponseStatus?.ErrorCode == 500
+          res?.data?.[0]?.[0]?.Result?.ResponseStatus?.ErrorCode == 500 ||
+          res?.data?.Result?.ResponseStatus?.ErrorCode == 500
         ) {
           if (
             res?.data?.[0]?.[0]?.Result?.ResponseStatus?.Errors[0].Message ==
               '登录信息超时，请重新登录' ||
             res?.data?.[0]?.[0]?.Result?.ResponseStatus?.Errors[0].Message ==
-              '会话信息已丢失，请重新登录'
+              '会话信息已丢失，请重新登录' ||
+            res?.data?.Result?.ResponseStatus?.Errors[0].Message === '会话信息已丢失，请重新登录'
           ) {
             //返回登录
             uni.showToast({
@@ -49,13 +49,18 @@ const request = (obj: any) => {
               url: '/pages/login/login'
             })
           } else {
-            uni.showToast({
-              title: res?.data?.[0]?.[0]?.Result?.ResponseStatus?.Errors[0].Message,
-              icon: 'none'
-            })
+            resolve(res)
+
+            // if (res?.data?.Result?.ResponseStatus?.Errors[0].Message === '传递的编码值不存在') {
+            // } else {
+            //   uni.showToast({
+            //     title: res?.data?.[0]?.[0]?.Result?.ResponseStatus?.Errors[0].Message,
+            //     icon: 'none'
+            //   })
+            // }
           }
         } else {
-          // resolve(res)
+          resolve(res)
         }
       },
       fail: (err) => {

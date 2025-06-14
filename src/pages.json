@@ -82,6 +82,20 @@
         "navigationBarTitleText": "入库",
         "navigationStyle": "custom"
       }
+    },
+    {
+      "path": "pages/lowerCamelCase/PascalCase",
+      "style": {
+        "navigationBarTitleText": "销售出库",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/cancelOutbound/Index",
+      "style": {
+        "navigationBarTitleText": "销售出库撤销",
+        "navigationStyle": "custom"
+      }
     }
     
   ],

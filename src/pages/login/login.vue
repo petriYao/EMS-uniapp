@@ -6,7 +6,7 @@ import { onLoad } from '@dcloudio/uni-app'
 
 const reactiveData = reactive({
   username: '',
-  password: '',
+  password: 'lxq888',
   checked: true,
   msgshow: false,
   msgcontent: ''

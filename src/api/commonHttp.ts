@@ -1,5 +1,18 @@
 import http from '@/utils/requset'
 
+//查询是否封账
+export function QueryCheckoutTime(time: any) {
+  const data = {
+    parameters: [time]
+  }
+  return http({
+    url: '/k3cloud/Kingdee.BOS.TM.WebApi.ClosePeriodWebApiService.QueryCheckoutTime,Kingdee.BOS.TM.WebApi.common.kdsvc',
+    method: 'POST',
+    requestTime: 5000, //等待5秒
+    data: data
+  })
+}
+
 //登录接口
 export function login(data: any) {
   return http({

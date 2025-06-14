@@ -47,7 +47,12 @@ const saveClick = throttleSave(async () => {
         currentWarehouse.stoCurrentWarehouse = results12.currentData.stoCurrentWarehouse //获取当前库位
         currentWarehouse.warehousePositionList = results12.currentData.warehousePositionList //获取库位列表
         currentWarehouse.curNow = results12.currentData.curNow //获取当前库位
-
+        if (results12.dataList.length === 0) {
+          uni.showToast({
+            icon: 'none',
+            title: '无提交数据'
+          })
+        }
         const res1 = await saveProductionOrder(results12.dataList, results12.fid, results12.SCCJ)
         console.log('res', res1)
         if (res1 && res1.data && res1.data?.Result?.Number) {
@@ -74,7 +79,7 @@ const saveClick = throttleSave(async () => {
       // 执行扫单入库的保存逻辑
       const results3 = await titleStorageRefB.value?.backClick()
       console.log('results3', results3)
-      if (results3) {
+      if (results3 && !results3.isError) {
         const res3 = await saveProductionOrder(results3.dataList, results3.fid, results3.SCCJ)
         if (res3 && res3.data && res3.data?.Result?.Number) {
           uni.showToast({

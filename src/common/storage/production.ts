@@ -108,7 +108,7 @@ export const getInboundOrder = async (searchValue: any) => {
           },
           {
             label: '批量',
-            value: item.MustQty,
+            value: null,
             disabled: true,
             type: 'input',
             style: { width: '30%' }
@@ -207,9 +207,10 @@ export const getInboundOrder = async (searchValue: any) => {
         SplitValue: '',
         Unit: item.BaseUnitId.Name[0].Value,
         //分装批次号
-        // packagiingData: [],
-        packagiingData: packagingData,
-        packagngSig: packagingSig
+        FZLOTList: [],
+        packagingDataFZLOT: {} as any
+        // packagiingData: packagingData,
+        // packagngSig: packagingSig
       }
       dataList.push(data)
       console.log('生产入库明细数据', data)
@@ -244,7 +245,13 @@ export const productionGetData = async (
       })
       return null
     }
-    console.log('条码类型', barCodeData.F_BARTYPE)
+    if (barCodeData.DocumentStatus !== 'C') {
+      uni.showToast({
+        title: '条码未审核',
+        icon: 'none'
+      })
+      return null
+    }
     //条码类型为唯一
     if (barCodeData.F_BARTYPE === '2') {
       uni.showToast({
@@ -285,8 +292,9 @@ export const productionGetData = async (
       })
       return null
     }
+    console.log('条码状态', barCodeData.F_BARSTATUS)
 
-    if (barCodeData.F_BARSTATUS !== '1') {
+    if (barCodeData.F_BARSTATUS != 1) {
       uni.showToast({
         title: '条码非创建状态',
         icon: 'none'
@@ -298,7 +306,7 @@ export const productionGetData = async (
       `FBillNo = '${barCodeData.F_SourceFbillno}' AND FTreeEntity_FSeq = ${barCodeData.F_SourceEntry}`,
       `FBillNo,FNoStockInQty`
     )
-    console.log('生产订单行数据2', res2.data)
+    console.log('查找最大可收货数量', res2.data)
     const packagingData = {} as any
     const packagingSig = [] as string[] //分装编号
 
@@ -326,8 +334,7 @@ export const productionGetData = async (
       packagingData[barCodeData.F_FZNO].unitQty = barCodeData.F_JUNITQTY
       packagingData[barCodeData.F_FZNO].finishedQty = barCodeData.F_UNITQTY / barCodeData.F_JUNITQTY
     }
-    console.log('条码单数据', res2.data[0][1], packagingData)
-
+    console.log('测试', packagingData)
     const data = {
       currentList: [
         {
@@ -487,7 +494,7 @@ export const productionGetData = async (
       //数量
       Quantity2: barCodeData.F_CHECKBOXFZ ? 0 : barCodeData.F_UNITQTY,
       //可收货数量
-      canReceive: res2.data[0][1],
+      canReceive: res2.data?.[0]?.[1],
       //当前条码数量
       CurrentQty: barCodeData.F_UNITQTY,
       //是否分装
@@ -502,9 +509,18 @@ export const productionGetData = async (
       SplitValue: barCodeData.F_UNITQTY,
       Unit: barCodeData.F_NUMBER.MaterialBase[0].BaseUnitId.Name[0].Value,
       //分装批次号
-      packagingData: packagingData,
-      packagingSig: packagingSig
+      FZLOTList: [barCodeData.F_QADV_FZLOT],
+      packagingDataFZLOT: {} as any
     }
+    data.packagingDataFZLOT[barCodeData.F_QADV_FZLOT] = {
+      //分装批次号
+      packagingData: packagingData,
+      packagingSig: packagingSig,
+      isInteger: false,
+      FZquantity: 0
+    }
+    console.log('扫描条码2222')
+
     return data
   }
 }
@@ -590,7 +606,7 @@ export const getcamelCase = async (searchValue: any) => {
           },
           {
             label: '批量',
-            value: item.MustQty,
+            value: null,
             disabled: true,
             type: 'input',
             style: { width: '30%' }
@@ -605,7 +621,7 @@ export const getcamelCase = async (searchValue: any) => {
           },
           {
             label: '总箱数',
-            value: item.F_TOTALCARTONQTY,
+            value: null,
             disabled: true,
             type: 'input',
             style: { width: '30%' }
@@ -662,6 +678,8 @@ export const getcamelCase = async (searchValue: any) => {
         //条码单编码
         BarCode: searchValue,
         */
+        //是否第一次扫描条码
+        isLowerCamelCase: false,
         //是否整数
         isInteger: true,
         //生产部门
@@ -722,7 +740,13 @@ export const camelCaseProduction = async (searchValue: any, warehousePosition: a
       })
       return null
     }
-
+    if (barCodeData.DocumentStatus !== 'C') {
+      uni.showToast({
+        title: '条码未审核',
+        icon: 'none'
+      })
+      return null
+    }
     const data = {
       currentList: [],
       otherData: {

@@ -1,6 +1,6 @@
 {
   "typescript.tsdk": "node_modules/typescript/lib",
-  "prettier.enable": false,
+  "prettier.enable": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
   },
@@ -9,5 +9,6 @@
   // },
   "god.tsconfig": "./tsconfig.json",
   "i18n-ally.localesPaths": [],
-  "editor.inlineSuggest.showToolbar": "always"
+  "editor.inlineSuggest.showToolbar": "always",
+  
 }

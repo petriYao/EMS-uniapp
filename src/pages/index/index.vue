@@ -1,38 +1,17 @@
 <script setup lang="ts">
-import { onBeforeMount, reactive, ref } from 'vue'
+import { onBeforeMount, ref } from 'vue'
 import { getPushCK } from '@/api/modules/saleOrder'
+import TestInput from './TestInput.vue'
 import router from '@/router'
-
-const reactiveData = reactive({
-  UserAuthoritylist: [] as any
-})
 
 //报工
 const crmList = ref([] as any)
 
 //入库
-const crmList2 = ref([
-  {
-    name: '生产入库',
-    icon: 'https://cdn.uviewui.com/uview/album/1.jpg',
-    src: 'storage/storage?type=生产入库'
-  },
-  {
-    name: '简单生产入库',
-    icon: 'https://cdn.uviewui.com/uview/album/1.jpg',
-    src: 'storage/storage?type=简单生产入库'
-  },
-  {
-    name: '采购入库',
-    icon: 'https://cdn.uviewui.com/uview/album/1.jpg',
-    src: 'storage/storage?type=采购入库'
-  },
-  {
-    name: '其他入库',
-    icon: 'https://cdn.uviewui.com/uview/album/1.jpg',
-    src: 'storage/storage?type=其他入库'
-  }
-] as any)
+const crmList2 = ref([] as any)
+
+//销售出库
+const crmList3 = ref([] as any)
 
 const NavChange = (pages: any) => {
   console.log('pages', pages)
@@ -88,6 +67,7 @@ onBeforeMount(() => {
           src: 'productionreporting/productionreporting'
         })
         break
+      /*入库*********************************/
       case '12':
         crmList2.value.push({
           name: '生产入库',
@@ -116,6 +96,21 @@ onBeforeMount(() => {
           src: 'storage/storage?type=其他入库'
         })
         break
+      /*出库*********************************/
+      case '28':
+        crmList3.value.push({
+          name: '销售出库',
+          icon: '/static/index/Reportingforwork.png',
+          src: 'lowerCamelCase/PascalCase'
+        })
+        break
+      case '29':
+        crmList3.value.push({
+          name: '出库撤销',
+          icon: '/static/index/Reportingforwork.png',
+          src: 'cancelOutbound/Index'
+        })
+        break
     }
   }
   console.log('reactiveData.1', crmList.value)
@@ -123,6 +118,7 @@ onBeforeMount(() => {
 })
 </script>
 <template>
+  <!-- <TestInput /> -->
   <view class="text-14px">
     <view class="flex">
       <view class="bg-#FFF py-20rpx mx-20px w-100% rounded-6px">
@@ -150,6 +146,26 @@ onBeforeMount(() => {
         <view class="flex flex-wrap">
           <view
             v-for="(item, index) in crmList2"
+            :key="index"
+            class="w-25%"
+            @click="NavChange(item.src)"
+          >
+            <view class="flex justify-center">
+              <u-image :src="item.icon" mode="scaleToFill" width="80rpx" height="80rpx" />
+            </view>
+            <view class="flex justify-center">{{ item.name }}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="flex">
+      <view class="bg-#FFF mt-20px py-20rpx mx-20px w-100% rounded-6px">
+        <view class="ml-20px mb-20px">出库</view>
+
+        <view class="flex flex-wrap">
+          <view
+            v-for="(item, index) in crmList3"
             :key="index"
             class="w-25%"
             @click="NavChange(item.src)"

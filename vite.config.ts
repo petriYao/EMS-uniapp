@@ -14,7 +14,13 @@ export default defineConfig({
   server: {
     // port: 8080,
     host: '0.0.0.0',
-    proxy: {}
+    proxy: {
+      '/K3Cloud': {
+        target: 'http://localhost',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/K3Cloud/, '/K3Cloud')
+      }
+    }
   },
   resolve: {
     alias: {
