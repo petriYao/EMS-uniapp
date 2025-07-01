@@ -53,6 +53,33 @@ export const getInboundOrder = async (searchValue: any) => {
             packagingData[F_FZNO].quantity / packagingData[F_FZNO].unitQty
         }
       })
+
+      const stockLoc = item.StockLocId
+      let actualValue = null
+
+      // 获取对象的所有 key
+      const FStockLocId = {} as any
+      // 找到第一个 F10000x 字段，且其值不为 null
+      if (stockLoc != null) {
+        const keys = Object.keys(stockLoc)
+
+        for (const key of keys) {
+          console.log('key', key)
+
+          if (
+            key.startsWith('F10000') &&
+            stockLoc[key] !== null &&
+            typeof stockLoc[key] === 'object'
+          ) {
+            FStockLocId[`FSTOCKLOCID__F` + key] = {
+              Fnumber: stockLoc[key].Number
+            }
+            actualValue = stockLoc[key]
+            break
+          }
+        }
+      }
+
       console.log('数量', item.RealQty)
       const data = {
         currentList: [
@@ -104,14 +131,14 @@ export const getInboundOrder = async (searchValue: any) => {
             value: item.F_QADV_HTNO,
             disabled: true,
             type: 'input',
-            style: { width: '70%' }
+            style: { width: '65%' }
           },
           {
             label: '批量',
             value: null,
             disabled: true,
             type: 'input',
-            style: { width: '30%' }
+            style: { width: '35%' }
           },
 
           {
@@ -119,21 +146,21 @@ export const getInboundOrder = async (searchValue: any) => {
             value: item.F_QADV_KH?.Name?.[0]?.Value,
             disabled: true,
             type: 'input',
-            style: { width: '70%' }
+            style: { width: '65%' }
           },
           {
             label: '总箱数',
             value: item.F_TOTALCARTONQTY,
             disabled: true,
             type: 'input',
-            style: { width: '30%' }
+            style: { width: '35%' }
           },
           {
             label: '推荐',
             value: '',
             disabled: true,
             type: 'input',
-            style: { width: '70%' }
+            style: { width: '65%' }
           },
 
           {
@@ -141,11 +168,11 @@ export const getInboundOrder = async (searchValue: any) => {
             value: item.BaseUnitId.Name[0].Value,
             disabled: true,
             type: 'input',
-            style: { width: '30%' }
+            style: { width: '35%' }
           },
           {
             label: '仓位',
-            value: item.StockLocId?.F100001?.Number,
+            value: actualValue?.Number,
             disabled: false,
             type: 'select',
             style: { width: '100%' }
@@ -154,8 +181,8 @@ export const getInboundOrder = async (searchValue: any) => {
         barCodeList: item.F_BARSubEntity,
         otherData: {
           FMemo: item?.Description?.[0]?.Value, //备注
-          F_QADV_KH: item.FCUSTID?.Number, //客户
-          F_QADV_HTNO: item.F_HTNO, //合同
+          F_QADV_KH: item.F_QADV_KH?.Number, //客户
+          F_QADV_HTNO: item.F_QADV_HTNO, //合同
           F_QADV_HTENTRYID: item.F_QADV_HTENTRYID //合同行号
         },
         /*
@@ -189,15 +216,15 @@ export const getInboundOrder = async (searchValue: any) => {
         //数量
         Quantity2: 0,
         //可收货数量
-        canReceive: item.RealQty,
+        canReceive: item.MustQty,
         //累计入库数量(合格品入库数量)
         //是否分装
         IsSplit: false,
         //分装编号
         SplitCode: '',
         //仓位
-        WarehousePosition: item.StockLocId?.F100001?.Number,
-        WarehousePositionName: item.StockLocId?.F100001?.Name[0].Value,
+        WarehousePosition: actualValue?.Number,
+        WarehousePositionName: actualValue?.Name[0].Value,
         //仓库
         WarehouseId: item.StockId?.Number,
         WarehouseName: item.StockId?.Name[0].Value,
@@ -213,7 +240,7 @@ export const getInboundOrder = async (searchValue: any) => {
         // packagngSig: packagingSig
       }
       dataList.push(data)
-      console.log('生产入库明细数据', data)
+      console.log('生产入库明细数据123', data)
     }
   }
   return { dataList, fid }
@@ -385,14 +412,14 @@ export const productionGetData = async (
           value: barCodeData.F_HTNO + '-' + barCodeData.F_QADV_HTENTRYID,
           disabled: true,
           type: 'input',
-          style: { width: '70%' }
+          style: { width: '65%' }
         },
         {
           label: '批量',
           value: barCodeData.F_POQTY,
           disabled: true,
           type: 'input',
-          style: { width: '30%' }
+          style: { width: '35%' }
         },
 
         {
@@ -400,14 +427,14 @@ export const productionGetData = async (
           value: barCodeData.FCUSTID?.Name?.[0]?.Value,
           disabled: true,
           type: 'input',
-          style: { width: '70%' }
+          style: { width: '65%' }
         },
         {
           label: '总箱数',
           value: barCodeData.F_TOTALCARTONQTY,
           disabled: true,
           type: 'input',
-          style: { width: '30%' }
+          style: { width: '35%' }
         },
 
         {
@@ -416,14 +443,14 @@ export const productionGetData = async (
           value: '',
           disabled: true,
           type: 'input',
-          style: { width: '70%' }
+          style: { width: '65%' }
         },
         {
           label: '单位',
           value: barCodeData.F_NUMBER.MaterialBase[0].BaseUnitId.Name[0].Value,
           disabled: true,
           type: 'input',
-          style: { width: '30%' }
+          style: { width: '35%' }
         },
         {
           label: '仓位',
@@ -533,7 +560,6 @@ export const getcamelCase = async (searchValue: any) => {
   console.log('条码单数据', res.data)
 
   if (res && res.data) {
-    console.log('条码单数据2', res.data.Result?.ResponseStatus?.IsSuccess)
     if (res.data.Result?.ResponseStatus?.IsSuccess === false) {
       uni.showToast({
         title: '生产入库单不存在',
@@ -552,6 +578,31 @@ export const getcamelCase = async (searchValue: any) => {
     const TreeEntity = res.data.Result.Result.Entity
     console.log('生产订单属性', TreeEntity)
     for (const item of TreeEntity) {
+      const stockLoc = item.StockLocId
+      let actualValue = null
+
+      // 获取对象的所有 key
+      const FStockLocId = {} as any
+      // 找到第一个 F10000x 字段，且其值不为 null
+      if (stockLoc != null) {
+        const keys = Object.keys(stockLoc)
+
+        for (const key of keys) {
+          console.log('key', key)
+
+          if (
+            key.startsWith('F10000') &&
+            stockLoc[key] !== null &&
+            typeof stockLoc[key] === 'object'
+          ) {
+            FStockLocId[`FSTOCKLOCID__F` + key] = {
+              Fnumber: stockLoc[key].Number
+            }
+            actualValue = stockLoc[key]
+            break
+          }
+        }
+      }
       const data = {
         currentList: [
           {
@@ -602,14 +653,14 @@ export const getcamelCase = async (searchValue: any) => {
             value: item.F_QADV_HTNO,
             disabled: true,
             type: 'input',
-            style: { width: '70%' }
+            style: { width: '65%' }
           },
           {
             label: '批量',
             value: null,
             disabled: true,
             type: 'input',
-            style: { width: '30%' }
+            style: { width: '35%' }
           },
 
           {
@@ -617,21 +668,21 @@ export const getcamelCase = async (searchValue: any) => {
             value: item.F_QADV_KH?.Name?.[0]?.Value,
             disabled: true,
             type: 'input',
-            style: { width: '70%' }
+            style: { width: '65%' }
           },
           {
             label: '总箱数',
             value: null,
             disabled: true,
             type: 'input',
-            style: { width: '30%' }
+            style: { width: '35%' }
           },
           {
             label: '推荐',
             value: '',
             disabled: true,
             type: 'input',
-            style: { width: '70%' }
+            style: { width: '65%' }
           },
 
           {
@@ -639,11 +690,11 @@ export const getcamelCase = async (searchValue: any) => {
             value: item.BaseUnitId.Name[0].Value,
             disabled: true,
             type: 'input',
-            style: { width: '30%' }
+            style: { width: '35%' }
           },
           {
             label: '仓位',
-            value: item.StockLocId?.F100001?.Number,
+            value: actualValue?.Number,
             disabled: false,
             type: 'select',
             style: { width: '100%' }
@@ -670,8 +721,8 @@ export const getcamelCase = async (searchValue: any) => {
         ],
         otherData: {
           FMemo: item?.Description?.[0]?.Value, //备注
-          F_QADV_KH: item.FCUSTID?.Number, //客户
-          F_QADV_HTNO: item.F_HTNO, //合同
+          F_QADV_KH: item.F_QADV_KH?.Number, //客户
+          F_QADV_HTNO: item.F_QADV_HTNO, //合同
           F_QADV_HTENTRYID: item.F_QADV_HTENTRYID //合同行号
         },
         /*
@@ -701,8 +752,8 @@ export const getcamelCase = async (searchValue: any) => {
         //数量
         Quantity2: item.RealQty,
         //仓位
-        WarehousePosition: item.StockLocId?.F100001?.Number,
-        WarehousePositionName: item.StockLocId?.F100001?.Name[0].Value,
+        WarehousePosition: actualValue?.Number,
+        WarehousePositionName: actualValue?.Name[0].Value,
         //仓库
         WarehouseId: item.StockId?.Number,
         WarehouseName: item.StockId?.Name[0].Value,

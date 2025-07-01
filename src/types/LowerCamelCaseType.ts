@@ -37,5 +37,6 @@ export type SalesOutboundCancelType = {
   location: string
   FENTRYID: number
   isInteger: boolean
+  isFE: boolean
   FRealQty: number
 }

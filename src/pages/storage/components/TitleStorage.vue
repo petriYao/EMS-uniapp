@@ -2,7 +2,7 @@
 import { reactive, watch, onBeforeMount, ref, onBeforeUnmount } from 'vue'
 import { debounceSave } from '@/utils'
 import { productionGetData, getInboundOrder } from '@/common/storage/production'
-import { productionOrder, lowerCamelCase } from '@/api/modules/storage'
+import { productionOrder, lowerCamelCase2 } from '@/api/modules/storage'
 import { queryStorage, lookqueryStorage, barcodeStatus } from '@/api/modules/storage'
 const props = defineProps({
   title: {
@@ -55,6 +55,7 @@ const warehouseList = ref([
     value: '仓库2'
   }
 ])
+const FlexNumber = ref('')
 //仓位
 const warehousePositionList = ref([] as any)
 
@@ -330,14 +331,14 @@ const searchChange = async () => {
           })
         } else {
           //获取推荐仓位（根据物料编码、批号、仓库查库存表）
-          const FMaterialId = res.MaterialCode //物料编码FMaterialId.Fnumber
-          const FLot = res.Lot //批号FLot
-          const FStockId = currentWarehouse.number //仓库FStockId.Fname
+          // const FMaterialId = res.MaterialCode //物料编码FMaterialId.Fnumber
+          // const FLot = res.Lot //批号FLot
+          // const FStockId = currentWarehouse.number //仓库FStockId.Fname
 
-          const lowerRes = await lowerCamelCase(`
-            FMaterialId.Fnumber = '${FMaterialId}' AND FLot.Fnumber = '${FLot}' AND FStockId.Fnumber = '${FStockId}'
-          `)
-          console.log('lowerRes', lowerRes)
+          // const lowerRes = await lowerCamelCase2(`
+          //   FMaterialId.Fnumber = '${FMaterialId}' AND FLot.Fnumber = '${FLot}' AND FStockId.Fnumber = '${FStockId}'
+          // `)
+          // console.log('lowerRes', lowerRes)
 
           reactiveData.detailsList.push(res)
           reactiveData.curNow = 0
@@ -352,7 +353,8 @@ const searchChange = async () => {
       const FLot = res.Lot //批号FLot
       const FStockId = currentWarehouse.number //仓库FStockId.Fname
       const FilterString = `FMaterialId.Fnumber = '${FMaterialId}' AND FLot.Fnumber = '${FLot}' AND FStockId.Fnumber = '${FStockId}' AND FBaseQty > 0`
-      const lowerRes: any = await lowerCamelCase(FilterString)
+      const FieldKeys = `FStockLocId.${FlexNumber.value}.FNumber`
+      const lowerRes: any = await lowerCamelCase2(FilterString, FieldKeys)
       console.log('lowerRes', lowerRes)
       if (lowerRes && lowerRes.data && lowerRes.data.length > 0) {
         res.currentList[10].value = lowerRes.data.map((item: any) => item[0]).join(',') //推荐仓位
@@ -517,6 +519,7 @@ const warehouseClick = async (val: any) => {
     console.log('res', res)
     if (res) {
       const list = res.data.Result.Result.StockFlexItem[0].StockFlexDetail
+      FlexNumber.value = res.data.Result.Result.StockFlexItem[0].FlexId.FlexNumber
       console.log('list', list)
       if (list[0].Id === 0) {
         warehousePositionList.value = []
@@ -560,7 +563,7 @@ const pickerConfirm = async (val: any) => {
 }
 //仓位选择器确认(iswarehousePosition为true时，表示表头仓位选择器，否则为当前仓位选择器)
 const pickerConfirm2 = (val: any, iswarehousePosition?: boolean) => {
-  console.log('选择仓位2', iswarehousePosition)
+  console.log('选择仓位2', val)
 
   if (iswarehousePosition) {
     reactiveData.titleList[3].value = val.value
@@ -852,6 +855,7 @@ const backClick = async () => {
         const index = orderData.findIndex((item1: any) => {
           return item1[1] === item.SourceOrderNo && item1[2] === item.SourceOrderLineNo
         })
+        console.log('查找相同', orderData[index])
         if (index === -1) return
         //单据内码
         const documentInnerCode = orderData[index][0] //单据内码
@@ -864,6 +868,13 @@ const backClick = async () => {
         if (item.ProductionDepartment) {
           SCCJ = item.ProductionDepartment
         }
+        //仓位
+        const FStockLocPJ = 'FSTOCKLOCID__' + FlexNumber.value
+        const FStockLocId = {} as any
+        FStockLocId[FStockLocPJ] = {
+          FNumber: item.WarehousePosition
+        }
+        console.log('FStockLocId', FStockLocId)
         // 构建 data 对象（同上）
         let data = {
           FSrcEntryId: entryInnerCode, //源单分录内码
@@ -900,12 +911,7 @@ const backClick = async () => {
             //仓库
             FNumber: currentWarehouse.number
           },
-          FStockLocId: {
-            //仓位
-            FSTOCKLOCID__FF100001: {
-              FNumber: item.WarehousePosition
-            }
-          },
+          FStockLocId: FStockLocId, //仓位
           FLot: {
             FNumber: item.Lot
           },
@@ -993,7 +999,8 @@ const backClick = async () => {
     currentWarehousePositionName: currentWarehousePosition.name,
     currentWarehousePositionNumber: currentWarehousePosition.number,
     warehousePositionList: warehousePositionList.value,
-    curNow: reactiveData.curNow
+    curNow: reactiveData.curNow,
+    FlexNumber: FlexNumber.value
   }
   console.log('当前仓库', currentData)
   return {
@@ -1037,14 +1044,27 @@ watch(
     if (props.stoCurrentWarehouse.name === '') return
     currentWarehouse.name = props.stoCurrentWarehouse.name
     currentWarehouse.number = props.stoCurrentWarehouse.number
-    warehousePositionList.value = props.stoCurrentWarehouse.warehousePositionList //仓位
+
     reactiveData.curNow = props.stoCurrentWarehouse.curNow
     reactiveData.titleList[2].value = currentWarehouse.name
-    reactiveData.titleList[3].disabled = props.stoCurrentWarehouse.number == ''
 
-    setTimeout(() => {
-      focusIndex.value = 0
-    }, 200)
+    warehousePositionList.value = props.stoCurrentWarehouse.warehousePositionList //仓位
+    FlexNumber.value = props.stoCurrentWarehouse.FlexNumber
+    if (warehousePositionList.value.length == 0) {
+      console.log('1')
+      reactiveData.titleList[3].disabled = true
+      focusIndex.value = 22
+      setTimeout(() => {
+        focusIndex.value = 0
+      }, 200)
+    } else {
+      console.log('2')
+      reactiveData.titleList[3].disabled = false
+      focusIndex.value = 22
+      setTimeout(() => {
+        focusIndex.value = 3
+      }, 200)
+    }
   },
   { immediate: true, deep: true }
 )
@@ -1396,8 +1416,8 @@ defineExpose({
       <view v-else>
         <view class="flex bg-#f2f2f2 py-10rpx">
           <view class="w-15% text-center">序号</view>
-          <view class="w-75%">条码编号</view>
-          <view class="w-10% text-center">数量</view>
+          <view class="w-70%">条码编号</view>
+          <view class="w-15% text-center">数量</view>
           <!-- <view class="w-10% text-center">分装</view>
           <view class="w-40% text-center">部件名称</view> -->
           <!-- <view class="w-10% text-center">用量</view> -->
@@ -1412,9 +1432,9 @@ defineExpose({
         >
           <view class="flex py-10rpx" :style="index % 2 == 1 ? 'background-color:#f2f2f2' : ''">
             <view class="w-15% flex items-center justify-center">{{ index + 1 }}</view>
-            <view class="w-75%" style="overflow-wrap: break-word">
+            <view class="w-70%" style="overflow-wrap: break-word">
               <view> {{ item.F_BARCODENO }}</view>
-              <view class="flex items-center" v-if="item.F_JUNITQTY > 0">
+              <view class="flex items-center" v-if="item.F_FZNO !== ' ' && item.F_FZNO !== ''">
                 <view class=""> 分装： {{ item.F_FZNO }}</view>
                 <view class="ml-8px flex items-center justify-center h-100%">
                   用量：{{ item.F_JUNITQTY === 0 ? '' : item.F_JUNITQTY }}
@@ -1422,7 +1442,7 @@ defineExpose({
                 <view class="ml-8px h-24px flex items-center">{{ item.F_BJNAME }}</view>
               </view>
             </view>
-            <view class="w-10% flex justify-center">{{ item.F_UNITQTY }}</view>
+            <view class="w-15% flex justify-center">{{ item.F_UNITQTY }}</view>
           </view>
         </view>
       </view>

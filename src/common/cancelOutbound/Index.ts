@@ -1,10 +1,13 @@
 import { QueryCheckoutTime } from '@/api/commonHttp'
 import { salesOrder, lookSalesOrder, pickupOrder, lookBarCode } from '@/api/modules/lowerCamelCase'
 import {
+  UnAuditApiClient,
   shipmentSubContainer,
   lookShipmentSubContainer,
-  shipmentSubContainerSave
+  shipmentSubContainerSave,
+  deleteSubContainer
 } from '@/api/modules/lowerCamelCase'
+
 /**
  * 查看条码是否存在与提货单中（单据查询销售出库，按提货单号+柜号+编码）
  * 储存出库单号
@@ -16,9 +19,19 @@ export const productionGetData = async (
   containerNoValue: any
 ) => {
   const BarCoderes: any = await lookBarCode(searchValue)
+  console.log('查询条码数据', BarCoderes)
+  if (BarCoderes.data.Result.Result == null) {
+    uni.showToast({
+      title: '条码不存在',
+      icon: 'none'
+    })
+    return null
+  }
+
+  const barCodeData = BarCoderes.data?.Result?.Result
+  console.log('分装', barCodeData.F_CHECKBOXFZ)
   if (BarCoderes && BarCoderes.data) {
     //条码-明细
-    const barCodeData = BarCoderes.data.Result.Result
     console.log('条码-明细', barCodeData)
     if (barCodeData == null) {
       uni.showToast({
@@ -115,13 +128,38 @@ export const productionGetData = async (
     })
   }
   const index = ckData.SAL_OUTSTOCKENTRY.findIndex((item: any) => item.Id == res.data[0][1])
-  let isFE = false
   if (index !== -1) {
+    const stockLoc = ckData.SAL_OUTSTOCKENTRY[index].StockLocID
+    let actualValue = null
+
+    // 获取对象的所有 key
+    const FStockLocId = {} as any
+    // 找到第一个 F10000x 字段，且其值不为 null
+    if (stockLoc != null) {
+      const keys = Object.keys(stockLoc)
+
+      for (const key of keys) {
+        console.log('key', key)
+
+        if (
+          key.startsWith('F10000') &&
+          stockLoc[key] !== null &&
+          typeof stockLoc[key] === 'object'
+        ) {
+          FStockLocId[`FSTOCKLOCID__F` + key] = {
+            Fnumber: stockLoc[key].Number
+          }
+          actualValue = stockLoc[key]
+          break
+        }
+      }
+    }
+
     console.log('index', ckData.SAL_OUTSTOCKENTRY[index])
     console.log('错误', ckData.SAL_OUTSTOCKENTRY[index].StockLocID)
     lowerCamelCaseList.FENTRYID = ckData.SAL_OUTSTOCKENTRY[index].Id
     lowerCamelCaseList.warehouse = ckData.SAL_OUTSTOCKENTRY[index].StockID.Name[0].Value
-    lowerCamelCaseList.location = ckData.SAL_OUTSTOCKENTRY[index].StockLocID?.F100001?.Name[0].Value
+    lowerCamelCaseList.location = actualValue?.Name[0].Value
     lowerCamelCaseList.currentList = [
       {
         label: '条码',
@@ -199,14 +237,16 @@ export const productionGetData = async (
         style: { width: '50%' }
       }
     ]
-    isFE = ckData.SAL_OUTSTOCKENTRY[index].F_QADV_XSCKSubEntity[0].F_JUNITQTY > 0
   }
   //仓库仓位
   console.log('Model', Model)
+  console.log('lowerCamelCaseList', lowerCamelCaseList)
+  console.log('F_CHECKBOXFZ', barCodeData.F_CHECKBOXFZ)
   const data = {
     Model, //提交数据
+    FEntityIndex: index,
     lowerCamelCaseList: lowerCamelCaseList,
-    isFE: isFE //是否分装
+    isFE: barCodeData.F_CHECKBOXFZ //是否分装
   }
   //删除Model.FEntity[0].F_QADV_XSCKSubEntity中F_BARCODENO=searchValue的值
   // Model.FEntity[0].F_QADV_XSCKSubEntity = Model.FEntity[0].F_QADV_XSCKSubEntity.filter(
@@ -241,8 +281,8 @@ export async function changeOutbound(
       FEntity: [] as any
     }
     for (const SALitem of ckData.QADV_THDFGEntry) {
-      console.log('SALitem', res.data[0][6] == SALitem.Id, res.data[0][6], SALitem.Id)
       if (res.data[0][6] == SALitem.Id) {
+        console.log('SALitem', SALitem.F_QADV_QTY, num)
         if (SALitem.F_QADV_QTY - num > 0) {
           Model.FEntity.push({
             FENTRYID: SALitem.Id,
@@ -256,9 +296,16 @@ export async function changeOutbound(
         })
       }
     }
-    //保存分柜单
-    const fgres = await shipmentSubContainerSave(Model, false)
-    console.log('修改出运分柜', fgres)
+    //反审核
+    await UnAuditApiClient('QADV_THDFG', Model.FID)
+    if (Model.FEntity.length == 0) {
+      //删除分柜单
+      await deleteSubContainer(Model.FID)
+    } else {
+      //保存分柜单
+      const fgres = await shipmentSubContainerSave(Model, true)
+      console.log('修改出运分柜', fgres)
+    }
   }
   return res
 }

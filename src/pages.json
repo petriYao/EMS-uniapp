@@ -96,8 +96,21 @@
         "navigationBarTitleText": "销售出库撤销",
         "navigationStyle": "custom"
       }
+    },
+    {
+      "path": "pages/barCodeStock/Index",
+      "style": {
+        "navigationBarTitleText": "条码库存查询",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/transferOrder/Index",
+      "style": {
+        "navigationBarTitleText": "调拨单",
+        "navigationStyle": "custom"
+      }
     }
-    
   ],
   "tabBar": {
     "color": "#606266",

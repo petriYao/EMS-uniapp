@@ -36,6 +36,7 @@ const currentWarehousePosition = reactive({
 const warehouseList = ref([] as any)
 //仓位
 const warehousePositionList = ref([] as any)
+const FlexNumber = ref('')
 
 const reactiveData = reactive({
   searchValue: '',
@@ -282,6 +283,7 @@ const warehouseClick = async (val: any) => {
     console.log('res', res)
     if (res) {
       const list = res.data.Result.Result.StockFlexItem[0].StockFlexDetail
+      FlexNumber.value = res.data.Result.Result.StockFlexItem[0].FlexId.FlexNumber
       console.log('list', list)
       if (list[0].Id === 0) {
         warehousePositionList.value = []
@@ -444,6 +446,12 @@ const backClick = async () => {
         if (item.ProductionDepartment) {
           SCCJ = item.ProductionDepartment
         }
+        //仓位
+        const FStockLocPJ = 'FSTOCKLOCID__' + FlexNumber.value
+        const FStockLocId = {} as any
+        FStockLocId[FStockLocPJ] = {
+          FNumber: item.WarehousePosition
+        }
         // 构建 data 对象（同上）
         let data = {
           FSrcEntryId: entryInnerCode, //源单分录内码
@@ -480,12 +488,7 @@ const backClick = async () => {
             //仓库
             FNumber: currentWarehouse.number
           },
-          FStockLocId: {
-            //仓位
-            FSTOCKLOCID__FF100001: {
-              FNumber: item.WarehousePosition
-            }
-          },
+          FStockLocId: FStockLocId, //仓位
           FLot: {
             FNumber: item.Lot
           },
@@ -781,7 +784,7 @@ defineExpose({
               @change="warehouseChange($event, item.label == '仓库', true)"
             >
               <template #suffix>
-                <view @click="warehousePositionList.length !== 0 ? (pickerShow = true) : ''">
+                <view @click="warehousePositionList.length !== 0 ? (pickerShow3 = true) : ''">
                   <u-icon name="arrow-down" size="20" />
                 </view>
                 <view>

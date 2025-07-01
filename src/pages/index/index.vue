@@ -3,7 +3,7 @@ import { onBeforeMount, ref } from 'vue'
 import { getPushCK } from '@/api/modules/saleOrder'
 import TestInput from './TestInput.vue'
 import router from '@/router'
-
+import { UpdateInstallApp } from '@/common/AppUpdate.js'
 //报工
 const crmList = ref([] as any)
 
@@ -12,7 +12,10 @@ const crmList2 = ref([] as any)
 
 //销售出库
 const crmList3 = ref([] as any)
-
+//库存管理
+const crmList4 = ref([] as any)
+//领料
+const crmList5 = ref([] as any)
 const NavChange = (pages: any) => {
   console.log('pages', pages)
   uni.navigateTo({
@@ -48,6 +51,8 @@ const scanCode = async () => {
 }
 
 onBeforeMount(() => {
+  UpdateInstallApp()
+
   let UserAuthority = uni.getStorageSync('UserAuthority')
   crmList.value = []
   crmList2.value = []
@@ -77,9 +82,9 @@ onBeforeMount(() => {
         break
       case '16':
         crmList2.value.push({
-          name: '简单生产入库',
+          name: '简单入库',
           icon: '/static/index/Reportingforwork.png',
-          src: 'storage/storage?type=简单生产入库'
+          src: 'storage/storage?type=简单入库'
         })
         break
       case '20':
@@ -90,7 +95,7 @@ onBeforeMount(() => {
         })
         break
       case '24':
-        crmList2.value.push({
+        crmList5.value.push({
           name: '其他入库',
           icon: '/static/index/Reportingforwork.png',
           src: 'storage/storage?type=其他入库'
@@ -109,6 +114,24 @@ onBeforeMount(() => {
           name: '出库撤销',
           icon: '/static/index/Reportingforwork.png',
           src: 'cancelOutbound/Index'
+        })
+        crmList3.value.push({
+          name: '其他出库',
+          icon: '/static/index/Reportingforwork.png',
+          src: 'cancelOutbound/Index'
+        })
+        break
+
+      case '30':
+        crmList4.value.push({
+          name: '库存查询',
+          icon: '/static/index/Reportingforwork.png',
+          src: 'barCodeStock/Index'
+        })
+        crmList4.value.push({
+          name: '调拨单',
+          icon: '/static/index/Reportingforwork.png',
+          src: 'transferOrder/Index'
         })
         break
     }
@@ -158,6 +181,25 @@ onBeforeMount(() => {
         </view>
       </view>
     </view>
+    <view class="flex" v-if="false">
+      <view class="bg-#FFF mt-20px py-20rpx mx-20px w-100% rounded-6px">
+        <view class="ml-20px mb-20px">领料</view>
+
+        <view class="flex flex-wrap">
+          <view
+            v-for="(item, index) in crmList5"
+            :key="index"
+            class="w-25%"
+            @click="NavChange(item.src)"
+          >
+            <view class="flex justify-center">
+              <u-image :src="item.icon" mode="scaleToFill" width="80rpx" height="80rpx" />
+            </view>
+            <view class="flex justify-center">{{ item.name }}</view>
+          </view>
+        </view>
+      </view>
+    </view>
 
     <view class="flex">
       <view class="bg-#FFF mt-20px py-20rpx mx-20px w-100% rounded-6px">
@@ -178,8 +220,31 @@ onBeforeMount(() => {
         </view>
       </view>
     </view>
+    <view class="flex">
+      <view class="bg-#FFF mt-20px py-20rpx mx-20px w-100% rounded-6px">
+        <view class="ml-20px mb-20px">库存管理</view>
+
+        <view class="flex flex-wrap">
+          <view
+            v-for="(item, index) in crmList4"
+            :key="index"
+            class="w-25%"
+            @click="NavChange(item.src)"
+          >
+            <view class="flex justify-center">
+              <u-image :src="item.icon" mode="scaleToFill" width="80rpx" height="80rpx" />
+            </view>
+            <view class="flex justify-center">{{ item.name }}</view>
+          </view>
+        </view>
+      </view>
+    </view>
   </view>
-  <view class="toShoppingCart bg-#409DF4 border-2 border-#F7F8F7 rounded-100rpx" @tap="scanCode">
+  <view
+    class="toShoppingCart bg-#409DF4 border-2 border-#F7F8F7 rounded-100rpx"
+    v-if="false"
+    @tap="scanCode"
+  >
     <u-icon name="plus" size="30px" color="#FFFFFF" />
   </view>
 </template>

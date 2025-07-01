@@ -7,7 +7,8 @@ import {
   pushClient,
   shipmentSubContainer,
   pickupOrder,
-  shipmentSubContainerSave
+  shipmentSubContainerSave,
+  UnAuditApiClient
 } from '@/api/modules/lowerCamelCase'
 import { throttleSave } from '@/utils'
 import { barcodeStatus } from '@/api/modules/storage'
@@ -62,17 +63,6 @@ const saveClick = throttleSave(async () => {
     reacticeData.loading = false
     return
   }
-
-  if (barCodeRes && barCodeRes.data && barCodeRes.data.length > 0) {
-    //条码状态不为1的提示
-    uni.showToast({
-      title: `编码${barCodeRes.data[0][1]}中，条码${barCodeRes.data[0][0]}不为入库状态`,
-      icon: 'none',
-      duration: 5000
-    })
-    return
-  }
-
   //调用发货通知单单据查询验证出运分柜数量是否超发货通知数量
   const pickupRes: any = await pickupOrder(results12.ThFilter.filtersString)
   if (pickupRes && pickupRes.data.length !== results12.ThFilter.ThFilterNum) {
@@ -189,6 +179,8 @@ const saveClick = throttleSave(async () => {
         })
       )
       console.log('Model', Model)
+      //反审核出运分柜单
+      await UnAuditApiClient('QADV_THDFG', Model.FID)
       //3.保存出运分柜单
       const pushResSaveData = shipmentSubContainerSave(Model, false)
       console.log('pushResSaveData', pushResSaveData)

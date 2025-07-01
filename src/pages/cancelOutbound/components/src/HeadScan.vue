@@ -1,26 +1,30 @@
 <script setup lang="ts">
-import { reactive, ref, onBeforeMount, onBeforeUnmount } from 'vue'
-
+import { reactive, ref, onBeforeUnmount, onBeforeMount, watch } from 'vue'
 import { productionGetData } from '@/common/cancelOutbound/Index'
 import { SalesOutboundCancelType } from '@/types/LowerCamelCaseType'
 // import { useEmitt } from '@/hooks/useEmitt'
 
+const props = defineProps<{
+  pickupOrderValue: any
+  containerNoValue: any
+}>()
 //数据
 const reactiveData = reactive({
   searchValue: '', //搜索值
-  pickupOrderValue: '', //单号
+  pickupOrderValue: 'FHTZD000008', //单号
   containerNoValue: 1, //柜号
   focus: 1,
   detailsList: {} as any,
   lowerCamelCaseList: {
     currentList: [] as any,
-    barcodeList: [] as any,
+    barcodeList: [] as any[],
     packagingData: {} as any,
     packagingSig: [] as any,
     pickupOrderValue: '',
     containerNoValue: 0,
     FENTRYID: 0,
     isInteger: false, //是否成套
+    isFE: false, //是否分装
     FRealQty: 0 //成套数量
   } as SalesOutboundCancelType,
   containerNoList: [
@@ -72,7 +76,6 @@ const reactiveData = reactive({
 const emit = defineEmits<{
   (e: 'update:detailsList', modelValue: any): void
   (e: 'update:lowerCamelCaseList', modelValue: any): void
-  (e: 'update:loading', modelValue: boolean): void
 }>()
 // const { emitter } = useEmitt()
 
@@ -82,13 +85,13 @@ const searchChange = () => {
     if (reactiveData.searchValue === '') {
       return
     }
-    emit('update:loading', true)
     ss()
     // 第一次扫单号
     if (!reactiveData.pickupOrderValue) {
       reactiveData.pickupOrderValue = reactiveData.searchValue
       reactiveData.searchValue = ''
     } else {
+      console.log('后续扫码-扫描单号', reactiveData.lowerCamelCaseList.barcodeList.length > 0)
       //后续扫码-扫描条码
       if (reactiveData.lowerCamelCaseList.barcodeList.length > 0) {
         //判断条码中F_BARCODENO是否有相同的条码
@@ -101,10 +104,10 @@ const searchChange = () => {
             icon: 'none'
           })
           reactiveData.searchValue = ''
-          reactiveData.focus = 20
+          reactiveData.focus = 22
           setTimeout(() => {
             reactiveData.focus = 1
-          }, 500)
+          }, 200)
           return
         }
       }
@@ -123,44 +126,67 @@ const searchChange = () => {
         reactiveData.lowerCamelCaseList.pickupOrderValue = reactiveData.pickupOrderValue
         reactiveData.lowerCamelCaseList.containerNoValue = reactiveData.containerNoValue
         /**添加到待删除列表中 */
-        const index = reactiveData.detailsList.Model.FEntity[0].F_QADV_XSCKSubEntity.findIndex(
-          (item: any) => {
-            return item.F_BARCODENO === reactiveData.searchValue
-          }
-        )
+        const index = reactiveData.detailsList.Model.FEntity[
+          res.FEntityIndex
+        ].F_QADV_XSCKSubEntity.findIndex((item: any) => {
+          return item.F_BARCODENO === reactiveData.searchValue
+        })
+        if (reactiveData.lowerCamelCaseList.barcodeList.length === 0) {
+          reactiveData.lowerCamelCaseList.isFE = res.isFE
+        }
+        console.log('是否分装', res.isFE)
+
+        console.log('分装情况下1', reactiveData.lowerCamelCaseList.barcodeList, res.FEntityIndex)
         if (index !== -1) {
           //分装情况下
-          console.log('分装情况下1', res.isFE)
-
-          if (res.isFE) {
+          if (reactiveData.lowerCamelCaseList.isFE) {
             //判断之前是否存在待删除分装，并且分装编号F_QADV_FZLOT一致
-            console.log('分装情况下2', reactiveData.lowerCamelCaseList.barcodeList)
+            console.log('分装情况下2', reactiveData.lowerCamelCaseList)
             if (reactiveData.lowerCamelCaseList.barcodeList.length > 0) {
+              console.log('分装情况下4')
               if (
                 reactiveData.lowerCamelCaseList.barcodeList[0].F_QADV_FZLOT ===
-                reactiveData.detailsList.Model.FEntity[0].F_QADV_XSCKSubEntity[index].F_QADV_FZLOT
+                reactiveData.detailsList.Model.FEntity[res.FEntityIndex].F_QADV_XSCKSubEntity[index]
+                  .F_QADV_FZLOT
               ) {
                 reactiveData.lowerCamelCaseList.barcodeList.push(
-                  reactiveData.detailsList.Model.FEntity[0].F_QADV_XSCKSubEntity[index]
+                  reactiveData.detailsList.Model.FEntity[res.FEntityIndex].F_QADV_XSCKSubEntity[
+                    index
+                  ]
                 )
+                console.log('报错1')
                 reactiveData.lowerCamelCaseList.packagingData[
-                  reactiveData.detailsList.Model.FEntity[0].F_QADV_XSCKSubEntity[index].F_FZNO
+                  reactiveData.detailsList.Model.FEntity[res.FEntityIndex].F_QADV_XSCKSubEntity[
+                    index
+                  ].F_FZNO
                 ].quantity +=
-                  reactiveData.detailsList.Model.FEntity[0].F_QADV_XSCKSubEntity[index].F_UNITQTY
+                  reactiveData.detailsList.Model.FEntity[res.FEntityIndex].F_QADV_XSCKSubEntity[
+                    index
+                  ].F_UNITQTY
 
                 reactiveData.lowerCamelCaseList.packagingData[
-                  reactiveData.detailsList.Model.FEntity[0].F_QADV_XSCKSubEntity[index].F_FZNO
+                  reactiveData.detailsList.Model.FEntity[res.FEntityIndex].F_QADV_XSCKSubEntity[
+                    index
+                  ].F_FZNO
                 ].unitQty =
-                  reactiveData.detailsList.Model.FEntity[0].F_QADV_XSCKSubEntity[index].F_JUNITQTY
-
+                  reactiveData.detailsList.Model.FEntity[res.FEntityIndex].F_QADV_XSCKSubEntity[
+                    index
+                  ].F_JUNITQTY
+                console.log('报错2')
                 reactiveData.lowerCamelCaseList.packagingData[
-                  reactiveData.detailsList.Model.FEntity[0].F_QADV_XSCKSubEntity[index].F_FZNO
+                  reactiveData.detailsList.Model.FEntity[res.FEntityIndex].F_QADV_XSCKSubEntity[
+                    index
+                  ].F_FZNO
                 ].finishedQty =
                   reactiveData.lowerCamelCaseList.packagingData[
-                    reactiveData.detailsList.Model.FEntity[0].F_QADV_XSCKSubEntity[index].F_FZNO
+                    reactiveData.detailsList.Model.FEntity[res.FEntityIndex].F_QADV_XSCKSubEntity[
+                      index
+                    ].F_FZNO
                   ].quantity /
                   reactiveData.lowerCamelCaseList.packagingData[
-                    reactiveData.detailsList.Model.FEntity[0].F_QADV_XSCKSubEntity[index].F_FZNO
+                    reactiveData.detailsList.Model.FEntity[res.FEntityIndex].F_QADV_XSCKSubEntity[
+                      index
+                    ].F_FZNO
                   ].unitQty
 
                 //判断成套更最小成品数量
@@ -203,16 +229,22 @@ const searchChange = () => {
                   title: '分装产品非同批出货',
                   icon: 'none'
                 })
+                reactiveData.searchValue = ''
+                reactiveData.focus = 22
+                setTimeout(() => {
+                  reactiveData.focus = 1
+                }, 200)
                 return
               }
             } else {
+              console.log('分装情况下3')
               //原数组没值，直接添加
               reactiveData.lowerCamelCaseList.barcodeList.push(
-                reactiveData.detailsList.Model.FEntity[0].F_QADV_XSCKSubEntity[index]
+                reactiveData.detailsList.Model.FEntity[res.FEntityIndex].F_QADV_XSCKSubEntity[index]
               )
               let packagingSig = [] as any
               let packagingData = {} as any
-              for (const item of res.Model.FEntity[0].F_QADV_XSCKSubEntity) {
+              for (const item of res.Model.FEntity[res.FEntityIndex].F_QADV_XSCKSubEntity) {
                 //重复的不要
                 if (!packagingSig.includes(item.F_FZNO)) {
                   packagingSig.push(item.F_FZNO)
@@ -226,7 +258,15 @@ const searchChange = () => {
                   finishedQty: 0
                 }
               }
-              packagingData[reactiveData.lowerCamelCaseList.barcodeList[0].F_FZNO].quantity +=
+              console.log('报错', reactiveData.lowerCamelCaseList.barcodeList)
+              console.log('报错3', reactiveData.lowerCamelCaseList.barcodeList[0])
+
+              console.log(
+                '报错4',
+                packagingData[reactiveData.lowerCamelCaseList.barcodeList[0].F_FZNO]
+              )
+
+              packagingData[reactiveData.lowerCamelCaseList.barcodeList[0].F_FZNO]['quantity'] +=
                 reactiveData.lowerCamelCaseList.barcodeList[0].F_UNITQTY
               packagingData[reactiveData.lowerCamelCaseList.barcodeList[0].F_FZNO].unitQty =
                 reactiveData.lowerCamelCaseList.barcodeList[0].F_JUNITQTY
@@ -239,12 +279,33 @@ const searchChange = () => {
             }
           } else {
             //非分装的情况下替换
+            console.log(
+              '非分装的情况下替换1',
+              reactiveData.detailsList.Model.FEntity[res.FEntityIndex]
+            )
+            console.log(
+              '非分装的情况下替换2',
+              reactiveData.detailsList.Model.FEntity[res.FEntityIndex],
+              index
+            )
             reactiveData.lowerCamelCaseList.barcodeList = [
-              reactiveData.detailsList.Model.FEntity[0].F_QADV_XSCKSubEntity[index]
+              reactiveData.detailsList.Model.FEntity[res.FEntityIndex].F_QADV_XSCKSubEntity[index]
             ]
             reactiveData.lowerCamelCaseList.currentList[9].value =
               reactiveData.lowerCamelCaseList.barcodeList[0].F_UNITQTY
           }
+        } else {
+          //提示 分装产品非同批出货
+          uni.showToast({
+            title: '分装产品非同批出货',
+            icon: 'none'
+          })
+          reactiveData.searchValue = ''
+          reactiveData.focus = 22
+          setTimeout(() => {
+            reactiveData.focus = 1
+          }, 200)
+          return
         }
       }
     }
@@ -253,11 +314,10 @@ const searchChange = () => {
     console.log('处理', reactiveData.lowerCamelCaseList)
     emit('update:lowerCamelCaseList', reactiveData.lowerCamelCaseList)
     reactiveData.searchValue = ''
-    reactiveData.focus = 20
+    reactiveData.focus = 22
     setTimeout(() => {
       reactiveData.focus = 1
-    }, 500)
-    emit('update:loading', false)
+    }, 200)
   }, 500)
 }
 
@@ -266,7 +326,18 @@ const containerNoClick = async (val: any) => {
   reactiveData.containerNoValue = val.value
 
   //清空数据
-  reactiveData.lowerCamelCaseList = {} as SalesOutboundCancelType
+  reactiveData.lowerCamelCaseList = {
+    currentList: [] as any,
+    barcodeList: [] as any[],
+    packagingData: {} as any,
+    packagingSig: [] as any,
+    pickupOrderValue: '',
+    containerNoValue: 0,
+    FENTRYID: 0,
+    isInteger: false, //是否成套
+    isFE: false, //是否分装
+    FRealQty: 0 //成套数量
+  } as SalesOutboundCancelType
   reactiveData.detailsList = {}
   emit('update:detailsList', reactiveData.detailsList)
   emit('update:lowerCamelCaseList', reactiveData.lowerCamelCaseList)
@@ -301,6 +372,15 @@ onBeforeUnmount(() => {
   console.log('离开')
   clearTimer()
 })
+
+watch(
+  () => props.pickupOrderValue,
+  (val: any) => {
+    reactiveData.pickupOrderValue = val
+    reactiveData.containerNoValue = props.containerNoValue
+  },
+  { immediate: true, deep: true }
+)
 </script>
 
 <template>

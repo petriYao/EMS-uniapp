@@ -122,12 +122,7 @@ export const getPickupOrder = async (searchValue: any) => {
             FBaseMustQty: item.RemainOutQty, //应发基数
             FNote: item.NoteEntry, //备注
             FStockID: { FNumber: '205' }, //仓库**
-            FStockLocId: {
-              //仓位**
-              FSTOCKLOCID__FF100001: {
-                FNumber: '102'
-              }
-            },
+            FStockLocId: {},
             FSRCTYPE: 'SAL_DELIVERYNOTICE', //源单类型
             FSRCBILLNO: PickupOrder.BillNo, //源单编号
             F_QADV_YDENTRYID: item.Seq, //源单行号
@@ -273,7 +268,35 @@ export const productionGetData = async (searchValue: any) => {
     if (barCodeData.F_QADV_BARCODEENTRY.length > 0) {
       packData = barCodeData.F_QADV_BARCODEENTRY[barCodeData.F_QADV_BARCODEENTRY.length - 1]
     }
+    console.log('packData', packData)
 
+    const stockLoc = packData?.F_QADV_STOCKLOCID
+    let actualValue = null
+
+    // 获取对象的所有 key
+    const FStockLocId = {} as any
+    // 找到第一个 F10000x 字段，且其值不为 null
+    if (stockLoc != null) {
+      const keys = Object.keys(stockLoc)
+
+      for (const key of keys) {
+        console.log('key', key)
+
+        if (
+          key.startsWith('F10000') &&
+          stockLoc[key] !== null &&
+          typeof stockLoc[key] === 'object'
+        ) {
+          FStockLocId[`FSTOCKLOCID__F` + key] = {
+            Fnumber: stockLoc[key].Number
+          }
+          actualValue = stockLoc[key]
+          break
+        }
+      }
+    }
+
+    console.log('实际值存储在:', actualValue)
     const data = {
       barcodeList: {
         FNumber: barCodeData.Number, //编码
@@ -283,8 +306,9 @@ export const productionGetData = async (searchValue: any) => {
         unitQuantity: barCodeData.F_JUNITQTY, //单位用量
         FSTOCKName: packData?.F_QADV_FSTOCKID?.Name?.[0]?.Value, //仓库
         FSTOCKNumber: packData?.F_QADV_FSTOCKID?.Number,
-        STOCKLOCName: packData?.F_QADV_STOCKLOCID?.F100001?.Name?.[0]?.Value, //仓位
-        STOCKLOCNumber: packData?.F_QADV_STOCKLOCID?.F100001?.Number,
+        STOCKLOCName: actualValue?.Name?.[0]?.Value, //仓位
+        STOCKLOCNumber: actualValue?.Number,
+        FStockLocId: FStockLocId,
         FZLOT: barCodeData.F_QADV_FZLOT, //分装编码
         FLot: barCodeData.F_WLLOT //批次
       },

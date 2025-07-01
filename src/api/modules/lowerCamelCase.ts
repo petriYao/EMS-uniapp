@@ -45,13 +45,13 @@ export function pickupOrder(
   return executeBillQueryApi(data)
 }
 //条码单据查询
-export function queryBarCode(F_QADV_FZLOT: string) {
+export function queryBarCode(FilterString: string) {
   const data = {
     parameters: [
       {
         FormId: `QADV_BARCODE`,
-        FieldKeys: 'F_FZNO',
-        FilterString: `F_QADV_FZLOT='${F_QADV_FZLOT}'`,
+        FieldKeys: 'F_NUMBER.Fnumber,F_NUMBER.Fname,F_NUMBER.FSpecification',
+        FilterString: FilterString,
         OrderString: '',
         TopRowCount: 0,
         StartRow: 0,
@@ -167,7 +167,7 @@ export function saveBarCode(Model: any) {
   return saveApi(data) as any
 }
 //销售出库单保存
-export function saveSalesOrder(Model: any, IsAutoSubmitAndAudit = true) {
+export function saveSalesOrder(Model: any) {
   console.log('保存销售出库单', JSON.stringify(Model))
   const data = {
     formid: 'SAL_OUTSTOCK',
@@ -185,7 +185,7 @@ export function saveSalesOrder(Model: any, IsAutoSubmitAndAudit = true) {
       IgnoreInterationFlag: '',
       IsControlPrecision: 'false',
       ValidateRepeatJson: 'false',
-      IsAutoSubmitAndAudit: IsAutoSubmitAndAudit,
+      IsAutoSubmitAndAudit: true,
       Model: Model
     }
   }
@@ -299,13 +299,13 @@ export function lookShipmentSubContainer(Id: any) {
   return viewApi(data)
 }
 //出运分柜保存
-export function shipmentSubContainerSave(Model: any, IsAutoSubmitAndAudit = true) {
+export function shipmentSubContainerSave(Model: any, IsDeleteEntry = false) {
   const data = {
     formid: 'QADV_THDFG',
     data: {
       NeedUpDateFields: [],
       NeedReturnFields: [],
-      IsDeleteEntry: false,
+      IsDeleteEntry: IsDeleteEntry,
       SubSystemId: '',
       IsVerifyBaseDataField: 'false',
       IsEntryBatchFill: false,
@@ -316,7 +316,7 @@ export function shipmentSubContainerSave(Model: any, IsAutoSubmitAndAudit = true
       IgnoreInterationFlag: '',
       IsControlPrecision: 'false',
       ValidateRepeatJson: 'false',
-      IsAutoSubmitAndAudit: IsAutoSubmitAndAudit,
+      IsAutoSubmitAndAudit: true,
       Model: Model
     }
   }
@@ -395,7 +395,8 @@ export function UnAuditApiClient(formid: string, Numbers: any) {
     FormId: formid,
     data: {
       CreateOrgId: 0,
-      Numbers: Numbers,
+      Numbers: '',
+      Ids: Numbers,
       InterationFlags: '',
       NetworkCtrl: '',
       IsVerifyProcInst: '',

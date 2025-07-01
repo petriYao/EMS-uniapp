@@ -13,6 +13,30 @@ export function QueryCheckoutTime(time: any) {
   })
 }
 
+//条码库存查询
+export function QueryStock(Number: any) {
+  const data = {
+    parameters: [Number]
+  }
+  return http({
+    url: '/k3cloud/Kingdee.BOS.TM.WebApi.StockItemCountWebApiService.QueryStock,Kingdee.BOS.TM.WebApi.common.kdsvc',
+    method: 'POST',
+    requestTime: 5000, //等待5秒
+    data: data
+  })
+}
+//条码列表查询
+export function TMQuery(parameters: any) {
+  const data = {
+    parameters: parameters
+  }
+  return http({
+    url: '/k3cloud/Kingdee.BOS.TM.WebApi.StockItemCountWebApiService.TMQuery,Kingdee.BOS.TM.WebApi.common.kdsvc',
+    method: 'POST',
+    requestTime: 5000, //等待5秒
+    data: data
+  })
+}
 //登录接口
 export function login(data: any) {
   return http({

@@ -145,12 +145,12 @@ export function getProductionOrder(Number: any) {
   return viewApi(data) as any
 }
 //即时库存单据查询接口
-export function lowerCamelCase(FilterString: string) {
+export function lowerCamelCase2(FilterString: string, FieldKeys: string) {
   const data = {
     parameters: [
       {
         FormId: `STK_Inventory`,
-        FieldKeys: 'FStockLocId.FF100001.FNumber',
+        FieldKeys: FieldKeys,
         FilterString: FilterString,
         OrderString: '',
         TopRowCount: 0,
@@ -224,7 +224,7 @@ export function saveProductionOrder(FEntity: any, FID: any, SCCJ: string) {
       }
     }
   }
-  console.log('生产入库单保存', data)
+  console.log('生产入库单保存', JSON.stringify(data.data.Model))
   return saveApi(data) as any
 }
 

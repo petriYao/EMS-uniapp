@@ -60,7 +60,7 @@ const saveClick = async () => {
         /** */
         /**仓库仓位 */
         FEntity_model.FStockID.FNumber = item.barcodeList[0].FSTOCKNumber
-        FEntity_model.FStockLocId.FSTOCKLOCID__FF100001.FNumber = item.barcodeList[0].STOCKLOCNumber
+        FEntity_model.FStockLocId = item.barcodeList[0].FStockLocId
         /**数量 */
         let FZLOTList = [] as any
         let packagingDataFZLOT = {} as any

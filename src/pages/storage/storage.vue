@@ -23,7 +23,8 @@ const currentWarehouse = reactive({
   number: '',
   stoCurrentWarehouse: '', //当前库位
   warehousePositionList: [], //库位列表
-  curNow: ''
+  curNow: '',
+  FlexNumber: ''
 }) as any
 
 const saveClick = throttleSave(async () => {
@@ -47,6 +48,8 @@ const saveClick = throttleSave(async () => {
         currentWarehouse.stoCurrentWarehouse = results12.currentData.stoCurrentWarehouse //获取当前库位
         currentWarehouse.warehousePositionList = results12.currentData.warehousePositionList //获取库位列表
         currentWarehouse.curNow = results12.currentData.curNow //获取当前库位
+        currentWarehouse.FlexNumber = results12.currentData.FlexNumber
+
         if (results12.dataList.length === 0) {
           uni.showToast({
             icon: 'none',

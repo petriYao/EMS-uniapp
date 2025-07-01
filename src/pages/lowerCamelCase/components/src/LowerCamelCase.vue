@@ -316,10 +316,10 @@ watch(
       <view v-if="reactiveData.curNow == 2">
         <view class="flex bg-#f2f2f2 py-10rpx">
           <view class="w-12% text-center">序号</view>
-          <view class="w-52%">条码编码</view>
+          <view class="w-38%">条码编码</view>
           <view class="w-12% text-center">数量</view>
-          <view class="w-12% text-center">仓库</view>
-          <view class="w-12% text-center">仓位</view>
+          <view class="w-17% text-center">仓库</view>
+          <view class="w-21% text-center">仓位</view>
         </view>
         <view
           v-for="(item, index) of reactiveData.detailsList[reactiveData.datailsIndex]
@@ -331,9 +331,12 @@ watch(
         >
           <view class="flex py-10rpx" :style="index % 2 == 1 ? 'background-color:#f2f2f2' : ''">
             <view class="w-12% flex justify-center pt-3px">{{ index + 1 }}</view>
-            <view class="w-52% pt-3px">
-              <view>{{ item.FNumber }}</view>
-              <view class="flex items-center" v-if="item.unitQuantity > 0">
+            <view class="w-38% pt-3px">
+              <view style="overflow-wrap: break-word">{{ item.FNumber }}</view>
+              <view
+                class="flex items-center"
+                v-if="item.subPackageNo !== ' ' && item.subPackageNo !== ''"
+              >
                 <view class="mr-8px">分装：{{ item.subPackageNo }}</view>
                 <view class="mr-8px">{{ item.partNumberName }}</view>
                 <view class="mr-8px">用量：{{ item.unitQuantity }}</view>
@@ -342,8 +345,8 @@ watch(
             <view class="w-12% flex justify-center pt-3px">
               {{ item.quantity }}
             </view>
-            <view class="w-12% flex justify-center">{{ item.FSTOCKName }}</view>
-            <view class="w-12% flex justify-center pt-3px">{{ item.STOCKLOCName }}</view>
+            <view class="w-17% flex justify-center">{{ item.FSTOCKName }}</view>
+            <view class="w-21% flex justify-center pt-3px">{{ item.STOCKLOCName }}</view>
           </view>
         </view>
       </view>
