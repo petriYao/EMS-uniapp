@@ -107,7 +107,7 @@
     {
       "path": "pages/transferOrder/Index",
       "style": {
-        "navigationBarTitleText": "调拨单",
+        "navigationBarTitleText": "调拨",
         "navigationStyle": "custom"
       }
     }

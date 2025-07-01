@@ -4,7 +4,7 @@ import HeadStorage from './components/HeadStorage.vue'
 import ContentStorage from './components/ContentStorage.vue'
 import { throttleSave } from '@/utils'
 
-const reacticeData = reactive({
+const reactiveData = reactive({
   isShow: true, //是否选择
   loading: false, //是否保存
   title: '销售出库撤销',
@@ -19,7 +19,7 @@ const saveClick = throttleSave(async () => {
 </script>
 <template>
   <view>
-    <HeadStorage :title="reacticeData.title" />
+    <HeadStorage :title="reactiveData.title" />
   </view>
   <scroll-view scroll-y style="height: calc(100vh - 40px - 44px - 24px)">
     <view>

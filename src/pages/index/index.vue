@@ -124,12 +124,12 @@ onBeforeMount(() => {
 
       case '30':
         crmList4.value.push({
-          name: '库存查询',
+          name: '条码库存',
           icon: '/static/index/Reportingforwork.png',
           src: 'barCodeStock/Index'
         })
         crmList4.value.push({
-          name: '调拨单',
+          name: '调拨',
           icon: '/static/index/Reportingforwork.png',
           src: 'transferOrder/Index'
         })

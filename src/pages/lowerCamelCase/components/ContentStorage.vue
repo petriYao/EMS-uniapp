@@ -1,8 +1,22 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, watch } from 'vue'
 import HeadScan from './src/HeadScan.vue'
 import LowerCamelCase from './src/LowerCamelCase.vue'
 import { SalesOutboundType } from '@/types/LowerCamelCaseType'
+
+const props = defineProps({
+  containerNoValue: {
+    //柜号
+    type: Number,
+    default: 0
+  },
+
+  pickupOrderValue: {
+    //单号
+    type: String,
+    default: ''
+  }
+})
 
 //总界面缓存
 const pageLoading = ref(false)
@@ -253,6 +267,22 @@ function groupBarcodeLists(data: any[]) {
   return { result, ThFilter }
 }
 
+watch(
+  () => props.containerNoValue,
+  () => {
+    reactiveData.containerNoValue = props.containerNoValue
+  },
+  { immediate: true, deep: true }
+)
+watch(
+  () => props.pickupOrderValue,
+  () => {
+    reactiveData.Numbers = props.pickupOrderValue
+    console.log('reactiveData.pickupOrderValue123333', props.pickupOrderValue)
+  },
+  { immediate: true, deep: true }
+)
+
 //暴露方法
 defineExpose({
   saveClick
@@ -270,7 +300,7 @@ defineExpose({
       v-model:loading="reactiveData.loading"
       v-model:model="reactiveData.model"
       v-model:containerNoValue="reactiveData.containerNoValue"
-      v-model:Numbers="reactiveData.Numbers"
+      v-model:numbers="reactiveData.Numbers"
     />
   </view>
   <!-- 内容 -->

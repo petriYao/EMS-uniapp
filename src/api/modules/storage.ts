@@ -105,7 +105,7 @@ export function queryStorage() {
     parameters: [
       {
         FormId: `BD_STOCK`,
-        FieldKeys: 'FName,FNumber',
+        FieldKeys: 'FName,FNumber,FSTOCKID',
         FilterString: "FDocumentStatus = 'C' AND FForbidStatus = 'A' ",
         OrderString: 'FNumber',
         TopRowCount: 0,

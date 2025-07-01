@@ -37,6 +37,33 @@ export function TMQuery(parameters: any) {
     data: data
   })
 }
+//修改条码
+export function TMUpdate(parameters: any) {
+  const data = {
+    parameters: [parameters]
+  }
+  console.log('修改条码', data)
+  return http({
+    url: '/k3cloud/Kingdee.BOS.TM.WebApi.ModifyBarcodeWebApiService.EditTM,Kingdee.BOS.TM.WebApi.common.kdsvc',
+    method: 'POST',
+    requestTime: 5000, //等待5秒
+    data: data
+  })
+}
+//修改条码（无仓库仓位）
+export function EditCKTM(parameters: any) {
+  const data = {
+    parameters: [parameters]
+  }
+  console.log('修改条码', data)
+  return http({
+    url: '/k3cloud/Kingdee.BOS.TM.WebApi.ModifyBarcodeWebApiService.EditCKTM,Kingdee.BOS.TM.WebApi.common.kdsvc',
+    method: 'POST',
+    requestTime: 5000, //等待5秒
+    data: data
+  })
+}
+
 //登录接口
 export function login(data: any) {
   return http({

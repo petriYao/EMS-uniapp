@@ -17,7 +17,7 @@ const emit = defineEmits<{
   (e: 'update:scanCodeType', val: String): void
 }>()
 
-const reacticeData = reactive({
+const reactiveData = reactive({
   title: props.title,
   rightTitleShow: false,
   radioList: [
@@ -45,25 +45,25 @@ const onLeftClick = () => {
 }
 //弹出选择扫码类型
 const onRightClick = () => {
-  reacticeData.rightTitleShow = !reacticeData.rightTitleShow
+  reactiveData.rightTitleShow = !reactiveData.rightTitleShow
 }
 
 //选择扫码类型
 const groupChange = () => {
   //将选择储存到本地缓存
-  uni.setStorageSync('scanCodeType', reacticeData.scanCodeType)
-  emit('update:scanCodeType', reacticeData.scanCodeType)
-  reacticeData.rightTitleShow = !reacticeData.rightTitleShow
+  uni.setStorageSync('scanCodeType', reactiveData.scanCodeType)
+  emit('update:scanCodeType', reactiveData.scanCodeType)
+  reactiveData.rightTitleShow = !reactiveData.rightTitleShow
 }
 
 onBeforeMount(() => {
   //获取本地缓存的扫码类型
   const scanCodeType = uni.getStorageSync('scanCodeType')
   if (scanCodeType) {
-    reacticeData.scanCodeType = scanCodeType
+    reactiveData.scanCodeType = scanCodeType
     emit('update:scanCodeType', scanCodeType)
   } else {
-    reacticeData.scanCodeType = '扫码入库'
+    reactiveData.scanCodeType = '扫码入库'
   }
 
   let UserAuthority = uni.getStorageSync('UserAuthority')
@@ -75,50 +75,50 @@ onBeforeMount(() => {
       console.log('生产入库4', UserAuthority.includes('14'))
       console.log('生产入库5', UserAuthority.includes('15'))
       if (UserAuthority.includes('13')) {
-        reacticeData.radioList[0].disabled = false
+        reactiveData.radioList[0].disabled = false
       }
       if (UserAuthority.includes('14')) {
-        reacticeData.radioList[1].disabled = false
+        reactiveData.radioList[1].disabled = false
       }
       if (UserAuthority.includes('15')) {
-        reacticeData.radioList[2].disabled = false
+        reactiveData.radioList[2].disabled = false
       }
       break
     case '简单生产入库':
       if (UserAuthority.includes('17')) {
-        reacticeData.radioList[0].disabled = false
+        reactiveData.radioList[0].disabled = false
       }
       if (UserAuthority.includes('18')) {
-        reacticeData.radioList[1].disabled = false
+        reactiveData.radioList[1].disabled = false
       }
       if (UserAuthority.includes('19')) {
-        reacticeData.radioList[2].disabled = false
+        reactiveData.radioList[2].disabled = false
       }
       break
     case '采购入库':
       if (UserAuthority.includes('21')) {
-        reacticeData.radioList[0].disabled = false
+        reactiveData.radioList[0].disabled = false
       }
       if (UserAuthority.includes('22')) {
-        reacticeData.radioList[1].disabled = false
+        reactiveData.radioList[1].disabled = false
       }
       if (UserAuthority.includes('23')) {
-        reacticeData.radioList[2].disabled = false
+        reactiveData.radioList[2].disabled = false
       }
       break
     case '其他入库':
       if (UserAuthority.includes('25')) {
-        reacticeData.radioList[0].disabled = false
+        reactiveData.radioList[0].disabled = false
       }
       if (UserAuthority.includes('26')) {
-        reacticeData.radioList[1].disabled = false
+        reactiveData.radioList[1].disabled = false
       }
       if (UserAuthority.includes('27')) {
-        reacticeData.radioList[2].disabled = false
+        reactiveData.radioList[2].disabled = false
       }
       break
   }
-  console.log('生产入库2', reacticeData.radioList)
+  console.log('生产入库2', reactiveData.radioList)
 })
 </script>
 
@@ -136,7 +136,7 @@ onBeforeMount(() => {
       </template>
     </u-navbar>
     <view
-      v-if="reacticeData.rightTitleShow"
+      v-if="reactiveData.rightTitleShow"
       class="w-100vw h-100vh fixed bg-transparent z-999"
       @click="onRightClick"
     >
@@ -148,13 +148,13 @@ onBeforeMount(() => {
         <view class="text-28rpx">请选择扫码类型</view>
         <view>
           <u-radio-group
-            v-model="reacticeData.scanCodeType"
+            v-model="reactiveData.scanCodeType"
             placement="column"
             @change="groupChange"
           >
             <u-radio
               :customStyle="{ marginBottom: '8px' }"
-              v-for="(item, index) in reacticeData.radioList"
+              v-for="(item, index) in reactiveData.radioList"
               :key="index"
               :disabled="item.disabled"
               :label="item.name"

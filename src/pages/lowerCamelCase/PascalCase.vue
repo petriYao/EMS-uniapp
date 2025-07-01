@@ -12,11 +12,14 @@ import {
 } from '@/api/modules/lowerCamelCase'
 import { throttleSave } from '@/utils'
 import { barcodeStatus } from '@/api/modules/storage'
+import { EditCKTM } from '@/api/commonHttp'
 
-const reacticeData = reactive({
+const reactiveData = reactive({
   isShow: true, //是否选择
   loading: false, //是否保存
   title: '销售出库',
+  containerNoValue: 1, //柜号
+  pickupOrderValue: '', //单号
   FEntity: [] as any //单据提交
 })
 
@@ -24,7 +27,7 @@ const contentStorageRef = ref() //标题组件引用
 
 const saveClick = throttleSave(async () => {
   console.log('保存')
-  reacticeData.loading = true //显示保存按钮
+  reactiveData.loading = true //显示保存按钮
   const results12 = await contentStorageRef.value?.saveClick()
   // let results12 = {} as any
 
@@ -34,7 +37,7 @@ const saveClick = throttleSave(async () => {
   // } else {
   //   results12 = await contentStorageRef.value?.saveClick()
   //   //储存到本地缓存中
-  //   uni.setStorageSync('SalesOutbound', JSON.stringify(reacticeData))
+  //   uni.setStorageSync('SalesOutbound', JSON.stringify(reactiveData))
   // }
   console.log('results1', results12)
 
@@ -44,9 +47,10 @@ const saveClick = throttleSave(async () => {
     //   icon: 'none',
     //   title: '无提交数据'
     // })
-    reacticeData.loading = false
+    reactiveData.loading = false
     return
   }
+
   // 将 F_BARCODENO 拼接成 SQL 查询条件
   const fNumbersInClause = results12.ThFilter.tmList.map((code: any) => `'${code}'`).join(',')
   // 构建最终的 SQL 条件字符串
@@ -60,7 +64,7 @@ const saveClick = throttleSave(async () => {
       icon: 'none',
       duration: 5000
     })
-    reacticeData.loading = false
+    reactiveData.loading = false
     return
   }
   //调用发货通知单单据查询验证出运分柜数量是否超发货通知数量
@@ -71,7 +75,7 @@ const saveClick = throttleSave(async () => {
       title: '出运分柜数量超出发货通知单数量',
       duration: 5000
     })
-    reacticeData.loading = false
+    reactiveData.loading = false
     return
   }
   console.log('model', JSON.stringify(results12.model))
@@ -82,6 +86,12 @@ const saveClick = throttleSave(async () => {
     //   icon: 'none',
     //   title: '提交成功'
     // })
+    EditCKTM({
+      barcodes: results12.ThFilter.tmList,
+      documentNumber: res1.data.Result.Number,
+      documentType: '销售出库单',
+      status: '3'
+    })
     /*下推-出运分柜单*/
     //1.根据单号跟柜号查找出运分柜表中是否有相同
     const res2: any = await shipmentSubContainer(
@@ -186,9 +196,13 @@ const saveClick = throttleSave(async () => {
       console.log('pushResSaveData', pushResSaveData)
     }
 
-    reacticeData.isShow = false //隐藏标题组件
+    reactiveData.isShow = false //隐藏标题组件
     setTimeout(() => {
-      reacticeData.isShow = true //显示标题组件
+      reactiveData.isShow = true //显示标题组件
+      reactiveData.containerNoValue = results12.containerNoValue
+      reactiveData.pickupOrderValue = results12.Numbers
+      console.log('reactiveData.pickupOrderValue', reactiveData.pickupOrderValue)
+      console.log('reactiveData.containerNoValue', reactiveData.containerNoValue)
     }, 500)
   } else {
     uni.showToast({
@@ -197,20 +211,25 @@ const saveClick = throttleSave(async () => {
       duration: 5000
     })
   }
-  reacticeData.loading = false
+  reactiveData.loading = false
 }) //调用标题组件的保存方法
 </script>
 <template>
-  <view v-if="reacticeData.loading" class="bg-#FFF h-300rpx flex items-center justify-center">
+  <view v-if="reactiveData.loading" class="bg-#FFF h-300rpx flex items-center justify-center">
     <u-loading-icon text="保存中" textSize="18" />
   </view>
-  <u-loading-page loading-color="#000000" loadingText="保存中" :loading="reacticeData.loading" />
+  <u-loading-page loading-color="#000000" loadingText="保存中" :loading="reactiveData.loading" />
   <view>
-    <HeadStorage :title="reacticeData.title" />
+    <HeadStorage :title="reactiveData.title" />
   </view>
+
   <scroll-view scroll-y style="height: calc(100vh - 40px - 44px - 24px)">
-    <view v-if="reacticeData.isShow">
-      <ContentStorage ref="contentStorageRef" />
+    <view v-if="reactiveData.isShow">
+      <ContentStorage
+        ref="contentStorageRef"
+        :pickupOrderValue="reactiveData.pickupOrderValue"
+        :containerNoValue="reactiveData.containerNoValue"
+      />
     </view>
   </scroll-view>
 

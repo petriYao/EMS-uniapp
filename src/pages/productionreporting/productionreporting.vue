@@ -1,39 +1,45 @@
 <template>
   <view class="prductionOrder_body">
     <u-navbar :custom-back="backpage" title="生产报工" placeholder :background="background">
-      <view class="slot-wrap" slot="left">
-        <u-icon
-          @click="ClosePage"
-          name="close"
-          color="rgb(96, 98, 102)"
-          size="35"
-          style="margin-left: 30rpx"
-        />
-      </view>
-      <view slot="right">
-        <u-icon
-          style="margin-right: 30rpx"
-          @click="Fnseeting"
-          name="setting-fill"
-          color="rgb(96, 98, 102)"
-          size="50"
-        />
-      </view>
+      <template #left>
+        <view class="slot-wrap">
+          <u-icon
+            @click="ClosePage"
+            name="close"
+            color="rgb(96, 98, 102)"
+            size="35"
+            style="margin-left: 30rpx"
+          />
+        </view>
+      </template>
+      <template #right>
+        <view>
+          <u-icon
+            style="margin-right: 30rpx"
+            @click="Fnseeting"
+            name="setting-fill"
+            color="rgb(96, 98, 102)"
+            size="50"
+          />
+        </view>
+      </template>
     </u-navbar>
     <view class="content">
       <!-- 正文内容 -->
-      <u-popup v-model="show" mode="top">
+      <u-popup :show="show" mode="top" @close="show = false">
         <view>
           <u-card title="设置报工类型">
-            <view class="" slot="body">
-              <view class="u-body-item u-flex u-border-bottom u-col-between u-p-t-0">
-                <u-radio-group v-model="JTypevalue" :wrap="true" @change="radioGroupChange">
-                  <u-radio name="1">个人计件</u-radio>
-                  <u-radio name="2">团体计件</u-radio>
-                  <u-radio name="3">仅报工</u-radio>
-                </u-radio-group>
+            <template #body>
+              <view class="">
+                <view class="u-body-item u-flex u-border-bottom u-col-between u-p-t-0">
+                  <u-radio-group v-model="JTypevalue" :wrap="true" @change="radioGroupChange">
+                    <u-radio label="个人计件" />
+                    <u-radio label="团体计件" />
+                    <u-radio label="仅报工" />
+                  </u-radio-group>
+                </view>
               </view>
-            </view>
+            </template>
           </u-card>
         </view>
       </u-popup>
@@ -299,25 +305,25 @@
           >
             <span>删除</span>
           </view>
-          <view
+          <show
             class="btn-item"
             v-if="UserAuthoritylist.includes('11')"
             @tap="startclick('submit')"
           >
             <span>提交</span>
-          </view>
+          </show>
         </view>
       </view>
     </view>
     <u-toast ref="uToast" />
     <u-modal
-      v-model="msgshow"
+      :show="msgshow"
       :title="msgtitle"
       @confirm="ConfirmationInformation"
       :content="msgcontent"
     />
     <u-modal
-      v-model="deleteshow"
+      :show="deleteshow"
       @confirm="deleteFn"
       :show-cancel-button="true"
       @cancel="deleteFncancel"
@@ -325,7 +331,7 @@
       content="是否删除选中行内容？"
     />
     <u-modal
-      v-model="submittoshow"
+      :show="submittoshow"
       @confirm="submittoFn"
       :show-cancel-button="true"
       @cancel="submittoFncancel"
@@ -334,7 +340,7 @@
     />
     <!-- 选择组别 -->
     <u-picker
-      v-model="SCZBshow"
+      :show="SCZBshow"
       mode="selector"
       :range="SCZBList"
       range-key="label"
@@ -342,7 +348,7 @@
     />
     <!-- 选择员工 -->
     <u-picker
-      v-model="YGshow"
+      :show="YGshow"
       mode="selector"
       :range="YGList"
       range-key="label"
@@ -1179,6 +1185,7 @@ const deleteFncancel = () => {
 }
 
 const startclick = (str: string) => {
+  console.log(str)
   if (str === 'delete') {
     let deleteitem: any[] = []
     SaoMaList.value.forEach((item) => {
@@ -1196,6 +1203,7 @@ const startclick = (str: string) => {
     }
   }
   if (str === 'submit') {
+    console.log('提交')
     submittoshow.value = true
   }
 }
@@ -1388,7 +1396,7 @@ const radioGroupChange = (e: any) => {
   //存储报工类型数据状态
   JTypevalue.value = e
   uni.setStorageSync('F_WOMW__JJType', e)
-  if (JTypevalue.value !== '1') {
+  if (JTypevalue.value !== '个人计件') {
     YGNoDisabled.value = true //不可编辑员工
     isShowDisplay.value = false
     YGNo.value = ''

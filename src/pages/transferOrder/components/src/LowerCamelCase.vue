@@ -138,7 +138,7 @@ watch(
           <view class="flex">
             <view class="w-33% flex items-center h-20px">
               <view class="w-70px text-end">数量：</view>
-              <view> {{ item.detailList.quantity }}</view>
+              <view> {{ item.Quantity2 }}</view>
             </view>
             <view class="w-33% flex items-center h-20px">
               <view class="w-70px text-end">件数：</view>
@@ -169,7 +169,7 @@ watch(
         <view class="w-15% flex justify-center pt-3px">{{ index + 1 }}</view>
         <view class="w-70% pt-3px">
           <view>{{ item.F_BARCODENO }}</view>
-          <view class="flex items-center" v-if="item.F_CHECKBOXFZ > 0">
+          <view class="flex items-center" v-if="item.F_FZNO !== ' ' && item.F_FZNO !== ''">
             <view class="mr-8px">分装：{{ item.F_FZNO }}</view>
             <view class="mr-8px">{{ item.F_BJNAME }}</view>
             <view class="mr-8px">用量：{{ item.F_JUNITQTY }}</view>

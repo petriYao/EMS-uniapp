@@ -6,8 +6,9 @@ import TitleStorage from './components/TitleStorage.vue'
 import TitleStorageB from './components/TitleStorageB.vue'
 import { saveProductionOrder } from '@/api/modules/storage'
 import { throttleSave } from '@/utils'
+import { TMUpdate } from '@/api/commonHttp'
 
-const reacticeData = reactive({
+const reactiveData = reactive({
   isShow: true, //是否选择
   loading: false, //是否保存
   title: '',
@@ -21,6 +22,7 @@ const titleStorageRefB = ref() //标题组件引用
 const currentWarehouse = reactive({
   name: '',
   number: '',
+  Id: 0,
   stoCurrentWarehouse: '', //当前库位
   warehousePositionList: [], //库位列表
   curNow: '',
@@ -33,18 +35,21 @@ const saveClick = throttleSave(async () => {
   //   title: '保存成功',
   //   icon: 'success'
   // })
-  reacticeData.loading = true //显示保存按钮
-  switch (reacticeData.scanCodeType) {
+  reactiveData.loading = true //显示保存按钮
+  switch (reactiveData.scanCodeType) {
     case '扫码入库':
     case '单码双扫':
+      let tmList = [] as any
       // 执行扫码入库的保存逻辑
       // 执行单码双扫的保存逻辑
       console.log('扫码入库')
       const results12 = await titleStorageRef.value?.backClick()
       console.log('results1', results12)
+
       if (results12 && !results12.isError) {
         currentWarehouse.name = results12.currentData.currentWarehouseName //获取当前库位
         currentWarehouse.number = results12.currentData.currentWarehouseNumber //获取当前库房
+        currentWarehouse.Id = results12.currentData.currentWarehouseId
         currentWarehouse.stoCurrentWarehouse = results12.currentData.stoCurrentWarehouse //获取当前库位
         currentWarehouse.warehousePositionList = results12.currentData.warehousePositionList //获取库位列表
         currentWarehouse.curNow = results12.currentData.curNow //获取当前库位
@@ -59,13 +64,26 @@ const saveClick = throttleSave(async () => {
         const res1 = await saveProductionOrder(results12.dataList, results12.fid, results12.SCCJ)
         console.log('res', res1)
         if (res1 && res1.data && res1.data?.Result?.Number) {
+          for (const item of results12.dataList) {
+            for (const item2 of item.F_BARSubEntity) {
+              tmList.push(item2.F_BARCODENO)
+            }
+            TMUpdate({
+              barcodes: tmList,
+              warehouse: results12.currentData.currentWarehouseId,
+              location: item.currentWarehousePositionId,
+              documentNumber: res1.data?.Result?.Number,
+              documentType: '生产入库单',
+              status: '2'
+            })
+          }
           uni.showToast({
             icon: 'none',
             title: '提交成功'
           })
-          reacticeData.isShow = false //隐藏标题组件
+          reactiveData.isShow = false //隐藏标题组件
           setTimeout(() => {
-            reacticeData.isShow = true //显示标题组件
+            reactiveData.isShow = true //显示标题组件
           }, 500)
         } else {
           uni.showToast({
@@ -75,7 +93,7 @@ const saveClick = throttleSave(async () => {
           })
         }
       }
-      reacticeData.loading = false
+      reactiveData.loading = false
       break
 
     case '扫单入库':
@@ -89,9 +107,9 @@ const saveClick = throttleSave(async () => {
             icon: 'none',
             title: '提交成功'
           })
-          reacticeData.isShow = false //隐藏标题组件
+          reactiveData.isShow = false //隐藏标题组件
           setTimeout(() => {
-            reacticeData.isShow = true //显示标题组件
+            reactiveData.isShow = true //显示标题组件
           }, 500)
         } else {
           uni.showToast({
@@ -102,7 +120,7 @@ const saveClick = throttleSave(async () => {
         }
       }
 
-      reacticeData.loading = false
+      reactiveData.loading = false
       break
     default:
       break
@@ -112,39 +130,39 @@ const saveClick = throttleSave(async () => {
 onLoad((e: any) => {
   console.log('ee', e)
   //修改导航栏名称
-  reacticeData.title = e.type
+  reactiveData.title = e.type
 })
 </script>
 <template>
-  <!-- <view v-if="reacticeData.loading" class="bg-#FFF h-300rpx flex items-center justify-center">
+  <!-- <view v-if="reactiveData.loading" class="bg-#FFF h-300rpx flex items-center justify-center">
     <u-loading-icon text="保存中" textSize="18" />
   </view> -->
-  <u-loading-page loading-color="#000000" loadingText="保存中" :loading="reacticeData.loading" />
+  <u-loading-page loading-color="#000000" loadingText="保存中" :loading="reactiveData.loading" />
   <view>
-    <HeadStorage :title="reacticeData.title" v-model:scanCodeType="reacticeData.scanCodeType" />
+    <HeadStorage :title="reactiveData.title" v-model:scanCodeType="reactiveData.scanCodeType" />
   </view>
   <scroll-view scroll-y class="bg-#FFF" style="height: calc(100vh - 40px - 44px - 24px)">
-    <view v-if="reacticeData.scanCodeType == '扫码入库' && reacticeData.isShow">
+    <view v-if="reactiveData.scanCodeType == '扫码入库' && reactiveData.isShow">
       <TitleStorage
         ref="titleStorageRef"
-        :title="reacticeData.title"
+        :title="reactiveData.title"
         :stoCurrentWarehouse="currentWarehouse"
-        v-model:scanCodeType="reacticeData.scanCodeType"
+        v-model:scanCodeType="reactiveData.scanCodeType"
       />
     </view>
-    <view v-else-if="reacticeData.scanCodeType == '单码双扫' && reacticeData.isShow">
+    <view v-else-if="reactiveData.scanCodeType == '单码双扫' && reactiveData.isShow">
       <TitleStorage
         ref="titleStorageRef"
-        :title="reacticeData.title"
+        :title="reactiveData.title"
         :stoCurrentWarehouse="currentWarehouse"
-        v-model:scanCodeType="reacticeData.scanCodeType"
+        v-model:scanCodeType="reactiveData.scanCodeType"
       />
     </view>
-    <view v-else-if="reacticeData.scanCodeType == '扫单入库' && reacticeData.isShow">
+    <view v-else-if="reactiveData.scanCodeType == '扫单入库' && reactiveData.isShow">
       <TitleStorageB
         ref="titleStorageRefB"
-        :title="reacticeData.title"
-        v-model:scanCodeType="reacticeData.scanCodeType"
+        :title="reactiveData.title"
+        v-model:scanCodeType="reactiveData.scanCodeType"
       />
     </view>
   </scroll-view>

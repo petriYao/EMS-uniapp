@@ -1,10 +1,22 @@
 <script setup lang="ts">
-import { reactive, ref, onBeforeMount, onBeforeUnmount } from 'vue'
+import { reactive, ref, onBeforeMount, onBeforeUnmount, watch } from 'vue'
 
 import { getPickupOrder, productionGetData } from '@/common/lowerCamelCase/LowerCamelCase'
 import { SalesOutboundType } from '@/types/LowerCamelCaseType'
 import { useEmitt } from '@/hooks/useEmitt'
 
+const props = defineProps({
+  containerNoValue: {
+    //柜号
+    type: Number,
+    default: 0
+  },
+  numbers: {
+    //单号
+    type: String,
+    default: ''
+  }
+})
 //数据
 const reactiveData = reactive({
   searchValue: '', //搜索值
@@ -63,7 +75,7 @@ const emit = defineEmits<{
   (e: 'update:loading', modelValue: boolean): void
   (e: 'update:model', modelValue: any): void
   (e: 'update:containerNoValue', modelValue: any): void
-  (e: 'update:Numbers', modelValue: any): void
+  (e: 'update:numbers', modelValue: any): void
 }>()
 const { emitter } = useEmitt()
 
@@ -84,7 +96,7 @@ const searchChange = () => {
         reactiveData.detailsList = res.dataList
         emit('update:lowerCamelCaseList', res.dataList)
         emit('update:model', res.model)
-        emit('update:Numbers', reactiveData.pickupOrderValue)
+        emit('update:numbers', reactiveData.pickupOrderValue)
         reactiveData.searchValue = ''
       } else {
         //扫码有问题
@@ -318,6 +330,26 @@ const clearTimer = () => {
   console.log('清除定时器', hideTimer.value)
 }
 
+watch(
+  () => props.containerNoValue,
+  () => {
+    reactiveData.containerNoValue = props.containerNoValue
+  },
+  {
+    immediate: true,
+    deep: true
+  }
+)
+watch(
+  () => props.numbers,
+  () => {
+    reactiveData.pickupOrderValue = props.numbers
+  },
+  {
+    immediate: true,
+    deep: true
+  }
+)
 onBeforeMount(() => {
   // 组件挂载前的逻辑
   handleFocus()

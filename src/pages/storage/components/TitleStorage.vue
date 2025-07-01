@@ -33,11 +33,13 @@ const pickerShow3 = ref(false)
 
 //当前仓库
 const currentWarehouse = reactive({
+  Id: 0,
   name: '',
   number: ''
 }) as any
 //当前仓位
 const currentWarehousePosition = reactive({
+  Id: 0,
   name: '',
   number: ''
 }) as any
@@ -397,9 +399,9 @@ const changeFocus = () => {
 const getWarehouseList = async () => {
   const res: any = await queryStorage()
   if (res) {
-    warehouseList.value = res.data.map((item: any, index: number) => {
+    warehouseList.value = res.data.map((item: any) => {
       return {
-        id: index,
+        id: item[2],
         text: item[0],
         value: item[1]
       }
@@ -529,6 +531,7 @@ const warehouseClick = async (val: any) => {
       }
       warehousePositionList.value = list.map((item: any) => {
         return {
+          id: item.Id,
           text: item.FlexEntryId.Name[0].Value,
           value: item.FlexEntryId.Number
         }
@@ -552,8 +555,10 @@ const warehouseClick = async (val: any) => {
 //仓库选择器确认
 const pickerConfirm = async (val: any) => {
   console.log('pickerConfirm', val)
+  currentWarehouse.Id = val.id
   currentWarehouse.name = val.text
   currentWarehouse.number = val.value
+
   reactiveData.titleList[2].value = val.text
   handleFocus()
   focusIndex.value = 3
@@ -567,6 +572,7 @@ const pickerConfirm2 = (val: any, iswarehousePosition?: boolean) => {
 
   if (iswarehousePosition) {
     reactiveData.titleList[3].value = val.value
+    currentWarehousePosition.Id = val.id
     currentWarehousePosition.name = val.text
     currentWarehousePosition.number = val.value
     console.log('仓位', reactiveData.detailsList)
@@ -959,6 +965,7 @@ const backClick = async () => {
 
           F_QADV_HTNO: item.otherData.F_QADV_HTNO, //合同号
           F_BARSubEntity: item.barCodeList,
+          currentWarehousePositionId: currentWarehousePosition.Id, //仓位ID
           FEntity_Link: [
             {
               FEntity_Link_FRuleId: 'PRD_MO2INSTOCK',
@@ -994,6 +1001,7 @@ const backClick = async () => {
   })
 
   let currentData = {
+    currentWarehouseId: currentWarehouse.Id,
     currentWarehouseName: currentWarehouse.name,
     currentWarehouseNumber: currentWarehouse.number,
     currentWarehousePositionName: currentWarehousePosition.name,

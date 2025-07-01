@@ -112,6 +112,7 @@ export const transferScanBarcode = async (searchValue: any, warehouseDataId: any
     }
     const stockLoc =
       barCodeData.F_QADV_BARCODEENTRY[barCodeData.F_QADV_BARCODEENTRY.length - 1].F_QADV_STOCKLOCID
+    console.log('stockLoc', stockLoc)
     let actualValue = null
     // 获取对象的所有 key
     const FStockLocId = {} as any
@@ -127,7 +128,7 @@ export const transferScanBarcode = async (searchValue: any, warehouseDataId: any
           stockLoc[key] !== null &&
           typeof stockLoc[key] === 'object'
         ) {
-          FStockLocId[`FSTOCKLOCID__F` + key] = {
+          FStockLocId[`FSrcStockLocId__F` + key] = {
             Fnumber: stockLoc[key].Number
           }
           actualValue = stockLoc[key]
@@ -135,11 +136,11 @@ export const transferScanBarcode = async (searchValue: any, warehouseDataId: any
         }
       }
     }
-    console.log('测试', actualValue)
+    console.log('测试123', actualValue)
     const data = {
       currentList: [
         {
-          label: '调入仓',
+          label: '调出仓',
           value:
             barCodeData.F_QADV_BARCODEENTRY[barCodeData.F_QADV_BARCODEENTRY.length - 1]
               .F_QADV_FSTOCKID.Name[0].Value,
@@ -149,7 +150,7 @@ export const transferScanBarcode = async (searchValue: any, warehouseDataId: any
         },
         {
           label: '仓位',
-          value: barCodeData.F_SourceFbillno + '-' + barCodeData.F_SourceEntry,
+          value: actualValue?.Name[0].Value,
           disabled: true,
           type: 'input',
           style: { width: '100%' }
@@ -245,7 +246,8 @@ export const transferScanBarcode = async (searchValue: any, warehouseDataId: any
         specification: barCodeData.F_NUMBER.MultiLanguageText[0].Specification, //规格
         quantity: barCodeData.F_UNITQTY, //数量
         pieces: 1, //件数
-        warehousePosition: actualValue.Name[0].Value //仓位
+        FStockLocId: FStockLocId, //仓位信息
+        warehousePosition: actualValue?.Name[0].Value //仓位
       },
       //生产部门
       ProductionDepartment: barCodeData.F_ALMA_BM?.Number,
@@ -273,7 +275,7 @@ export const transferScanBarcode = async (searchValue: any, warehouseDataId: any
       //是否整数
       isInteger: !barCodeData.F_CHECKBOXFZ,
       //件数
-      Quantity: 1,
+      Quantity: barCodeData.F_CHECKBOXFZ ? 0 : barCodeData.F_UNITQTY,
       //数量
       Quantity2: barCodeData.F_CHECKBOXFZ ? 0 : barCodeData.F_UNITQTY,
       //当前条码数量
@@ -282,7 +284,10 @@ export const transferScanBarcode = async (searchValue: any, warehouseDataId: any
       IsSplit: barCodeData.F_CHECKBOXFZ,
       //分装编号
       SplitCode: barCodeData.F_FZNO,
-      //仓位
+      //仓库
+      WarehouseNumber:
+        barCodeData.F_QADV_BARCODEENTRY[barCodeData.F_QADV_BARCODEENTRY.length - 1].F_QADV_FSTOCKID
+          .Number,
       //部件单位用量
       UnitQty: barCodeData.F_JUNITQTY,
       //分装数量
