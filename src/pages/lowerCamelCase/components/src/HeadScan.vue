@@ -343,7 +343,8 @@ watch(
 watch(
   () => props.numbers,
   () => {
-    reactiveData.pickupOrderValue = props.numbers
+    reactiveData.searchValue = props.numbers
+    searchChange()
   },
   {
     immediate: true,

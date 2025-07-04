@@ -402,7 +402,7 @@ watch(
             <view class="w-50px text-end">名称：</view>
             <view> {{ item.detailList.name }}</view>
           </view>
-          <view class="flex">
+          <view class="flex items-center h-20px">
             <view class="min-w-50px text-end">规格：</view>
             <view class="flex-wrap">{{ item.detailList.specification }}</view>
           </view>
@@ -418,7 +418,7 @@ watch(
             </view>
 
             <view class="w-46% flex items-center h-20px">
-              <view class="w-50px text-end">仓位：</view>
+              <view class="w-50px text-end">调入位：</view>
               <view>{{ item.detailList.location }}</view>
             </view>
           </view>

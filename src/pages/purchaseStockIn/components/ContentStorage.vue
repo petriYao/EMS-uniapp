@@ -4,11 +4,11 @@ import HeadScan from './src/HeadScan.vue'
 import LowerCamelCase from './src/LowerCamelCase.vue'
 import { saveProductionOrder } from '@/api/modules/transferOrder'
 import { TMUpdate } from '@/api/commonHttp'
-import { barcodeStatus } from '@/api/modules/lowerCamelCase'
+
 const reactiveData = reactive({
-  detailsList: [] as any,
+  detailsList: [],
+  locationList: [],
   setData: {} as any,
-  locationList: [] as any,
   loading: true
 })
 
@@ -16,59 +16,40 @@ const reactiveData = reactive({
 const saveClick = async () => {
   console.log('保存1', reactiveData.detailsList)
   console.log('保存2', reactiveData.setData)
-  if (reactiveData.detailsList.length === 0) {
+  if (reactiveData.detailsList.length == 0) {
     uni.showToast({
       title: '无提交数据',
       icon: 'none'
     })
     return
   }
-  //判断条码入库状态
-  let barcodeList = []
-  for (const item of reactiveData.detailsList) {
-    barcodeList = item.barCodeList.map((item: any) => {
-      return item.F_BARCODENO
-    })
-  }
-  console.log('条码值', barcodeList)
-  //条码单据查询
-  const fNumbersInClause = barcodeList.map((code: any) => `'${code}'`).join(',')
-  // 构建最终的 SQL 条件字符串
-  const sqlCondition = `FNUMBER in (${fNumbersInClause}) AND F_BARSTATUS != '3'`
-  //单据查询 条码状态
-  const barCodeRes: any = await barcodeStatus(sqlCondition)
-  if (barCodeRes && barCodeRes.data && barCodeRes.data.length > 0) {
-    //条码状态不为1的提示
-    uni.showToast({
-      title: `编码${barCodeRes.data[0][1]}中，条码${barCodeRes.data[0][0]}不为出库状态`,
-      icon: 'none',
-      duration: 5000
-    })
-    return
-  }
-
   reactiveData.loading = false
   const Model = {
     FBillEntry: [] as any
   }
-  let isInteger = true
-  let myIndex = 0
+  let tmList = [] as any
   reactiveData.detailsList.map(async (item: any, index: number) => {
-    console.log('item', !item.isInteger, item)
+    console.log('item', index, item)
     if (!item.isInteger) {
-      isInteger = false
-      myIndex = index
-
+      //提升
+      uni.showToast({
+        title: `第${index + 1}行不配套`,
+        icon: 'none'
+      })
+      reactiveData.loading = true
       return
     }
-    console.log('错误2', item)
+    item.barCodeList.forEach((obj: any) => {
+      tmList.push(obj.F_BARCODENO)
+    })
     //仓位
     const FStockLocPJ = 'FDESTSTOCKLOCID__' + reactiveData.setData.FlexNumber
     const FStockLocId = {} as any
     FStockLocId[FStockLocPJ] = {
-      FNumber: item.WarehousePositionNumber
+      FNumber: reactiveData.setData.locationNumber
     }
 
+    /*
     Model.FBillEntry.push({
       FRowType: 'Standard', // 产品类型
       FMaterialId: {
@@ -165,17 +146,9 @@ const saveClick = async () => {
       FCheckDelivery: false, // 是否检查交货
       FBomEntryId: 0 // BOM分录ID
     })
+      */
   })
-  if (!isInteger) {
-    console.log('错误')
-    //提升
-    uni.showToast({
-      title: `第${myIndex + 1}行不配套`,
-      icon: 'none'
-    })
-    reactiveData.loading = true
-    return
-  }
+
   //保存
   const res = await saveProductionOrder(Model)
   console.log('保存结果', res)
@@ -189,24 +162,21 @@ const saveClick = async () => {
     return
   }
   if (res && res.data) {
-    for (const item of reactiveData.detailsList) {
-      const tmList = item.barCodeList.map((item: any) => item.F_BARCODENO)
-      TMUpdate({
-        barcodes: tmList,
-        warehouse: reactiveData.setData.warehouseId,
-        location: item.WarehousePosition,
-        documentNumber: res.data.Result.Number,
-        documentType: '直接调拨单',
-        status: '2'
-      })
-    }
+    reactiveData.detailsList = []
 
+    TMUpdate({
+      barcodes: tmList,
+      warehouse: reactiveData.setData.warehouseId,
+      location: reactiveData.setData.locationId,
+      documentNumber: res.data.Result.Number,
+      documentType: '直接调拨单',
+      status: '2'
+    })
     uni.showToast({
       icon: 'none',
       title: '保存成功',
       duration: 5000
     })
-    reactiveData.detailsList = []
   }
   reactiveData.loading = true
 }

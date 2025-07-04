@@ -1,29 +1,22 @@
 <script setup lang="ts">
-import { reactive, onBeforeUnmount, onBeforeMount, ref, watch } from 'vue'
+import { reactive, onBeforeUnmount, onBeforeMount, ref } from 'vue'
 import { queryStorage, lookqueryStorage } from '@/api/modules/storage'
-import { transferScanBarcode } from '@/common/transferOrder/Index'
+import { transferScanBarcode } from '@/common/purchaseStockIn/Index'
 // import { queryBarCode } from '@/api/modules/lowerCamelCase'
-import { debounceSave } from '@/utils'
-import { useEmitt } from '@/hooks/useEmitt'
 
-const props = defineProps({
-  detailsList: {
-    type: Array as any,
-    default: () => [] as any
-  }
-})
+// import { useEmitt } from '@/hooks/useEmitt'
 //数据
 const reactiveData = reactive({
+  searchValue: 'AC2004N04TEX002125070001', //搜索值
   focus: 1,
   heardList: {
+    documentNumber: '', //单号
     warehouse: '', //仓库
-    location: '', //库位
-    barcode: '' //条码
+    location: '' //库位
   },
   setData: {
     warehouseNumber: '', //仓库编号
     warehouseId: '', //仓库ID
-    warehouseDisplay: false, //禁用
     locationNumber: '', //库位
     locationId: '', //库位ID
     locationDisplay: true, //禁用
@@ -49,32 +42,54 @@ const emit = defineEmits<{
   (e: 'update:locationList', modelValue: any): void
 }>()
 
+const searchInput = ref()
+//扫码获取数据
+const searchClick = async () => {
+  //uniapp打开扫码
+  const res: any = await uni.scanCode({
+    scanType: ['barCode', 'qrCode'],
+    onlyFromCamera: true
+  })
+  console.log('扫码结果', res)
+  if (res) {
+    //在focusIndex.value为0时，给搜索框赋值
+    if (reactiveData.focus === 0) {
+      reactiveData.searchValue = res.result
+      searchChange()
+    } else if (reactiveData.focus === 2) {
+      //在reactiveData.focus为2时，给仓库赋值
+      reactiveData.heardList.warehouse = res.result
+      //触发更新事件
+      reactiveData.focus = 3
+    } else if (reactiveData.focus === 3) {
+      //在reactiveData.focus为3时，给仓位赋值
+      reactiveData.heardList.location = res.result
+      reactiveData.focus = 0
+    } else {
+      searchInput.value.setValue(res.result)
+    }
+    // searchChange()
+  }
+}
+
 //扫描条码
 const searchChange = () => {
+  console.log('搜索值', reactiveData.searchValue)
   setTimeout(async () => {
-    if (reactiveData.heardList.barcode === '') {
+    if (reactiveData.searchValue === '') {
       return
     }
     handleFocus()
     //调用条码（单据查询）
-    const queryRes: any = await transferScanBarcode(
-      reactiveData.heardList.barcode,
-      reactiveData.setData,
-      reactiveData.heardList.location
-    )
-    if (!queryRes) {
-      focusTm()
-      return
-    }
-    console.log('查询结果', queryRes, reactiveData.detailsList)
-    if (reactiveData.detailsList && reactiveData.detailsList.length > 0) {
+    const queryRes: any = await transferScanBarcode(reactiveData.searchValue)
+    console.log('查询结果', queryRes)
+    if (reactiveData.detailsList.length > 0) {
       const index = reactiveData.detailsList.findIndex((item: any) => {
         console.log('判断之前是否有一样的', item, queryRes)
         return (
           item.MaterialCode === queryRes.MaterialCode &&
           item.SourceOrderNo === queryRes.SourceOrderNo &&
-          item.SourceOrderLineNo === queryRes.SourceOrderLineNo &&
-          item.WarehousePosition === reactiveData.setData.locationId
+          item.SourceOrderLineNo === queryRes.SourceOrderLineNo
         )
       })
       if (index !== -1) {
@@ -84,7 +99,7 @@ const searchChange = () => {
             title: '仓库不一致',
             icon: 'none'
           })
-          focusTm()
+
           return
         }
         //判断是否重复扫描
@@ -93,7 +108,7 @@ const searchChange = () => {
             title: '请勿重复扫描',
             icon: 'none'
           })
-          focusTm()
+
           return
         }
 
@@ -178,16 +193,16 @@ const searchChange = () => {
             item.barCodeList.map((item2: { [x: string]: any }) => item2['F_BARCODENO'])
           )
         )
-        if (scannedBarcodes.has(reactiveData.heardList.barcode)) {
+        if (scannedBarcodes.has(reactiveData.searchValue)) {
           uni.showToast({
             title: '请勿重复扫描',
             icon: 'none'
           })
-          reactiveData.heardList.barcode = ''
+          reactiveData.searchValue = ''
           focusTm()
           return
         }
-        console.log('重复', scannedBarcodes, scannedBarcodes.has(reactiveData.heardList.barcode))
+        console.log('重复', scannedBarcodes, scannedBarcodes.has(reactiveData.searchValue))
         reactiveData.detailsList.push(queryRes)
       }
     } else {
@@ -195,15 +210,15 @@ const searchChange = () => {
     }
     emit('update:detailsList', reactiveData.detailsList)
 
+    reactiveData.searchValue = ''
     focusTm()
   }, 500)
 }
 
 const focusTm = () => {
-  reactiveData.heardList.barcode = ''
   reactiveData.focus = 0
   setTimeout(() => {
-    reactiveData.focus = 3
+    reactiveData.focus = 99
   }, 200)
 }
 
@@ -276,11 +291,10 @@ const getWarehousePosition = async (warehouseId: any) => {
         focusTm()
       } else {
         reactiveData.setData.locationDisplay = false
-        reactiveData.focus = 0
-        console.log('到我')
         setTimeout(() => {
+          console.log('到我')
           reactiveData.focus = 2
-        }, 500)
+        }, 200)
       }
       handleFocus()
       emit('update:locationList', locationData.locationList)
@@ -296,68 +310,10 @@ const locationPickerConfirm = (val: any) => {
   reactiveData.setData.locationNumber = val.value
   reactiveData.setData.locationId = val.Id
   locationData.show = false
-  reactiveData.setData.warehouseDisplay = true
   focusTm()
   emit('update:setData', reactiveData.setData)
   // reactiveData.locationValue = val.value
 }
-//仓库
-const warehouseChange = debounceSave((val: any) => {
-  reactiveData.heardList.location = ''
-  //获取仓库id替换为仓库名称
-  const warehouseId: any = warehouseData.warehouseList.find((item: any) => item.value === val)
-  console.log('warehouseId1', warehouseId)
-  if (!warehouseId && val != '') {
-    //提示仓库不存在
-    uni.showToast({
-      title: '仓库不存在',
-      icon: 'none'
-    })
-    reactiveData.heardList.warehouse = ''
-
-    //重新回到光标位置
-    reactiveData.focus = 0
-    setTimeout(() => {
-      reactiveData.focus = 1
-    }, 200)
-    return
-  }
-  reactiveData.heardList.warehouse = warehouseId.text
-  reactiveData.setData.warehouseNumber = warehouseId.value
-  reactiveData.setData.warehouseId = warehouseId.id
-  getWarehousePosition(val)
-  emit('update:setData', reactiveData.setData)
-})
-//仓位
-const locationChange = debounceSave((val: any) => {
-  console.log('locationChange', val)
-  const location: any = locationData.locationList.find((item: any) => item.value === val)
-  console.log('location', location)
-  if (!location && val != '') {
-    //提示仓位不存在
-    uni.showToast({
-      title: '仓位不存在',
-      icon: 'none'
-    })
-    reactiveData.heardList.location = ''
-    //重新回到光标位置
-    reactiveData.focus = 0
-    setTimeout(() => {
-      reactiveData.focus = 2
-    }, 200)
-    return
-  }
-  reactiveData.heardList.location = location.value
-  reactiveData.setData.locationNumber = location.value
-  reactiveData.setData.locationId = location.Id
-  reactiveData.setData.warehouseDisplay = true
-  reactiveData.focus = 0
-  setTimeout(() => {
-    reactiveData.focus = 3
-  }, 200)
-  emit('update:setData', reactiveData.setData)
-})
-
 const hideTimer = ref<number | null>(null)
 const handleFocus = () => {
   // 设置定时器
@@ -377,23 +333,6 @@ const clearTimer = () => {
   console.log('清除定时器', hideTimer.value)
 }
 
-useEmitt({
-  name: 'update:clearTimer',
-  callback: async () => {
-    console.log('清除定时器')
-    clearTimer()
-  }
-})
-
-watch(
-  () => props.detailsList,
-  (val: any) => {
-    console.log('val', val)
-    reactiveData.detailsList = val
-  },
-  { immediate: true, deep: true }
-)
-
 onBeforeMount(() => {
   // 组件挂载前的逻辑
   handleFocus()
@@ -408,160 +347,167 @@ onBeforeUnmount(() => {
 
 <template>
   <view>
-    <view class="pt-20rpx">
-      <view class="flex items-center pb-10rpx w-100%">
-        <view class="w-50px flex justify-center">调入仓</view>
-        <view class="flex-1" style="border: 1px solid #f8f8f8" @click="clearTimer">
-          <u-input
-            ref="searchInput"
-            v-model="reactiveData.heardList.warehouse"
-            :showAction="false"
-            :focus="reactiveData.focus == 1"
-            :disabled="reactiveData.setData.warehouseDisplay"
-            shape="round"
-            placeholder=""
-            @change="warehouseChange"
-          >
-            <template #suffix>
-              <view
-                @click="!reactiveData.setData.warehouseDisplay ? (warehouseData.show = true) : ''"
-              >
-                <u-icon name="arrow-down" size="20" />
-              </view>
-              <view>
-                <u-action-sheet
-                  :show="warehouseData.show"
-                  round="10"
-                  :closeOnClickOverlay="true"
-                  :closeOnClickAction="true"
-                  @close="warehouseData.show = false"
-                >
-                  <view
-                    class="flex items-center p-20rpx"
-                    style="border-bottom: 1px solid #f8f8f8"
-                    @click="clearTimer"
-                  >
-                    <view @tap="warehouseData.show = false">搜索 </view>
-                    <view class="flex-1">
-                      <u-input
-                        id="searchInput1"
-                        v-model="warehouseData.scValue"
-                        :showAction="false"
-                        shape="round"
-                        placeholder="请输入搜索关键词"
-                        @blur="handleFocus"
-                      />
-                    </view>
-                  </view>
-                  <view>
-                    <!-- 滚动条 -->
-                    <scroll-view scroll-y style="height: 800rpx">
-                      <view
-                        class=""
-                        v-for="(warehouseItem, index) of warehouseData.warehouseList"
-                        :key="index"
-                      >
-                        <view
-                          class="flex justify-center py-10px"
-                          style="border-bottom: 1px solid #f8f8f8"
-                          v-if="warehouseItem.value.indexOf(warehouseData.scValue || '') !== -1"
-                          @tap="pickerConfirm(warehouseItem)"
-                        >
-                          {{ warehouseItem.text }}
-                        </view>
-                      </view>
-                    </scroll-view>
-                  </view>
-                </u-action-sheet>
-              </view>
-            </template>
-          </u-input>
-        </view>
+    <!-- 订单号搜索 -->
+    <view class="flex items-center pb-20rpx bg-#f2f2f2">
+      <view class="w-50px flex justify-center" @click="searchClick">
+        <u-icon name="scan" size="24" />
       </view>
-
-      <view class="flex items-center pb-10rpx w-100%">
-        <view class="w-50px flex justify-center">仓位</view>
-        <view class="flex-1" style="border: 1px solid #f8f8f8" @click="clearTimer">
-          <u-input
-            ref="searchInput"
-            v-model="reactiveData.heardList.location"
-            :showAction="false"
-            :focus="reactiveData.focus == 2"
-            :disabled="reactiveData.setData.locationDisplay"
-            shape="round"
-            placeholder=""
-            @change="locationChange"
-          >
-            <template #suffix>
-              <view
-                @click="!reactiveData.setData.locationDisplay ? (locationData.show = true) : ''"
-              >
-                <u-icon name="arrow-down" size="20" />
-              </view>
-              <view>
-                <u-action-sheet
-                  :show="locationData.show"
-                  round="10"
-                  :closeOnClickOverlay="true"
-                  :closeOnClickAction="true"
-                  @close="locationData.show = false"
-                >
-                  <view
-                    class="flex items-center p-20rpx"
-                    style="border-bottom: 1px solid #f8f8f8"
-                    @click="clearTimer"
-                  >
-                    <view @tap="locationData.show = false">搜索 </view>
-                    <view class="flex-1">
-                      <u-input
-                        id="searchInput1"
-                        v-model="warehouseData.scValue"
-                        :showAction="false"
-                        shape="round"
-                        placeholder="请输入搜索关键词"
-                        @blur="handleFocus"
-                      />
-                    </view>
-                  </view>
-                  <view>
-                    <!-- 滚动条 -->
-                    <scroll-view scroll-y style="height: 800rpx">
-                      <view
-                        class=""
-                        v-for="(warehouseItem, index) of locationData.locationList"
-                        :key="index"
-                      >
-                        <view
-                          class="flex justify-center py-10px"
-                          style="border-bottom: 1px solid #f8f8f8"
-                          v-if="warehouseItem.value.indexOf(warehouseData.scValue || '') !== -1"
-                          @tap="locationPickerConfirm(warehouseItem)"
-                        >
-                          {{ warehouseItem.text }}
-                        </view>
-                      </view>
-                    </scroll-view>
-                  </view>
-                </u-action-sheet>
-              </view>
-            </template>
-          </u-input>
-        </view>
+      <view class="flex-1 mr-20rpx" style="border: 1px solid #f8f8f8" @click="clearTimer">
+        <u-input
+          ref="searchInput"
+          v-model="reactiveData.searchValue"
+          :showAction="false"
+          customStyle="background: #FFF;"
+          shape="round"
+          placeholder="请输入搜索关键词"
+          :focus="reactiveData.focus == 99"
+          @blur="searchChange"
+        />
       </view>
+    </view>
+    <!-- <view class="flex items-center py-10rpx w-100%">
+      <view class="w-50px flex justify-center">单号</view>
+      <view class="flex-1 mr-20rpx" style="border: 1px solid #f8f8f8" @click="clearTimer">
+        <u-input
+          ref="searchInput"
+          v-model="reactiveData.heardList.documentNumber"
+          :showAction="false"
+          :disabled="true"
+          shape="round"
+          placeholder=""
+        />
+      </view>
+    </view> -->
+    <view class="flex items-center py-10rpx w-100%">
+      <view class="w-50px flex justify-center">仓库</view>
+      <view class="flex-1 mr-20rpx" style="border: 1px solid #f8f8f8">
+        <u-input
+          ref="searchInput"
+          v-model="reactiveData.heardList.warehouse"
+          :showAction="false"
+          :focus="reactiveData.focus == 1"
+          shape="round"
+          placeholder=""
+        >
+          <template #suffix>
+            <view @click="warehouseData.show = true">
+              <u-icon name="arrow-down" size="20" />
+            </view>
+            <view>
+              <u-action-sheet
+                :show="warehouseData.show"
+                round="10"
+                :closeOnClickOverlay="true"
+                :closeOnClickAction="true"
+                @close="warehouseData.show = false"
+              >
+                <view
+                  class="flex items-center p-20rpx"
+                  style="border-bottom: 1px solid #f8f8f8"
+                  @click="clearTimer"
+                >
+                  <view @tap="warehouseData.show = false">搜索 </view>
+                  <view class="flex-1">
+                    <u-input
+                      id="searchInput1"
+                      v-model="warehouseData.scValue"
+                      :showAction="false"
+                      shape="round"
+                      placeholder="请输入搜索关键词"
+                      @blur="handleFocus"
+                    />
+                  </view>
+                </view>
+                <view>
+                  <!-- 滚动条 -->
+                  <scroll-view scroll-y style="height: 800rpx">
+                    <view
+                      class=""
+                      v-for="(warehouseItem, index) of warehouseData.warehouseList"
+                      :key="index"
+                    >
+                      <view
+                        class="flex justify-center py-10px"
+                        style="border-bottom: 1px solid #f8f8f8"
+                        v-if="warehouseItem.value.indexOf(warehouseData.scValue || '') !== -1"
+                        @tap="pickerConfirm(warehouseItem)"
+                      >
+                        {{ warehouseItem.text }}
+                      </view>
+                    </view>
+                  </scroll-view>
+                </view>
+              </u-action-sheet>
+            </view>
+          </template>
+        </u-input>
+      </view>
+    </view>
 
-      <view class="flex items-center pb-10rpx w-100%">
-        <view class="w-50px flex justify-center">条码</view>
-        <view class="flex-1" style="border: 1px solid #f8f8f8" @click="clearTimer">
-          <u-input
-            ref="searchInput"
-            v-model="reactiveData.heardList.barcode"
-            :showAction="false"
-            :focus="reactiveData.focus == 3"
-            shape="round"
-            placeholder=""
-            @blur="searchChange"
-          />
-        </view>
+    <view class="flex items-center pb-10rpx w-100%">
+      <view class="w-50px flex justify-center">仓位</view>
+      <view class="flex-1 mr-20rpx" style="border: 1px solid #f8f8f8">
+        <u-input
+          ref="searchInput"
+          v-model="reactiveData.heardList.location"
+          :showAction="false"
+          :focus="reactiveData.focus == 2"
+          :disabled="reactiveData.setData.locationDisplay"
+          shape="round"
+          placeholder=""
+        >
+          <template #suffix>
+            <view @click="!reactiveData.setData.locationDisplay ? (locationData.show = true) : ''">
+              <u-icon name="arrow-down" size="20" />
+            </view>
+            <view>
+              <u-action-sheet
+                :show="locationData.show"
+                round="10"
+                :closeOnClickOverlay="true"
+                :closeOnClickAction="true"
+                @close="locationData.show = false"
+              >
+                <view
+                  class="flex items-center p-20rpx"
+                  style="border-bottom: 1px solid #f8f8f8"
+                  @click="clearTimer"
+                >
+                  <view @tap="locationData.show = false">搜索 </view>
+                  <view class="flex-1">
+                    <u-input
+                      id="searchInput1"
+                      v-model="warehouseData.scValue"
+                      :showAction="false"
+                      shape="round"
+                      placeholder="请输入搜索关键词"
+                      @blur="handleFocus"
+                    />
+                  </view>
+                </view>
+                <view>
+                  <!-- 滚动条 -->
+                  <scroll-view scroll-y style="height: 800rpx">
+                    <view
+                      class=""
+                      v-for="(warehouseItem, index) of locationData.locationList"
+                      :key="index"
+                    >
+                      <view
+                        class="flex justify-center py-10px"
+                        style="border-bottom: 1px solid #f8f8f8"
+                        v-if="warehouseItem.value.indexOf(warehouseData.scValue || '') !== -1"
+                        @tap="locationPickerConfirm(warehouseItem)"
+                      >
+                        {{ warehouseItem.text }}
+                      </view>
+                    </view>
+                  </scroll-view>
+                </view>
+              </u-action-sheet>
+            </view>
+          </template>
+        </u-input>
       </view>
     </view>
   </view>

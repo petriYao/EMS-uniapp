@@ -1408,7 +1408,7 @@ defineExpose({
             </view>
             <view class=""> 批号： {{ item.Lot }}</view>
             <view> 名称： {{ item.Name }}</view>
-            <view> 规格： {{ item.Specification }}</view>
+            <view class="flex-wrap"> 规格： {{ item.Specification }}</view>
             <view class="flex">
               <view class="w-50%"> 可收： {{ item.canReceive }}</view>
               <view class="w-50%"> 数量： {{ item.Quantity2 }}</view>

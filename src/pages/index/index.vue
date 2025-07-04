@@ -133,6 +133,11 @@ onBeforeMount(() => {
           icon: '/static/index/Reportingforwork.png',
           src: 'transferOrder/Index'
         })
+        crmList4.value.push({
+          name: '采购入库',
+          icon: '/static/index/Reportingforwork.png',
+          src: 'purchaseStockIn/Index'
+        })
         break
     }
   }

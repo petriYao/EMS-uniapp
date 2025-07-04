@@ -1,7 +1,7 @@
 import { lookBarCode, queryBarCode, productionOrder } from '@/api/modules/storage'
 
 //调拨单-扫描条码
-export const transferScanBarcode = async (searchValue: any, warehouseDataId: any) => {
+export const transferScanBarcode = async (searchValue: any, setData: any, location: any) => {
   const res = await lookBarCode(searchValue)
   if (res && res.data) {
     //条码详情
@@ -149,7 +149,7 @@ export const transferScanBarcode = async (searchValue: any, warehouseDataId: any
           style: { width: '100%' }
         },
         {
-          label: '仓位',
+          label: '调出位',
           value: actualValue?.Name[0].Value,
           disabled: true,
           type: 'input',
@@ -219,6 +219,14 @@ export const transferScanBarcode = async (searchValue: any, warehouseDataId: any
           disabled: true,
           type: 'input',
           style: { width: '35%' }
+        },
+
+        {
+          label: '调入位',
+          value: location,
+          disabled: true,
+          type: 'select',
+          style: { width: '100%' }
         }
       ],
       barCodeList: [
@@ -245,9 +253,9 @@ export const transferScanBarcode = async (searchValue: any, warehouseDataId: any
         name: barCodeData.F_NUMBER.Name[0].Value, //名称
         specification: barCodeData.F_NUMBER.MultiLanguageText[0].Specification, //规格
         quantity: barCodeData.F_UNITQTY, //数量
-        pieces: 1, //件数
-        FStockLocId: FStockLocId, //仓位信息
-        warehousePosition: actualValue?.Name[0].Value //仓位
+        FStockLocId: FStockLocId, //源仓位信息
+        location: location, //目标仓名称 actualValue?.Name[0].Value
+        locationNumber: setData.locationNumber //目标仓位编码
       },
       //生产部门
       ProductionDepartment: barCodeData.F_ALMA_BM?.Number,
@@ -265,7 +273,10 @@ export const transferScanBarcode = async (searchValue: any, warehouseDataId: any
       SourceOrderNo2: barCodeData.F_YVRT_XQDJ,
       //需求行号
       SourceOrderLineNo2: barCodeData.F_YVRT_YDSeq,
-
+      //仓位
+      WarehousePosition: setData.locationId,
+      //仓位编码
+      WarehousePositionNumber: setData.locationNumber,
       //批号
       Lot: barCodeData.F_WLLOT === ' ' ? '' : barCodeData.F_WLLOT,
       //名称

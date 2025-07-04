@@ -110,6 +110,13 @@
         "navigationBarTitleText": "调拨",
         "navigationStyle": "custom"
       }
+    },
+    {
+      "path": "pages/purchaseStockIn/Index",
+      "style": {
+        "navigationBarTitleText": "采购入库",
+        "navigationStyle": "custom"
+      }
     }
   ],
   "tabBar": {
