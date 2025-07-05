@@ -34,13 +34,13 @@ const saveClick = async () => {
   //条码单据查询
   const fNumbersInClause = barcodeList.map((code: any) => `'${code}'`).join(',')
   // 构建最终的 SQL 条件字符串
-  const sqlCondition = `FNUMBER in (${fNumbersInClause}) AND F_BARSTATUS != '3'`
+  const sqlCondition = `FNUMBER in (${fNumbersInClause}) AND F_BARSTATUS != '2'`
   //单据查询 条码状态
   const barCodeRes: any = await barcodeStatus(sqlCondition)
   if (barCodeRes && barCodeRes.data && barCodeRes.data.length > 0) {
     //条码状态不为1的提示
     uni.showToast({
-      title: `编码${barCodeRes.data[0][1]}中，条码${barCodeRes.data[0][0]}不为出库状态`,
+      title: `编码${barCodeRes.data[0][1]}中，条码${barCodeRes.data[0][0]}不为入库状态`,
       icon: 'none',
       duration: 5000
     })
@@ -55,12 +55,26 @@ const saveClick = async () => {
   let myIndex = 0
   reactiveData.detailsList.map(async (item: any, index: number) => {
     console.log('item', !item.isInteger, item)
-    if (!item.isInteger) {
-      isInteger = false
-      myIndex = index
+    if (item.IsSplit) {
+      item.FZLOTList.forEach((element: any) => {
+        let faLotData = item.packagingDataFZLOT[element]
+        if (!faLotData.isInteger) {
+          myIndex = index
+          isInteger = false
+        }
 
-      return
+        let finishedQty = faLotData.packagingData[faLotData.packagingSig[0]].finishedQty //成品数量
+        console.log('成品数量', finishedQty)
+        faLotData.packagingSig.forEach((element: any) => {
+          console.log('成品数量值', faLotData.packagingData[element].finishedQty)
+          if (faLotData.packagingData[element].finishedQty !== finishedQty) {
+            myIndex = index
+            isInteger = false
+          }
+        })
+      })
     }
+
     console.log('错误2', item)
     //仓位
     const FStockLocPJ = 'FDESTSTOCKLOCID__' + reactiveData.setData.FlexNumber
@@ -85,7 +99,7 @@ const saveClick = async () => {
       FDestLot: {
         FNumber: item.Lot
       },
-      FQty: 2.0, // 数量
+      FQty: item.Quantity2, // 数量
       FSrcStockId: {
         // 源仓库
         FNumber: item.WarehouseNumber
@@ -124,7 +138,7 @@ const saveClick = async () => {
         // 基本单位
         FNumber: 'Pcs'
       },
-      FBaseQty: item.Quantity, // 基本数量
+      FBaseQty: item.Quantity2, // 基本数量
       FISFREE: false, // 是否赠品
       FKeeperTypeId: 'BD_KeeperOrg', // 保管者类型
       FActQty: 0.0, // 实际数量
@@ -147,15 +161,15 @@ const saveClick = async () => {
         // 销售单位
         FNumber: 'Pcs'
       },
-      FSaleQty: item.Quantity, // 销售数量
-      FSalBaseQty: item.Quantity, // 销售基本数量
+      FSaleQty: item.Quantity2, // 销售数量
+      FSalBaseQty: item.Quantity2, // 销售基本数量
       FPriceUnitID: {
         // 计价单位
         FNumber: 'Pcs'
       },
       F_QADV_TBTMSubEntity: item.barCodeList, // 条码
-      FPriceQty: item.Quantity, // 计价数量
-      FPriceBaseQty: item.Quantity, // 计价基本数量
+      FPriceQty: item.Quantity2, // 计价数量
+      FPriceBaseQty: item.Quantity2, // 计价基本数量
       FOutJoinQty: 0.0, // 出库关联数量
       FBASEOUTJOINQTY: 0.0, // 基本出库关联数量
       FSOEntryId: 0, // 销售订单分录ID

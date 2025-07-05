@@ -248,7 +248,7 @@ export const transferScanBarcode = async (searchValue: any, setData: any, locati
       },
       detailList: {
         //编码，批号，名称，规格，数量，件数，仓位
-        fnumber: barCodeData.Number, //编码
+        fnumber: barCodeData.F_NUMBER.Number, //编码
         lot: barCodeData.F_WLLOT, //批号
         name: barCodeData.F_NUMBER.Name[0].Value, //名称
         specification: barCodeData.F_NUMBER.MultiLanguageText[0].Specification, //规格

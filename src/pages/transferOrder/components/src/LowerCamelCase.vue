@@ -51,8 +51,10 @@ const longpressClick = (item: any, index: number) => {
         if (reactiveData.detailsList.length === 0) {
           reactiveData.barcodeIndex = 0
         } else if (reactiveData.barcodeIndex > index) {
+          console.log('删除1')
           reactiveData.barcodeIndex--
         } else {
+          console.log('删除2')
           reactiveData.barcodeIndex = reactiveData.detailsList.length - 1
         }
       } else if (res.cancel) {
@@ -165,7 +167,7 @@ const longpressDetailsClick = (item: any, index: number) => {
         if (reactiveData.detailsList[reactiveData.barcodeIndex].barCodeList.length === 0) {
           //删除明细
           reactiveData.detailsList.splice(reactiveData.barcodeIndex, 1)
-          reactiveData.barcodeIndex--
+          if (reactiveData.detailsList.length === 0) reactiveData.barcodeIndex = 0
         }
         emit('update:detailsList', reactiveData.detailsList)
       } else if (res.cancel) {
@@ -206,6 +208,7 @@ const warehouseChange = debounceSave((val: any) => {
 
   pickerShow.value = false
   emit('update:detailsList', reactiveData.detailsList)
+  emitter.emit('update:handleFocus')
 })
 
 const pickerConfirm = (warehouseItem: any) => {
@@ -220,6 +223,7 @@ const pickerConfirm = (warehouseItem: any) => {
   reactiveData.detailsList[reactiveData.barcodeIndex].currentList[11].value = warehouseItem.text
   pickerShow.value = false
   emit('update:detailsList', reactiveData.detailsList)
+  emitter.emit('update:handleFocus')
 }
 
 const clearTimer = () => {
@@ -284,7 +288,7 @@ watch(
           :disabled="reactiveData.locationList.length == 0"
           shape="round"
           placeholder=""
-          @blur="warehouseChange(item.value)"
+          @change="warehouseChange(item.value)"
         >
           <template #suffix>
             <view @click="reactiveData.locationList.length == 0 ? '' : (pickerShow = true)">
@@ -338,7 +342,7 @@ watch(
       </view>
     </view>
     <view v-if="reactiveData.detailsList.length > 0" class="w-100% pl-2px mt-2px">
-      <view class="flex w-100% px-10px">
+      <view class="flex w-100% pl-3px pr-10px">
         <view class="w-50% flex items-center">
           <view>本箱数</view>
           <view class="ml-20px text-18px mt-2px">{{

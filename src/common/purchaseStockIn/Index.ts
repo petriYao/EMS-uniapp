@@ -207,7 +207,7 @@ export const transferScanBarcode = async (searchValue: any) => {
         },
         {
           label: '仓位',
-          value: location,
+          value: '',
           disabled: true,
           type: 'select',
           style: { width: '100%' }

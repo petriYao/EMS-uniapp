@@ -39,7 +39,6 @@ const saveClick = throttleSave(async () => {
   switch (reactiveData.scanCodeType) {
     case '扫码入库':
     case '单码双扫':
-      let tmList = [] as any
       // 执行扫码入库的保存逻辑
       // 执行单码双扫的保存逻辑
       console.log('扫码入库')
@@ -65,6 +64,7 @@ const saveClick = throttleSave(async () => {
         console.log('res', res1)
         if (res1 && res1.data && res1.data?.Result?.Number) {
           for (const item of results12.dataList) {
+            let tmList = [] as any
             for (const item2 of item.F_BARSubEntity) {
               tmList.push(item2.F_BARCODENO)
             }
@@ -81,10 +81,10 @@ const saveClick = throttleSave(async () => {
             icon: 'none',
             title: '提交成功'
           })
-          reactiveData.isShow = false //隐藏标题组件
-          setTimeout(() => {
-            reactiveData.isShow = true //显示标题组件
-          }, 500)
+          // reactiveData.isShow = false //隐藏标题组件
+          // setTimeout(() => {
+          //   reactiveData.isShow = true //显示标题组件
+          // }, 500)
         } else {
           uni.showToast({
             icon: 'none',

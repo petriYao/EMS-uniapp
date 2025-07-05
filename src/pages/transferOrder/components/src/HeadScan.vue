@@ -156,10 +156,12 @@ const searchChange = () => {
 
           // 如果存在任何一个 0，或者所有值都是无效的，则设为 0
           const productsQuantity = hasZero || minNonZero === Infinity ? 0 : minNonZero
+
           //判断productsQuantity是否为整数
           reactiveData.detailsList[index].packagingDataFZLOT[queryRes.FZLOTList[0]].isInteger =
             productsQuantity % 1 === 0 && productsQuantity !== 0
 
+          console.log('是否整数', reactiveData.detailsList)
           //计算单分装数量
           reactiveData.detailsList[index].packagingDataFZLOT[queryRes.FZLOTList[0]].FZquantity =
             Math.floor(productsQuantity)
@@ -241,6 +243,7 @@ const pickerConfirm = async (val: any) => {
   reactiveData.setData.locationNumber = ''
   reactiveData.setData.locationId = ''
   reactiveData.heardList.location = ''
+  handleFocus()
   getWarehousePosition(val.value)
   emit('update:setData', reactiveData.setData)
   warehouseData.show = false
@@ -282,7 +285,6 @@ const getWarehousePosition = async (warehouseId: any) => {
           reactiveData.focus = 2
         }, 500)
       }
-      handleFocus()
       emit('update:locationList', locationData.locationList)
       console.log('focusIndex', reactiveData.focus)
     }
@@ -297,6 +299,8 @@ const locationPickerConfirm = (val: any) => {
   reactiveData.setData.locationId = val.Id
   locationData.show = false
   reactiveData.setData.warehouseDisplay = true
+  handleFocus()
+
   focusTm()
   emit('update:setData', reactiveData.setData)
   // reactiveData.locationValue = val.value
@@ -325,6 +329,7 @@ const warehouseChange = debounceSave((val: any) => {
   reactiveData.heardList.warehouse = warehouseId.text
   reactiveData.setData.warehouseNumber = warehouseId.value
   reactiveData.setData.warehouseId = warehouseId.id
+  handleFocus()
   getWarehousePosition(val)
   emit('update:setData', reactiveData.setData)
 })
@@ -351,6 +356,8 @@ const locationChange = debounceSave((val: any) => {
   reactiveData.setData.locationNumber = location.value
   reactiveData.setData.locationId = location.Id
   reactiveData.setData.warehouseDisplay = true
+  handleFocus()
+
   reactiveData.focus = 0
   setTimeout(() => {
     reactiveData.focus = 3
@@ -360,6 +367,7 @@ const locationChange = debounceSave((val: any) => {
 
 const hideTimer = ref<number | null>(null)
 const handleFocus = () => {
+  console.log('设置定时器')
   // 设置定时器
   if (!hideTimer.value) {
     hideTimer.value = setInterval(() => {
@@ -384,14 +392,22 @@ useEmitt({
     clearTimer()
   }
 })
+useEmitt({
+  name: 'update:handleFocus',
+  callback: async () => {
+    console.log('设置定时器')
+    handleFocus()
+  }
+})
 
 watch(
   () => props.detailsList,
   (val: any) => {
     console.log('val', val)
     reactiveData.detailsList = val
+    focusTm()
   },
-  { immediate: true, deep: true }
+  { deep: true }
 )
 
 onBeforeMount(() => {
@@ -480,7 +496,7 @@ onBeforeUnmount(() => {
       </view>
 
       <view class="flex items-center pb-10rpx w-100%">
-        <view class="w-50px flex justify-center">仓位</view>
+        <view class="w-50px flex justify-center">调入位</view>
         <view class="flex-1" style="border: 1px solid #f8f8f8" @click="clearTimer">
           <u-input
             ref="searchInput"
