@@ -331,7 +331,7 @@ export const productionGetData = async (
     //查找最大可收货数量
     const res2: any = await productionOrder(
       `FBillNo = '${barCodeData.F_SourceFbillno}' AND FTreeEntity_FSeq = ${barCodeData.F_SourceEntry}`,
-      `FBillNo,FNoStockInQty`
+      `FBillNo,FNoStockInQty,FID,FTreeEntity_FEntryId,FWorkShopID.FNumber,FStockInQuaAuxQty` //单据编号,未入库数量,单据ID,行号ID,车间,累计入库
     )
     console.log('查找最大可收货数量', res2.data)
     const packagingData = {} as any
@@ -522,6 +522,14 @@ export const productionGetData = async (
       Quantity2: barCodeData.F_CHECKBOXFZ ? 0 : barCodeData.F_UNITQTY,
       //可收货数量
       canReceive: res2.data?.[0]?.[1],
+      //行号ID
+      FEntryId: res2.data?.[0]?.[3],
+      //生产订单FID
+      MOFID: res2.data?.[0]?.[2],
+      //生产车间
+      ProductionWorkshop: res2.data?.[0]?.[4],
+      //累计入库数量
+      TotalQty: res2.data?.[0]?.[5],
       //当前条码数量
       CurrentQty: barCodeData.F_UNITQTY,
       //是否分装

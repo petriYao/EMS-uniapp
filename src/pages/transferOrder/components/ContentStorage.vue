@@ -4,7 +4,7 @@ import HeadScan from './src/HeadScan.vue'
 import LowerCamelCase from './src/LowerCamelCase.vue'
 import { saveProductionOrder } from '@/api/modules/transferOrder'
 import { TMUpdate } from '@/api/commonHttp'
-import { barcodeStatus } from '@/api/modules/lowerCamelCase'
+import { TMStatusQuery } from '@/api/commonHttp'
 const reactiveData = reactive({
   detailsList: [] as any,
   setData: {} as any,
@@ -15,7 +15,6 @@ const reactiveData = reactive({
 //保存
 const saveClick = async () => {
   console.log('保存1', reactiveData.detailsList)
-  console.log('保存2', reactiveData.setData)
   if (reactiveData.detailsList.length === 0) {
     uni.showToast({
       title: '无提交数据',
@@ -31,19 +30,19 @@ const saveClick = async () => {
     })
   }
   console.log('条码值', barcodeList)
-  //条码单据查询
-  const fNumbersInClause = barcodeList.map((code: any) => `'${code}'`).join(',')
-  // 构建最终的 SQL 条件字符串
-  const sqlCondition = `FNUMBER in (${fNumbersInClause}) AND F_BARSTATUS != '2'`
-  //单据查询 条码状态
-  const barCodeRes: any = await barcodeStatus(sqlCondition)
-  if (barCodeRes && barCodeRes.data && barCodeRes.data.length > 0) {
+  const tmStatusRes: any = await TMStatusQuery({
+    barcodes: barcodeList,
+    status: '2'
+  })
+  console.log('tmStatusRes', tmStatusRes)
+  if (tmStatusRes && tmStatusRes.data && tmStatusRes.data.length > 0) {
     //条码状态不为1的提示
     uni.showToast({
-      title: `编码${barCodeRes.data[0][1]}中，条码${barCodeRes.data[0][0]}不为入库状态`,
+      title: `编码${tmStatusRes.data[0]['material_fnumber']}中，条码${tmStatusRes.data[0]['FNUMBER']}不为入库状态`,
       icon: 'none',
       duration: 5000
     })
+    reactiveData.loading = false
     return
   }
 
@@ -54,7 +53,6 @@ const saveClick = async () => {
   let isInteger = true
   let myIndex = 0
   reactiveData.detailsList.map(async (item: any, index: number) => {
-    console.log('item', !item.isInteger, item)
     if (item.IsSplit) {
       item.FZLOTList.forEach((element: any) => {
         let faLotData = item.packagingDataFZLOT[element]
@@ -64,9 +62,7 @@ const saveClick = async () => {
         }
 
         let finishedQty = faLotData.packagingData[faLotData.packagingSig[0]].finishedQty //成品数量
-        console.log('成品数量', finishedQty)
         faLotData.packagingSig.forEach((element: any) => {
-          console.log('成品数量值', faLotData.packagingData[element].finishedQty)
           if (faLotData.packagingData[element].finishedQty !== finishedQty) {
             myIndex = index
             isInteger = false
@@ -75,7 +71,6 @@ const saveClick = async () => {
       })
     }
 
-    console.log('错误2', item)
     //仓位
     const FStockLocPJ = 'FDESTSTOCKLOCID__' + reactiveData.setData.FlexNumber
     const FStockLocId = {} as any
@@ -181,7 +176,6 @@ const saveClick = async () => {
     })
   })
   if (!isInteger) {
-    console.log('错误')
     //提升
     uni.showToast({
       title: `第${myIndex + 1}行不配套`,
@@ -192,7 +186,6 @@ const saveClick = async () => {
   }
   //保存
   const res = await saveProductionOrder(Model)
-  console.log('保存结果', res)
   if (res && res.data.Result.ResponseStatus.ErrorCode === 500) {
     uni.showToast({
       icon: 'none',

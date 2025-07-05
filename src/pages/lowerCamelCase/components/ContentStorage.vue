@@ -220,9 +220,9 @@ function groupBarcodeLists(data: any[]) {
       result.push(item)
       continue
     }
-    ThFilterString += `(FEntity_FEntryID = '${item.id}' AND F_QADV_WCYQTY > ${
-      item.currentTotal - 1
-    }) OR `
+    ThFilterString += `(d.FENTRYID = '${item.id}' AND  ${
+      item.currentTotal + 1
+    } > d.F_QADV_WCYQTY ) OR `
     ThFilter2++
     EntryIds.push({
       id: item.id,
@@ -258,7 +258,7 @@ function groupBarcodeLists(data: any[]) {
     ThFilterString = ThFilterString.substring(0, ThFilterString.length - 3)
   }
   let ThFilter = {
-    filtersString: `FBillNo = '${reactiveData.Numbers}' AND (${ThFilterString})`,
+    filtersString: ThFilterString,
     ThFilterNum: ThFilter2,
     EntryIds,
     tmList
@@ -278,7 +278,6 @@ watch(
   () => props.pickupOrderValue,
   () => {
     reactiveData.Numbers = props.pickupOrderValue
-    console.log('reactiveData.pickupOrderValue123333', props.pickupOrderValue)
   },
   { immediate: true, deep: true }
 )

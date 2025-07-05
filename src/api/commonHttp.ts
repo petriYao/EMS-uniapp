@@ -37,6 +37,32 @@ export function TMQuery(parameters: any) {
     data: data
   })
 }
+
+//条码状态查询
+export function TMStatusQuery(parameters: any) {
+  const data = {
+    parameters: [parameters]
+  }
+  return http({
+    url: '/k3cloud/Kingdee.BOS.TM.WebApi.StockItemCountWebApiService.TMStatusQuery,Kingdee.BOS.TM.WebApi.common.kdsvc',
+    method: 'POST',
+    requestTime: 5000, //等待5秒
+    data: data
+  })
+}
+//校验出运分柜单
+export function CYFGQuery(parameters: any) {
+  const data = {
+    parameters: [parameters]
+  }
+  return http({
+    url: '/k3cloud/Kingdee.BOS.TM.WebApi.StockItemCountWebApiService.CYFGQuery,Kingdee.BOS.TM.WebApi.common.kdsvc',
+    method: 'POST',
+    requestTime: 5000, //等待5秒
+    data: data
+  })
+}
+
 //修改条码
 export function TMUpdate(parameters: any) {
   const data = {
@@ -50,6 +76,7 @@ export function TMUpdate(parameters: any) {
     data: data
   })
 }
+
 //修改条码（无仓库仓位）
 export function EditCKTM(parameters: any) {
   const data = {

@@ -6,13 +6,12 @@ import {
   saveSalesOrder,
   pushClient,
   shipmentSubContainer,
-  pickupOrder,
   shipmentSubContainerSave,
   UnAuditApiClient
 } from '@/api/modules/lowerCamelCase'
 import { throttleSave } from '@/utils'
-import { barcodeStatus } from '@/api/modules/storage'
 import { EditCKTM } from '@/api/commonHttp'
+import { TMStatusQuery, CYFGQuery } from '@/api/commonHttp'
 
 const reactiveData = reactive({
   isShow: true, //是否选择
@@ -26,53 +25,43 @@ const reactiveData = reactive({
 const contentStorageRef = ref() //标题组件引用
 
 const saveClick = throttleSave(async () => {
-  console.log('保存')
   reactiveData.loading = true //显示保存按钮
   const results12 = await contentStorageRef.value?.saveClick()
-  // let results12 = {} as any
-
-  // /***存储数据 */
-  // if (datasss.value) {
-  //   results12 = datasss.value
-  // } else {
-  //   results12 = await contentStorageRef.value?.saveClick()
-  //   //储存到本地缓存中
-  //   uni.setStorageSync('SalesOutbound', JSON.stringify(reactiveData))
-  // }
-  console.log('results1', results12)
-
+  console.log('保存', results12)
   /***保存数据 */
   if (!results12 || (results12 && results12.isError)) {
-    // uni.showToast({
-    //   icon: 'none',
-    //   title: '无提交数据'
-    // })
+    uni.showToast({
+      icon: 'none',
+      title: '无提交数据'
+    })
     reactiveData.loading = false
     return
   }
-
-  // 将 F_BARCODENO 拼接成 SQL 查询条件
-  const fNumbersInClause = results12.ThFilter.tmList.map((code: any) => `'${code}'`).join(',')
-  // 构建最终的 SQL 条件字符串
-  const sqlCondition = `FNUMBER in (${fNumbersInClause}) AND F_BARSTATUS != '2'`
-  //单据查询 条码状态
-  const barCodeRes: any = await barcodeStatus(sqlCondition)
-  if (barCodeRes && barCodeRes.data && barCodeRes.data.length > 0) {
+  const tmStatusRes: any = await TMStatusQuery({
+    barcodes: results12.ThFilter.tmList,
+    status: '2'
+  })
+  console.log('tmStatusRes', tmStatusRes)
+  if (tmStatusRes && tmStatusRes.data && tmStatusRes.data.length > 0) {
     //条码状态不为1的提示
     uni.showToast({
-      title: `编码${barCodeRes.data[0][1]}中，条码${barCodeRes.data[0][0]}不为入库状态`,
+      title: `编码${tmStatusRes.data[0]['material_fnumber']}中，条码${tmStatusRes.data[0]['FNUMBER']}不为入库状态`,
       icon: 'none',
       duration: 5000
     })
     reactiveData.loading = false
     return
   }
+
   //调用发货通知单单据查询验证出运分柜数量是否超发货通知数量
-  const pickupRes: any = await pickupOrder(results12.ThFilter.filtersString)
-  if (pickupRes && pickupRes.data.length !== results12.ThFilter.ThFilterNum) {
+  console.log('查询出运分柜数量是否超发货通知数量', results12.ThFilter.filtersString)
+  const pickupRes1: any = await CYFGQuery(results12.ThFilter.filtersString)
+  console.log('pickupRes1', pickupRes1)
+  if (pickupRes1 && pickupRes1.data && pickupRes1.data.length > 0) {
+    //条码状态不为1的提示
     uni.showToast({
+      title: `编码${pickupRes1.data[0]['FNUMBER']}，出运分柜数量超出发货通知单数量`,
       icon: 'none',
-      title: '出运分柜数量超出发货通知单数量',
       duration: 5000
     })
     reactiveData.loading = false
@@ -82,10 +71,6 @@ const saveClick = throttleSave(async () => {
   const res1 = await saveSalesOrder(results12.model)
   console.log('res', res1)
   if (res1 && res1.data && res1.data?.Result?.Number) {
-    // uni.showToast({
-    //   icon: 'none',
-    //   title: '提交成功'
-    // })
     EditCKTM({
       barcodes: results12.ThFilter.tmList,
       documentNumber: res1.data.Result.Number,
@@ -132,9 +117,7 @@ const saveClick = throttleSave(async () => {
         FID: res2.data[0][0],
         FEntity: [] as any
       }
-      console.log('res3')
       for (const item of res2.data) {
-        console.log('res4', item)
         let item2 = {
           FEntryID: item[1],
           F_QADV_QTY: item[2],
