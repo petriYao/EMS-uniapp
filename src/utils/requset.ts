@@ -1,8 +1,8 @@
 // import { useAppStore } from '@/store'
 // 定义请求地址
-const BASE_URL = 'http://localhost:80/' //澳马正式环境
+// const BASE_URL = 'http://localhost:80/' //澳马正式环境
 // const BASE_URL = 'http://125z0344r3.oicp.vip/' //澳马正式环境
-// const BASE_URL = 'http://172.16.50.44/' //澳马正式环境
+const BASE_URL = 'http://172.16.50.136/' //澳马正式环境
 // 封装请求方法
 const request = (obj: any) => {
   // const appStore = useAppStore()

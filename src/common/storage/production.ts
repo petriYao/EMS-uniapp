@@ -225,6 +225,7 @@ export const getInboundOrder = async (searchValue: any) => {
         //仓位
         WarehousePosition: actualValue?.Number,
         WarehousePositionName: actualValue?.Name[0].Value,
+        WarehousePositionId: actualValue?.Id,
         //仓库
         WarehouseId: item.StockId?.Number,
         WarehouseName: item.StockId?.Name[0].Value,
@@ -454,7 +455,7 @@ export const productionGetData = async (
         },
         {
           label: '仓位',
-          value: warehousePosition,
+          value: warehousePosition.number,
           disabled: false,
           type: 'select',
           style: { width: '100%' }
@@ -537,7 +538,8 @@ export const productionGetData = async (
       //分装编号
       SplitCode: barCodeData.F_FZNO,
       //仓位
-      WarehousePosition: warehousePosition,
+      WarehousePosition: warehousePosition.number,
+      WarehousePositionId: warehousePosition.id,
       //部件单位用量
       UnitQty: barCodeData.F_JUNITQTY,
       //分装数量
@@ -762,6 +764,7 @@ export const getcamelCase = async (searchValue: any) => {
         //仓位
         WarehousePosition: actualValue?.Number,
         WarehousePositionName: actualValue?.Name[0].Value,
+        WarehousePositionId: '',
         //仓库
         WarehouseId: item.StockId?.Number,
         WarehouseName: item.StockId?.Name[0].Value,
@@ -840,6 +843,7 @@ export const camelCaseProduction = async (searchValue: any, warehousePosition: a
       Quantity2: barCodeData.F_UNITQTY,
       //仓位
       WarehousePosition: warehousePosition,
+      WarehousePositionId: '',
       //部件单位用量
       UnitQty: barCodeData.F_JUNITQTY,
       Unit: barCodeData.F_NUMBER.MaterialBase[0].BaseUnitId.Name[0].Value

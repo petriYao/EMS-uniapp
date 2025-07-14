@@ -265,9 +265,9 @@ export const transferScanBarcode = async (searchValue: any) => {
       Specification: barCodeData.F_NUMBER.MultiLanguageText[0].Specification,
       //是否整数
       isInteger: !barCodeData.F_CHECKBOXFZ,
-      //件数
+      //数量1
       Quantity: barCodeData.F_CHECKBOXFZ ? 0 : barCodeData.F_UNITQTY,
-      //数量
+      //数量2
       Quantity2: barCodeData.F_CHECKBOXFZ ? 0 : barCodeData.F_UNITQTY,
       //当前条码数量
       CurrentQty: barCodeData.F_UNITQTY,

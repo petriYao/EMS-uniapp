@@ -30,7 +30,6 @@ export const getPickupOrder = async (searchValue: any) => {
 
     console.log('生产订单属性', TreeEntity)
     for (const item of TreeEntity) {
-      console.log('单据体', item)
       if (item.Qty - item.SumOutQty > 0) {
         const data = {
           currentList: [
@@ -169,7 +168,6 @@ export const getPickupOrder = async (searchValue: any) => {
           packagingDataFZLOT: {} as any //储存分装明细的成品计算
         } as SalesOutboundType
         dataList.push(data)
-        console.log('生产入库明细数据', data)
       }
     }
 

@@ -12,9 +12,11 @@ import {
 import { throttleSave } from '@/utils'
 import { EditCKTM } from '@/api/commonHttp'
 import { TMStatusQuery, CYFGQuery } from '@/api/commonHttp'
+import { useEmitt } from '@/hooks/useEmitt'
 
 const reactiveData = reactive({
   isShow: true, //是否选择
+  TMdisabled: false,
   loading: false, //是否保存
   title: '销售出库',
   containerNoValue: 1, //柜号
@@ -25,15 +27,16 @@ const reactiveData = reactive({
 const contentStorageRef = ref() //标题组件引用
 
 const saveClick = throttleSave(async () => {
+  if (reactiveData.TMdisabled) return
   reactiveData.loading = true //显示保存按钮
   const results12 = await contentStorageRef.value?.saveClick()
   console.log('保存', results12)
   /***保存数据 */
   if (!results12 || (results12 && results12.isError)) {
-    uni.showToast({
-      icon: 'none',
-      title: '无提交数据'
-    })
+    // uni.showToast({
+    //   icon: 'none',
+    //   title: '无提交数据'
+    // })
     reactiveData.loading = false
     return
   }
@@ -196,6 +199,13 @@ const saveClick = throttleSave(async () => {
   }
   reactiveData.loading = false
 }) //调用标题组件的保存方法
+
+useEmitt({
+  name: 'update:TMdisabled',
+  callback: (loading: boolean) => {
+    reactiveData.TMdisabled = loading
+  }
+})
 </script>
 <template>
   <view v-if="reactiveData.loading" class="bg-#FFF h-300rpx flex items-center justify-center">
@@ -219,10 +229,12 @@ const saveClick = throttleSave(async () => {
   <view class="h-40px">
     <view>
       <view
-        class="bg-#56a8fe text-#FFF w-100% h-40px flex justify-center items-center"
+        class="text-#FFF w-100% h-40px flex justify-center items-center"
+        :style="reactiveData.TMdisabled ? 'background-color: #A3C5E9' : 'background-color: #56a8fe'"
         @click="saveClick"
-        >提交</view
       >
+        提交
+      </view>
     </view>
   </view>
 </template>

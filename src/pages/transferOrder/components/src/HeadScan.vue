@@ -48,7 +48,7 @@ const emit = defineEmits<{
   (e: 'update:setData', modelValue: any): void
   (e: 'update:locationList', modelValue: any): void
 }>()
-
+const { emitter } = useEmitt()
 //扫描条码
 const searchChange = () => {
   setTimeout(async () => {
@@ -69,7 +69,6 @@ const searchChange = () => {
     console.log('查询结果', queryRes, reactiveData.detailsList)
     if (reactiveData.detailsList && reactiveData.detailsList.length > 0) {
       const index = reactiveData.detailsList.findIndex((item: any) => {
-        console.log('判断之前是否有一样的', item, queryRes)
         return (
           item.MaterialCode === queryRes.MaterialCode &&
           item.SourceOrderNo === queryRes.SourceOrderNo &&
@@ -77,6 +76,8 @@ const searchChange = () => {
           item.WarehousePosition === reactiveData.setData.locationId
         )
       })
+      console.log('index', index)
+
       if (index !== -1) {
         //判断仓库是否一样
         if (reactiveData.detailsList[index].WarehouseNumber !== queryRes.WarehouseNumber) {
@@ -87,15 +88,19 @@ const searchChange = () => {
           focusTm()
           return
         }
-        //判断是否重复扫描
-        if (reactiveData.detailsList.some((item: any) => item.BarCode === queryRes.BarCode)) {
+        //判断reactiveData.detailsList[index].barCodeList中是否重复扫描
+        const index3 = reactiveData.detailsList[index].barCodeList.findIndex((item: any) => {
+          return item.F_BARCODENO === queryRes.barCodeList[0].F_BARCODENO
+        })
+        if (index3 !== -1) {
           uni.showToast({
-            title: '请勿重复扫描',
+            title: '条码重复扫描',
             icon: 'none'
           })
           focusTm()
           return
         }
+        emitter.emit('update:barcodeIndex', index)
 
         reactiveData.detailsList[index].barCodeList.push(queryRes.barCodeList[0]) //条码
         reactiveData.detailsList[index].Quantity++ //件数
@@ -189,8 +194,8 @@ const searchChange = () => {
           focusTm()
           return
         }
-        console.log('重复', scannedBarcodes, scannedBarcodes.has(reactiveData.heardList.barcode))
         reactiveData.detailsList.push(queryRes)
+        emitter.emit('update:barcodeIndex', reactiveData.detailsList.length - 1)
       }
     } else {
       reactiveData.detailsList.push(queryRes)

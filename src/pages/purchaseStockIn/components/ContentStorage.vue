@@ -25,7 +25,7 @@ const saveClick = async () => {
   }
   reactiveData.loading = false
   const Model = {
-    FBillEntry: [] as any
+    FInStockEntry: [] as any
   }
   let tmList = [] as any
   reactiveData.detailsList.map(async (item: any, index: number) => {
@@ -49,104 +49,88 @@ const saveClick = async () => {
       FNumber: reactiveData.setData.locationNumber
     }
 
-    /*
-    Model.FBillEntry.push({
-      FRowType: 'Standard', // 产品类型
+    Model.FInStockEntry.push({
+      FRowType: 'Standard', // 产品类型 - 标准类型
+      FProductType: '1', // 产品类型编码
       FMaterialId: {
-        // 物料编码
-        FNumber: item.MaterialCode
+        // 物料信息
+        FNumber: item.MaterialCode // 物料编号 - 2004号有扶手网布餐椅
       },
+      FMaterialDesc: item.Name, // 物料描述
+      FWWPickMtlQty: 0.0, // 委外领料套数 - 0表示非委外领料
       FUnitID: {
-        // 单位
-        FNumber: 'Pcs'
+        // 库存单位
+        FNumber: 'Pcs' // 单位编号 - 件
       },
-      FLot: {
-        FNumber: item.Lot
-      },
-      FDestLot: {
-        FNumber: item.Lot
-      },
-      FQty: 2.0, // 数量
-      FSrcStockId: {
-        // 源仓库
-        FNumber: item.WarehouseNumber
-      },
-      FSrcStockLocId: item.detailList.FStockLocId, // 源仓库仓位
-      FDestStockId: {
-        // 目标仓库
-        FNumber: reactiveData.setData.warehouseNumber
-      },
-      FDestStockLocId: FStockLocId, // 目标仓库仓位
-      FSrcStockStatusId: {
-        // 源库存状态
-        FNumber: 'KCZT01_SYS'
-      },
-      FDestStockStatusId: {
-        // 目标库存状态
-        FNumber: 'KCZT01_SYS'
-      },
-      //FBusinessDate: '2025-06-28 00:00:00', // 业务日期
-      FSrcBillTypeId: '', // 源单据类型
-      FOwnerTypeOutId: 'BD_OwnerOrg', // 货主类型（出）
-      FOwnerOutId: {
-        // 货主（出）
-        FNumber: '100'
-      },
-      FOwnerTypeId: 'BD_OwnerOrg', // 货主类型
-      FOwnerId: {
-        // 货主
-        FNumber: '100'
-      },
-      FNoteEntry: '', // 备注
-      FSrcBillNo: '', // 源单据编号
-      FSecQty: 0.0, // 辅助数量
-      FExtAuxUnitQty: 0.0, // 扩展辅助单位数量
-      FBaseUnitId: {
-        // 基本单位
-        FNumber: 'Pcs'
-      },
-      FBaseQty: item.Quantity, // 基本数量
-      FISFREE: false, // 是否赠品
-      FKeeperTypeId: 'BD_KeeperOrg', // 保管者类型
-      FActQty: 0.0, // 实际数量
-      FKeeperId: {
-        // 保管者
-        FNumber: '100'
-      },
-      FKeeperTypeOutId: 'BD_KeeperOrg', // 保管者类型（出）
-      FKeeperOutId: {
-        // 保管者（出）
-        FNumber: '100'
-      },
-      FDiscountRate: 0.0, // 折扣率
-      FRepairQty: 0.0, // 返修数量
-      FDestMaterialId: {
-        // 目标物料
-        FNUMBER: item.MaterialCode
-      },
-      FSaleUnitId: {
-        // 销售单位
-        FNumber: 'Pcs'
-      },
-      FSaleQty: item.Quantity, // 销售数量
-      FSalBaseQty: item.Quantity, // 销售基本数量
+      FRealQty: item.Quantity2, // 实收数量 - 90件
       FPriceUnitID: {
         // 计价单位
-        FNumber: 'Pcs'
+        FNumber: 'Pcs' // 单位编号 - 件(与库存单位相同)
       },
-      F_QADV_TBTMSubEntity: item.barCodeList, // 条码
-      FPriceQty: item.Quantity, // 计价数量
-      FPriceBaseQty: item.Quantity, // 计价基本数量
-      FOutJoinQty: 0.0, // 出库关联数量
-      FBASEOUTJOINQTY: 0.0, // 基本出库关联数量
-      FSOEntryId: 0, // 销售订单分录ID
-      FTransReserveLink: false, // 是否转预留
-      FQmEntryId: 0, // 质量管理分录ID
-      FConvertEntryId: 0, // 转换分录ID
-      FCheckDelivery: false, // 是否检查交货
-      FBomEntryId: 0 // BOM分录ID
+      FPrice: 8.849558, // 单价 - 8.85元/件(不含税)
+      FStockId: {
+        // 仓库信息
+        FNumber: '101' // 仓库编号 - 101号仓库
+      },
+      FDisPriceQty: 0.0, // 拆单数量(计价) - 0表示未拆单
+      FStockLocId: {
+        // 仓位信息
+        FSTOCKLOCID__FF100001: {
+          // 原料仓位
+          FNumber: '101' // 仓位编号 - 101号仓位
+        }
+      },
+      FStockStatusId: {
+        // 库存状态
+        FNumber: 'KCZT01_SYS' // 库存状态编号 - 系统默认状态
+      },
+      FGiveAway: false, // 是否赠品 - 否
+      FOWNERTYPEID: 'BD_OwnerOrg', // 货主类型 - 组织
+      FExtAuxUnitQty: 0.0, // 实收数量(辅单位) - 0表示未使用辅单位
+      FCheckInComing: false, // 来料检验 - 否
+      FIsReceiveUpdateStock: false, // 收料更新库存 - 否
+      FInvoicedJoinQty: 0.0, // 已开票关联数量 - 0
+      FPriceBaseQty: 90.0, // 计价基本数量 - 90件
+      FRemainInStockUnitId: {
+        // 采购单位
+        FNumber: 'Pcs' // 单位编号 - 件
+      },
+      FBILLINGCLOSE: false, // 立账关闭 - 否
+      FRemainInStockQty: 90.0, // 采购数量 - 90件
+      FAPNotJoinQty: 90.0, // 未关联应付数量 - 90件
+      FRemainInStockBaseQty: 90.0, // 采购基本数量 - 90件
+      FTaxPrice: 10.0, // 含税单价 - 10元/件
+      FEntryTaxRate: 13.0, // 税率(%) - 13%
+      FDiscountRate: 0.0, // 折扣率(%) - 0%
+      FCostPrice: 0.0, // 成本价 - 0(可能未计算)
+      FAuxUnitQty: 0.0, // 数量(库存辅单位) - 0
+      FOWNERID: {
+        // 货主信息
+        FNumber: '100' // 货主编号 - 100号组织
+      },
+      FSRCBILLTYPEID: 'PUR_PurchaseOrder', // 源单类型 - 采购订单
+      FSRCBillNo: 'CGDD000001', // 源单编号 - CGDD000001
+      FAllAmountExceptDisCount: 900.0, // 价税合计(折前) - 900元
+      FPriceDiscount: 0.0, // 单价折扣 - 0
+      FConsumeSumQty: 0.0, // 消耗汇总数量 - 0
+      FBaseConsumeSumQty: 0.0, // 消耗汇总基本单位数量 - 0
+      FSalOutStockEntryId: 0, // 销售出库单分录Id - 0(无关联)
+      FBeforeDisPriceQty: 0.0, // 拆单前原计价数量 - 0
+      FPayableEntryID: 0, // 应付单分录ID - 0(未关联)
+      F_QADV_WGHJ: 0.0, // 重量合计 - 0(可能未记录)
+      F_QADV_KH: {
+        // 客户信息
+        FNUMBER: 'KH01' // 客户编号 - KH01
+      },
+      F_QADV_HTNO: 'XSDD000011', // 销售合同号 - XSDD000011
+      FCOSTRATE: 0.0, // 成本权重 - 0
+      FTaxDetailSubEntity: [
+        // 税务明细
+        {
+          FTaxRate: 0.0 // 税率 - 0%(可能为默认值)
+        }
+      ]
     })
-      */
   })
 
   //保存

@@ -81,10 +81,10 @@ const saveClick = throttleSave(async () => {
             icon: 'none',
             title: '提交成功'
           })
-          // reactiveData.isShow = false //隐藏标题组件
-          // setTimeout(() => {
-          //   reactiveData.isShow = true //显示标题组件
-          // }, 500)
+          reactiveData.isShow = false //隐藏标题组件
+          setTimeout(() => {
+            reactiveData.isShow = true //显示标题组件
+          }, 500)
         } else {
           uni.showToast({
             icon: 'none',

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue'
+import { ref, reactive, onBeforeMount } from 'vue'
 import HeadScan from './src/HeadScan.vue'
 import LowerCamelCase from './src/LowerCamelCase.vue'
 import { SalesOutboundType } from '@/types/LowerCamelCaseType'
@@ -48,7 +48,7 @@ const saveClick = async () => {
   await Promise.all(
     reactiveData.lowerCamelCaseList.map(async (item, index) => {
       console.log('item', item.isInteger, item)
-      if (!item.isInteger) {
+      if (!item.isInteger && item.barcodeList.length > 0) {
         throw new Error(`第${index + 1}行不配套`)
       }
     })
@@ -220,9 +220,7 @@ function groupBarcodeLists(data: any[]) {
       result.push(item)
       continue
     }
-    ThFilterString += `(d.FENTRYID = '${item.id}' AND  ${
-      item.currentTotal + 1
-    } > d.F_QADV_WCYQTY ) OR `
+    ThFilterString += `(d.FENTRYID = '${item.id}' AND  ${item.currentTotal} > d.F_QADV_WCYQTY ) OR `
     ThFilter2++
     EntryIds.push({
       id: item.id,
@@ -267,20 +265,10 @@ function groupBarcodeLists(data: any[]) {
   return { result, ThFilter }
 }
 
-watch(
-  () => props.containerNoValue,
-  () => {
-    reactiveData.containerNoValue = props.containerNoValue
-  },
-  { immediate: true, deep: true }
-)
-watch(
-  () => props.pickupOrderValue,
-  () => {
-    reactiveData.Numbers = props.pickupOrderValue
-  },
-  { immediate: true, deep: true }
-)
+onBeforeMount(() => {
+  reactiveData.containerNoValue = props.containerNoValue
+  reactiveData.Numbers = props.pickupOrderValue
+})
 
 //暴露方法
 defineExpose({

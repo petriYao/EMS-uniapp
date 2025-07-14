@@ -149,6 +149,29 @@ const deleteBarcode = (item: any, index: number) => {
     //判断productsQuantity是否为整数
     reactiveData.detailsList[reactiveData.datailsIndex].packagingDataFZLOT[item.FZLOT].isInteger =
       productsQuantity % 1 === 0 && productsQuantity !== 0
+
+    reactiveData.detailsList[reactiveData.datailsIndex].isInteger =
+      productsQuantity % 1 === 0 && productsQuantity !== 0
+
+    if (
+      reactiveData.detailsList[reactiveData.datailsIndex].packagingDataFZLOT[item.FZLOT].isInteger
+    ) {
+      reactiveData.detailsList[reactiveData.datailsIndex].packagingDataFZLOT[
+        item.FZLOT
+      ].packagingSig.forEach((element: any) => {
+        if (
+          reactiveData.detailsList[reactiveData.datailsIndex].packagingDataFZLOT[item.FZLOT]
+            .packagingData[element].finishedQty !== productsQuantity
+        ) {
+          reactiveData.detailsList[reactiveData.datailsIndex].packagingDataFZLOT[
+            item.FZLOT
+          ].isInteger = false
+          reactiveData.detailsList[reactiveData.datailsIndex].isInteger = false
+          return
+        }
+      })
+    }
+
     //重新计算
     let total = 0
     for (const FZLOTListItem of reactiveData.detailsList[reactiveData.datailsIndex].FZLOTList) {
@@ -289,28 +312,33 @@ watch(
           <view class="w-12% text-center">累计</view>
           <view class="w-12% text-center">本次</view>
         </view>
-        <view
-          v-for="(item, index) of reactiveData.detailsList"
-          :key="index"
-          class="flex items-center mb-6rpx py-4px"
-          :class="[
-            index % 2 === 0 ? 'bg-#F2F2F2' : 'bg-white', // 基础黑白交替
-            index === reactiveData.datailsIndex ? '!bg-[#C4D8EE]' : '' // 覆盖选中状态
-          ]"
-          @click="reactiveData.datailsIndex = index"
-          @longpress="longpressClick(item, index)"
-          @touchstart="handleTouchStart"
-          @touchmove="handleTouchMove"
+        <scroll-view
+          scroll-y
+          style="height: calc(100vh - 44px - 44px - 80px - 34px - 40px - 26px - 30px)"
         >
-          <view class="w-12% flex justify-center">{{ index + 1 }}</view>
-          <view class="w-52%">
-            <view>{{ item.number }}</view>
-            <view>{{ item.fname }}</view>
+          <view
+            v-for="(item, index) of reactiveData.detailsList"
+            :key="index"
+            class="flex items-center mb-6rpx py-4px"
+            :class="[
+              index % 2 === 0 ? 'bg-#F2F2F2' : 'bg-white', // 基础黑白交替
+              index === reactiveData.datailsIndex ? '!bg-[#C4D8EE]' : '' // 覆盖选中状态
+            ]"
+            @click="reactiveData.datailsIndex = index"
+            @longpress="longpressClick(item, index)"
+            @touchstart="handleTouchStart"
+            @touchmove="handleTouchMove"
+          >
+            <view class="w-12% flex justify-center">{{ index + 1 }}</view>
+            <view class="w-52%">
+              <view>{{ item.number }}</view>
+              <view>{{ item.fname }}</view>
+            </view>
+            <view class="w-12% flex justify-center">{{ item.shouldSendQuantity }}</view>
+            <view class="w-12% flex justify-center">{{ item.cumulativeActualSend }}</view>
+            <view class="w-12% flex justify-center">{{ item.currentTotal }}</view>
           </view>
-          <view class="w-12% flex justify-center">{{ item.shouldSendQuantity }}</view>
-          <view class="w-12% flex justify-center">{{ item.cumulativeActualSend }}</view>
-          <view class="w-12% flex justify-center">{{ item.currentTotal }}</view>
-        </view>
+        </scroll-view>
       </view>
       <!-- 条码 -->
       <view v-if="reactiveData.curNow == 2">
@@ -321,20 +349,31 @@ watch(
           <view class="w-17% text-center">仓库</view>
           <view class="w-21% text-center">仓位</view>
         </view>
-        <view
-          v-for="(item, index) of reactiveData.detailsList[reactiveData.datailsIndex]
-            ?.barcodeList || []"
-          :key="index"
-          @longpress="longpressDetailsClick(item, index)"
-          @touchstart="handleTouchStart"
-          @touchmove="handleTouchMove"
-        >
-          <view class="flex py-10rpx" :style="index % 2 == 1 ? 'background-color:#f2f2f2' : ''">
-            <view class="w-12% flex justify-center pt-3px">{{ index + 1 }}</view>
-            <view class="w-38% pt-3px">
-              <view style="overflow-wrap: break-word">{{ item.FNumber }}</view>
+        <scroll-view scroll-y style="height: calc(100vh - 44px - 44px - 80px - 34px - 40px - 26px)">
+          <view
+            v-for="(item, index) of reactiveData.detailsList[reactiveData.datailsIndex]
+              ?.barcodeList || []"
+            :key="index"
+            @longpress="longpressDetailsClick(item, index)"
+            @touchstart="handleTouchStart"
+            @touchmove="handleTouchMove"
+          >
+            <view
+              class="flex flex-wrap py-10rpx"
+              :style="index % 2 == 1 ? 'background-color:#f2f2f2' : ''"
+            >
+              <view class="w-12% flex justify-center pt-3px">{{ index + 1 }}</view>
+              <view class="w-38% pt-3px">
+                <view style="overflow-wrap: break-word">{{ item.FNumber }}</view>
+              </view>
+              <view class="w-12% flex justify-center pt-3px">
+                {{ item.quantity }}
+              </view>
+              <view class="w-17% flex justify-center">{{ item.FSTOCKName }}</view>
+              <view class="w-21% flex justify-center pt-3px">{{ item.STOCKLOCName }}</view>
+
               <view
-                class="flex items-center"
+                class="flex ml-12% items-center"
                 v-if="item.subPackageNo !== ' ' && item.subPackageNo !== ''"
               >
                 <view class="mr-8px">分装：{{ item.subPackageNo }}</view>
@@ -342,13 +381,8 @@ watch(
                 <view class="mr-8px">用量：{{ item.unitQuantity }}</view>
               </view>
             </view>
-            <view class="w-12% flex justify-center pt-3px">
-              {{ item.quantity }}
-            </view>
-            <view class="w-17% flex justify-center">{{ item.FSTOCKName }}</view>
-            <view class="w-21% flex justify-center pt-3px">{{ item.STOCKLOCName }}</view>
           </view>
-        </view>
+        </scroll-view>
       </view>
     </view>
   </view>

@@ -230,6 +230,14 @@ const clearTimer = () => {
   // 清除定时器
   emitter.emit('update:clearTimer')
 }
+
+useEmitt({
+  name: 'update:barcodeIndex',
+  callback: async (val) => {
+    reactiveData.barcodeIndex = val
+  }
+})
+
 watch(
   () => props.detailsList,
   (val: any) => {
@@ -394,17 +402,17 @@ watch(
         <view class="w-20px flex justify-center items-center">{{ index + 1 }}</view>
         <view class="flex-1">
           <view class="flex items-center">
-            <view class="w-50px text-end">编码：</view>
-            <view> {{ item.detailList.fnumber }}</view>
+            <view class="min-w-50px text-end">编码：</view>
+            <view class="flex-wrap"> {{ item.detailList.fnumber }}</view>
           </view>
           <view class="flex items-center">
-            <view class="w-50px text-end">批号：</view>
-            <view>{{ item.detailList.lot }}</view>
+            <view class="min-w-50px text-end">批号：</view>
+            <view class="flex-wrap">{{ item.detailList.lot }}</view>
           </view>
 
-          <view class="flex items-center">
-            <view class="w-50px text-end">名称：</view>
-            <view> {{ item.detailList.name }}</view>
+          <view class="flex">
+            <view class="min-w-50px text-end">名称：</view>
+            <view class="flex-wrap"> {{ item.detailList.name }}</view>
           </view>
           <view class="flex">
             <view class="min-w-50px text-end">规格：</view>
@@ -413,16 +421,16 @@ watch(
 
           <view class="flex">
             <view class="w-30% flex items-center h-20px">
-              <view class="w-50px text-end">数量：</view>
+              <view class="min-w-50px text-end">数量：</view>
               <view> {{ item.Quantity2 }}</view>
             </view>
             <view class="w-24% flex items-center h-20px">
-              <view class="w-50px text-end">件数：</view>
+              <view class="min-w-50px text-end">件数：</view>
               <view> {{ item.barCodeList.length }}</view>
             </view>
 
             <view class="w-46% flex items-center h-20px">
-              <view class="w-50px text-end">仓位：</view>
+              <view class="min-w-50px text-end">仓位：</view>
               <view>{{ item.detailList.location }}</view>
             </view>
           </view>

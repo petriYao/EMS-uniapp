@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref, onBeforeMount, onBeforeUnmount, watch } from 'vue'
+import { reactive, ref, onBeforeMount, onBeforeUnmount } from 'vue'
 
 import { getPickupOrder, productionGetData } from '@/common/lowerCamelCase/LowerCamelCase'
 import { SalesOutboundType } from '@/types/LowerCamelCaseType'
@@ -20,6 +20,7 @@ const props = defineProps({
 //数据
 const reactiveData = reactive({
   searchValue: '', //搜索值
+  TMdisabled: false,
   pickupOrderValue: '', //单号
   containerNoValue: 1, //柜号
   focus: 1,
@@ -89,17 +90,20 @@ const searchChange = () => {
     handleFocus()
     // 第一次扫单号
     if (!reactiveData.pickupOrderValue) {
+      emitter.emit('update:TMdisabled', true)
+      reactiveData.TMdisabled = true
       const res = await getPickupOrder(reactiveData.searchValue)
-      console.log('第一次扫单号', res.dataList)
       if (res && res.dataList.length > 0) {
-        reactiveData.pickupOrderValue = reactiveData.searchValue
+        reactiveData.TMdisabled = false
+        emitter.emit('update:TMdisabled', false)
+        reactiveData.pickupOrderValue = JSON.parse(JSON.stringify(reactiveData.searchValue))
         reactiveData.detailsList = res.dataList
         emit('update:lowerCamelCaseList', res.dataList)
         emit('update:model', res.model)
         emit('update:numbers', reactiveData.pickupOrderValue)
-        reactiveData.searchValue = ''
       } else {
         //扫码有问题
+        reactiveData.TMdisabled = false
       }
     } else {
       //后续扫码-扫描条码
@@ -109,7 +113,6 @@ const searchChange = () => {
         const index = element.barcodeList.findIndex((item: any) => {
           return item.FNumber === reactiveData.searchValue
         })
-        console.log('判断之前是否扫过', index)
         if (index !== -1) {
           exitMethod = true
           uni.showToast({
@@ -130,7 +133,6 @@ const searchChange = () => {
         return
       }
       const res = await productionGetData(reactiveData.searchValue)
-      console.log('res', res)
       if (res) {
         //判断条码单合同号是否一致
         const index = reactiveData.detailsList.findIndex((item: any) => {
@@ -140,7 +142,6 @@ const searchChange = () => {
             item.number === res.Fnumber
           )
         })
-        console.log('合同号是否一致', index)
 
         if (index !== -1) {
           reactiveData.detailsList[index].barcodeList.push(res.barcodeList)
@@ -148,25 +149,19 @@ const searchChange = () => {
           emitter.emit('update:datailsIndex', index)
           //分装情况下
           if (res.IsSplit) {
-            console.log('是否空对象', res.packagingData)
             //判断分装批次号列表中是否有该分装批次号
             const index2 = reactiveData.detailsList[index].FZLOTList.findIndex((item: any) => {
               return item === res.FZLOT
             })
-            console.log('index2', index2)
 
             if (index2 === -1) {
               //没有的情况下，添加分装批次号到列表中，并且把packagingData跟packagingSig储存到packagingDataFZLOT
               reactiveData.detailsList[index].FZLOTList.push(res.FZLOT)
-              console.log(
-                '选中的明细1',
-                reactiveData.detailsList[index].packagingDataFZLOT[res.FZLOT]
-              )
+
               reactiveData.detailsList[index].packagingDataFZLOT[res.FZLOT] = {
                 packagingData: res.packagingData,
                 packagingSig: res.packagingSig
               }
-              console.log('选中的明细3')
             } else {
               // 有的情况下，直接加数量
               reactiveData.detailsList[index].packagingDataFZLOT[res.FZLOT].packagingData[
@@ -215,12 +210,10 @@ const searchChange = () => {
             //判断productsQuantity是否为整数
             reactiveData.detailsList[index].packagingDataFZLOT[res.FZLOT].isInteger =
               productsQuantity % 1 === 0 && productsQuantity !== 0
+
             reactiveData.detailsList[index].isInteger =
               productsQuantity % 1 === 0 && productsQuantity !== 0
-            console.log(
-              'productsQuantity',
-              reactiveData.detailsList[index].packagingDataFZLOT[res.FZLOT]
-            )
+
             if (reactiveData.detailsList[index].packagingDataFZLOT[res.FZLOT].isInteger) {
               reactiveData.detailsList[index].packagingDataFZLOT[res.FZLOT].packagingSig.forEach(
                 (element: any) => {
@@ -273,11 +266,8 @@ const searchChange = () => {
               ],
               index: reactiveData.detailsList[index].barcodeList.length - 1
             }
-            console.log('删除的值', deleteBarcode)
             emitter.emit('deleteBarcode', deleteBarcode)
           }
-
-          console.log('扫码后的值', reactiveData.detailsList)
         } else {
           //提示
           uni.showToast({
@@ -287,9 +277,9 @@ const searchChange = () => {
         }
       }
     }
-    reactiveData.searchValue = ''
     reactiveData.focus = 20
     setTimeout(() => {
+      reactiveData.searchValue = ''
       reactiveData.focus = 1
     }, 500)
     emit('update:loading', false)
@@ -327,44 +317,173 @@ const clearTimer = () => {
     clearInterval(hideTimer.value)
     hideTimer.value = null
   }
-  console.log('清除定时器', hideTimer.value)
 }
 
-watch(
-  () => props.containerNoValue,
-  () => {
-    reactiveData.containerNoValue = props.containerNoValue
-  },
-  {
-    immediate: true,
-    deep: true
-  }
-)
-watch(
-  () => props.numbers,
-  () => {
-    if (reactiveData.pickupOrderValue == '') {
-      reactiveData.searchValue = props.numbers
-      searchChange()
-    }
-  },
-  {
-    deep: true
-  }
-)
 onBeforeMount(() => {
   // 组件挂载前的逻辑
   handleFocus()
+  if (reactiveData.pickupOrderValue == '') {
+    reactiveData.searchValue = props.numbers
+    searchChange()
+  }
+  if (reactiveData.containerNoValue !== 0) {
+    reactiveData.containerNoValue = props.containerNoValue
+  }
 })
 onBeforeUnmount(() => {
   // 组件卸载时清理
-  console.log('离开')
   clearTimer()
 })
+
+const testClick = () => {
+  let list = [
+    'PE650010A000325070001',
+    'PE650010A000425070001',
+    'PE650010A000525070001',
+    'PE650010A000625070001',
+    'PE650010A000725070001',
+    'PE650010A000825070001',
+    'PE650010A001025070001',
+    'PE650010A001225070001',
+    'PE650010A001325070001',
+    'PE650010A001425070001',
+    'PE650010A001525070001',
+    'PE650010A001625070001',
+    'PE650010A001725070001',
+    'PE650010A001825070001',
+    'PE650010A001925070001',
+    'PE650010A002025070001',
+    'PE650010A002125070001',
+    'PE650010A002225070001',
+    'PE650010A002325070001',
+    'PE650010A002425070001',
+    'PE650031A0001.000125070001',
+    'PE650031A0002.000125070001',
+    'HA77001B000125070002',
+    'HA77001B000125070003',
+    'HC73003A000125070002',
+    'HC73003A000125070003',
+    'PE650010A000125070002',
+    'PE650010A000125070003',
+    'PE650010A000325070003',
+    'PE650010A000325070002',
+    'PE650010A000225070003',
+    'PE650010A000425070002',
+    'PE650010A000425070003',
+    'PE650010A000525070002',
+    'PE650010A000525070003',
+    'PE650010A000725070003',
+    'PE650010A000725070002',
+    'PE650010A000625070003',
+    'PE650010A000625070002',
+    'PE650010A000825070002',
+    'PE650010A000825070003',
+    'PE650010A001025070002',
+    'PE650010A001025070003',
+    'PE650010A001125070002',
+    'PE650010A001125070003',
+    'PE650010A001225070002',
+    'PE650010A001225070003',
+    'PE650010A001325070002',
+    'PE650010A001325070003',
+    'PE650010A001425070002',
+    'PE650010A001425070003',
+    'PE650010A001525070002',
+    'PE650010A001625070002',
+    'PE650010A001625070003',
+    'PE650010A001725070002',
+    'PE650010A001725070003',
+    'PE650010A001825070002',
+    'PE650010A001825070003',
+    'PE650010A001925070002',
+    'PE650010A001925070003',
+    'PE650010A002025070002',
+    'PE650010A002025070003',
+    'PE650010A002125070002',
+    'PE650010A002125070003',
+    'PE650010A002225070002',
+    'PE650010A002225070003',
+    'PE650010A002325070002',
+    'PE650010A002325070003',
+    'PE650010A002425070002',
+    'PE650010A002425070003',
+    'PE650031A0001.000125070003',
+    'PE650031A0002.000125070002',
+    'PE650031A0002.000125070003',
+    'PE650010A000125070004',
+    'PE650010A000225070004',
+    'PE650010A000325070004',
+    'PE650010A000425070004',
+    'PE650010A000525070004',
+    'PE650010A000625070004',
+    'PE650010A000725070004',
+    'PE650010A000825070004',
+    'PE650010A001325070004',
+    'PE650010A001225070004',
+    'PE650010A001125070004',
+    'PE650010A001025070004',
+    'PE650010A001425070004',
+    'PE650010A001525070004',
+    'PE650010A001625070004',
+    'PE650010A001725070004',
+    'PE650010A001925070004',
+    'PE650010A002025070004',
+    'PE650010A002125070004',
+    'PE650010A000125070005',
+    'PE650010A002425070004',
+    'PE650010A002325070004',
+    'PE650010A002225070004',
+    'PE650010A000225070005',
+    'PE650010A000325070005',
+    'PE650010A000425070005',
+    'PE650010A000525070005',
+    'PE650010A001025070005',
+    'PE650010A000825070005',
+    'PE650010A000725070005',
+    'PE650010A000625070005',
+    'PE650010A001125070005',
+    'PE650010A001225070005',
+    'PE650010A001325070005',
+    'PE650010A001425070005',
+    'PE650010A001625070005',
+    'PE650010A001725070005',
+    'PE650010A001825070005',
+    'PE650010A002025070005',
+    'PE650010A001925070005',
+    'B1C2001N10ROP000125070001',
+    'B1C2014A04RAT000125070001',
+    'B1C2014N04RAT000125070001',
+    'HA77001B000125070001',
+    'HC73003A000125070001',
+    'PE650010A000125070001',
+    'PE650010A000225070001',
+    'PE650010A000225070002',
+    'PE650010A001125070001',
+    'PE650010A001525070003',
+    'PE650010A001525070005',
+    'PE650010A001825070004',
+    'PE650031A0001.000125070002'
+  ]
+
+  //每两秒读取一个值给搜索框赋值
+  let b = 0
+  const intervalId = setInterval(() => {
+    if (b >= list.length) {
+      clearInterval(intervalId) // 停止定时器
+      return
+    }
+
+    reactiveData.searchValue = list[b]
+    searchChange()
+    b++
+  }, 1000)
+  return
+}
 </script>
 
 <template>
   <view>
+    <!-- <view @click="testClick">调试</view> -->
     <view class="flex items-center py-10rpx">
       <view class="w-70px flex justify-center">条码</view>
       <view class="flex-1 mr-20rpx" style="border: 1px solid #f8f8f8" @click="clearTimer">
@@ -372,8 +491,8 @@ onBeforeUnmount(() => {
           ref="searchInput"
           v-model="reactiveData.searchValue"
           :showAction="false"
-          customStyle="background: #FFF;"
           shape="round"
+          :disabled="reactiveData.TMdisabled"
           :focus="reactiveData.focus == 1"
           placeholder=""
           @blur="searchChange"
@@ -385,7 +504,6 @@ onBeforeUnmount(() => {
         <view class="w-70px flex justify-center">单号</view>
         <view class="flex-1" style="border: 1px solid #f8f8f8">
           <u-input
-            ref="searchInput"
             v-model="reactiveData.pickupOrderValue"
             :showAction="false"
             :disabled="true"

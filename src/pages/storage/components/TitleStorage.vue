@@ -35,13 +35,13 @@ const pickerShow3 = ref(false)
 
 //当前仓库
 const currentWarehouse = reactive({
-  Id: 0,
+  id: 0,
   name: '',
   number: ''
 }) as any
 //当前仓位
 const currentWarehousePosition = reactive({
-  Id: 0,
+  id: 0,
   name: '',
   number: ''
 }) as any
@@ -167,7 +167,7 @@ const searchChange = async () => {
     /*获取条码数据************************************************* */
     const res: any = await productionGetData(
       reactiveData.searchValue,
-      currentWarehousePosition.number,
+      currentWarehousePosition,
       props.scanCodeType === '单码双扫'
     )
     if (!res) {
@@ -337,12 +337,16 @@ const searchChange = async () => {
       const FMaterialId = res.MaterialCode //物料编码FMaterialId.Fnumber
       const FLot = res.Lot //批号FLot
       const FStockId = currentWarehouse.number //仓库FStockId.Fname
-      const FilterString = `FMaterialId.Fnumber = '${FMaterialId}' AND FLot.Fnumber = '${FLot}' AND FStockId.Fnumber = '${FStockId}' AND FBaseQty > 0`
-      const FieldKeys = `FStockLocId.${FlexNumber.value}.FNumber`
-      const lowerRes: any = await lowerCamelCase2(FilterString, FieldKeys)
-      if (lowerRes && lowerRes.data && lowerRes.data.length > 0) {
-        res.currentList[10].value = lowerRes.data.map((item: any) => item[0]).join(',') //推荐仓位
+      console.log('获取推荐仓位（根据物料编码、批号、仓库查库存表）', FlexNumber)
+      if (FlexNumber.value !== '') {
+        const FilterString = `FMaterialId.Fnumber = '${FMaterialId}' AND FLot.Fnumber = '${FLot}' AND FStockId.Fnumber = '${FStockId}' AND FBaseQty > 0`
+        const FieldKeys = `FStockLocId.${FlexNumber.value}.FNumber`
+        const lowerRes: any = await lowerCamelCase2(FilterString, FieldKeys)
+        if (lowerRes && lowerRes.data && lowerRes.data.length > 0) {
+          res.currentList[10].value = lowerRes.data.map((item: any) => item[0]).join(',') //推荐仓位
+        }
       }
+
       reactiveData.detailsList.push(res)
       reactiveData.curNow = 0
       reactiveData.datailsIndex = reactiveData.detailsList.length - 1
@@ -393,6 +397,7 @@ const getWarehouseList = async () => {
 }
 //扫码获取数据
 const searchClick = async () => {
+  /*
   let list = [
     'PE650010A000325070001',
     'PE650010A000425070001',
@@ -532,8 +537,9 @@ const searchClick = async () => {
     reactiveData.searchValue = list[b]
     searchChange()
     b++
-  }, 3000)
+  }, 1000)
   return
+  */
   //uniapp打开扫码
   const res: any = await uni.scanCode({
     scanType: ['barCode', 'qrCode'],
@@ -585,9 +591,11 @@ const warehouseChange = debounceSave(
         }, 500)
         return
       }
+      console.log('warehouseId', warehouseId)
       reactiveData.titleList[2].value = warehouseId.text
       currentWarehouse.name = warehouseId.text
       currentWarehouse.number = warehouseId.value
+      currentWarehouse.id = warehouseId.id
       warehouseClick(val)
     } else {
       //获取仓位id替换为仓位名称
@@ -615,9 +623,12 @@ const warehouseChange = debounceSave(
           reactiveData.titleList[3].value = warehouseId.text
           currentWarehousePosition.name = warehouseId.text
           currentWarehousePosition.number = warehouseId.value
+          currentWarehousePosition.id = warehouseId.id
+          console.log('仓位', reactiveData.detailsList)
           if (reactiveData.detailsList.length !== 0) {
             reactiveData.detailsList[reactiveData.datailsIndex].WarehousePosition =
               warehouseId.value
+            reactiveData.detailsList[reactiveData.datailsIndex].WarehousePositionId = warehouseId.id
           }
         }
 
@@ -625,6 +636,7 @@ const warehouseChange = debounceSave(
       } else {
         reactiveData.titleList[3].value = ''
       }
+      console.log('warehouseChange', reactiveData.detailsList[reactiveData.datailsIndex])
     }
   }
 )
@@ -633,6 +645,7 @@ const warehouseClick = async (val: any) => {
   //清空仓位
   currentWarehousePosition.name = ''
   currentWarehousePosition.number = ''
+  currentWarehousePosition.id = ''
   reactiveData.titleList[3].value = ''
   //查看仓位
   if (val) {
@@ -669,7 +682,7 @@ const warehouseClick = async (val: any) => {
 }
 //仓库选择器确认
 const pickerConfirm = async (val: any) => {
-  currentWarehouse.Id = val.id
+  currentWarehouse.id = val.id
   currentWarehouse.name = val.text
   currentWarehouse.number = val.value
 
@@ -683,7 +696,7 @@ const pickerConfirm = async (val: any) => {
 const pickerConfirm2 = (val: any, iswarehousePosition?: boolean) => {
   if (iswarehousePosition) {
     reactiveData.titleList[3].value = val.value
-    currentWarehousePosition.Id = val.id
+    currentWarehousePosition.id = val.id
     currentWarehousePosition.name = val.text
     currentWarehousePosition.number = val.value
   } else {
@@ -691,6 +704,7 @@ const pickerConfirm2 = (val: any, iswarehousePosition?: boolean) => {
     if (reactiveData.detailsList.length !== 0) {
       reactiveData.detailsList[reactiveData.datailsIndex].currentList[12].value = val.text
       reactiveData.detailsList[reactiveData.datailsIndex].WarehousePosition = val.value
+      reactiveData.detailsList[reactiveData.datailsIndex].WarehousePositionId = val.id
     }
   }
   handleFocus()
@@ -871,6 +885,7 @@ const backClick = async () => {
     })
     return
   }
+
   //搜索条码单状态（获取条码列表）
   // 提取所有的 F_BARCODENO
   const barCodes = reactiveData.detailsList
@@ -1041,7 +1056,7 @@ const backClick = async () => {
 
         F_QADV_HTNO: item.otherData.F_QADV_HTNO, //合同号
         F_BARSubEntity: item.barCodeList,
-        currentWarehousePositionId: currentWarehousePosition.Id, //仓位ID
+        currentWarehousePositionId: item.WarehousePositionId, //仓位ID
         FEntity_Link: [
           {
             FEntity_Link_FRuleId: 'PRD_MO2INSTOCK',
@@ -1073,7 +1088,7 @@ const backClick = async () => {
   })
   console.log('保存', dataList)
   let currentData = {
-    currentWarehouseId: currentWarehouse.Id,
+    currentWarehouseId: currentWarehouse.id,
     currentWarehouseName: currentWarehouse.name,
     currentWarehouseNumber: currentWarehouse.number,
     currentWarehousePositionName: currentWarehousePosition.name,
@@ -1119,6 +1134,8 @@ watch(
   () => props.stoCurrentWarehouse,
   () => {
     if (props.stoCurrentWarehouse.name === '') return
+
+    currentWarehouse.id = props.stoCurrentWarehouse.Id
     currentWarehouse.name = props.stoCurrentWarehouse.name
     currentWarehouse.number = props.stoCurrentWarehouse.number
 
