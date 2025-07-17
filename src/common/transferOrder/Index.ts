@@ -1,4 +1,4 @@
-import { lookBarCode, queryBarCode, productionOrder } from '@/api/modules/storage'
+import { lookBarCode, queryBarCode } from '@/api/modules/storage'
 
 //调拨单-扫描条码
 export const transferScanBarcode = async (searchValue: any, setData: any, location: any) => {

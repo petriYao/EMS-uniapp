@@ -91,7 +91,7 @@ onBeforeMount(() => {
         crmList2.value.push({
           name: '采购入库',
           icon: '/static/index/Reportingforwork.png',
-          src: 'storage/storage?type=采购入库'
+          src: 'purchaseStockIn/Index'
         })
         break
       case '24':
@@ -133,11 +133,7 @@ onBeforeMount(() => {
           icon: '/static/index/Reportingforwork.png',
           src: 'transferOrder/Index'
         })
-        crmList4.value.push({
-          name: '采购入库',
-          icon: '/static/index/Reportingforwork.png',
-          src: 'purchaseStockIn/Index'
-        })
+
         break
     }
   }
