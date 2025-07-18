@@ -24,6 +24,7 @@ const reactiveData = reactive({
   setData: {
     warehouseNumber: '', //仓库编号
     warehouseId: '', //仓库ID
+    warehouseDisplay: false, //禁用
     locationNumber: '', //库位
     locationId: '', //库位ID
     locationDisplay: true, //禁用
@@ -96,7 +97,18 @@ const searchChange = () => {
       focusTm()
       return
     }
+    reactiveData.setData.warehouseDisplay = true
     if (reactiveData.detailsList.length > 0) {
+      //判断供应商是否一致
+      if (reactiveData.detailsList[0].currentList[0].value !== queryRes.currentList[0].value) {
+        uni.showToast({
+          title: '供应商不同',
+          icon: 'none'
+        })
+        reactiveData.searchValue = ''
+        focusTm()
+        return
+      }
       const index = reactiveData.detailsList.findIndex((item: any) => {
         console.log('判断之前是否有一样的', item, queryRes)
         return (
@@ -107,13 +119,18 @@ const searchChange = () => {
       })
       if (index !== -1) {
         //判断是否重复扫描
-        if (reactiveData.detailsList.some((item: any) => item.BarCode === queryRes.BarCode)) {
+        if (
+          reactiveData.detailsList[index].barCodeList.some(
+            (item: any) => item.F_BARCODENO === queryRes.BarCode
+          )
+        ) {
           uni.showToast({
             title: '请勿重复扫描',
             icon: 'none'
           })
           reactiveData.searchValue = ''
           focusTm()
+
           return
         }
 
@@ -306,7 +323,8 @@ const getWarehousePosition = async (warehouseId: any) => {
         locationData.locationList = []
         reactiveData.setData.locationDisplay = true
         focusTm()
-
+        handleFocus()
+        emit('update:locationList', locationData.locationList)
         return
       }
       locationData.locationList = list.map((item: any) => {
@@ -342,6 +360,7 @@ const locationPickerConfirm = (val: any) => {
   reactiveData.setData.locationId = val.Id
   locationData.show = false
   focusTm()
+  handleFocus()
   emit('update:setData', reactiveData.setData)
   // reactiveData.locationValue = val.value
 }
@@ -508,6 +527,7 @@ onBeforeUnmount(() => {
           v-model="reactiveData.heardList.warehouse"
           :showAction="false"
           :focus="reactiveData.focus == 1"
+          :disabled="reactiveData.setData.warehouseDisplay"
           shape="round"
           placeholder=""
           @change="warehouseChange"

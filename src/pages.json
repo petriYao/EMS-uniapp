@@ -117,6 +117,27 @@
         "navigationBarTitleText": "采购入库",
         "navigationStyle": "custom"
       }
+    },
+    {
+      "path": "pages/returnMaterial/purchaseReturn/Index",
+      "style": {
+        "navigationBarTitleText": "采购退货",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/returnMaterial/salesReturn/Index",
+      "style": {
+        "navigationBarTitleText": "销售退货",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/returnMaterial/otherOutbound/Index",
+      "style": {
+        "navigationBarTitleText": "其他出库",
+        "navigationStyle": "custom"
+      }
     }
   ],
   "tabBar": {

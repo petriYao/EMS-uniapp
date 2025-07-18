@@ -16,6 +16,10 @@ const crmList3 = ref([] as any)
 const crmList4 = ref([] as any)
 //领料
 const crmList5 = ref([] as any)
+
+//退库退料
+const crmList6 = ref([] as any)
+
 const NavChange = (pages: any) => {
   console.log('pages', pages)
   uni.navigateTo({
@@ -128,13 +132,50 @@ onBeforeMount(() => {
           icon: '/static/index/Reportingforwork.png',
           src: 'barCodeStock/Index'
         })
+        break
+      case '31':
         crmList4.value.push({
           name: '调拨',
           icon: '/static/index/Reportingforwork.png',
           src: 'transferOrder/Index'
         })
-
         break
+      /*退库退料*********************************/
+      case '32':
+        crmList6.value.push({
+          name: '采购退货',
+          icon: '/static/index/Reportingforwork.png',
+          src: 'returnMaterial/purchaseReturn/Index'
+        })
+        break
+      case '35':
+        crmList6.value.push({
+          name: '销售退货',
+          icon: '/static/index/Reportingforwork.png',
+          src: 'returnMaterial/salesReturn/Index'
+        })
+        break
+      case '36':
+        crmList6.value.push({
+          name: '其他出库',
+          icon: '/static/index/Reportingforwork.png',
+          src: 'returnMaterial/otherOutbound/Index'
+        })
+        break
+      // case '33':
+      //   crmList6.value.push({
+      //     name: '生产退库',
+      //     icon: '/static/index/Reportingforwork.png',
+      //     src: 'returnMaterial/returnStorage/Index'
+      //   })
+      //   break
+      // case '34':
+      //   crmList6.value.push({
+      //     name: '简单退库',
+      //     icon: '/static/index/Reportingforwork.png',
+      //     src: 'returnMaterial/returnStorage/Index'
+      //   })
+      //   break
     }
   }
   console.log('reactiveData.1', crmList.value)
@@ -189,6 +230,25 @@ onBeforeMount(() => {
         <view class="flex flex-wrap">
           <view
             v-for="(item, index) in crmList5"
+            :key="index"
+            class="w-25%"
+            @click="NavChange(item.src)"
+          >
+            <view class="flex justify-center">
+              <u-image :src="item.icon" mode="scaleToFill" width="80rpx" height="80rpx" />
+            </view>
+            <view class="flex justify-center">{{ item.name }}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view class="flex">
+      <view class="bg-#FFF mt-20px py-20rpx mx-20px w-100% rounded-6px">
+        <view class="ml-20px mb-20px">退库退料</view>
+
+        <view class="flex flex-wrap">
+          <view
+            v-for="(item, index) in crmList6"
             :key="index"
             class="w-25%"
             @click="NavChange(item.src)"

@@ -206,6 +206,7 @@ const reCompute = (val: any) => {
 }
 
 //仓库
+//仓库
 const warehouseChange = debounceSave((val: any) => {
   //获取仓库id替换为仓库名称
   const warehouseId: any = reactiveData.locationList.find((item: any) => item.value === val)
@@ -235,7 +236,6 @@ const pickerConfirm = (warehouseItem: any) => {
   console.log('pickerConfirm', warehouseItem)
   reactiveData.detailsList[reactiveData.barcodeIndex].FStockLocId = warehouseItem.Id
   reactiveData.detailsList[reactiveData.barcodeIndex].currentList[12].value = warehouseItem.text
-  reactiveData.detailsList[reactiveData.barcodeIndex].detailList.location = warehouseItem.text
   pickerShow.value = false
   emit('update:detailsList', reactiveData.detailsList)
   emitter.emit('update:handleFocus')
@@ -265,11 +265,7 @@ watch(
 watch(
   () => props.locationList,
   (val: any) => {
-    if (val && val.length > 0) {
-      reactiveData.locationList = val
-    } else {
-      reactiveData.locationList = []
-    }
+    reactiveData.locationList = val
     console.log('页面数据改动', val)
   },
   { immediate: true, deep: true }

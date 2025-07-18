@@ -25,14 +25,6 @@ const saveClick = async () => {
     })
     return
   }
-  //
-  if (!reactiveData.setData.warehouseNumber) {
-    uni.showToast({
-      title: '仓库不可为空',
-      icon: 'none'
-    })
-    return
-  }
   //判断条码入库状态
   let barcodeList = []
   for (const item of reactiveData.detailsList) {
@@ -53,27 +45,21 @@ const saveClick = async () => {
       icon: 'none',
       duration: 5000
     })
+    reactiveData.loading = false
     return
   }
 
-  let isValid = true
-  for (let i = 0; i < reactiveData.detailsList.length; i++) {
-    const item = reactiveData.detailsList[i]
+  reactiveData.detailsList.map(async (item: any, index: number) => {
     console.log('item', item.isInteger, item)
     if (!item.isInteger && item.barCodeList.length > 0) {
-      // 条码不是整数的提示
+      //条码不是整数的提示
       uni.showToast({
-        title: `第${i + 1}行不配套`,
+        title: `第${index + 1}行不配套`,
         icon: 'none'
       })
-      isValid = false
-      break
+      return
     }
-  }
-
-  if (!isValid) {
-    return // 阻止后续代码的执行
-  }
+  })
 
   /**************************开始保存*************************/
   reactiveData.loading = false
@@ -161,7 +147,7 @@ defineExpose({
     />
   </view>
   <!-- 内容 -->
-  <view class="bg-#FFF pt-6rpx" v-if="reactiveData.loading">
+  <view class="bg-#FFF" v-if="reactiveData.loading">
     <LowerCamelCase
       v-model:detailsList="reactiveData.detailsList"
       v-model:locationList="reactiveData.locationList"

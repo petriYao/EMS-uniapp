@@ -1,8 +1,7 @@
 import { lookBarCode, queryBarCode } from '@/api/modules/storage'
-import { transferOrder, getProductionOrder } from '@/api/modules/transferOrder'
-// 采购入库-扫描条码
-export const purchaseScanBarcode = async (searchValue: any, setData: any) => {
-  console.log('条码仓位', setData)
+import { transferOrder, lookqueryStorage } from '@/api/modules/transferOrder'
+// 采购退货-扫描条码
+export const purchaseScanBarcode = async (searchValue: any) => {
   const res = await lookBarCode(searchValue)
   if (res && res.data) {
     //条码详情
@@ -58,14 +57,6 @@ export const purchaseScanBarcode = async (searchValue: any, setData: any) => {
       return null
     }
 
-    //供应商不可为空
-    if (barCodeData.F_QADV_GYS?.Name[0].Value == null) {
-      uni.showToast({
-        title: '供应商不可为空',
-        icon: 'none'
-      })
-      return null
-    }
     //源单号，行号不能为空
     if (
       !barCodeData.F_SourceFbillno ||
@@ -207,13 +198,6 @@ export const purchaseScanBarcode = async (searchValue: any, setData: any) => {
           disabled: true,
           type: 'input',
           style: { width: '35%' }
-        },
-        {
-          label: '仓位',
-          value: setData.locationNumber,
-          disabled: true,
-          type: 'select',
-          style: { width: '100%' }
         }
       ],
       barCodeList: [
@@ -240,8 +224,7 @@ export const purchaseScanBarcode = async (searchValue: any, setData: any) => {
         name: barCodeData.F_NUMBER.Name[0].Value, //名称
         specification: barCodeData.F_NUMBER.MultiLanguageText[0].Specification, //规格
         receivableQuantity: barCodeData.F_POQTY, //可收
-        quantity: barCodeData.F_UNITQTY, //数量
-        location: setData.locationNumber //仓位
+        quantity: barCodeData.F_UNITQTY //数量
       },
       //生产部门
       ProductionDepartment: barCodeData.F_ALMA_BM?.Number,
@@ -281,8 +264,6 @@ export const purchaseScanBarcode = async (searchValue: any, setData: any) => {
       SplitCode: barCodeData.F_FZNO,
       //仓库
       WarehouseNumber: '',
-      //仓位Id
-      FStockLocId: setData.locationId,
       //部件单位用量
       UnitQty: barCodeData.F_JUNITQTY,
       //分装数量
@@ -305,11 +286,11 @@ export const purchaseScanBarcode = async (searchValue: any, setData: any) => {
   }
 }
 
-//采购入库-扫描单号
+//采购退货-扫描单号
 export const getcamelCase = async (searchValue: any) => {
   const dataList = [] as any
   let fid = 0
-  const res = await getProductionOrder(searchValue)
+  const res = await lookqueryStorage(searchValue)
   console.log('条码单数据', res.data)
 
   if (res && res.data) {
@@ -328,13 +309,13 @@ export const getcamelCase = async (searchValue: any) => {
       return { dataList: [], fid: 0 }
     }
     fid = res.data.Result.Result.Id
-    const TreeEntity = res.data.Result.Result.InStockEntry
+    const TreeEntity = res.data.Result.Result.PUR_MRBENTRY
     console.log('生产订单属性', TreeEntity)
     for (const item of TreeEntity) {
       console.log('item', item)
-      const stockLoc = item.StockLocId
+      const stockLoc = item.FSTOCKLOCID
       let actualValue = null
-
+      console.log('stockLoc', stockLoc)
       // 获取对象的所有 key
       const FStockLocId = {} as any
       // 找到第一个 F10000x 字段，且其值不为 null
@@ -354,11 +335,12 @@ export const getcamelCase = async (searchValue: any) => {
           }
         }
       }
+      console.log('采购仓位', actualValue)
       const data = {
         currentList: [
           {
             label: '供应商',
-            value: res.data.Result.Result.SupplierId?.Name[0].Value,
+            value: res.data.Result.Result.SUPPLIERID?.Name[0].Value,
             disabled: true,
             type: 'input',
             style: { width: '100%' }
@@ -372,21 +354,21 @@ export const getcamelCase = async (searchValue: any) => {
           },
           {
             label: '编码',
-            value: item.MaterialId.Number,
+            value: item.MATERIALID.Number,
             disabled: true,
             type: 'input',
             style: { width: '100%' }
           },
           {
             label: '名称',
-            value: item.MaterialId?.Name[0].Value,
+            value: item.MATERIALID?.Name[0].Value,
             disabled: true,
             type: 'input',
             style: { width: '100%' }
           },
           {
             label: '规格',
-            value: item.MaterialId.MultiLanguageText[0].Specification,
+            value: item.MATERIALID.MultiLanguageText[0].Specification,
             disabled: true,
             type: 'input',
             style: { width: '100%' }
@@ -428,34 +410,20 @@ export const getcamelCase = async (searchValue: any) => {
             type: 'input',
             style: { width: '35%' }
           },
+
           {
-            label: '推荐',
+            label: '可退',
             value: '',
             disabled: true,
             type: 'input',
             style: { width: '65%' }
           },
-
           {
             label: '单位',
-            value: item.BaseUnitID?.Name[0].Value,
+            value: item.FUnitID?.Name[0].Value,
             disabled: true,
             type: 'input',
             style: { width: '35%' }
-          },
-          {
-            label: '仓位',
-            value: actualValue?.Number,
-            disabled: false,
-            type: 'select',
-            style: { width: '100%' }
-          },
-          {
-            label: '数量',
-            value: item.RealQty,
-            disabled: false,
-            type: 'input',
-            style: { width: '100%' }
           }
         ],
         otherData: {
@@ -466,10 +434,10 @@ export const getcamelCase = async (searchValue: any) => {
         },
         detailList: {
           //编码，批号，名称，规格，可收，数量，仓位，件数
-          fnumber: item.MaterialId.Number, //编码
+          fnumber: item.MATERIALID.Number, //编码
           lot: item.Lot_Text, //批号
-          name: item.MaterialId?.Name[0].Value, //名称
-          specification: item.MaterialId.MultiLanguageText[0].Specification, //规格
+          name: item.MATERIALID?.Name[0].Value, //名称
+          specification: item.MATERIALID.MultiLanguageText[0].Specification, //规格
           receivableQuantity: item.MustQty, //可收
           quantity: item.RealQty, //数量
           location: actualValue?.Number //仓位
@@ -480,7 +448,7 @@ export const getcamelCase = async (searchValue: any) => {
         //是否整数
         isInteger: true,
         //物料编码
-        MaterialCode: item.MaterialId.Number,
+        MaterialCode: item.MATERIALID.Number,
         //源单单号
         SourceOrderNo: item.SRCBillNo,
         //源单行号
@@ -488,9 +456,9 @@ export const getcamelCase = async (searchValue: any) => {
         //批号
         Lot: item.Lot_Text === ' ' ? '' : item.Lot_Text,
         //名称
-        Name: item.MaterialId?.Name[0].Value,
+        Name: item.MATERIALID?.Name[0].Value,
         //规格型号
-        Specification: item.MaterialId.MultiLanguageText[0].Specification,
+        Specification: item.MATERIALID.MultiLanguageText[0].Specification,
         //件数
         Quantity: item.RealQty,
         //数量
@@ -503,14 +471,14 @@ export const getcamelCase = async (searchValue: any) => {
         WarehousePositionName: actualValue?.Name[0].Value,
         WarehousePositionId: actualValue?.Id,
         //仓库
-        WarehouseId: item.StockId?.Id,
-        WarehouseNumber: item.StockId?.Number,
-        WarehouseName: item.StockId?.Name[0].Value,
+        WarehouseId: item.STOCKID?.Id,
+        WarehouseNumber: item.STOCKID?.Number,
+        WarehouseName: item.STOCKID?.Name[0].Value,
         //部件单位用量
         UnitQty: '',
-        //可收货数量
+        //可退货数量
         canReceive: item.MustQty,
-        Unit: item.BaseUnitID?.Name[0].Value
+        Unit: item.FUnitID?.Name[0].Value
       }
       dataList.push(data)
     }
@@ -518,60 +486,4 @@ export const getcamelCase = async (searchValue: any) => {
   console.log('生产入库明细数据', dataList)
 
   return { dataList, fid }
-}
-
-/*扫单入库-扫描条码 */
-export const camelCaseProduction = async (searchValue: any) => {
-  const res = await lookBarCode(searchValue)
-  if (res && res.data) {
-    //生产订单-明细
-    const barCodeData = res.data.Result.Result
-    if (barCodeData == null) {
-      uni.showToast({
-        title: '条码单不存在',
-        icon: 'none'
-      })
-      return null
-    }
-    //条码类型为唯一
-    if (barCodeData.F_BARTYPE === '1') {
-      uni.showToast({
-        title: '条码类型非通用类型',
-        icon: 'none'
-      })
-      return null
-    }
-    if (barCodeData.DocumentStatus !== 'C') {
-      uni.showToast({
-        title: '条码未审核',
-        icon: 'none'
-      })
-      return null
-    }
-    const data = {
-      //条码单编码
-      BarCode: searchValue,
-      //物料编码
-      MaterialCode: barCodeData.F_NUMBER.Number,
-      //源单单号
-      SourceOrderNo: barCodeData.F_SourceFbillno,
-      //源单行号
-      SourceOrderLineNo: barCodeData.F_SourceEntry * 1,
-      //需求来源
-      SourceOrderType: barCodeData.ReqSrc,
-      //需求单号
-      SourceOrderNo2: barCodeData.ReqBillNo,
-      //需求行号
-      SourceOrderLineNo2: barCodeData.ReqEntrySeq,
-      //批号
-      Lot: barCodeData.F_WLLOT === ' ' ? '' : barCodeData.F_WLLOT,
-      //名称
-      Name: barCodeData.F_NUMBER.Name[0].Value,
-      //规格型号
-      Specification: barCodeData.F_NUMBER.MultiLanguageText[0].Specification,
-      //数量
-      Quantity: barCodeData.F_UNITQTY
-    }
-    return data
-  }
 }
