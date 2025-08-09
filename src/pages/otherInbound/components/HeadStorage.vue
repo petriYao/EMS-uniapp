@@ -20,6 +20,16 @@ const emit = defineEmits<{
 const reactiveData = reactive({
   title: props.title,
   rightTitleShow: false,
+  radioList: [
+    {
+      name: '扫码入库',
+      disabled: false
+    },
+    {
+      name: '扫单入库',
+      disabled: false
+    }
+  ],
   scanCodeType: props.scanCodeType
 })
 

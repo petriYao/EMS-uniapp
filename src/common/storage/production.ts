@@ -178,7 +178,7 @@ export const getInboundOrder = async (searchValue: any) => {
             style: { width: '100%' }
           }
         ],
-        barCodeList: item.F_BARSubEntity,
+        barcodeList: item.F_BARSubEntity,
         otherData: {
           FMemo: item?.Description?.[0]?.Value, //备注
           F_QADV_KH: item.F_QADV_KH?.Number, //客户
@@ -475,7 +475,7 @@ export const productionGetData = async (
         //   style: { width: '50%' }
         // },
       ],
-      barCodeList: [
+      barcodeList: [
         {
           F_BARCODENO: barCodeData.Number,
           F_UNITQTY: barCodeData.F_UNITQTY, //每箱数量

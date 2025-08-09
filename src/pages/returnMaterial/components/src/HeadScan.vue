@@ -1,14 +1,24 @@
 <script setup lang="ts">
 import { reactive, onBeforeUnmount, onBeforeMount, ref } from 'vue'
 import { purchaseScanBarcode, getcamelCase } from '@/common/returnMaterial/Index'
+import { otherScanBarcode, getOtherCase } from '@/common/returnMaterial/OtherOutbound'
+// import { salesScanBarcode, getSalesCase } from '@/common/returnMaterial/SalesReturn'
 // import { queryBarCode } from '@/api/modules/lowerCamelCase'
 import { useEmitt } from '@/hooks/useEmitt'
 
+const props = defineProps({
+  title: {
+    type: String,
+    default: ''
+  }
+})
+
 //数据
 const reactiveData = reactive({
-  searchValue: 'CGTL000011', //搜索值
+  searchValue: '', //搜索值
   documentNumber: '', //单号
-  focus: 1,
+  fid: '', //单号ID
+  focus: 99,
   //单号
   detailsList: [] as any
 })
@@ -16,8 +26,7 @@ const reactiveData = reactive({
 //类型式声明
 const emit = defineEmits<{
   (e: 'update:detailsList', modelValue: any): void
-  (e: 'update:setData', modelValue: any): void
-  (e: 'update:locationList', modelValue: any): void
+  (e: 'update:fid', modelValue: any): void
 }>()
 const { emitter } = useEmitt()
 
@@ -39,186 +48,292 @@ const searchClick = async () => {
 }
 
 //扫描条码
-const searchChange = () => {
+// 使用防抖优化搜索函数，避免频繁触发
+const searchChange = debounce(async () => {
   console.log('搜索值', reactiveData.searchValue)
-  setTimeout(async () => {
-    if (reactiveData.searchValue === '') {
-      return
+  if (!reactiveData.searchValue) return // 空值检查提前
+
+  handleFocus() // 聚焦操作
+
+  try {
+    // 情况1：单据号为空时（单据查询）
+    if (!reactiveData.documentNumber) {
+      await handleDocumentSearch()
     }
-    handleFocus()
-    //调用条码（单据查询）
-    if (reactiveData.documentNumber === '') {
-      const queryRes: any = await getcamelCase(reactiveData.searchValue)
-      console.log('查询结果', queryRes)
-      if (!queryRes || queryRes.dataList.length === 0) {
-        reactiveData.searchValue = ''
-        focusTm()
-        return
-      }
-      reactiveData.documentNumber = reactiveData.searchValue
-    } else {
-      const queryRes: any = await purchaseScanBarcode(reactiveData.searchValue)
-      console.log('查询结果', queryRes)
-      if (!queryRes) {
-        reactiveData.searchValue = ''
-        focusTm()
-        return
-      }
-      if (reactiveData.detailsList.length > 0) {
-        const index = reactiveData.detailsList.findIndex((item: any) => {
-          console.log('判断之前是否有一样的', item, queryRes)
-          return (
-            item.MaterialCode === queryRes.MaterialCode &&
-            item.SourceOrderNo === queryRes.SourceOrderNo &&
-            item.SourceOrderLineNo === queryRes.SourceOrderLineNo
-          )
-        })
-        if (index !== -1) {
-          //判断是否重复扫描
-          if (
-            reactiveData.detailsList[index].barCodeList.some(
-              (item: any) => item.F_BARCODENO === queryRes.BarCode
-            )
-          ) {
-            uni.showToast({
-              title: '请勿重复扫描',
-              icon: 'none'
-            })
-            reactiveData.searchValue = ''
-            focusTm()
-            return
-          }
-
-          reactiveData.detailsList[index].barCodeList.push(queryRes.barCodeList[0]) //条码
-          reactiveData.detailsList[index].Quantity++ //件数
-          emitter.emit('update:datailsIndex', index)
-          if (reactiveData.detailsList[index].IsSplit) {
-            //分装的情况下
-            //判断源数据是否有相同的分装批号，有则跳过，无则push
-            const index2 = reactiveData.detailsList[index].FZLOTList.findIndex((item: any) => {
-              return item === queryRes.FZLOTList[0]
-            })
-            console.log('选中的明细1', index2)
-            if (index2 === -1) {
-              reactiveData.detailsList[index].FZLOTList.push(queryRes.FZLOTList[0])
-
-              reactiveData.detailsList[index].packagingDataFZLOT[queryRes.FZLOTList[0]] =
-                queryRes.packagingDataFZLOT[queryRes.FZLOTList[0]]
-
-              reactiveData.detailsList[index].packagingDataFZLOT[
-                queryRes.FZLOTList[0]
-              ].packagingData[queryRes.SplitCode]['quantity'] = 0
-            }
-
-            reactiveData.detailsList[index].packagingDataFZLOT[queryRes.FZLOTList[0]].packagingData[
-              queryRes.SplitCode
-            ]['quantity'] += queryRes.SplitValue //数量
-            reactiveData.detailsList[index].packagingDataFZLOT[queryRes.FZLOTList[0]].packagingData[
-              queryRes.SplitCode
-            ]['unitQty'] = queryRes.UnitQty //单位用量
-            reactiveData.detailsList[index].packagingDataFZLOT[queryRes.FZLOTList[0]].packagingData[
-              queryRes.SplitCode
-            ]['finishedQty'] =
-              reactiveData.detailsList[index].packagingDataFZLOT[queryRes.FZLOTList[0]]
-                .packagingData[queryRes.SplitCode]['quantity'] / queryRes.UnitQty
-            //判断是否有成品
-            const packagingSig =
-              reactiveData.detailsList[index].packagingDataFZLOT[queryRes.FZLOTList[0]].packagingSig
-            let hasZero = false
-            let minNonZero = Infinity
-
-            packagingSig.forEach((item: any) => {
-              const sum = Number(
-                reactiveData.detailsList[index].packagingDataFZLOT[queryRes.FZLOTList[0]]
-                  .packagingData[item].finishedQty
-              )
-
-              if (isNaN(sum)) {
-                // 如果转换失败，根据需求决定如何处理，这里假设视为 0
-                hasZero = true
-              } else {
-                if (sum === 0) {
-                  hasZero = true
-                } else if (sum < minNonZero) {
-                  minNonZero = sum
-                }
-              }
-            })
-
-            // 如果存在任何一个 0，或者所有值都是无效的，则设为 0
-            const productsQuantity = hasZero || minNonZero === Infinity ? 0 : minNonZero
-            //判断productsQuantity是否为整数
-            reactiveData.detailsList[index].packagingDataFZLOT[queryRes.FZLOTList[0]].isInteger =
-              productsQuantity % 1 === 0 && productsQuantity !== 0
-
-            reactiveData.detailsList[index].isInteger =
-              productsQuantity % 1 === 0 && productsQuantity !== 0
-            console.log('isInteger1', reactiveData.detailsList[index], queryRes.FZLOTList[0])
-            console.log(
-              'isInteger1',
-              reactiveData.detailsList[index].packagingDataFZLOT[queryRes.FZLOTList[0]]
-            )
-            if (
-              reactiveData.detailsList[index].packagingDataFZLOT[queryRes.FZLOTList[0]].isInteger
-            ) {
-              reactiveData.detailsList[index].packagingDataFZLOT[
-                queryRes.FZLOTList[0]
-              ].packagingSig.forEach((element: any) => {
-                if (
-                  reactiveData.detailsList[index].packagingDataFZLOT[queryRes.FZLOTList[0]]
-                    .packagingData[element].finishedQty !== productsQuantity
-                ) {
-                  reactiveData.detailsList[index].packagingDataFZLOT[
-                    queryRes.FZLOTList[0]
-                  ].isInteger = false
-                  reactiveData.detailsList[index].isInteger = false
-                  return
-                }
-              })
-            }
-
-            //计算单分装数量
-            reactiveData.detailsList[index].packagingDataFZLOT[queryRes.FZLOTList[0]].FZquantity =
-              Math.floor(productsQuantity)
-
-            //计算总数量
-            reactiveData.detailsList[index].Quantity2 = reCompute(reactiveData.detailsList[index])
-          } else {
-            console.log('未封装新增', reactiveData.detailsList[index])
-            reactiveData.detailsList[index].Quantity2 += queryRes.Quantity2
-            reactiveData.detailsList[index].isInteger = true //是否整数
-          }
-        } else {
-          //判断条码是否重复扫
-          const scannedBarcodes = new Set(
-            reactiveData.detailsList.flatMap((item: { barCodeList: any[] }) =>
-              item.barCodeList.map((item2: { [x: string]: any }) => item2['F_BARCODENO'])
-            )
-          )
-          if (scannedBarcodes.has(reactiveData.searchValue)) {
-            uni.showToast({
-              title: '请勿重复扫描',
-              icon: 'none'
-            })
-            reactiveData.searchValue = ''
-            focusTm()
-            return
-          }
-          console.log('重复', scannedBarcodes, scannedBarcodes.has(reactiveData.searchValue))
-          reactiveData.detailsList.push(queryRes)
-          emitter.emit('update:datailsIndex', reactiveData.detailsList.length - 1)
-        }
-      } else {
-        reactiveData.detailsList.push(queryRes)
-        emitter.emit('update:datailsIndex', 0)
-      }
+    // 情况2：已有单据号（条码扫描）
+    else {
+      await handleBarcodeScan()
     }
+  } catch (error) {
+    console.error('处理过程中出错:', error)
+  } finally {
+    resetSearchField() // 重置搜索字段
+  }
+}, 500)
 
-    emit('update:detailsList', reactiveData.detailsList)
+// 单据查询处理
+const handleDocumentSearch = async () => {
+  let queryRes: any = {}
+  console.log(props.title)
 
-    reactiveData.searchValue = ''
-    focusTm()
-  }, 500)
+  switch (props.title) {
+    case '采购退货':
+      console.log('采购退货123')
+      queryRes = await getcamelCase(reactiveData.searchValue)
+      break
+    // case '销售退货':
+    //   queryRes = await getSalesCase(reactiveData.searchValue)
+    //   break
+    case '其他出库':
+      queryRes = await getOtherCase(reactiveData.searchValue)
+      break
+  }
+
+  console.log('单据查询结果', queryRes)
+
+  // 处理无结果情况
+  if (!queryRes?.dataList?.length) {
+    showToast('未找到相关单据')
+    return
+  }
+
+  // 更新单据数据
+  reactiveData.documentNumber = reactiveData.searchValue
+  reactiveData.detailsList = queryRes.dataList
+  reactiveData.fid = queryRes.fid
+  emit('update:fid', reactiveData.fid)
+  emit('update:detailsList', reactiveData.detailsList)
+}
+
+// 条码扫描处理
+const handleBarcodeScan = async () => {
+  let queryRes: any = {}
+  switch (props.title) {
+    case '采购退货':
+      queryRes = await purchaseScanBarcode(reactiveData.searchValue)
+      break
+    // case '销售退货':
+    //   queryRes = await salesScanBarcode(reactiveData.searchValue)
+    //   break
+    case '其他出库':
+      queryRes = await otherScanBarcode(reactiveData.searchValue)
+      break
+  }
+
+  console.log('条码扫描结果', queryRes)
+
+  // 处理无效条码
+  if (!queryRes) {
+    // showToast('无效条码')
+    return
+  }
+
+  // 查找匹配的明细项
+  const detailIndex = findMatchingDetail(queryRes)
+  console.log('匹配的明细项索引', detailIndex)
+  if (detailIndex === -1) {
+    showToast('条码与明细不符合')
+    return
+  }
+
+  // 处理条码重复扫描
+  if (isBarcodeDuplicate(detailIndex, queryRes.BarCode)) {
+    showToast('请勿重复扫描')
+    return
+  }
+
+  // 更新明细数据
+  updateDetailItem(detailIndex, queryRes)
+  emit('update:detailsList', reactiveData.detailsList)
+}
+
+// 查找匹配的明细项
+const findMatchingDetail = (queryRes: any): number => {
+  return reactiveData.detailsList.findIndex((item: any) => {
+    switch (props.title) {
+      case '采购退货':
+        return (
+          item.MaterialCode === queryRes.MaterialCode && // 编码
+          item.SourceOrderNo === queryRes.SourceOrderNo && // 来源单号
+          item.Supplier === queryRes.Supplier && // 供应商
+          item.Lot === queryRes.Lot // 批次
+        )
+      case '其他出库':
+        console.log('其他出库', item, queryRes)
+        return (
+          item.MaterialCode === queryRes.MaterialCode && // 编码
+          item.Lot === queryRes.Lot
+        )
+    }
+  })
+}
+
+// 检查条码是否重复
+const isBarcodeDuplicate = (index: number, barcode: string): boolean => {
+  return reactiveData.detailsList[index].barcodeList.some((item: any) => {
+    console.log('条码重复', item, barcode)
+    return item.FNumber === barcode
+  })
+}
+
+// 更新明细项数据
+const updateDetailItem = (index: number, queryRes: any) => {
+  const detail = reactiveData.detailsList[index]
+
+  // 初始化分装标记
+  if (detail.isLowerCamelCase) {
+    detail.isLowerCamelCase = false
+    detail.IsSplit = queryRes.IsSplit
+  }
+
+  // 添加条码并更新数量
+  detail.barcodeList.push(queryRes.barcodeList)
+  detail.Quantity++
+  let showToast = ''
+  switch (props.title) {
+    case '采购退货':
+      detail.currentList[7].value = queryRes.F_POQTY // 批量
+      detail.currentList[9].value = queryRes.TotalBox // 总箱数
+      showToast = '实退数量大于应退数量'
+      break
+    case '其他出库':
+      detail.currentList[6].value = queryRes.F_POQTY // 批量
+      detail.currentList[8].value = queryRes.TotalBox // 总箱数
+      showToast = '实发数量大于可发数量'
+      break
+  }
+  emitter.emit('update:datailsIndex', index)
+  console.log('分装处理', detail)
+  // 分装处理
+  if (detail.IsSplit) {
+    handleSplitPackage(detail, queryRes)
+  }
+  // 非分装处理
+  else {
+    detail.Quantity2 += queryRes.Quantity2
+    detail.isInteger = true
+  }
+  //如果累计实发超过对应发数量，调用删除
+  if (detail.Quantity2 > detail.canReceive) {
+    let deleteBarcode = {
+      item: detail.barcodeList[detail.barcodeList.length - 1],
+      index: detail.barcodeList.length - 1
+    }
+    //提示
+    uni.showToast({
+      title: showToast,
+      icon: 'none'
+    })
+    emitter.emit('deleteBarcode', deleteBarcode)
+  }
+}
+
+// 处理分装逻辑
+const handleSplitPackage = (detail: any, queryRes: any) => {
+  const fzlot = queryRes.FZLOTList[0]
+  console.log('处理分装逻辑1', queryRes)
+  // 添加新分装批号
+  if (!detail.FZLOTList.includes(fzlot)) {
+    detail.FZLOTList.push(fzlot)
+    detail.packagingDataFZLOT[fzlot] = queryRes.packagingDataFZLOT[fzlot]
+    detail.packagingDataFZLOT[fzlot].packagingData[queryRes.SplitCode] = {
+      quantity: 0,
+      unitQty: queryRes.unitQty,
+      finishedQty: 0
+    }
+  }
+
+  // 更新分装数据
+  const packagingData = detail.packagingDataFZLOT[fzlot].packagingData[queryRes.SplitCode]
+  console.log('处理分装逻辑2', packagingData)
+
+  packagingData.quantity += queryRes.SplitValue
+  packagingData.unitQty = queryRes.unitQty
+  packagingData.finishedQty = packagingData.quantity / packagingData.unitQty
+  console.log('处理分装逻辑3', packagingData.quantity, packagingData.unitQty)
+  // 计算成品数量
+  const productsQuantity = calculateProductsQuantity(detail, fzlot)
+  console.log('productsQuantity', productsQuantity)
+  // 更新分装状态和数量
+  updatePackageStatus(detail, fzlot, productsQuantity)
+}
+
+// 计算成品数量
+const calculateProductsQuantity = (detail: any, fzlot: string): number => {
+  const packagingData = detail.packagingDataFZLOT[fzlot]
+
+  for (const key of packagingData.packagingSig) {
+    const qty = Number(packagingData.packagingData[key]?.finishedQty || 0)
+    if (qty === 0) {
+      return 0 // 这会立即从整个函数返回0
+    }
+  }
+
+  let minNonZero = Infinity
+  for (const key of packagingData.packagingSig) {
+    const qty = Number(packagingData.packagingData[key]?.finishedQty || 0)
+    if (qty > 0 && qty < minNonZero) {
+      minNonZero = qty
+    }
+  }
+
+  return minNonZero === Infinity ? 0 : minNonZero
+}
+
+// 更新分装状态
+const updatePackageStatus = (detail: any, fzlot: string, productsQuantity: number) => {
+  const packagingData = detail.packagingDataFZLOT[fzlot]
+
+  // 检查是否为整数
+  const isInteger = productsQuantity > 0 && productsQuantity % 1 === 0
+  packagingData.isInteger = isInteger
+  detail.isInteger = isInteger
+  console.log('分装状态', isInteger)
+  console.log('分装状态2', productsQuantity)
+  // 验证所有分装是否一致
+  if (isInteger) {
+    packagingData.packagingSig.forEach((key: string) => {
+      console.log('分装状态3', packagingData.packagingData[key]?.finishedQty)
+      if (packagingData.packagingData[key]?.finishedQty !== productsQuantity) {
+        packagingData.isInteger = false
+        detail.isInteger = false
+      }
+    })
+  }
+
+  // 更新数量
+  packagingData.FZquantity = Math.floor(productsQuantity)
+  detail.Quantity2 = reCompute(detail)
+  //如果累计实发超过对应发数量，调用删除
+  // if (detail.Quantity2 > detail.canReceive) {
+  //   let deleteBarcode = {
+  //     item: detail.barcodeList[detail.barcodeList.length - 1],
+  //     index: detail.barcodeList.length - 1
+  //   }
+  //   emitter.emit('deleteBarcode', deleteBarcode)
+  // }
+}
+
+// 工具函数：显示提示
+const showToast = (title: string) => {
+  uni.showToast({ title, icon: 'none' })
+  reactiveData.searchValue = ''
+  focusTm()
+}
+
+// 工具函数：重置搜索字段
+const resetSearchField = () => {
+  reactiveData.searchValue = ''
+  focusTm()
+}
+
+// 防抖函数实现
+function debounce<T extends (...args: any[]) => any>(fn: T, delay: number) {
+  let timer: ReturnType<typeof setTimeout> | null = null
+  return function (this: any, ...args: Parameters<T>) {
+    if (timer) clearTimeout(timer)
+    timer = setTimeout(() => fn.apply(this, args), delay)
+  }
 }
 
 const focusTm = () => {
@@ -301,7 +416,7 @@ onBeforeUnmount(() => {
       </view>
     </view>
     <view class="flex items-center py-4rpx w-100%">
-      <view class="w-50px flex justify-center">仓库</view>
+      <view class="w-50px flex justify-center">单号</view>
       <view class="flex-1 mr-20rpx" style="border: 1px solid #f8f8f8" @click="clearTimer">
         <u-input
           ref="searchInput"

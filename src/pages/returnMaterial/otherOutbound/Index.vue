@@ -1,22 +1,22 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import HeadStorage from './components/HeadStorage.vue'
+import HeadStorage from '../components/HeadStorage.vue'
 import ContentStorage from './components/ContentStorage.vue'
 
-import { throttleSave } from '@/utils'
+import { debounceSave } from '@/utils'
 
-//采购入库单
+//采购退货单
 const reactiveData = reactive({
   isShow: true, //是否选择
   loading: false, //是否保存
-  title: '采购入库',
+  title: '其他出库',
   FEntity: [] as any, //单据提交
   scanCodeType: '扫码入库'
 })
 
 const contentStorageRef = ref() //标题组件引用
 
-const saveClick = throttleSave(async () => {
+const saveClick = debounceSave(async () => {
   contentStorageRef.value?.saveClick()
 })
 </script>

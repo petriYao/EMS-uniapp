@@ -9,7 +9,8 @@ const reactiveData = reactive({
   locationList: [],
   setData: {} as any,
   barcodeIndex: 0,
-  loading: true
+  loading: true,
+  isShow: true
 })
 
 //保存
@@ -28,7 +29,14 @@ const saveClick = async () => {
     FID: reactiveData.setData.fid,
     FInStockEntry: [] as any
   }
+  const FStockLocPJ = 'FSTOCKLOCID__' + reactiveData.setData.FlexNumber
+
   for (const item of reactiveData.detailsList) {
+    const FStockLocId = {} as any
+    FStockLocId[FStockLocPJ] = {
+      FNumber: item.WarehousePosition
+    }
+    console.log('FStockLocId', item, FStockLocId)
     Model.FInStockEntry.push({
       FEntryID: item.entryId,
       FRealQty: item.Quantity2,
@@ -41,22 +49,24 @@ const saveClick = async () => {
       FStockId: {
         FNumber: reactiveData.setData.warehouseNumber
       },
-      FStockLocId: item.setFStockLocId
+      FStockLocId: FStockLocId
     })
   }
+  console.log('保存3', Model)
   const res = await savePurchaseOrder(Model)
   if (res && res.data && res.data?.Result?.Number) {
     uni.showToast({
       icon: 'none',
       title: '提交成功'
     })
-    /*
-    清空
+    //清空
     reactiveData.isShow = false //隐藏标题组件
     setTimeout(() => {
       reactiveData.isShow = true //显示标题组件
     }, 500)
-    */
+    reactiveData.detailsList = []
+    reactiveData.barcodeIndex = 0
+    reactiveData.setData = {}
   } else {
     uni.showToast({
       icon: 'none',
@@ -76,7 +86,7 @@ defineExpose({
 
 <template>
   <!-- 扫描条码 -->
-  <view class="bg-#FFF">
+  <view class="bg-#FFF" v-if="reactiveData.isShow">
     <HeadScan
       v-model:detailsList="reactiveData.detailsList"
       v-model:setData="reactiveData.setData"

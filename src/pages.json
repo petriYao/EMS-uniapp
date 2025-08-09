@@ -84,6 +84,13 @@
       }
     },
     {
+      "path": "pages/otherInbound/Index",
+      "style": {
+        "navigationBarTitleText": "其他入库",
+        "navigationStyle": "custom"
+      }
+    },
+    {
       "path": "pages/lowerCamelCase/PascalCase",
       "style": {
         "navigationBarTitleText": "销售出库",
@@ -126,7 +133,7 @@
       }
     },
     {
-      "path": "pages/returnMaterial/salesReturn/Index",
+      "path": "pages/salesReturn/Index",
       "style": {
         "navigationBarTitleText": "销售退货",
         "navigationStyle": "custom"
@@ -136,6 +143,27 @@
       "path": "pages/returnMaterial/otherOutbound/Index",
       "style": {
         "navigationBarTitleText": "其他出库",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/materialWithdrawal/production/Index",
+      "style": {
+        "navigationBarTitleText": "生产领料",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/materialWithdrawal/simple/Index",
+      "style": {
+        "navigationBarTitleText": "简单领料",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/materialWithdrawal/outsourced/Index",
+      "style": {
+        "navigationBarTitleText": "委外领料",
         "navigationStyle": "custom"
       }
     }

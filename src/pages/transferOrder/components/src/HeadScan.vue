@@ -88,9 +88,9 @@ const searchChange = () => {
           focusTm()
           return
         }
-        //判断reactiveData.detailsList[index].barCodeList中是否重复扫描
-        const index3 = reactiveData.detailsList[index].barCodeList.findIndex((item: any) => {
-          return item.F_BARCODENO === queryRes.barCodeList[0].F_BARCODENO
+        //判断reactiveData.detailsList[index].barcodeList中是否重复扫描
+        const index3 = reactiveData.detailsList[index].barcodeList.findIndex((item: any) => {
+          return item.F_BARCODENO === queryRes.barcodeList[0].F_BARCODENO
         })
         if (index3 !== -1) {
           uni.showToast({
@@ -102,7 +102,7 @@ const searchChange = () => {
         }
         emitter.emit('update:barcodeIndex', index)
 
-        reactiveData.detailsList[index].barCodeList.push(queryRes.barCodeList[0]) //条码
+        reactiveData.detailsList[index].barcodeList.push(queryRes.barcodeList[0]) //条码
         reactiveData.detailsList[index].Quantity++ //件数
 
         if (reactiveData.detailsList[index].IsSplit) {
@@ -181,8 +181,8 @@ const searchChange = () => {
       } else {
         //判断条码是否重复扫
         const scannedBarcodes = new Set(
-          reactiveData.detailsList.flatMap((item: { barCodeList: any[] }) =>
-            item.barCodeList.map((item2: { [x: string]: any }) => item2['F_BARCODENO'])
+          reactiveData.detailsList.flatMap((item: { barcodeList: any[] }) =>
+            item.barcodeList.map((item2: { [x: string]: any }) => item2['F_BARCODENO'])
           )
         )
         if (scannedBarcodes.has(reactiveData.heardList.barcode)) {

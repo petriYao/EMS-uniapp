@@ -31,7 +31,7 @@ const reactiveData = reactive({
   subsectionList: ['当前', '明细'],
   locationList: [] as any,
   curNow: 0,
-  barCodeList: [] as any, //条码
+  barcodeList: [] as any, //条码
   barcodeIndex: 0
 })
 
@@ -87,13 +87,11 @@ const handleTouchMove = (e: TouchEvent) => {
     isMoved = true
   }
 }
-//仓库
+//仓位
 const warehouseChange = debounceSave((val: any) => {
-  //获取仓库id替换为仓库名称
   const warehouseId: any = reactiveData.locationList.find((item: any) => item.value === val)
   console.log('warehouseId1', warehouseId)
   if (!warehouseId && val != '') {
-    //提示仓库不存在
     uni.showToast({
       title: '仓位不存在',
       icon: 'none'
@@ -105,8 +103,8 @@ const warehouseChange = debounceSave((val: any) => {
   reactiveData.detailsList[reactiveData.barcodeIndex].WarehousePosition = warehouseId.Id
   reactiveData.detailsList[reactiveData.barcodeIndex].WarehousePositionNumber = warehouseId.value
 
-  reactiveData.detailsList[reactiveData.barcodeIndex].detailList.location = warehouseId.Id
-  reactiveData.detailsList[reactiveData.barcodeIndex].detailList.locationNumber = warehouseId.value
+  reactiveData.detailsList[reactiveData.barcodeIndex].detailList.location = warehouseId.text
+  reactiveData.detailsList[reactiveData.barcodeIndex].FStockLocId = warehouseId.Id
 
   pickerShow.value = false
   emit('update:detailsList', reactiveData.detailsList)
@@ -116,6 +114,10 @@ const warehouseChange = debounceSave((val: any) => {
 const pickerConfirm = (warehouseItem: any) => {
   console.log('pickerConfirm', warehouseItem)
   reactiveData.detailsList[reactiveData.barcodeIndex].FStockLocId = warehouseItem.Id
+  reactiveData.detailsList[reactiveData.barcodeIndex].WarehousePosition = warehouseItem.value
+  reactiveData.detailsList[reactiveData.barcodeIndex].WarehousePositionNumber = warehouseItem.value
+
+  reactiveData.detailsList[reactiveData.barcodeIndex].detailList.location = warehouseItem.text
   reactiveData.detailsList[reactiveData.barcodeIndex].currentList[12].value = warehouseItem.text
   pickerShow.value = false
   emit('update:detailsList', reactiveData.detailsList)
@@ -124,8 +126,8 @@ const pickerConfirm = (warehouseItem: any) => {
 
 const quantChange = (val: any) => {
   console.log('val', val)
-  reactiveData.detailsList[reactiveData.barcodeIndex].Quantity2 = val
-  reactiveData.detailsList[reactiveData.barcodeIndex].currentList[12].value = val
+  reactiveData.detailsList[reactiveData.barcodeIndex].Quantity2 = val * 1
+  reactiveData.detailsList[reactiveData.barcodeIndex].currentList[13].value = val * 1
 }
 
 const clearTimer = () => {
@@ -160,7 +162,7 @@ watch(
     @change="reactiveData.curNow = $event"
   />
   <!-- 当前 -->
-  <view v-if="reactiveData.curNow == 0" class="flex flex-wrap">
+  <view v-if="reactiveData.curNow == 0" class="flex flex-wrap content-input">
     <view
       v-for="(item, index) of reactiveData.detailsList[reactiveData.barcodeIndex]?.currentList ||
       []"
@@ -304,7 +306,7 @@ watch(
 
             <!-- <view class="w-50% flex items-center h-20px">
               <view class="w-50px text-end">件数：</view>
-              <view> {{ item.barCodeList.length }}</view>
+              <view> {{ item.barcodeList.length }}</view>
             </view> -->
           </view>
         </view>
@@ -312,3 +314,21 @@ watch(
     </view>
   </view>
 </template>
+<style lang="less" scoped>
+::v-deep .uni-select__selector-scroll {
+  max-height: 140px !important;
+}
+::v-deep .u-input__content__field-wrapper__field {
+  line-height: 34px;
+}
+::v-deep .u-input {
+  height: 28px;
+  padding: 2px 9px !important;
+}
+.content-input {
+  ::v-deep .u-input {
+    height: 22px;
+    padding: 2px 9px !important;
+  }
+}
+</style>

@@ -114,13 +114,14 @@ const searchChange = () => {
         return (
           item.MaterialCode === queryRes.MaterialCode &&
           item.SourceOrderNo === queryRes.SourceOrderNo &&
-          item.SourceOrderLineNo === queryRes.SourceOrderLineNo
+          item.SourceOrderLineNo === queryRes.SourceOrderLineNo &&
+          item.FStockLocId === queryRes.FStockLocId
         )
       })
       if (index !== -1) {
         //判断是否重复扫描
         if (
-          reactiveData.detailsList[index].barCodeList.some(
+          reactiveData.detailsList[index].barcodeList.some(
             (item: any) => item.F_BARCODENO === queryRes.BarCode
           )
         ) {
@@ -134,7 +135,7 @@ const searchChange = () => {
           return
         }
 
-        reactiveData.detailsList[index].barCodeList.push(queryRes.barCodeList[0]) //条码
+        reactiveData.detailsList[index].barcodeList.push(queryRes.barcodeList[0]) //条码
         reactiveData.detailsList[index].Quantity++ //件数
         emitter.emit('update:datailsIndex', index)
         if (reactiveData.detailsList[index].IsSplit) {
@@ -235,8 +236,8 @@ const searchChange = () => {
       } else {
         //判断条码是否重复扫
         const scannedBarcodes = new Set(
-          reactiveData.detailsList.flatMap((item: { barCodeList: any[] }) =>
-            item.barCodeList.map((item2: { [x: string]: any }) => item2['F_BARCODENO'])
+          reactiveData.detailsList.flatMap((item: { barcodeList: any[] }) =>
+            item.barcodeList.map((item2: { [x: string]: any }) => item2['F_BARCODENO'])
           )
         )
         if (scannedBarcodes.has(reactiveData.searchValue)) {

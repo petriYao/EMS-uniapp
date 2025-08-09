@@ -11,7 +11,7 @@ const props = defineProps({
 const reactiveData = reactive({
   subsectionList: ['明细', '条码'],
   curNow: 0,
-  barCodeList: [] as any //条码
+  barcodeList: [] as any //条码
 })
 
 const getBarCode = async (item: any, index: number, curNow = 1) => {
@@ -24,9 +24,9 @@ const getBarCode = async (item: any, index: number, curNow = 1) => {
     item.F_QADV_FSTOCKID,
     item.F_QADV_STOCKLOCID
   ])
-  reactiveData.barCodeList = res.data
+  reactiveData.barcodeList = res.data
   console.log('条码', res)
-  // reactiveData.barCodeList = item.F_BARCODE
+  // reactiveData.barcodeList = item.F_BARCODE
   reactiveData.curNow = curNow
 }
 
@@ -94,7 +94,7 @@ watch(
       <view class="w-70%">条码编码</view>
       <view class="w-15% text-center">数量</view>
     </view>
-    <view v-for="(item, index) of reactiveData.barCodeList || []" :key="item.FNUMBER">
+    <view v-for="(item, index) of reactiveData.barcodeList || []" :key="item.FNUMBER">
       <view class="flex py-10rpx" :style="index % 2 == 1 ? 'background-color:#f2f2f2' : ''">
         <view class="w-15% flex justify-center pt-3px">{{ index + 1 }}</view>
         <view class="w-70% pt-3px">

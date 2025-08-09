@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onBeforeMount, ref } from 'vue'
 import { getPushCK } from '@/api/modules/saleOrder'
-import TestInput from './TestInput.vue'
+// import TestInput from './TestInput.vue'
 import router from '@/router'
 import { UpdateInstallApp } from '@/common/AppUpdate.js'
 //报工
@@ -55,7 +55,8 @@ const scanCode = async () => {
 }
 
 onBeforeMount(() => {
-  UpdateInstallApp()
+  //更新
+  //UpdateInstallApp()
 
   let UserAuthority = uni.getStorageSync('UserAuthority')
   crmList.value = []
@@ -99,10 +100,10 @@ onBeforeMount(() => {
         })
         break
       case '24':
-        crmList5.value.push({
+        crmList2.value.push({
           name: '其他入库',
           icon: '/static/index/Reportingforwork.png',
-          src: 'storage/storage?type=其他入库'
+          src: 'otherInbound/Index'
         })
         break
       /*出库*********************************/
@@ -116,11 +117,6 @@ onBeforeMount(() => {
       case '29':
         crmList3.value.push({
           name: '出库撤销',
-          icon: '/static/index/Reportingforwork.png',
-          src: 'cancelOutbound/Index'
-        })
-        crmList3.value.push({
-          name: '其他出库',
           icon: '/static/index/Reportingforwork.png',
           src: 'cancelOutbound/Index'
         })
@@ -152,11 +148,34 @@ onBeforeMount(() => {
         crmList6.value.push({
           name: '销售退货',
           icon: '/static/index/Reportingforwork.png',
-          src: 'returnMaterial/salesReturn/Index'
+          src: 'salesReturn/Index'
+        })
+        break
+
+      /**领料 */
+      case '37':
+        crmList5.value.push({
+          name: '生产领料',
+          icon: '/static/index/Reportingforwork.png',
+          src: 'materialWithdrawal/production/Index'
+        })
+        break
+      case '38':
+        crmList5.value.push({
+          name: '简单领料', //SP_PickMtrl
+          icon: '/static/index/Reportingforwork.png',
+          src: 'materialWithdrawal/simple/Index'
+        })
+        break
+      case '39':
+        crmList5.value.push({
+          name: '委外领料', //SUB_PickMtrl
+          icon: '/static/index/Reportingforwork.png',
+          src: 'materialWithdrawal/outsourced/Index'
         })
         break
       case '36':
-        crmList6.value.push({
+        crmList5.value.push({
           name: '其他出库',
           icon: '/static/index/Reportingforwork.png',
           src: 'returnMaterial/otherOutbound/Index'
@@ -223,7 +242,7 @@ onBeforeMount(() => {
         </view>
       </view>
     </view>
-    <view class="flex" v-if="false">
+    <view class="flex">
       <view class="bg-#FFF mt-20px py-20rpx mx-20px w-100% rounded-6px">
         <view class="ml-20px mb-20px">领料</view>
 
@@ -264,7 +283,7 @@ onBeforeMount(() => {
 
     <view class="flex">
       <view class="bg-#FFF mt-20px py-20rpx mx-20px w-100% rounded-6px">
-        <view class="ml-20px mb-20px">出库</view>
+        <view class="ml-20px mb-20px">销售</view>
 
         <view class="flex flex-wrap">
           <view
@@ -300,6 +319,7 @@ onBeforeMount(() => {
         </view>
       </view>
     </view>
+    <view class="h-100px">&nbsp;</view>
   </view>
   <view
     class="toShoppingCart bg-#409DF4 border-2 border-#F7F8F7 rounded-100rpx"

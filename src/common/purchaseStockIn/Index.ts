@@ -216,7 +216,7 @@ export const purchaseScanBarcode = async (searchValue: any, setData: any) => {
           style: { width: '100%' }
         }
       ],
-      barCodeList: [
+      barcodeList: [
         {
           F_BARCODENO: barCodeData.Number, //条码单号
           F_UNITQTY: barCodeData.F_UNITQTY, //每箱数量
@@ -235,7 +235,7 @@ export const purchaseScanBarcode = async (searchValue: any, setData: any) => {
       },
       detailList: {
         //编码，批号，名称，规格，可收，数量，仓位，件数
-        fnumber: barCodeData.Number, //编码
+        fnumber: barCodeData.F_NUMBER.Number, //编码
         lot: barCodeData.F_WLLOT, //批号
         name: barCodeData.F_NUMBER.Name[0].Value, //名称
         specification: barCodeData.F_NUMBER.MultiLanguageText[0].Specification, //规格
@@ -315,7 +315,7 @@ export const getcamelCase = async (searchValue: any) => {
   if (res && res.data) {
     if (res.data.Result?.ResponseStatus?.IsSuccess === false) {
       uni.showToast({
-        title: '生产入库单不存在',
+        title: '采购入库单不存在',
         icon: 'none'
       })
       return { dataList: [], fid: 0 }
@@ -337,6 +337,7 @@ export const getcamelCase = async (searchValue: any) => {
 
       // 获取对象的所有 key
       const FStockLocId = {} as any
+      let FlexNumber = ''
       // 找到第一个 F10000x 字段，且其值不为 null
       if (stockLoc != null) {
         const keys = Object.keys(stockLoc)
@@ -350,6 +351,7 @@ export const getcamelCase = async (searchValue: any) => {
               Fnumber: stockLoc[key].Number
             }
             actualValue = stockLoc[key]
+            FlexNumber = key
             break
           }
         }
@@ -472,7 +474,8 @@ export const getcamelCase = async (searchValue: any) => {
           specification: item.MaterialId.MultiLanguageText[0].Specification, //规格
           receivableQuantity: item.MustQty, //可收
           quantity: item.RealQty, //数量
-          location: actualValue?.Number //仓位
+          location: actualValue?.Number, //仓位
+          FlexNumber: FlexNumber
         },
         entryId: item.Id,
         //是否第一次扫描条码

@@ -534,7 +534,7 @@ const backClick = async () => {
           },
           F_QADV_TIQTY: orderData[index][6], //累计入库数量
           F_QADV_HTNO: item.otherData.F_QADV_HTNO, //合同号
-          F_BARSubEntity: item.barCodeList,
+          F_BARSubEntity: item.barcodeList,
           FEntity_Link: item.FEntity_Link,
           FBFLowId: {
             FID: 'f11b462a-8733-40bd-8f29-0906afc6a201'

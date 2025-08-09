@@ -9,7 +9,7 @@ const debounceSave = (f: (...args: any) => any) => {
 }
 
 const throttleSave = (f: (...args: any) => any, p0?: number) => {
-  return throttle(f, 500)
+  return throttle(f, 3000)
 }
 
 export {

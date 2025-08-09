@@ -4,7 +4,7 @@ import HeadScan from './src/HeadScan.vue'
 import LowerCamelCase from './src/LowerCamelCase.vue'
 import { pushClient } from '@/api/modules/transferOrder'
 import { TMUpdate } from '@/api/commonHttp'
-import { SubmitClient, AuditApiClient } from '@/api/modules/user'
+import { SaveClient, SubmitClient, AuditApiClient } from '@/api/modules/user'
 import { TMStatusQuery } from '@/api/commonHttp'
 
 const reactiveData = reactive({
@@ -36,7 +36,7 @@ const saveClick = async () => {
   //判断条码入库状态
   let barcodeList = []
   for (const item of reactiveData.detailsList) {
-    barcodeList = item.barCodeList.map((item: any) => {
+    barcodeList = item.barcodeList.map((item: any) => {
       return item.F_BARCODENO
     })
   }
@@ -60,7 +60,7 @@ const saveClick = async () => {
   for (let i = 0; i < reactiveData.detailsList.length; i++) {
     const item = reactiveData.detailsList[i]
     console.log('item', item.isInteger, item)
-    if (!item.isInteger && item.barCodeList.length > 0) {
+    if (!item.isInteger && item.barcodeList.length > 0) {
       // 条码不是整数的提示
       uni.showToast({
         title: `第${i + 1}行不配套`,
@@ -89,7 +89,7 @@ const saveClick = async () => {
       FStockLocID: item.FStockLocId, //仓位ID
       FRealQty: item.Quantity2, //实际数量
       lot: item.detailList.lot, //批号
-      F_QADV_WGTMSubEntity: item.barCodeList //条码列表
+      F_QADV_WGTMSubEntity: item.barcodeList //条码列表
     })
   }
   //保存
@@ -109,7 +109,11 @@ const saveClick = async () => {
   }
   if (res && res.data) {
     let numbers = res.data.Result.ResponseStatus.SuccessEntitys[0].Number
+    let Model = {
+      FID: res.data.Result.ResponseStatus.SuccessEntitys[0].Id
+    }
     //提交审核
+    await SaveClient('STK_InStock', Model)
     await SubmitClient('STK_InStock', numbers)
     const res2: any = await AuditApiClient('STK_InStock', numbers)
     if (res2 && res2.data.Result.ResponseStatus.ErrorCode === 500) {
@@ -122,7 +126,7 @@ const saveClick = async () => {
       return
     }
     for (const item of reactiveData.detailsList) {
-      const tmList = item.barCodeList.map((item: any) => item.F_BARCODENO)
+      const tmList = item.barcodeList.map((item: any) => item.F_BARCODENO)
       TMUpdate({
         barcodes: tmList,
         warehouse: reactiveData.setData.warehouseId,

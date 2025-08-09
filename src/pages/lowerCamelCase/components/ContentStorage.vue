@@ -62,7 +62,7 @@ const saveClick = async () => {
     return null
   })
   //循环出入明细数据(当条码中，仓库或者仓位不同时，分为多个明细)
-  const processedData = groupBarcodeLists(reactiveData.lowerCamelCaseList)
+  const processedData = groupbarcodeLists(reactiveData.lowerCamelCaseList)
   await Promise.all(
     processedData.result.map(async (item) => {
       if (item.currentTotal > 0) {
@@ -206,7 +206,7 @@ const saveClick = async () => {
   }
 }
 // 处理数据函数
-function groupBarcodeLists(data: any[]) {
+function groupbarcodeLists(data: any[]) {
   const result: any[] = []
   let ThFilterString = `` //提货单过滤
   let ThFilter2 = 0 //明细数量

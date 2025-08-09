@@ -80,7 +80,7 @@ const reactiveData = reactive({
     { label: '仓位', value: '', scValue2: '', disabled: true, select: true }
   ],
   subsectionList: ['当前', '明细', '条码'],
-  curNow: 0,
+  curNow: 1,
   currentList: [
     { label: '序号', value: '', disabled: true, select: false },
     { label: '源单号', value: '', disabled: true, select: false },
@@ -99,7 +99,7 @@ const reactiveData = reactive({
   detailsList: [] as any, //明细
   //当前明细
   datailsIndex: 0,
-  barCodeList: [] //条码
+  barcodeList: [] //条码
 })
 const searchInput = ref()
 //订单号输入框
@@ -143,7 +143,7 @@ const searchChange = async () => {
     let exitMethod = false
     /*判断条码是否重复扫面************************************************/
     reactiveData.detailsList.forEach((element: any) => {
-      const index = element.barCodeList.findIndex((item: any) => {
+      const index = element.barcodeList.findIndex((item: any) => {
         return item.F_BARCODENO === reactiveData.searchValue
       })
       if (index !== -1) {
@@ -220,7 +220,7 @@ const searchChange = async () => {
           //   let data = JSON.parse(JSON.stringify(reactiveData.detailsList[index])) //深拷贝
           //   data['WarehousePosition'] = res.WarehousePosition //仓位
           //   data['Quantity2'] = res.Quantity2 //数量
-          //   data.barCodeList = res.barCodeList //条码
+          //   data.barcodeList = res.barcodeList //条码
           //   reactiveData.detailsList.push(data)
           //   reactiveData.searchValue = ''
           //   reactiveData.curNow = 0
@@ -231,8 +231,8 @@ const searchChange = async () => {
         reactiveData.datailsIndex = index
         reactiveData.detailsList[index].currentList[7].value = res.currentList[7].value
         reactiveData.detailsList[index].currentList[9].value = res.currentList[9].value
-        res.barCodeList[0].one = reactiveData.detailsList[index].barCodeList.length + 1
-        reactiveData.detailsList[index].barCodeList.push(res.barCodeList[0]) //条码
+        res.barcodeList[0].one = reactiveData.detailsList[index].barcodeList.length + 1
+        reactiveData.detailsList[index].barcodeList.push(res.barcodeList[0]) //条码
         reactiveData.detailsList[index].Quantity++ //件数
 
         /**更新之前的数据 */
@@ -339,7 +339,12 @@ const searchChange = async () => {
       const FStockId = currentWarehouse.number //仓库FStockId.Fname
       console.log('获取推荐仓位（根据物料编码、批号、仓库查库存表）', FlexNumber)
       if (FlexNumber.value !== '') {
-        const FilterString = `FMaterialId.Fnumber = '${FMaterialId}' AND FLot.Fnumber = '${FLot}' AND FStockId.Fnumber = '${FStockId}' AND FBaseQty > 0`
+        let FilterString = `FMaterialId.Fnumber = '${FMaterialId}'`
+        if (FLot !== '') {
+          FilterString += ` AND FLot.Fnumber = '${FLot}'`
+        }
+        FilterString += ` AND FStockId.Fnumber = '${FStockId}' AND FBaseQty > 0`
+
         const FieldKeys = `FStockLocId.${FlexNumber.value}.FNumber`
         const lowerRes: any = await lowerCamelCase2(FilterString, FieldKeys)
         if (lowerRes && lowerRes.data && lowerRes.data.length > 0) {
@@ -767,7 +772,7 @@ const longpressDetailsClick = (item: any, index: number) => {
     content: '是否删除当前条码明细',
     success: (res) => {
       if (res.confirm) {
-        reactiveData.detailsList[reactiveData.datailsIndex].barCodeList.splice(index, 1)
+        reactiveData.detailsList[reactiveData.datailsIndex].barcodeList.splice(index, 1)
         //删除当前明细
         if (reactiveData.detailsList[reactiveData.datailsIndex].IsSplit) {
           //分装情况下
@@ -836,7 +841,7 @@ const longpressDetailsClick = (item: any, index: number) => {
           reactiveData.detailsList[reactiveData.datailsIndex].Quantity-- //件数
           reactiveData.detailsList[reactiveData.datailsIndex].Quantity2 -= item.F_UNITQTY //数量
         }
-        if (reactiveData.detailsList[reactiveData.datailsIndex].barCodeList.length === 0) {
+        if (reactiveData.detailsList[reactiveData.datailsIndex].barcodeList.length === 0) {
           //删除明细
           reactiveData.detailsList.splice(reactiveData.datailsIndex, 1)
           reactiveData.datailsIndex--
@@ -889,7 +894,7 @@ const backClick = async () => {
   //搜索条码单状态（获取条码列表）
   // 提取所有的 F_BARCODENO
   const barCodes = reactiveData.detailsList
-    .map((item: any) => item.barCodeList.map((barCode: any) => barCode.F_BARCODENO))
+    .map((item: any) => item.barcodeList.map((barCode: any) => barCode.F_BARCODENO))
     .flat()
   console.log('barCodes', barCodes)
   if (barCodes.length === 0) {
@@ -922,7 +927,7 @@ const backClick = async () => {
   // 使用Promise.all等待所有异步操作完成
   await Promise.all(
     reactiveData.detailsList.map(async (item: any, index: number) => {
-      if (item.barCodeList.length === 0) {
+      if (item.barcodeList.length === 0) {
         return
       }
       //分装情况下
@@ -1055,7 +1060,7 @@ const backClick = async () => {
         F_QADV_TIQTY: item.TotalQty, //累计入库数量(合格品入库数量)
 
         F_QADV_HTNO: item.otherData.F_QADV_HTNO, //合同号
-        F_BARSubEntity: item.barCodeList,
+        F_BARSubEntity: item.barcodeList,
         currentWarehousePositionId: item.WarehousePositionId, //仓位ID
         FEntity_Link: [
           {
@@ -1440,8 +1445,8 @@ defineExpose({
             <view class="w-50% flex items-center">
               <view>本箱数</view>
               <view class="ml-20px text-18px mt-2px">{{
-                reactiveData.detailsList[reactiveData.datailsIndex]?.barCodeList[
-                  reactiveData.detailsList[reactiveData.datailsIndex].barCodeList.length - 1
+                reactiveData.detailsList[reactiveData.datailsIndex]?.barcodeList[
+                  reactiveData.detailsList[reactiveData.datailsIndex].barcodeList.length - 1
                 ]?.F_UNITQTY
               }}</view>
             </view>
@@ -1457,13 +1462,13 @@ defineExpose({
             v-if="reactiveData.detailsList[reactiveData.datailsIndex]?.IsSplit"
           >
             <view class="text-center">{{
-              reactiveData.detailsList[reactiveData.datailsIndex]?.barCodeList[
-                reactiveData.detailsList[reactiveData.datailsIndex].barCodeList.length - 1
+              reactiveData.detailsList[reactiveData.datailsIndex]?.barcodeList[
+                reactiveData.detailsList[reactiveData.datailsIndex].barcodeList.length - 1
               ].F_FZNO
             }}</view>
             <view class="ml-8px text-center">{{
-              reactiveData.detailsList[reactiveData.datailsIndex]?.barCodeList[
-                reactiveData.detailsList[reactiveData.datailsIndex].barCodeList.length - 1
+              reactiveData.detailsList[reactiveData.datailsIndex]?.barcodeList[
+                reactiveData.detailsList[reactiveData.datailsIndex].barcodeList.length - 1
               ].F_BJNAME
             }}</view>
           </view>
@@ -1517,7 +1522,7 @@ defineExpose({
         </view>
         <view
           v-for="(item, index) of reactiveData.detailsList[reactiveData.datailsIndex]
-            ?.barCodeList || []"
+            ?.barcodeList || []"
           :key="index"
           @longpress="longpressDetailsClick(item, index)"
           @touchstart="handleTouchStart"

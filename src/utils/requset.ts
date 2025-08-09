@@ -2,7 +2,7 @@
 // 定义请求地址
 const BASE_URL = 'http://localhost:80/' //澳马正式环境
 // const BASE_URL = 'http://125z0344r3.oicp.vip/' //澳马正式环境
-// const BASE_URL = 'http://172.16.50.101/' //澳马正式环境
+// const BASE_URL = 'http://172.16.50.128/' //澳马正式环境
 // 封装请求方法
 const request = (obj: any) => {
   // const appStore = useAppStore()
@@ -25,7 +25,7 @@ const request = (obj: any) => {
         'Content-Type': obj.header
       },
       success: (res: any) => {
-        console.log('请求成功', res)
+        // console.log('请求成功', res)
 
         // console.log('requsetRes',res)
         if (

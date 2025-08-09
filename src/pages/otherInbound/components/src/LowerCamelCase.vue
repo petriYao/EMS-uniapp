@@ -25,8 +25,8 @@ const reactiveData = reactive({
   detailsList: [] as any,
   subsectionList: ['当前', '明细', '条码'],
   locationList: [] as any,
-  curNow: 0,
-  barCodeList: [] as any, //条码
+  curNow: 1,
+  barcodeList: [] as any, //条码
   barcodeIndex: 0
 })
 
@@ -91,110 +91,108 @@ const longpressDetailsClick = (item: any, index: number) => {
     content: '是否删除当前条码明细',
     success: (res) => {
       if (res.confirm) {
-        reactiveData.detailsList[reactiveData.barcodeIndex].barCodeList.splice(index, 1)
-        //删除当前明细
-        if (reactiveData.detailsList[reactiveData.barcodeIndex].IsSplit) {
-          //分装情况下
-          reactiveData.detailsList[reactiveData.barcodeIndex].Quantity--
-          //减去数量
-          reactiveData.detailsList[reactiveData.barcodeIndex].packagingDataFZLOT[
-            item.F_QADV_FZLOT
-          ].packagingData[item.F_FZNO]['quantity'] -= item.F_UNITQTY //数量
-          //重新计算最小值
-          reactiveData.detailsList[reactiveData.barcodeIndex].packagingDataFZLOT[
-            item.F_QADV_FZLOT
-          ].packagingData[item.F_FZNO]['finishedQty'] =
-            reactiveData.detailsList[reactiveData.barcodeIndex].packagingDataFZLOT[
-              item.F_QADV_FZLOT
-            ].packagingData[item.F_FZNO]['quantity'] /
-            reactiveData.detailsList[reactiveData.barcodeIndex].packagingDataFZLOT[
-              item.F_QADV_FZLOT
-            ].packagingData[item.F_FZNO]['unitQty']
-
-          //判断是否有成品
-          // productsQuantity保留最小值
-          const packagingSig =
-            reactiveData.detailsList[reactiveData.barcodeIndex].packagingDataFZLOT[
-              item.F_QADV_FZLOT
-            ].packagingSig
-
-          let hasZero = false
-          let minNonZero = Infinity
-
-          packagingSig.forEach((item2: any) => {
-            const sum = Number(
-              reactiveData.detailsList[reactiveData.barcodeIndex].packagingDataFZLOT[
-                item.F_QADV_FZLOT
-              ].packagingData[item2].finishedQty
-            )
-
-            if (isNaN(sum)) {
-              // 如果转换失败，根据需求决定如何处理，这里假设视为 0
-              hasZero = true
-            } else {
-              if (sum === 0) {
-                hasZero = true
-              } else if (sum < minNonZero) {
-                minNonZero = sum
-              }
-            }
-          })
-
-          // 如果存在任何一个 0，或者所有值都是无效的，则设为 0
-          const productsQuantity = hasZero || minNonZero === Infinity ? 0 : minNonZero
-          //计算单分装数量
-          reactiveData.detailsList[reactiveData.barcodeIndex].packagingDataFZLOT[
-            item.F_QADV_FZLOT
-          ].FZquantity = Math.floor(productsQuantity)
-
-          //判断productsQuantity是否为整数
-          reactiveData.detailsList[reactiveData.barcodeIndex].packagingDataFZLOT[
-            item.F_QADV_FZLOT
-          ].isInteger = productsQuantity % 1 === 0 && productsQuantity !== 0
-
-          reactiveData.detailsList[reactiveData.barcodeIndex].isInteger =
-            productsQuantity % 1 === 0 && productsQuantity !== 0
-          if (
-            reactiveData.detailsList[reactiveData.barcodeIndex].packagingDataFZLOT[
-              item.F_QADV_FZLOT
-            ].isInteger
-          ) {
-            reactiveData.detailsList[reactiveData.barcodeIndex].packagingDataFZLOT[
-              item.F_QADV_FZLOT
-            ].packagingSig.forEach((element: any) => {
-              if (
-                reactiveData.detailsList[reactiveData.barcodeIndex].packagingDataFZLOT[
-                  item.F_QADV_FZLOT
-                ].packagingData[element].finishedQty !== productsQuantity
-              ) {
-                reactiveData.detailsList[reactiveData.barcodeIndex].packagingDataFZLOT[
-                  item.F_QADV_FZLOT
-                ].isInteger = false
-                reactiveData.detailsList[reactiveData.barcodeIndex].isInteger = false
-                return
-              }
-            })
-          }
-
-          reactiveData.detailsList[reactiveData.barcodeIndex].Quantity2 = reCompute(
-            reactiveData.detailsList[reactiveData.barcodeIndex]
-          )
-        } else {
-          //非分装情况下
-          reactiveData.detailsList[reactiveData.barcodeIndex].Quantity-- //件数
-          reactiveData.detailsList[reactiveData.barcodeIndex].Quantity2 -= item.F_UNITQTY //数量
-        }
-        if (reactiveData.detailsList[reactiveData.barcodeIndex].barCodeList.length === 0) {
-          //删除明细
-          reactiveData.detailsList.splice(reactiveData.barcodeIndex, 1)
-          reactiveData.barcodeIndex--
-        }
-        emit('update:detailsList', reactiveData.detailsList)
+        deleteBarcode(item, index)
       } else if (res.cancel) {
         console.log('用户点击取消')
       }
     }
   })
+}
+
+const deleteBarcode = (item: any, index: number) => {
+  reactiveData.detailsList[reactiveData.barcodeIndex].barcodeList.splice(index, 1)
+  //删除当前明细
+  if (reactiveData.detailsList[reactiveData.barcodeIndex].IsSplit) {
+    //分装情况下
+    reactiveData.detailsList[reactiveData.barcodeIndex].Quantity--
+    //减去数量
+    reactiveData.detailsList[reactiveData.barcodeIndex].packagingDataFZLOT[
+      item.F_QADV_FZLOT
+    ].packagingData[item.F_FZNO]['quantity'] -= item.F_UNITQTY //数量
+    //重新计算最小值
+    reactiveData.detailsList[reactiveData.barcodeIndex].packagingDataFZLOT[
+      item.F_QADV_FZLOT
+    ].packagingData[item.F_FZNO]['finishedQty'] =
+      reactiveData.detailsList[reactiveData.barcodeIndex].packagingDataFZLOT[item.F_QADV_FZLOT]
+        .packagingData[item.F_FZNO]['quantity'] /
+      reactiveData.detailsList[reactiveData.barcodeIndex].packagingDataFZLOT[item.F_QADV_FZLOT]
+        .packagingData[item.F_FZNO]['unitQty']
+
+    //判断是否有成品
+    // productsQuantity保留最小值
+    const packagingSig =
+      reactiveData.detailsList[reactiveData.barcodeIndex].packagingDataFZLOT[item.F_QADV_FZLOT]
+        .packagingSig
+
+    let hasZero = false
+    let minNonZero = Infinity
+
+    packagingSig.forEach((item2: any) => {
+      const sum = Number(
+        reactiveData.detailsList[reactiveData.barcodeIndex].packagingDataFZLOT[item.F_QADV_FZLOT]
+          .packagingData[item2].finishedQty
+      )
+
+      if (isNaN(sum)) {
+        // 如果转换失败，根据需求决定如何处理，这里假设视为 0
+        hasZero = true
+      } else {
+        if (sum === 0) {
+          hasZero = true
+        } else if (sum < minNonZero) {
+          minNonZero = sum
+        }
+      }
+    })
+
+    // 如果存在任何一个 0，或者所有值都是无效的，则设为 0
+    const productsQuantity = hasZero || minNonZero === Infinity ? 0 : minNonZero
+    //计算单分装数量
+    reactiveData.detailsList[reactiveData.barcodeIndex].packagingDataFZLOT[
+      item.F_QADV_FZLOT
+    ].FZquantity = Math.floor(productsQuantity)
+
+    //判断productsQuantity是否为整数
+    reactiveData.detailsList[reactiveData.barcodeIndex].packagingDataFZLOT[
+      item.F_QADV_FZLOT
+    ].isInteger = productsQuantity % 1 === 0 && productsQuantity !== 0
+
+    reactiveData.detailsList[reactiveData.barcodeIndex].isInteger =
+      productsQuantity % 1 === 0 && productsQuantity !== 0
+    if (
+      reactiveData.detailsList[reactiveData.barcodeIndex].packagingDataFZLOT[item.F_QADV_FZLOT]
+        .isInteger
+    ) {
+      reactiveData.detailsList[reactiveData.barcodeIndex].packagingDataFZLOT[
+        item.F_QADV_FZLOT
+      ].packagingSig.forEach((element: any) => {
+        if (
+          reactiveData.detailsList[reactiveData.barcodeIndex].packagingDataFZLOT[item.F_QADV_FZLOT]
+            .packagingData[element].finishedQty !== productsQuantity
+        ) {
+          reactiveData.detailsList[reactiveData.barcodeIndex].packagingDataFZLOT[
+            item.F_QADV_FZLOT
+          ].isInteger = false
+          reactiveData.detailsList[reactiveData.barcodeIndex].isInteger = false
+          return
+        }
+      })
+    }
+
+    reactiveData.detailsList[reactiveData.barcodeIndex].Quantity2 = reCompute(
+      reactiveData.detailsList[reactiveData.barcodeIndex]
+    )
+  } else {
+    //非分装情况下
+    reactiveData.detailsList[reactiveData.barcodeIndex].Quantity-- //件数
+    reactiveData.detailsList[reactiveData.barcodeIndex].Quantity2 -= item.F_UNITQTY //数量
+  }
+  if (reactiveData.detailsList[reactiveData.barcodeIndex].barcodeList.length === 0) {
+    //删除明细
+    reactiveData.detailsList.splice(reactiveData.barcodeIndex, 1)
+    reactiveData.barcodeIndex--
+  }
+  emit('update:detailsList', reactiveData.detailsList)
 }
 //重新计算总额
 const reCompute = (val: any) => {
@@ -205,7 +203,6 @@ const reCompute = (val: any) => {
   return sum
 }
 
-//仓库
 //仓库
 const warehouseChange = debounceSave((val: any) => {
   //获取仓库id替换为仓库名称
@@ -235,7 +232,9 @@ const warehouseChange = debounceSave((val: any) => {
 const pickerConfirm = (warehouseItem: any) => {
   console.log('pickerConfirm', warehouseItem)
   reactiveData.detailsList[reactiveData.barcodeIndex].FStockLocId = warehouseItem.Id
-  reactiveData.detailsList[reactiveData.barcodeIndex].currentList[12].value = warehouseItem.text
+  reactiveData.detailsList[reactiveData.barcodeIndex].locationNumber = warehouseItem.value
+  reactiveData.detailsList[reactiveData.barcodeIndex].currentList[11].value = warehouseItem.text
+  reactiveData.detailsList[reactiveData.barcodeIndex].detailList.location = warehouseItem.text
   pickerShow.value = false
   emit('update:detailsList', reactiveData.detailsList)
   emitter.emit('update:handleFocus')
@@ -265,7 +264,11 @@ watch(
 watch(
   () => props.locationList,
   (val: any) => {
-    reactiveData.locationList = val
+    if (val && val.length > 0) {
+      reactiveData.locationList = val
+    } else {
+      reactiveData.locationList = []
+    }
     console.log('页面数据改动', val)
   },
   { immediate: true, deep: true }
@@ -369,8 +372,8 @@ watch(
         <view class="w-50% flex items-center">
           <view>本箱数</view>
           <view class="ml-20px text-18px mt-2px">{{
-            reactiveData.detailsList[reactiveData.barcodeIndex]?.barCodeList[
-              reactiveData.detailsList[reactiveData.barcodeIndex].barCodeList.length - 1
+            reactiveData.detailsList[reactiveData.barcodeIndex]?.barcodeList[
+              reactiveData.detailsList[reactiveData.barcodeIndex].barcodeList.length - 1
             ]?.F_UNITQTY
           }}</view>
         </view>
@@ -386,13 +389,13 @@ watch(
         v-if="reactiveData.detailsList[reactiveData.barcodeIndex]?.IsSplit"
       >
         <view class="text-center">{{
-          reactiveData.detailsList[reactiveData.barcodeIndex]?.barCodeList[
-            reactiveData.detailsList[reactiveData.barcodeIndex].barCodeList.length - 1
+          reactiveData.detailsList[reactiveData.barcodeIndex]?.barcodeList[
+            reactiveData.detailsList[reactiveData.barcodeIndex].barcodeList.length - 1
           ].F_FZNO
         }}</view>
         <view class="ml-8px text-center">{{
-          reactiveData.detailsList[reactiveData.barcodeIndex]?.barCodeList[
-            reactiveData.detailsList[reactiveData.barcodeIndex].barCodeList.length - 1
+          reactiveData.detailsList[reactiveData.barcodeIndex]?.barcodeList[
+            reactiveData.detailsList[reactiveData.barcodeIndex].barcodeList.length - 1
           ].F_BJNAME
         }}</view>
       </view>
@@ -453,7 +456,7 @@ watch(
 
             <view class="w-50% flex items-center h-20px">
               <view class="w-50px text-end">件数：</view>
-              <view> {{ item.barCodeList.length }}</view>
+              <view> {{ item.barcodeList.length }}</view>
             </view>
           </view>
         </view>
@@ -467,7 +470,7 @@ watch(
       <view class="w-15% text-center">数量</view>
     </view>
     <view
-      v-for="(item, index) of reactiveData.detailsList[reactiveData.barcodeIndex]?.barCodeList ||
+      v-for="(item, index) of reactiveData.detailsList[reactiveData.barcodeIndex]?.barcodeList ||
       []"
       :key="item.FNUMBER"
       @longpress="longpressDetailsClick(item, index)"

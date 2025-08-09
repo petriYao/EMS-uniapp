@@ -2,9 +2,8 @@
 import { reactive } from 'vue'
 import HeadScan from './src/HeadScan.vue'
 import LowerCamelCase from './src/LowerCamelCase.vue'
-import { pushClient } from '@/api/modules/transferOrder'
+import { saveOtherInbound } from '@/api/modules/transferOrder'
 import { TMUpdate } from '@/api/commonHttp'
-import { SubmitClient, AuditApiClient } from '@/api/modules/user'
 import { TMStatusQuery } from '@/api/commonHttp'
 
 const reactiveData = reactive({
@@ -25,10 +24,18 @@ const saveClick = async () => {
     })
     return
   }
+  //
+  if (!reactiveData.setData.warehouseNumber) {
+    uni.showToast({
+      title: '仓库不可为空',
+      icon: 'none'
+    })
+    return
+  }
   //判断条码入库状态
   let barcodeList = []
   for (const item of reactiveData.detailsList) {
-    barcodeList = item.barCodeList.map((item: any) => {
+    barcodeList = item.barcodeList.map((item: any) => {
       return item.F_BARCODENO
     })
   }
@@ -38,6 +45,7 @@ const saveClick = async () => {
     status: '1'
   })
   console.log('tmStatusRes', tmStatusRes)
+
   if (tmStatusRes && tmStatusRes.data && tmStatusRes.data.length > 0) {
     //条码状态不为1的提示
     uni.showToast({
@@ -45,44 +53,72 @@ const saveClick = async () => {
       icon: 'none',
       duration: 5000
     })
-    reactiveData.loading = false
+    reactiveData.loading = true
     return
   }
 
-  reactiveData.detailsList.map(async (item: any, index: number) => {
+  let isValid = true
+  for (let i = 0; i < reactiveData.detailsList.length; i++) {
+    const item = reactiveData.detailsList[i]
     console.log('item', item.isInteger, item)
-    if (!item.isInteger && item.barCodeList.length > 0) {
-      //条码不是整数的提示
+    if (!item.isInteger && item.barcodeList.length > 0) {
+      // 条码不是整数的提示
       uni.showToast({
-        title: `第${index + 1}行不配套`,
+        title: `第${i + 1}行不配套`,
         icon: 'none'
       })
-      return
+      isValid = false
+      break
     }
-  })
+  }
+
+  if (!isValid) {
+    return // 阻止后续代码的执行
+  }
 
   /**************************开始保存*************************/
   reactiveData.loading = false
-  const CustomParams = {
-    FEntry: [] as any,
-    Numbers: [] as any
+  const Model = {
+    FDEPTID: {
+      //部门
+      FNumber: reactiveData.detailsList[0].ProductionDepartment
+    },
+    FEntity: [] as any
   }
+  const FStockLocPJ = 'FSTOCKLOCID__' + reactiveData.setData.FlexNumber
+
   for (const item of reactiveData.detailsList) {
-    CustomParams.Numbers.push(item.SourceOrderLineId)
-    CustomParams.FEntry.push({
-      FENTRYID: item.SourceOrderLineId, //源单行ID
-      FStockID: reactiveData.setData.warehouseId, //库存ID
-      FStockLocID: item.FStockLocId, //仓位ID
-      FRealQty: item.Quantity2, //实际数量
-      lot: item.detailList.lot, //批号
-      F_QADV_WGTMSubEntity: item.barCodeList //条码列表
+    const FStockLocId = {} as any
+    FStockLocId[FStockLocPJ] = {
+      FNumber: item.locationNumber
+    }
+
+    Model.FEntity.push({
+      FMATERIALID: {
+        //物料编码
+        FNumber: item.MaterialCode
+      },
+      FSTOCKID: {
+        // 仓库
+        FNumber: reactiveData.setData.warehouseNumber
+      },
+      FStockLocId: FStockLocId,
+      FLOT: {
+        //批号
+        FNumber: item.Lot
+      },
+      FQty: item.Quantity2, //实际数量
+      F_QADV_HTNO: item.ContractNumber, //合同号
+      F_QADV_KH: {
+        //客户
+        FNUMBER: item.Customer
+      },
+      F_QADV_QTTMSubEntity: item.barcodeList //条码列表
     })
   }
-  //保存
-  CustomParams.Numbers = Array.from(new Set(CustomParams.Numbers))
-  let EntryIds = CustomParams.Numbers.map((item: any) => item).join(',')
-  console.log('CustomParams', JSON.stringify(CustomParams.FEntry))
-  const res = await pushClient(EntryIds, CustomParams.FEntry)
+  //保存其他入库单
+
+  const res = await saveOtherInbound(Model)
   console.log('保存结果', res)
   if (res && res.data.Result.ResponseStatus.ErrorCode === 500) {
     uni.showToast({
@@ -95,26 +131,14 @@ const saveClick = async () => {
   }
   if (res && res.data) {
     let numbers = res.data.Result.ResponseStatus.SuccessEntitys[0].Number
-    //提交审核
-    await SubmitClient('STK_InStock', numbers)
-    const res2: any = await AuditApiClient('STK_InStock', numbers)
-    if (res2 && res2.data.Result.ResponseStatus.ErrorCode === 500) {
-      uni.showToast({
-        icon: 'none',
-        title: res2.data.Result.ResponseStatus.Errors[0].Message,
-        duration: 5000
-      })
-      reactiveData.loading = true
-      return
-    }
     for (const item of reactiveData.detailsList) {
-      const tmList = item.barCodeList.map((item: any) => item.F_BARCODENO)
+      const tmList = item.barcodeList.map((item: any) => item.F_BARCODENO)
       TMUpdate({
         barcodes: tmList,
         warehouse: reactiveData.setData.warehouseId,
         location: item.FStockLocId,
         documentNumber: numbers,
-        documentType: '采购入库单',
+        documentType: '其他入库单',
         status: '2'
       })
     }
@@ -126,6 +150,7 @@ const saveClick = async () => {
       title: '保存成功',
       duration: 5000
     })
+    reactiveData.loading = true
   }
   reactiveData.loading = true
 }
@@ -147,7 +172,7 @@ defineExpose({
     />
   </view>
   <!-- 内容 -->
-  <view class="bg-#FFF" v-if="reactiveData.loading">
+  <view class="bg-#FFF pt-6rpx" v-if="reactiveData.loading">
     <LowerCamelCase
       v-model:detailsList="reactiveData.detailsList"
       v-model:locationList="reactiveData.locationList"

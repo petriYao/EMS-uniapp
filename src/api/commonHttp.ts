@@ -91,6 +91,31 @@ export function EditCKTM(parameters: any) {
   })
 }
 
+//退料
+export function CYCKQuery(parameters: any) {
+  const data = {
+    parameters: [parameters]
+  }
+  return http({
+    url: '/k3cloud/Kingdee.BOS.TM.WebApi.ReturnMaterialWebApiService.PurchaseReturn,Kingdee.BOS.TM.WebApi.common.kdsvc',
+    method: 'POST',
+    requestTime: 5000, //等待5秒
+    data: data
+  })
+}
+
+//其他出库
+export function OtherOutbound(parameters: any) {
+  const data = {
+    parameters: [parameters]
+  }
+  return http({
+    url: '/k3cloud/Kingdee.BOS.TM.WebApi.ReturnMaterialWebApiService.OtherReturn,Kingdee.BOS.TM.WebApi.common.kdsvc',
+    method: 'POST',
+    requestTime: 5000, //等待5秒
+    data: data
+  })
+}
 //登录接口
 export function login(data: any) {
   return http({

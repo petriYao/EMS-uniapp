@@ -1,0 +1,34 @@
+import { pushApi, saveApi, executeBillQueryApi, viewApi } from '@/api/commonHttp'
+
+//查看生产领料单
+export function lookPickMtrl(Number: any) {
+  const data = {
+    FormId: `PRD_PickMtrl`,
+    data: {
+      CreateOrgId: 0,
+      Number: Number,
+      Id: '',
+      IsSortBySeq: 'false'
+    }
+  }
+  return viewApi(data) as any
+}
+
+//生产领料单单据查询
+export function transferOrder(FilterString: string) {
+  const data = {
+    parameters: [
+      {
+        FormId: `PRD_PickMtrl`,
+        FieldKeys: 'FID,FPOOrderEntry_FEntryID',
+        FilterString: FilterString,
+        OrderString: '',
+        TopRowCount: 0,
+        StartRow: 0,
+        Limit: 2000,
+        SubSystemId: ''
+      }
+    ]
+  }
+  return executeBillQueryApi(data)
+}

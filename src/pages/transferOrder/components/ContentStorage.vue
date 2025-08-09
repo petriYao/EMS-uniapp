@@ -25,7 +25,7 @@ const saveClick = async () => {
   //判断条码入库状态
   let barcodeList = []
   for (const item of reactiveData.detailsList) {
-    barcodeList = item.barCodeList.map((item: any) => {
+    barcodeList = item.barcodeList.map((item: any) => {
       return item.F_BARCODENO
     })
   }
@@ -162,7 +162,7 @@ const saveClick = async () => {
         // 计价单位
         FNumber: 'Pcs'
       },
-      F_QADV_TBTMSubEntity: item.barCodeList, // 条码
+      F_QADV_TBTMSubEntity: item.barcodeList, // 条码
       FPriceQty: item.Quantity2, // 计价数量
       FPriceBaseQty: item.Quantity2, // 计价基本数量
       FOutJoinQty: 0.0, // 出库关联数量
@@ -197,7 +197,7 @@ const saveClick = async () => {
   }
   if (res && res.data) {
     for (const item of reactiveData.detailsList) {
-      const tmList = item.barCodeList.map((item: any) => item.F_BARCODENO)
+      const tmList = item.barcodeList.map((item: any) => item.F_BARCODENO)
       TMUpdate({
         barcodes: tmList,
         warehouse: reactiveData.setData.warehouseId,

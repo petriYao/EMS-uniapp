@@ -229,7 +229,7 @@ export const transferScanBarcode = async (searchValue: any, setData: any, locati
           style: { width: '100%' }
         }
       ],
-      barCodeList: [
+      barcodeList: [
         {
           F_BARCODENO: barCodeData.Number,
           F_UNITQTY: barCodeData.F_UNITQTY, //每箱数量

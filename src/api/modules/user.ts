@@ -14,7 +14,9 @@ import {
 
 //获取FId
 export function getAuxiliary(fidValue: string, FParentId?: string) {
-  const Filter = FParentId ? `FParentId = '${FParentId}' AND FId = '${fidValue}'` : `FId = '${fidValue}'`
+  const Filter = FParentId
+    ? `FParentId = '${FParentId}' AND FId = '${fidValue}'`
+    : `FId = '${fidValue}'`
   const data = {
     parameters: [
       {
@@ -40,17 +42,7 @@ export function SaveClient(formid: string, Model: any) {
     data: {
       NeedUpDateFields: [],
       NeedReturnFields: [],
-      IsDeleteEntry: 'true',
-      SubSystemId: '',
-      IsVerifyBaseDataField: 'false',
-      IsEntryBatchFill: false,
-      ValidateFlag: 'true',
-      NumberSearch: 'true',
-      IsAutoAdjustField: 'false',
-      InterationFlags: '',
-      IgnoreInterationFlag: '',
-      IsControlPrecision: 'false',
-      ValidateRepeatJson: 'false',
+      IsDeleteEntry: 'false',
       Model: Model
     }
   }
@@ -174,15 +166,13 @@ export function setFileList(filedata: AttachmentUpLoadType) {
 //删除附件
 export function deleteFileList(FileId: string) {
   const data = {
-    "parameters": [
-      FileId
-    ]
+    parameters: [FileId]
   }
   return attachmentDeleteApi(data)
 }
 
 //汇率
-export function getexchange(filterstring = "FCyForID = 7 AND FCyToID = 1") {
+export function getexchange(filterstring = 'FCyForID = 7 AND FCyToID = 1') {
   const data = {
     parameters: [
       {
@@ -249,15 +239,15 @@ export function getAttachmentList(FieldKeys: string, FilterString: any) {
   return executeBillQueryApi(data)
 }
 
-//辅助资料 `FID in (${Filter})` 'FNumber,FDataValue,FMASTERID' 
-export function getAuxiliaryMaterials(FieldKeys:string,Filter?: string) {
-  console.log('辅助资料',Filter)
+//辅助资料 `FID in (${Filter})` 'FNumber,FDataValue,FMASTERID'
+export function getAuxiliaryMaterials(FieldKeys: string, Filter?: string) {
+  console.log('辅助资料', Filter)
   const data = {
     parameters: [
       {
         FormId: `BOS_ASSISTANTDATA_DETAIL`,
-        FieldKeys:FieldKeys,
-        FilterString:  Filter,
+        FieldKeys: FieldKeys,
+        FilterString: Filter,
         OrderString: '',
         TopRowCount: 0,
         StartRow: 0,

@@ -15,7 +15,7 @@ const props = defineProps({
 //数据
 const reactiveData = reactive({
   searchValue: '', //搜索值
-  focus: 1,
+  focus: 99,
   heardList: {
     documentNumber: '', //单号
     warehouse: '', //仓库
@@ -100,24 +100,37 @@ const searchChange = () => {
 
         reactiveData.setData.warehouseNumber = queryRes.dataList[0].WarehouseNumber
         reactiveData.setData.warehouseId = queryRes.dataList[0].WarehouseId
+        reactiveData.setData.FlexNumber = queryRes.dataList[0].FlexNumber
         getWarehousePosition(reactiveData.setData.warehouseNumber)
         emit('update:setData', reactiveData.setData)
+        emit('update:detailsList', reactiveData.detailsList)
       }
     } else {
       //调用条码（单据查询）
       const queryRes: any = await camelCaseProduction(reactiveData.searchValue)
-      console.log('查询结果1', queryRes, props.barcodeIndex)
-
+      if (!queryRes) {
+        reactiveData.searchValue = ''
+        focusTm()
+      }
+      console.log('是否第一次', reactiveData.detailsList[props.barcodeIndex].isLowerCamelCase)
+      console.log('查询结果', reactiveData.detailsList[props.barcodeIndex], queryRes)
       if (
         reactiveData.detailsList[props.barcodeIndex].MaterialCode === queryRes.MaterialCode &&
         reactiveData.detailsList[props.barcodeIndex].Lot === queryRes.Lot
       ) {
-        reactiveData.detailsList[props.barcodeIndex].Quantity += queryRes.Quantity
-        reactiveData.detailsList[props.barcodeIndex].Quantity2 += queryRes.Quantity
+        if (reactiveData.detailsList[props.barcodeIndex].isLowerCamelCase) {
+          reactiveData.detailsList[props.barcodeIndex].Quantity2 += queryRes.Quantity * 1
+          reactiveData.detailsList[props.barcodeIndex].currentList[13].value =
+            reactiveData.detailsList[props.barcodeIndex].Quantity2
+        } else {
+          reactiveData.detailsList[props.barcodeIndex].Quantity2 = queryRes.Quantity * 1
+          reactiveData.detailsList[props.barcodeIndex].currentList[13].value = queryRes.Quantity * 1
+          reactiveData.detailsList[props.barcodeIndex].isLowerCamelCase = true
+        }
       } else {
         //提示
         uni.showToast({
-          title: '条码与当前编码不符',
+          title: '条码与编码或者批号不符',
           icon: 'none'
         })
       }
@@ -191,7 +204,7 @@ const getWarehousePosition = async (warehouseId: any) => {
       } else {
         reactiveData.setData.locationDisplay = false
         setTimeout(() => {
-          reactiveData.focus = 2
+          reactiveData.focus = 99
         }, 200)
       }
       handleFocus()
@@ -255,7 +268,7 @@ const locationChange = debounceSave((val: any) => {
     //重新回到光标位置
     reactiveData.focus = 0
     setTimeout(() => {
-      reactiveData.focus = 2
+      reactiveData.focus = 99
     }, 200)
     return
   }

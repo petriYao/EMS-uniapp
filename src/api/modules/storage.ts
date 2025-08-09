@@ -163,6 +163,24 @@ export function lowerCamelCase2(FilterString: string, FieldKeys: string) {
   return executeBillQueryApi(data)
 }
 
+//储位单据查询接口
+export function lowerCamelCase3(FilterString: string, FieldKeys: string) {
+  const data = {
+    parameters: [
+      {
+        FormId: `QADV_CWB`,
+        FieldKeys: FieldKeys,
+        FilterString: FilterString,
+        OrderString: '',
+        TopRowCount: 0,
+        StartRow: 0,
+        Limit: 2000,
+        SubSystemId: ''
+      }
+    ]
+  }
+  return executeBillQueryApi(data)
+}
 //生产入库单保存
 export function saveProductionOrder(FEntity: any, FID: any, SCCJ: string) {
   console.log('生产入库单保存')

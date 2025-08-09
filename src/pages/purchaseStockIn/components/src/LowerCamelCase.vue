@@ -25,8 +25,8 @@ const reactiveData = reactive({
   detailsList: [] as any,
   subsectionList: ['当前', '明细', '条码'],
   locationList: [] as any,
-  curNow: 0,
-  barCodeList: [] as any, //条码
+  curNow: 1,
+  barcodeList: [] as any, //条码
   barcodeIndex: 0
 })
 
@@ -91,7 +91,7 @@ const longpressDetailsClick = (item: any, index: number) => {
     content: '是否删除当前条码明细',
     success: (res) => {
       if (res.confirm) {
-        reactiveData.detailsList[reactiveData.barcodeIndex].barCodeList.splice(index, 1)
+        reactiveData.detailsList[reactiveData.barcodeIndex].barcodeList.splice(index, 1)
         //删除当前明细
         if (reactiveData.detailsList[reactiveData.barcodeIndex].IsSplit) {
           //分装情况下
@@ -184,7 +184,7 @@ const longpressDetailsClick = (item: any, index: number) => {
           reactiveData.detailsList[reactiveData.barcodeIndex].Quantity-- //件数
           reactiveData.detailsList[reactiveData.barcodeIndex].Quantity2 -= item.F_UNITQTY //数量
         }
-        if (reactiveData.detailsList[reactiveData.barcodeIndex].barCodeList.length === 0) {
+        if (reactiveData.detailsList[reactiveData.barcodeIndex].barcodeList.length === 0) {
           //删除明细
           reactiveData.detailsList.splice(reactiveData.barcodeIndex, 1)
           reactiveData.barcodeIndex--
@@ -373,8 +373,8 @@ watch(
         <view class="w-50% flex items-center">
           <view>本箱数</view>
           <view class="ml-20px text-18px mt-2px">{{
-            reactiveData.detailsList[reactiveData.barcodeIndex]?.barCodeList[
-              reactiveData.detailsList[reactiveData.barcodeIndex].barCodeList.length - 1
+            reactiveData.detailsList[reactiveData.barcodeIndex]?.barcodeList[
+              reactiveData.detailsList[reactiveData.barcodeIndex].barcodeList.length - 1
             ]?.F_UNITQTY
           }}</view>
         </view>
@@ -390,13 +390,13 @@ watch(
         v-if="reactiveData.detailsList[reactiveData.barcodeIndex]?.IsSplit"
       >
         <view class="text-center">{{
-          reactiveData.detailsList[reactiveData.barcodeIndex]?.barCodeList[
-            reactiveData.detailsList[reactiveData.barcodeIndex].barCodeList.length - 1
+          reactiveData.detailsList[reactiveData.barcodeIndex]?.barcodeList[
+            reactiveData.detailsList[reactiveData.barcodeIndex].barcodeList.length - 1
           ].F_FZNO
         }}</view>
         <view class="ml-8px text-center">{{
-          reactiveData.detailsList[reactiveData.barcodeIndex]?.barCodeList[
-            reactiveData.detailsList[reactiveData.barcodeIndex].barCodeList.length - 1
+          reactiveData.detailsList[reactiveData.barcodeIndex]?.barcodeList[
+            reactiveData.detailsList[reactiveData.barcodeIndex].barcodeList.length - 1
           ].F_BJNAME
         }}</view>
       </view>
@@ -457,7 +457,7 @@ watch(
 
             <view class="w-50% flex items-center h-20px">
               <view class="w-50px text-end">件数：</view>
-              <view> {{ item.barCodeList.length }}</view>
+              <view> {{ item.barcodeList.length }}</view>
             </view>
           </view>
         </view>
@@ -471,7 +471,7 @@ watch(
       <view class="w-15% text-center">数量</view>
     </view>
     <view
-      v-for="(item, index) of reactiveData.detailsList[reactiveData.barcodeIndex]?.barCodeList ||
+      v-for="(item, index) of reactiveData.detailsList[reactiveData.barcodeIndex]?.barcodeList ||
       []"
       :key="item.FNUMBER"
       @longpress="longpressDetailsClick(item, index)"
