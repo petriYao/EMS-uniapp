@@ -95,7 +95,7 @@ const saveClick = async () => {
   if (barCodeRes && barCodeRes.data && barCodeRes.data.length > 0) {
     //条码状态不为1的提示
     uni.showToast({
-      title: `编码${barCodeRes.data[0][1]}中，条码${barCodeRes.data[0][0]}不为出库状态`,
+      title: `编码${barCodeRes.data[0][1]}中，条码${barCodeRes.data[0][0]}非审核、出库、非作废状态`,
       icon: 'none',
       duration: 5000
     })

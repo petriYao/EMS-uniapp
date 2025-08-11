@@ -159,6 +159,7 @@ const handleExistingDetails = (queryRes: any) => {
     addNewBarcodeDetail(queryRes)
   } else {
     handleUpdateBarcodeDetail(index, queryRes)
+    emitter.emit('update:datailsIndex', index)
   }
 }
 

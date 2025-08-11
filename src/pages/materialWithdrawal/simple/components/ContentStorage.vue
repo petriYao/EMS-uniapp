@@ -34,10 +34,13 @@ const saveClick = async () => {
   }
   //判断条码入库状态
   let barcodeList = []
+  // for (const item of reactiveData.detailsList) {
+  //   barcodeList = item.barcodeList.map((item: any) => {
+  //     return item.F_BARCODENO
+  //   })
+  // }
   for (const item of reactiveData.detailsList) {
-    barcodeList = item.barcodeList.map((item: any) => {
-      return item.F_BARCODENO
-    })
+    barcodeList.push(...item.barcodeList.map((item: any) => item.F_BARCODENO))
   }
   console.log('条码值', barcodeList)
   const tmStatusRes: any = await TMStatusQuery({
@@ -48,7 +51,7 @@ const saveClick = async () => {
   if (tmStatusRes && tmStatusRes.data && tmStatusRes.data.length > 0) {
     //条码状态不为1的提示
     uni.showToast({
-      title: `编码${tmStatusRes.data[0]['material_fnumber']}中，条码${tmStatusRes.data[0]['FNUMBER']}不为创建状态`,
+      title: `编码${tmStatusRes.data[0]['material_fnumber']}中，条码${tmStatusRes.data[0]['FNUMBER']}非审核、创建、非作废状态`,
       icon: 'none',
       duration: 5000
     })

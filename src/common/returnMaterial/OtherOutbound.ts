@@ -366,3 +366,15 @@ export function savePurchaseReturn(Model: any, IsAutoSubmitAndAudit = true) {
   }
   return saveApi(data) as any
 }
+//生产领料单保存
+export function saveMaterialRequisition(Model: any, IsAutoSubmitAndAudit = true) {
+  const data = {
+    formid: 'PRD_PickMtrl',
+    data: {
+      IsDeleteEntry: 'true',
+      IsAutoSubmitAndAudit: IsAutoSubmitAndAudit,
+      Model: Model
+    }
+  }
+  return saveApi(data) as any
+}

@@ -128,6 +128,10 @@ export const purchaseScanBarcode = async (searchValue: any, setData: any) => {
       SourceOrderNo2: barCodeData.F_YVRT_XQDJ,
       //需求行号
       SourceOrderLineNo2: barCodeData.F_YVRT_YDSeq,
+      //合同号
+      ContractNo: barCodeData.F_HTNO,
+      //合同行号
+      ContractLineNo: barCodeData.F_QADV_HTENTRYID,
       //批号
       Lot: barCodeData.F_WLLOT === ' ' ? '' : barCodeData.F_WLLOT,
       //名称

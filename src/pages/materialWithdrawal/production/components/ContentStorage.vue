@@ -3,9 +3,9 @@ import { reactive } from 'vue'
 import HeadScan from '../../components/src/HeadScan.vue'
 import LowerCamelCase from '../../components/src/LowerCamelCase.vue'
 // import { pushClient } from '@/api/modules/transferOrder'
-import { EditCKTM, OtherOutbound } from '@/api/commonHttp'
+import { EditCKTM, MaterialRequisition } from '@/api/commonHttp'
 import { TMStatusQuery } from '@/api/commonHttp'
-import { queryPurchaseReturn, savePurchaseReturn } from '@/common/returnMaterial/OtherOutbound'
+import { queryPurchaseReturn, saveMaterialRequisition } from '@/common/returnMaterial/OtherOutbound'
 
 const reactiveData = reactive({
   detailsList: [] as any,
@@ -54,7 +54,7 @@ const saveClick = async () => {
   if (tmStatusRes && tmStatusRes.data && tmStatusRes.data.length > 0) {
     //条码状态不为1的提示
     uni.showToast({
-      title: `编码${tmStatusRes.data[0]['material_fnumber']}中，条码${tmStatusRes.data[0]['FNUMBER']}不为入库状态`,
+      title: `编码${tmStatusRes.data[0]['material_fnumber']}中，条码${tmStatusRes.data[0]['FNUMBER']}非审核、入库、非作废状态`,
       icon: 'none',
       duration: 5000
     })
@@ -88,7 +88,7 @@ const saveClick = async () => {
   if (!isValid) {
     return // 阻止后续代码的执行
   }
-  const pushResYz = await savePurchaseReturn({ FID: reactiveData.fid }, false)
+  const pushResYz = await saveMaterialRequisition({ FID: reactiveData.fid }, false)
   console.log('pushResYz', pushResYz)
   if (pushResYz && pushResYz.data.Result.ResponseStatus.ErrorCode === 500) {
     uni.showToast({
@@ -101,7 +101,7 @@ const saveClick = async () => {
   console.log('detailsList', JSON.stringify(detailsList))
   /**库存检查***************************************************************** */
 
-  const resQues: any = await OtherOutbound({
+  const resQues: any = await MaterialRequisition({
     fid: reactiveData.fid,
     detailsList: detailsList
   })
@@ -129,7 +129,7 @@ const saveClick = async () => {
       }
       console.log('Model', Model)
       //3.保存其他出库单
-      const pushResSaveData: any = await savePurchaseReturn(Model)
+      const pushResSaveData: any = await saveMaterialRequisition(Model)
       console.log('pushResSaveData', pushResSaveData)
 
       EditCKTM({

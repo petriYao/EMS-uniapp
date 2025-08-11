@@ -116,6 +116,19 @@ export function OtherOutbound(parameters: any) {
     data: data
   })
 }
+
+//生产领料
+export function MaterialRequisition(parameters: any) {
+  const data = {
+    parameters: [parameters]
+  }
+  return http({
+    url: '/k3cloud/Kingdee.BOS.TM.WebApi.MaterialRequisitionWebApiService.MaterialRequisition,Kingdee.BOS.TM.WebApi.common.kdsvc',
+    method: 'POST',
+    requestTime: 5000, //等待5秒
+    data: data
+  })
+}
 //登录接口
 export function login(data: any) {
   return http({

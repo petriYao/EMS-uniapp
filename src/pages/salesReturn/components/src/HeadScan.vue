@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, onBeforeUnmount, watch } from 'vue'
+import { ref, reactive, onBeforeUnmount, watch, onBeforeMount } from 'vue'
 import { queryStorage, lookqueryStorage } from '@/api/modules/storage'
 import { purchaseScanBarcode, getcamelCase } from '@/common/purchaseStockIn/SalesReturn'
 import { debounceSave } from '@/utils'
@@ -143,10 +143,11 @@ const handleScanBarcode = async () => {
 // 查找物料索引
 const findMaterialIndex = (queryRes: any) =>
   detailsList.value.findIndex((item: any) => {
+    console.log('item', item, queryRes)
     return (
       item.MaterialCode === queryRes.MaterialCode && // 编码
-      item.SourceOrderNo === queryRes.SourceOrderNo && // 来源单号
-      item.SourceOrderLineNo === queryRes.SourceOrderLineNo && // 来源单行号
+      item.SourceOrderNo === queryRes.ContractNo && // 来源单号
+      item.SourceOrderLineNo === queryRes.ContractLineNo && // 来源单行号
       item.Lot === queryRes.Lot && // 批次
       item.Customer === queryRes.Customer // 客户
     )
@@ -322,9 +323,9 @@ const getWarehousePosition = async (warehouseId: string) => {
       }))
       setData.value.locationDisplay = locationData.locationList.length === 0
       if (!setData.value.locationDisplay) {
-        setTimeout(() => {
-          focus.value = 2
-        }, 200)
+        // setTimeout(() => {
+        //   focus.value = 2
+        // }, 200)
       }
       handleFocus()
       emit('update:locationList', locationData.locationList)
@@ -394,7 +395,10 @@ onBeforeUnmount(() => {
   clearTimer()
 })
 
-getWarehouseList()
+onBeforeMount(() => {
+  getWarehouseList()
+  handleFocus()
+})
 </script>
 
 <template>
@@ -417,7 +421,6 @@ getWarehouseList()
         />
       </view>
     </view>
-
     <!-- 单号 -->
     <view class="flex items-center py-4rpx w-100%">
       <view class="w-50px flex justify-center">单号</view>
