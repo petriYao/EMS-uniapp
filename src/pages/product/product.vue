@@ -1,6 +1,3 @@
 <template>
-  <div>
-    测试点击
-  </div>
+  <div> 测试点击 </div>
 </template>
-

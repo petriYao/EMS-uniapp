@@ -4,7 +4,7 @@
     :change:ban="focusNoKeyboard.watchBan"
     :focus="focusSelector"
     :change:focus="focusNoKeyboard.watchFocus"
-  ></text>
+  />
 </template>
 
 <script>

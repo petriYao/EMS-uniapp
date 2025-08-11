@@ -126,17 +126,43 @@ const handleScanBarcode = async () => {
   const queryRes: any = await purchaseScanBarcode(searchValue.value, setData.value)
   if (!queryRes) return resetFocus()
 
-  const index = findMaterialIndex(queryRes)
-  console.log('index', index)
-  if (index !== -1) {
+  // 改为查找全部匹配的明细项，支持同 MaterialCode+Lot 多行
+  const matchingDetails = findMatchingDetails(queryRes)
+  if (!matchingDetails.length) {
+    uni.showToast({ title: '条码与明细不符', icon: 'none' })
+    return resetFocus()
+  }
+
+  let matched = false
+  for (const detail of matchingDetails) {
+    const index = detailsList.value.indexOf(detail)
+
     if (isBarcodeScanned(detailsList.value[index], queryRes.BarCode)) {
       uni.showToast({ title: '请勿重复扫描', icon: 'none' })
-      return resetFocus()
+      continue
     }
+
+    // 分装与非分装分别进行可接收性判断
+    if (detailsList.value[index].IsSplit) {
+      if (!canAcceptForDetail(detailsList.value[index], queryRes)) {
+        // 本行接收会超额，尝试下一行
+        continue
+      }
+    } else {
+      const newQty = detailsList.value[index].Quantity2 + queryRes.Quantity2
+      if (newQty > detailsList.value[index].receivableQuantity) {
+        continue
+      }
+    }
+
+    // 通过可接收性校验后，再真正更新数据
     handleBarcodeAddition(index, queryRes)
-  } else {
-    //handleNewItemAddition(queryRes)
-    uni.showToast({ title: '条码与明细不符', icon: 'none' })
+    matched = true
+    break
+  }
+
+  if (!matched) {
+    uni.showToast({ title: '实收数量大于可收数量', icon: 'none' })
   }
 }
 
@@ -156,6 +182,91 @@ const findMaterialIndex = (queryRes: any) =>
 // 判断是否已扫描
 const isBarcodeScanned = (item: any, barcode: string) =>
   item.barcodeList.some((b: any) => b.F_BARCODENO === barcode)
+
+// 新增：查找全部匹配的行
+const findMatchingDetails = (queryRes: any): any[] => {
+  return detailsList.value.filter((item: any) => {
+    return (
+      item.MaterialCode === queryRes.MaterialCode &&
+      item.SourceOrderNo === queryRes.ContractNo &&
+      item.SourceOrderLineNo === queryRes.ContractLineNo &&
+      item.Lot === queryRes.Lot &&
+      item.Customer === queryRes.Customer
+    )
+  })
+}
+
+// 新增：分装模拟校验
+const canAcceptForDetail = (detail: any, queryRes: any): boolean => {
+  if (!detail.IsSplit) {
+    const newQty = detail.Quantity2 + queryRes.Quantity2
+    return newQty <= detail.receivableQuantity
+  }
+
+  // 若当前行已达上限，则直接不再接收任何分装条码
+  let currentTotal = 0
+  const lotList: string[] = Array.isArray(detail.FZLOTList) ? detail.FZLOTList : []
+  lotList.forEach((lot) => {
+    currentTotal += detail.packagingDataFZLOT?.[lot]?.FZquantity || 0
+  })
+  if (currentTotal >= detail.receivableQuantity) return false
+
+  const fzlot = queryRes.FZLOTList?.[0]
+  const splitCode = queryRes.SplitCode
+  const splitValue = queryRes.SplitValue
+  const unitQty = queryRes.UnitQty
+
+  const simulatedPackagingByLot: Record<string, any> = JSON.parse(
+    JSON.stringify(detail.packagingDataFZLOT || {})
+  )
+  const simulatedFZLOTList: string[] = Array.isArray(detail.FZLOTList)
+    ? [...detail.FZLOTList]
+    : []
+
+  if (!simulatedFZLOTList.includes(fzlot)) {
+    simulatedFZLOTList.push(fzlot)
+    simulatedPackagingByLot[fzlot] = simulatedPackagingByLot[fzlot] || {
+      packagingData: {},
+      packagingSig: [],
+      isInteger: false,
+      FZquantity: 0
+    }
+  }
+
+  if (!simulatedPackagingByLot[fzlot].packagingData[splitCode]) {
+    simulatedPackagingByLot[fzlot].packagingData[splitCode] = {
+      quantity: 0,
+      unitQty: unitQty,
+      finishedQty: 0
+    }
+  }
+
+  const simCell = simulatedPackagingByLot[fzlot].packagingData[splitCode]
+  simCell.quantity += splitValue
+  simCell.unitQty = unitQty
+  simCell.finishedQty = simCell.quantity / simCell.unitQty
+
+  const packagingSig: string[] = simulatedPackagingByLot[fzlot].packagingSig || []
+  let minNonZero = Infinity
+  for (const key of packagingSig) {
+    const qty = Number(simulatedPackagingByLot[fzlot].packagingData[key]?.finishedQty || 0)
+    if (qty === 0) {
+      minNonZero = 0
+      break
+    }
+    if (qty > 0 && qty < minNonZero) minNonZero = qty
+  }
+  const productsQuantity = minNonZero === Infinity ? 0 : minNonZero
+  const simFZquantity = Math.floor(productsQuantity)
+
+  let simulatedQuantity2 = 0
+  simulatedFZLOTList.forEach((lot) => {
+    if (lot === fzlot) simulatedQuantity2 += simFZquantity
+    else simulatedQuantity2 += detail.packagingDataFZLOT?.[lot]?.FZquantity || 0
+  })
+
+  return simulatedQuantity2 <= detail.receivableQuantity
+}
 
 // 新增条码
 const handleBarcodeAddition = (index: number, queryRes: any) => {

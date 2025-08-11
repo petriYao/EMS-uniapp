@@ -89,6 +89,114 @@ const findMatchingDetails = (queryRes: any): any[] => {
   })
 }
 
+// 分装场景-模拟是否可接收（不落库，只计算）
+const canAcceptForDetail = (detail: any, queryRes: any): boolean => {
+  // 若当前行已达上限，则直接不再接收任何分装条码
+  if (detail.IsSplit) {
+    let currentTotal = 0
+    const lotList: string[] = Array.isArray(detail.FZLOTList) ? detail.FZLOTList : []
+    lotList.forEach((lot) => {
+      currentTotal += detail.packagingDataFZLOT?.[lot]?.FZquantity || 0
+    })
+    if (currentTotal >= detail.canReceive) return false
+  }
+
+  // 非分装直接按原逻辑判断
+  if (!detail.IsSplit) {
+    const newQty = detail.Quantity2 + queryRes.Quantity2
+    return newQty <= detail.canReceive
+  }
+
+  const fzlot = queryRes.FZLOTList?.[0]
+  const splitCode = queryRes.SplitCode
+  const splitValue = queryRes.SplitValue
+  const unitQty = queryRes.unitQty
+
+  // 行剩余可接收的成品套数
+  const lotListNow: string[] = Array.isArray(detail.FZLOTList) ? detail.FZLOTList : []
+  const producedSoFar = lotListNow.reduce(
+    (sum, lot) => sum + (detail.packagingDataFZLOT?.[lot]?.FZquantity || 0),
+    0
+  )
+  const remainingKits = Math.max(0, detail.canReceive - producedSoFar)
+  const incomingKits = (splitValue || 0) / (unitQty || 1)
+
+  // 1) 快速拦截：单组件本次贡献超过剩余套数
+  if (incomingKits > remainingKits) return false
+
+  // 2) 快速拦截：同一组件(按 SplitCode)在全部 FZLOT 上累计的 finishedQty 不得超过 canReceive
+  let existingComponentKits = 0
+  lotListNow.forEach((lot) => {
+    const pack = detail.packagingDataFZLOT?.[lot]
+    if (pack?.packagingData?.[splitCode]) {
+      existingComponentKits += Number(pack.packagingData[splitCode].finishedQty || 0)
+    }
+  })
+  if (existingComponentKits + incomingKits > detail.canReceive) return false
+
+  // 基于当前行构建一个模拟的分装批次数据
+  const simulatedPackagingByLot: Record<string, any> = JSON.parse(
+    JSON.stringify(detail.packagingDataFZLOT || {})
+  )
+  const simulatedFZLOTList: string[] = Array.isArray(detail.FZLOTList) ? [...detail.FZLOTList] : []
+
+  // 如该 FZLOT 在当前明细中不存在，则以本次条码自带的结构为基础新增
+  if (!simulatedFZLOTList.includes(fzlot)) {
+    simulatedFZLOTList.push(fzlot)
+    simulatedPackagingByLot[fzlot] = JSON.parse(
+      JSON.stringify(
+        queryRes.packagingDataFZLOT?.[fzlot] || { packagingData: {}, packagingSig: [] }
+      )
+    )
+    if (!simulatedPackagingByLot[fzlot].packagingData)
+      simulatedPackagingByLot[fzlot].packagingData = {}
+    if (!simulatedPackagingByLot[fzlot].packagingSig)
+      simulatedPackagingByLot[fzlot].packagingSig = []
+  }
+
+  // 确保分装位存在
+  if (!simulatedPackagingByLot[fzlot].packagingData[splitCode]) {
+    simulatedPackagingByLot[fzlot].packagingData[splitCode] = {
+      quantity: 0,
+      unitQty: unitQty,
+      finishedQty: 0
+    }
+  }
+
+  // 模拟累加本次分装增量
+  const simCell = simulatedPackagingByLot[fzlot].packagingData[splitCode]
+  simCell.quantity += splitValue
+  simCell.unitQty = unitQty
+  simCell.finishedQty = simCell.quantity / simCell.unitQty
+
+  // 计算该 FZLOT 的成品数量（与 calculateProductsQuantity 逻辑一致）
+  const packagingSig: string[] = simulatedPackagingByLot[fzlot].packagingSig || []
+  // 若任何分装位为 0，则该 lot 的成套数为 0
+  let minNonZero = Infinity
+  for (const key of packagingSig) {
+    const qty = Number(simulatedPackagingByLot[fzlot].packagingData[key]?.finishedQty || 0)
+    if (qty === 0) {
+      minNonZero = 0
+      break
+    }
+    if (qty > 0 && qty < minNonZero) minNonZero = qty
+  }
+  const productsQuantity = minNonZero === Infinity ? 0 : minNonZero
+  const simFZquantity = Math.floor(productsQuantity)
+
+  // 按 reCompute 规则，汇总全部 FZLOT 的 FZquantity，但将当前 fzlot 替换为模拟值
+  let simulatedQuantity2 = 0
+  simulatedFZLOTList.forEach((lot) => {
+    if (lot === fzlot) {
+      simulatedQuantity2 += simFZquantity
+    } else {
+      simulatedQuantity2 += detail.packagingDataFZLOT?.[lot]?.FZquantity || 0
+    }
+  })
+
+  return simulatedQuantity2 <= detail.canReceive
+}
+
 // 条码扫描处理
 const handleBarcodeScan = async () => {
   let queryRes: any = {}
@@ -122,48 +230,21 @@ const handleBarcodeScan = async () => {
       continue
     }
 
-    const newQty = detail.Quantity2 + queryRes.Quantity2
-    if (newQty > detail.canReceive) {
-      continue
-    }
-
-    updateDetailItem(index, queryRes)
-
-    // 分装情况下，扫码后立即重新计算并判断是否超量
+    // 分装与非分装分别进行可接收性判断
     if (detail.IsSplit) {
-      const totalQty = reCompute(detail)
-      if (totalQty > detail.canReceive) {
-        showToast('累计实发超过对应发数量1')
-
-        // 删除最后一条条码并获取信息
-        const deletedBarcode = detail.barcodeList.splice(detail.barcodeList.length - 1, 1)[0]
-
-        console.log('删除的条码', deletedBarcode)
-        const fzlot = deletedBarcode.FZLOT
-        const splitCode = queryRes.SplitCode
-
-        // ✅ 重新计算受影响的 SplitCode 的 quantity 和 finishedQty
-        const packagingData = detail.packagingDataFZLOT[fzlot]?.packagingData
-        if (packagingData && packagingData[splitCode]) {
-          const newQuantity = detail.barcodeList
-            .filter((barcode: any) => barcode.FZLOT === fzlot && barcode.subPackageNo === splitCode)
-            .reduce((sum: number, barcode: any) => sum + barcode.quantity, 0)
-
-          packagingData[splitCode].quantity = newQuantity
-          packagingData[splitCode].finishedQty = newQuantity / packagingData[splitCode].unitQty
-        }
-
-        // ✅ 重新计算该分装批次的 FZquantity
-        const productsQuantity = calculateProductsQuantity(detail, fzlot)
-        detail.packagingDataFZLOT[fzlot].FZquantity = Math.floor(productsQuantity)
-
-        // ✅ 重新计算 isInteger
-        updatePackageStatus(detail, fzlot, productsQuantity)
-        // ✅ 重新计算总数量
-        detail.Quantity2 = reCompute(detail)
+      if (!canAcceptForDetail(detail, queryRes)) {
+        // 本行接收会超额，尝试下一行
+        continue
+      }
+    } else {
+      const newQty = detail.Quantity2 + queryRes.Quantity2
+      if (newQty > detail.canReceive) {
         continue
       }
     }
+
+    // 通过可接收性校验后，再真正更新数据
+    updateDetailItem(index, queryRes)
 
     matched = true
     break

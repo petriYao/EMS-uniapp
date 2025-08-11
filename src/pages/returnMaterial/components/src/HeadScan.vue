@@ -122,29 +122,150 @@ const handleBarcodeScan = async () => {
 
   console.log('条码扫描结果', queryRes)
 
-  // 处理无效条码
   if (!queryRes) {
     // showToast('无效条码')
     return
   }
 
-  // 查找匹配的明细项
-  const detailIndex = findMatchingDetail(queryRes)
-  console.log('匹配的明细项索引', detailIndex)
-  if (detailIndex === -1) {
+  // 查找所有匹配的明细项（支持多个相同 MaterialCode + Lot 的行）
+  const matchingDetails = findMatchingDetails(queryRes)
+  if (!matchingDetails.length) {
     showToast('条码与明细不符合')
     return
   }
 
-  // 处理条码重复扫描
-  if (isBarcodeDuplicate(detailIndex, queryRes.BarCode)) {
-    showToast('请勿重复扫描')
-    return
+  let matched = false
+
+  for (const detail of matchingDetails) {
+    const index = reactiveData.detailsList.indexOf(detail)
+
+    // 重复条码拦截
+    if (isBarcodeDuplicate(index, queryRes.BarCode)) {
+      showToast('请勿重复扫描')
+      continue
+    }
+
+    // 分装与非分装分别进行可接收性判断
+    if (detail.IsSplit) {
+      if (!canAcceptForDetail(detail, queryRes)) {
+        // 本行接收会超额，尝试下一行
+        continue
+      }
+    } else {
+      const newQty = detail.Quantity2 + queryRes.Quantity2
+      if (newQty > detail.canReceive) {
+        continue
+      }
+    }
+
+    // 通过可接收性校验后，再真正更新数据
+    updateDetailItem(index, queryRes)
+    matched = true
+    break
   }
 
-  // 更新明细数据
-  updateDetailItem(detailIndex, queryRes)
-  emit('update:detailsList', reactiveData.detailsList)
+  if (!matched) {
+    showToast('累计实发超过对应发数量')
+  } else {
+    emit('update:detailsList', reactiveData.detailsList)
+  }
+}
+
+// 查找匹配的明细项（数组）
+const findMatchingDetails = (queryRes: any): any[] => {
+  return reactiveData.detailsList.filter((item: any) => {
+    switch (props.title) {
+      case '采购退货':
+        return (
+          item.MaterialCode === queryRes.MaterialCode &&
+          item.SourceOrderNo === queryRes.SourceOrderNo &&
+          item.Supplier === queryRes.Supplier &&
+          item.Lot === queryRes.Lot
+        )
+      case '其他出库':
+        return item.MaterialCode === queryRes.MaterialCode && item.Lot === queryRes.Lot
+    }
+  })
+}
+
+// 分装场景-模拟是否可接收（不落库，只计算）
+const canAcceptForDetail = (detail: any, queryRes: any): boolean => {
+  // 若当前行已达上限，则直接不再接收任何分装条码
+  if (detail.IsSplit) {
+    let currentTotal = 0
+    const lotList: string[] = Array.isArray(detail.FZLOTList) ? detail.FZLOTList : []
+    lotList.forEach((lot) => {
+      currentTotal += detail.packagingDataFZLOT?.[lot]?.FZquantity || 0
+    })
+    if (currentTotal >= detail.canReceive) return false
+  }
+
+  // 非分装直接按原逻辑判断
+  if (!detail.IsSplit) {
+    const newQty = detail.Quantity2 + queryRes.Quantity2
+    return newQty <= detail.canReceive
+  }
+
+  const fzlot = queryRes.FZLOTList?.[0]
+  const splitCode = queryRes.SplitCode
+  const splitValue = queryRes.SplitValue
+  const unitQty = queryRes.unitQty
+
+  // 基于当前行构建一个模拟的分装批次数据
+  const simulatedPackagingByLot: Record<string, any> = JSON.parse(
+    JSON.stringify(detail.packagingDataFZLOT || {})
+  )
+  const simulatedFZLOTList: string[] = Array.isArray(detail.FZLOTList)
+    ? [...detail.FZLOTList]
+    : []
+
+  // 如该 FZLOT 在当前明细中不存在，则以本次条码自带的结构为基础新增
+  if (!simulatedFZLOTList.includes(fzlot)) {
+    simulatedFZLOTList.push(fzlot)
+    simulatedPackagingByLot[fzlot] = JSON.parse(
+      JSON.stringify(queryRes.packagingDataFZLOT?.[fzlot] || { packagingData: {}, packagingSig: [] })
+    )
+    if (!simulatedPackagingByLot[fzlot].packagingData) simulatedPackagingByLot[fzlot].packagingData = {}
+    if (!simulatedPackagingByLot[fzlot].packagingSig) simulatedPackagingByLot[fzlot].packagingSig = []
+  }
+
+  // 确保分装位存在
+  if (!simulatedPackagingByLot[fzlot].packagingData[splitCode]) {
+    simulatedPackagingByLot[fzlot].packagingData[splitCode] = {
+      quantity: 0,
+      unitQty: unitQty,
+      finishedQty: 0
+    }
+  }
+
+  // 模拟累加本次分装增量
+  const simCell = simulatedPackagingByLot[fzlot].packagingData[splitCode]
+  simCell.quantity += splitValue
+  simCell.unitQty = unitQty
+  simCell.finishedQty = simCell.quantity / simCell.unitQty
+
+  // 计算该 FZLOT 的成品数量（成套数）
+  const packagingSig: string[] = simulatedPackagingByLot[fzlot].packagingSig || []
+  let minNonZero = Infinity
+  for (const key of packagingSig) {
+    const qty = Number(simulatedPackagingByLot[fzlot].packagingData[key]?.finishedQty || 0)
+    if (qty === 0) {
+      minNonZero = 0
+      break
+    }
+    if (qty > 0 && qty < minNonZero) minNonZero = qty
+  }
+  const productsQuantity = minNonZero === Infinity ? 0 : minNonZero
+  const simFZquantity = Math.floor(productsQuantity)
+
+  // 汇总全部 FZLOT 的 FZquantity，但将当前 fzlot 替换为模拟值
+  let simulatedQuantity2 = 0
+  simulatedFZLOTList.forEach((lot) => {
+    if (lot === fzlot) simulatedQuantity2 += simFZquantity
+    else simulatedQuantity2 += detail.packagingDataFZLOT?.[lot]?.FZquantity || 0
+  })
+
+  return simulatedQuantity2 <= detail.canReceive
 }
 
 // 查找匹配的明细项

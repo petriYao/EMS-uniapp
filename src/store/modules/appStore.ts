@@ -47,12 +47,9 @@ const useAppStore = defineStore('app', {
       }
     }
   },
-  getters: {
-
-  },
+  getters: {},
   actions: {
     //初始化app的值 //APP-PLUS  MP-WEIXIN H5
-   
   }
 })
 

@@ -139,7 +139,7 @@ const getData = async () => {
           FEntity_Link_FSALBASEQTYOld: item.FEntity_Link[0].SALBASEQTYOld,
           FEntity_Link_FSALBASEQTY: item.FEntity_Link[0].SALBASEQTY,
           FEntity_Link_FPRICEBASEQTYOld: item.FEntity_Link[0].PRICEBASEQTYOld,
-          FEntity_Link_FPRICEBASEQTY: item.FEntity_Link[0].PRICEBASEQTY,
+          FEntity_Link_FPRICEBASEQTY: item.FEntity_Link[0].PRICEBASEQTY
         }
       ]
     }

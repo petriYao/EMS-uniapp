@@ -215,7 +215,7 @@ useEmitt({
 watch(
   () => props.detailsList,
   (val: any) => {
-    console.log('val', val)
+    console.log('val', JSON.stringify(val[6]?.barcodeList))
     reactiveData.detailsList = val
   },
   { immediate: true, deep: true }
