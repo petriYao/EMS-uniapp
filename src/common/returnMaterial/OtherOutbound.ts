@@ -378,3 +378,27 @@ export function saveMaterialRequisition(Model: any, IsAutoSubmitAndAudit = true)
   }
   return saveApi(data) as any
 }
+//简单生产领料单保存
+export function saveSimpleMaterialRequisition(Model: any, IsAutoSubmitAndAudit = true) {
+  const data = {
+    formid: 'SP_PickMtrl',
+    data: {
+      IsDeleteEntry: 'true',
+      IsAutoSubmitAndAudit: IsAutoSubmitAndAudit,
+      Model: Model
+    }
+  }
+  return saveApi(data) as any
+}
+//委外生产领料单保存
+export function saveOutsourceMaterialRequisition(Model: any, IsAutoSubmitAndAudit = true) {
+  const data = {
+    formid: 'SUB_PickMtrl',
+    data: {
+      IsDeleteEntry: 'true',
+      IsAutoSubmitAndAudit: IsAutoSubmitAndAudit,
+      Model: Model
+    }
+  }
+  return saveApi(data) as any
+}

@@ -2,6 +2,7 @@
 import { reactive, ref } from 'vue'
 import HeadStorage from '../components/HeadStorage.vue'
 import ContentStorage from './components/ContentStorage.vue'
+import SanContentStorage from './components/SanContentStorage.vue'
 
 import { debounceSave } from '@/utils'
 
@@ -15,9 +16,14 @@ const reactiveData = reactive({
 })
 
 const contentStorageRef = ref() //标题组件引用
+const sanContentStorageRef = ref()
 
 const saveClick = debounceSave(async () => {
-  contentStorageRef.value?.saveClick()
+  if (reactiveData.scanCodeType == '扫单入库') {
+    sanContentStorageRef.value?.saveClick()
+  } else {
+    contentStorageRef.value?.saveClick()
+  }
 })
 </script>
 <template>
@@ -25,8 +31,11 @@ const saveClick = debounceSave(async () => {
     <HeadStorage :title="reactiveData.title" v-model:scanCodeType="reactiveData.scanCodeType" />
   </view>
   <scroll-view scroll-y style="height: calc(100vh - 40px - 44px - 24px)">
-    <view>
+    <view v-if="reactiveData.scanCodeType == '扫码入库'">
       <ContentStorage ref="contentStorageRef" />
+    </view>
+    <view v-if="reactiveData.scanCodeType == '扫单入库'">
+      <SanContentStorage ref="sanContentStorageRef" />
     </view>
   </scroll-view>
   <view class="h-40px">

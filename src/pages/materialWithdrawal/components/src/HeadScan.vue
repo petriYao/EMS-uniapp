@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { reactive, onBeforeUnmount, onBeforeMount, ref } from 'vue'
 import { purchaseScanBarcode, getcamelCase } from '@/common/materialWithdrawal/Index'
-import { otherScanBarcode, getOtherCase } from '@/common/returnMaterial/OtherOutbound'
+import { getSimple } from '@/common/materialWithdrawal/Simple'
+import { getOutsourcing } from '@/common/materialWithdrawal/Outsourced'
 import { useEmitt } from '@/hooks/useEmitt'
 
 const props = defineProps({
@@ -13,7 +14,7 @@ const props = defineProps({
 
 // 数据
 const reactiveData = reactive({
-  searchValue: 'SOUT00000002', // 搜索值
+  searchValue: '', // 搜索值
   documentNumber: '', // 单号
   fid: '', // 单号ID
   focus: 99,
@@ -65,8 +66,11 @@ const handleDocumentSearch = async () => {
     case '生产领料':
       queryRes = await getcamelCase(reactiveData.searchValue)
       break
-    case '其他出库':
-      queryRes = await getOtherCase(reactiveData.searchValue)
+    case '简单生产领料':
+      queryRes = await getSimple(reactiveData.searchValue)
+      break
+    case '委外领料':
+      queryRes = await getOutsourcing(reactiveData.searchValue)
       break
   }
 
@@ -200,20 +204,14 @@ const canAcceptForDetail = (detail: any, queryRes: any): boolean => {
 // 条码扫描处理
 const handleBarcodeScan = async () => {
   let queryRes: any = {}
-  switch (props.title) {
-    case '生产领料':
-      queryRes = await purchaseScanBarcode(reactiveData.searchValue)
-      break
-    case '其他出库':
-      queryRes = await otherScanBarcode(reactiveData.searchValue)
-      return
-  }
+  queryRes = await purchaseScanBarcode(reactiveData.searchValue)
+
+  console.log('queryRes', queryRes)
 
   if (!queryRes) {
     // showToast('无效条码')
     return
   }
-
   const matchingDetails = findMatchingDetails(queryRes)
   if (!matchingDetails.length) {
     showToast('条码与明细不符合')
@@ -227,7 +225,7 @@ const handleBarcodeScan = async () => {
 
     if (isBarcodeDuplicate(index, queryRes.BarCode)) {
       showToast('请勿重复扫描')
-      continue
+      return
     }
 
     // 分装与非分装分别进行可接收性判断
@@ -274,10 +272,11 @@ const updateDetailItem = (index: number, queryRes: any) => {
 
   switch (props.title) {
     case '生产领料':
+    case '委外领料':
       detail.currentList[7].value = queryRes.F_POQTY
       detail.currentList[9].value = queryRes.TotalBox
       break
-    case '其他出库':
+    case '简单生产领料':
       detail.currentList[6].value = queryRes.F_POQTY
       detail.currentList[8].value = queryRes.TotalBox
       break
@@ -300,8 +299,9 @@ const updateDetailItem = (index: number, queryRes: any) => {
 // 处理分装逻辑
 const handleSplitPackage = (detail: any, queryRes: any) => {
   const fzlot = queryRes.FZLOTList[0]
-
-  if (!detail.FZLOTList.includes(fzlot)) {
+  console.log('处理分装逻辑', queryRes)
+  console.log('处理分装逻辑2', detail.FZLOTList)
+  if (!detail.FZLOTList || !detail.FZLOTList.includes(fzlot)) {
     detail.FZLOTList.push(fzlot)
     detail.packagingDataFZLOT[fzlot] = queryRes.packagingDataFZLOT[fzlot]
     detail.packagingDataFZLOT[fzlot].packagingData[queryRes.SplitCode] = {

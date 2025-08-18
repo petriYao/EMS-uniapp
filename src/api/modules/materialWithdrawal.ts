@@ -1,4 +1,4 @@
-import { pushApi, saveApi, executeBillQueryApi, viewApi } from '@/api/commonHttp'
+import { executeBillQueryApi, viewApi } from '@/api/commonHttp'
 
 //查看生产领料单
 export function lookPickMtrl(Number: any) {
@@ -31,4 +31,32 @@ export function transferOrder(FilterString: string) {
     ]
   }
   return executeBillQueryApi(data)
+}
+
+//查看简单生产领料单
+export function lookSimple(Number: any) {
+  const data = {
+    FormId: `SP_PickMtrl`,
+    data: {
+      CreateOrgId: 0,
+      Number: Number,
+      Id: '',
+      IsSortBySeq: 'false'
+    }
+  }
+  return viewApi(data) as any
+}
+
+//委外生产领料单
+export function lookOutsourcing(Number: any) {
+  const data = {
+    FormId: `SUB_PickMtrl`,
+    data: {
+      CreateOrgId: 0,
+      Number: Number,
+      Id: '',
+      IsSortBySeq: 'false'
+    }
+  }
+  return viewApi(data) as any
 }

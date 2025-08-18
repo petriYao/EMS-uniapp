@@ -325,20 +325,10 @@ watch(
             </view>
 
             <view class="flex">
-              <view class="w-33% flex items-center h-20px">
-                <view class="w-50px text-end">仓库：</view>
-                <view> {{ item.detailList.stockName }}</view>
-              </view>
-
-              <view class="w-33% flex items-center h-20px">
-                <view class="w-50px text-end">仓位：</view>
-                <view> {{ item.detailList.stockLocName }}</view>
-              </view>
-
-              <view class="w-33% flex items-center h-20px">
-                <view class="w-50px text-end">储位：</view>
-                <view> {{ item.detailList.storageLocation }}</view>
-              </view>
+              <view class="min-w-50px text-end">储位：</view>
+              <view class="flex-wrap">{{
+                item.detailList.storageLocation || item.detailList.stockLocName
+              }}</view>
             </view>
 
             <view class="flex">

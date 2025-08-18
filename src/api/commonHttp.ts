@@ -129,6 +129,31 @@ export function MaterialRequisition(parameters: any) {
     data: data
   })
 }
+//简单生产领料
+export function SimpleMaterialRequisition(parameters: any) {
+  const data = {
+    parameters: [parameters]
+  }
+  return http({
+    url: '/k3cloud/Kingdee.BOS.TM.WebApi.MaterialRequisitionWebApiService.SimpleMaterialRequisition,Kingdee.BOS.TM.WebApi.common.kdsvc',
+    method: 'POST',
+    requestTime: 5000, //等待5秒
+    data: data
+  })
+}
+//委外生产领料
+export function OutsourcedRequisition(parameters: any) {
+  const data = {
+    parameters: [parameters]
+  }
+  return http({
+    url: '/k3cloud/Kingdee.BOS.TM.WebApi.MaterialRequisitionWebApiService.OutsourcedRequisition,Kingdee.BOS.TM.WebApi.common.kdsvc',
+    method: 'POST',
+    requestTime: 5000, //等待5秒
+    data: data
+  })
+}
+
 //登录接口
 export function login(data: any) {
   return http({

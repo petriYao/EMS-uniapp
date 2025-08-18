@@ -1,30 +1,40 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import HeadStorage from './components/HeadStorage.vue'
+import HeadStorage from '../components/HeadStorage.vue'
 import ContentStorage from './components/ContentStorage.vue'
-import { throttleSave } from '@/utils'
 
-//其他入库单
+import { debounceSave } from '@/utils'
+
+//简单生产领料单
 const reactiveData = reactive({
   isShow: true, //是否选择
   loading: false, //是否保存
-  title: '其他入库',
-  FEntity: [] as any
+  title: '简单领料',
+  FEntity: [] as any, //单据提交
+  scanCodeType: '扫码入库'
 })
 
 const contentStorageRef = ref() //标题组件引用
+const sanContentStorageRef = ref()
 
-const saveClick = throttleSave(async () => {
-  contentStorageRef.value?.saveClick()
+const saveClick = debounceSave(async () => {
+  if (reactiveData.scanCodeType == '扫单入库') {
+    sanContentStorageRef.value?.saveClick()
+  } else {
+    contentStorageRef.value?.saveClick()
+  }
 })
 </script>
 <template>
   <view>
-    <HeadStorage :title="reactiveData.title" />
+    <HeadStorage :title="reactiveData.title" v-model:scanCodeType="reactiveData.scanCodeType" />
   </view>
   <scroll-view scroll-y style="height: calc(100vh - 40px - 44px - 24px)">
-    <view>
+    <view v-if="reactiveData.scanCodeType == '扫码入库'">
       <ContentStorage ref="contentStorageRef" />
+    </view>
+    <view v-if="reactiveData.scanCodeType == '扫单入库'">
+      <SanContentStorage ref="sanContentStorageRef" />
     </view>
   </scroll-view>
   <view class="h-40px">

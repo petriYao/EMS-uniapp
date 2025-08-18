@@ -77,9 +77,11 @@ const saveClick = async () => {
     }
     if (item.barcodeList.length !== 0) {
       detailsList.push({
-        entryId: item.entryId,
+        srcBillNo: item.SrcBillNo,
+        srcEntrySeq: item.SrcEntrySeq,
         isSplit: item.IsSplit,
         sum: item.Quantity2,
+        lotId: item.Lot,
         barcodeList: item.barcodeList
       })
     }
@@ -135,8 +137,8 @@ const saveClick = async () => {
       EditCKTM({
         barcodes: barcodeList,
         documentNumber: pushResSaveData.data.Result.Number,
-        documentType: '其他出库单',
-        status: '3'
+        documentType: '生产领料单',
+        status: '2'
       })
       reactiveData.detailsList = []
     }
