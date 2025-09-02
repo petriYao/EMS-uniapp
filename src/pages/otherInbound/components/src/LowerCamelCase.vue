@@ -437,24 +437,24 @@ watch(
             <view class="flex-wrap">{{ item.detailList.specification }}</view>
           </view>
 
-          <view class="flex">
+          <!-- <view class="flex">
             <view class="w-50% flex items-center h-20px">
               <view class="w-50px text-end">可收：</view>
               <view> {{ item.detailList.receivableQuantity }}</view>
             </view>
-
-            <view class="w-50% flex items-center h-20px">
+          </view> -->
+          <view class="flex">
+            <view class="w-33.33% flex items-center h-20px">
               <view class="w-50px text-end">数量：</view>
               <view> {{ item.Quantity2 }}</view>
             </view>
-          </view>
-          <view class="flex">
-            <view class="w-50% flex items-center h-20px">
+
+            <view class="w-33.33% flex items-center h-20px">
               <view class="w-50px text-end">仓位：</view>
               <view>{{ item.detailList.location }}</view>
             </view>
 
-            <view class="w-50% flex items-center h-20px">
+            <view class="w-33.33% flex items-center h-20px">
               <view class="w-50px text-end">件数：</view>
               <view> {{ item.barcodeList.length }}</view>
             </view>

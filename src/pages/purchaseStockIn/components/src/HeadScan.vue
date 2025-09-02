@@ -62,18 +62,24 @@ const searchClick = async () => {
   console.log('扫码结果', res)
   if (res) {
     //在focusIndex.value为0时，给搜索框赋值
-    if (reactiveData.focus === 0) {
+    if (reactiveData.focus === 99) {
       reactiveData.searchValue = res.result
       searchChange()
-    } else if (reactiveData.focus === 2) {
+    } else if (reactiveData.focus === 1) {
       //在reactiveData.focus为2时，给仓库赋值
       reactiveData.heardList.warehouse = res.result
+      warehouseChange(res.result)
       //触发更新事件
-      reactiveData.focus = 3
-    } else if (reactiveData.focus === 3) {
+      setTimeout(() => {
+        reactiveData.focus = 3
+      }, 500)
+    } else if (reactiveData.focus === 2) {
       //在reactiveData.focus为3时，给仓位赋值
       reactiveData.heardList.location = res.result
-      reactiveData.focus = 0
+      locationChange(res.result)
+      setTimeout(() => {
+        reactiveData.focus = 0
+      }, 500)
     } else {
       searchInput.value.setValue(res.result)
     }
@@ -528,6 +534,7 @@ onBeforeUnmount(() => {
           v-model="reactiveData.heardList.warehouse"
           :showAction="false"
           :focus="reactiveData.focus == 1"
+          @focus="reactiveData.focus = 1"
           :disabled="reactiveData.setData.warehouseDisplay"
           shape="round"
           placeholder=""
@@ -596,6 +603,7 @@ onBeforeUnmount(() => {
           v-model="reactiveData.heardList.location"
           :showAction="false"
           :focus="reactiveData.focus == 2"
+          @focus="reactiveData.focus = 2"
           :disabled="reactiveData.setData.locationDisplay"
           shape="round"
           placeholder=""

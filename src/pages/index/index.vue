@@ -136,6 +136,20 @@ onBeforeMount(() => {
           src: 'transferOrder/Index'
         })
         break
+      case '40':
+        crmList4.value.push({
+          name: '库存查询',
+          icon: '/static/index/Reportingforwork.png',
+          src: 'stockQuery/Index'
+        })
+        break
+      case '41':
+        crmList4.value.push({
+          name: '盘点',
+          icon: '/static/index/Reportingforwork.png',
+          src: 'inventory/Index'
+        })
+        break
       /*退库退料*********************************/
       case '32':
         crmList6.value.push({
@@ -197,8 +211,8 @@ onBeforeMount(() => {
       //   break
     }
   }
-  console.log('reactiveData.1', crmList.value)
-  console.log('reactiveData.2', crmList2.value)
+  // console.log('reactiveData.1', crmList.value)
+  // console.log('reactiveData.2', crmList2.value)
 })
 </script>
 <template>

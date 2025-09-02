@@ -111,6 +111,13 @@
         "navigationStyle": "custom"
       }
     },
+        {
+      "path": "pages/stockQuery/Index",
+      "style": {
+        "navigationBarTitleText": "库存查询",
+        "navigationStyle": "custom"
+      }
+    },
     {
       "path": "pages/transferOrder/Index",
       "style": {
@@ -164,6 +171,13 @@
       "path": "pages/materialWithdrawal/outsourced/Index",
       "style": {
         "navigationBarTitleText": "委外领料",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/inventory/Index",
+      "style": {
+        "navigationBarTitleText": "盘点",
         "navigationStyle": "custom"
       }
     }

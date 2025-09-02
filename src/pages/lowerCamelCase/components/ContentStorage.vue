@@ -36,7 +36,7 @@ const saveClick = async () => {
   console.log('保存2', reactiveData.lowerCamelCaseList)
   if (reactiveData.lowerCamelCaseList.length === 0) {
     uni.showToast({
-      title: '请先扫码',
+      title: '无提交数据',
       icon: 'none'
     })
     return

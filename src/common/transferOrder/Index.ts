@@ -48,41 +48,6 @@ export const transferScanBarcode = async (searchValue: any, setData: any, locati
       return null
     }
 
-    //源单类型非生产订单
-    if (barCodeData.F_YVRT_YDLX !== '生产订单') {
-      uni.showToast({
-        title: '源单类型非生产订单',
-        icon: 'none'
-      })
-      return null
-    }
-
-    //源单号，行号不能为空
-    if (
-      !barCodeData.F_SourceFbillno ||
-      barCodeData.F_SourceFbillno === ' ' ||
-      !barCodeData.F_SourceEntry ||
-      barCodeData.F_SourceEntry === ' '
-    ) {
-      uni.showToast({
-        title: '源单号，行号不能为空',
-        icon: 'none'
-      })
-      return null
-    }
-
-    //仓库是否为相同
-    // if (
-    //   barCodeData.F_QADV_BARCODEENTRY[barCodeData.F_QADV_BARCODEENTRY.length - 1].F_QADV_FSTOCKID
-    //     .Number !== warehouseDataId
-    // ) {
-    //   uni.showToast({
-    //     title: '仓库不一致',
-    //     icon: 'none'
-    //   })
-    //   return null
-    // }
-
     const packagingData = {} as any
     const packagingSig = [] as string[] //分装编号
 

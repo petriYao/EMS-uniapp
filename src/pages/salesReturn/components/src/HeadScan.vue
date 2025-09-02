@@ -1,16 +1,10 @@
 <script setup lang="ts">
-import { ref, reactive, onBeforeUnmount, watch, onBeforeMount } from 'vue'
+import { ref, reactive, onBeforeUnmount, onBeforeMount } from 'vue'
 import { queryStorage, lookqueryStorage } from '@/api/modules/storage'
 import { purchaseScanBarcode, getcamelCase } from '@/common/purchaseStockIn/SalesReturn'
 import { debounceSave } from '@/utils'
+import { getStockLoc } from '@/common/comModel/Index'
 import { useEmitt } from '@/hooks/useEmitt'
-
-const props = defineProps({
-  loading: {
-    type: Boolean,
-    default: false
-  }
-})
 
 // 数据定义
 const searchValue = ref<string>('')
@@ -139,7 +133,7 @@ const handleScanBarcode = async () => {
 
     if (isBarcodeScanned(detailsList.value[index], queryRes.BarCode)) {
       uni.showToast({ title: '请勿重复扫描', icon: 'none' })
-      continue
+      return
     }
 
     // 分装与非分装分别进行可接收性判断
@@ -162,22 +156,22 @@ const handleScanBarcode = async () => {
   }
 
   if (!matched) {
-    uni.showToast({ title: '实收数量大于可收数量', icon: 'none' })
+    uni.showToast({ title: '实退数量大于可退数量', icon: 'none' })
   }
 }
 
 // 查找物料索引
-const findMaterialIndex = (queryRes: any) =>
-  detailsList.value.findIndex((item: any) => {
-    console.log('item', item, queryRes)
-    return (
-      item.MaterialCode === queryRes.MaterialCode && // 编码
-      item.SourceOrderNo === queryRes.ContractNo && // 来源单号
-      item.SourceOrderLineNo === queryRes.ContractLineNo && // 来源单行号
-      item.Lot === queryRes.Lot && // 批次
-      item.Customer === queryRes.Customer // 客户
-    )
-  })
+// const findMaterialIndex = (queryRes: any) =>
+//   detailsList.value.findIndex((item: any) => {
+//     console.log('item', item, queryRes)
+//     return (
+//       item.MaterialCode === queryRes.MaterialCode && // 编码
+//       item.SourceOrderNo === queryRes.ContractNo && // 来源单号
+//       item.SourceOrderLineNo === queryRes.ContractLineNo && // 来源单行号
+//       item.Lot === queryRes.Lot && // 批次
+//       item.Customer === queryRes.Customer // 客户
+//     )
+//   })
 
 // 判断是否已扫描
 const isBarcodeScanned = (item: any, barcode: string) =>
@@ -219,9 +213,7 @@ const canAcceptForDetail = (detail: any, queryRes: any): boolean => {
   const simulatedPackagingByLot: Record<string, any> = JSON.parse(
     JSON.stringify(detail.packagingDataFZLOT || {})
   )
-  const simulatedFZLOTList: string[] = Array.isArray(detail.FZLOTList)
-    ? [...detail.FZLOTList]
-    : []
+  const simulatedFZLOTList: string[] = Array.isArray(detail.FZLOTList) ? [...detail.FZLOTList] : []
 
   if (!simulatedFZLOTList.includes(fzlot)) {
     simulatedFZLOTList.push(fzlot)
@@ -272,7 +264,11 @@ const canAcceptForDetail = (detail: any, queryRes: any): boolean => {
 const handleBarcodeAddition = (index: number, queryRes: any) => {
   detailsList.value[index].barcodeList.push(queryRes.barcodeList[0])
   detailsList.value[index].Quantity++
+  detailsList.value[index].IsSplit = queryRes.IsSplit
+  detailsList.value[index].currentList[7].value = queryRes.F_POQTY // 批量
+  detailsList.value[index].currentList[9].value = queryRes.TotalBox // 总箱数
 
+  console.log('新增条码', queryRes)
   if (detailsList.value[index].IsSplit) {
     handleSplitBarcodeAddition(index, queryRes)
   } else {
@@ -288,7 +284,7 @@ const handleBarcodeAddition = (index: number, queryRes: any) => {
     }
     //提示
     uni.showToast({
-      title: '实收数量大于可收数量',
+      title: '实退数量大于可退数量',
       icon: 'none'
     })
     emitter.emit('deleteBarcode', deleteBarcode)
@@ -300,62 +296,67 @@ const handleBarcodeAddition = (index: number, queryRes: any) => {
 // 分装处理
 const handleSplitBarcodeAddition = (index: number, queryRes: any) => {
   const { FZLOTList, SplitCode, SplitValue, UnitQty } = queryRes
-
+  console.log('分装处理', detailsList.value[index])
   const index2 = detailsList.value[index].FZLOTList.findIndex(
     (item: string) => item === FZLOTList[0]
   )
+  console.log('分装处理2', FZLOTList, SplitCode, SplitValue, UnitQty)
+
   if (index2 === -1) {
     detailsList.value[index].FZLOTList.push(FZLOTList[0])
     detailsList.value[index].packagingDataFZLOT[FZLOTList[0]] = {
-      packagingData: {},
-      packagingSig: [],
+      packagingData: queryRes.packagingDataFZLOT[FZLOTList[0]].packagingData,
+      packagingSig: queryRes.packagingDataFZLOT[FZLOTList[0]].packagingSig,
       isInteger: false
     }
-    detailsList.value[index].packagingDataFZLOT[FZLOTList[0]].packagingData[SplitCode] = {
-      quantity: 0,
-      unitQty: UnitQty,
-      finishedQty: 0
-    }
+    detailsList.value[index].isInteger = false
+    return
   }
 
-  const data = detailsList.value[index].packagingDataFZLOT[FZLOTList[0]].packagingData[SplitCode]
+  // 确保对象存在再访问
+  const fzlotData = detailsList.value[index].packagingDataFZLOT[FZLOTList[0]]
+  console.log('分装处理3', fzlotData.packagingData[SplitCode])
+  fzlotData.packagingData[SplitCode].unitQty = UnitQty
+
+  const data = fzlotData.packagingData[SplitCode]
   data.quantity += SplitValue
   data.finishedQty = data.quantity / UnitQty
 
   // 判断是否整数
-  const packagingSig = detailsList.value[index].packagingDataFZLOT[FZLOTList[0]].packagingSig
+  const packagingSig = fzlotData.packagingSig
   let hasZero = false
   let minNonZero = Infinity
 
   packagingSig.forEach((item: any) => {
-    const sum = Number(
-      detailsList.value[index].packagingDataFZLOT[FZLOTList[0]].packagingData[item].finishedQty
-    )
-    if (sum === 0) hasZero = true
-    else if (sum < minNonZero) minNonZero = sum
+    // 确保对象存在再访问
+    const packagingItem = fzlotData.packagingData[item]
+    if (packagingItem) {
+      const sum = Number(packagingItem.finishedQty)
+      if (sum === 0) hasZero = true
+      else if (sum < minNonZero) minNonZero = sum
+    }
   })
 
   const productsQuantity = hasZero || minNonZero === Infinity ? 0 : minNonZero
   const isInteger = productsQuantity % 1 === 0 && productsQuantity !== 0
-
-  detailsList.value[index].packagingDataFZLOT[FZLOTList[0]].isInteger = isInteger
+  console.log('是否整数1', isInteger)
+  fzlotData.isInteger = isInteger
   detailsList.value[index].isInteger = isInteger
 
   if (isInteger) {
     packagingSig.forEach((element: any) => {
-      if (
-        detailsList.value[index].packagingDataFZLOT[FZLOTList[0]].packagingData[element]
-          .finishedQty !== productsQuantity
-      ) {
-        detailsList.value[index].packagingDataFZLOT[FZLOTList[0]].isInteger = false
+      // 确保对象存在再访问
+      const packagingItem = fzlotData.packagingData[element]
+      console.log('是否整数2', packagingItem, productsQuantity)
+      if (packagingItem && packagingItem.finishedQty !== productsQuantity) {
+        fzlotData.isInteger = false
         detailsList.value[index].isInteger = false
         return
       }
     })
   }
 
-  detailsList.value[index].packagingDataFZLOT[FZLOTList[0]].FZquantity =
-    Math.floor(productsQuantity)
+  fzlotData.FZquantity = Math.floor(productsQuantity)
   detailsList.value[index].Quantity2 = reCompute(detailsList.value[index])
 }
 
@@ -394,19 +395,13 @@ const getWarehouseList = async () => {
 }
 
 // 仓库选择器确认
-const pickerConfirm = (val: any) => {
+const pickerConfirm = async (val: any) => {
   heardList.value.warehouse = val.text
   setData.value.warehouseNumber = val.value
   setData.value.warehouseId = val.id
-  getWarehousePosition(val.value)
+  await getWarehousePosition(val.value)
   //清空明细中的仓位
-  detailsList.value.forEach((item: any) => {
-    item.WarehousePosition = ''
-    item.WarehousePositionName = ''
-    item.WarehousePositionId = ''
-    item.detailList.location = ''
-    item.currentList[12].value = ''
-  })
+  await clearStock()
   emit('update:setData', setData.value)
   emit('update:detailsList', detailsList.value)
   warehouseData.show = false
@@ -427,11 +422,13 @@ const getWarehousePosition = async (warehouseId: string) => {
         emit('update:locationList', locationData.locationList)
         return
       }
+
       locationData.locationList = list.map((item: any) => ({
         Id: item.Id,
         text: item.FlexEntryId.Name[0].Value,
         value: item.FlexEntryId.Number
       }))
+
       setData.value.locationDisplay = locationData.locationList.length === 0
       if (!setData.value.locationDisplay) {
         // setTimeout(() => {
@@ -445,7 +442,7 @@ const getWarehousePosition = async (warehouseId: string) => {
 }
 
 // 仓库变更
-const warehouseChange = debounceSave((val: string) => {
+const warehouseChange = debounceSave(async (val: string) => {
   heardList.value.location = ''
   const warehouse = warehouseData.warehouseList.find((item: any) => item.value === val)
   if (!warehouse && val) {
@@ -461,18 +458,36 @@ const warehouseChange = debounceSave((val: string) => {
   setData.value.warehouseNumber = warehouse.value
   setData.value.warehouseId = warehouse.id
   handleFocus()
-  getWarehousePosition(val)
-  //清空明细中的仓位
-  detailsList.value.forEach((item: any) => {
+  await getWarehousePosition(val)
+  //清空明细中的仓位,并获取推荐仓位
+  await clearStock()
+  emit('update:setData', setData.value)
+  emit('update:detailsList', detailsList.value)
+})
+
+//仓位清空
+const clearStock = async () => {
+  console.log('清空明细中的仓位')
+  detailsList.value.forEach(async (item: any) => {
+    console.log('清空明细中的仓位1', setData.value.FlexNumber)
     item.WarehousePosition = ''
     item.WarehousePositionName = ''
     item.WarehousePositionId = ''
     item.detailList.location = ''
     item.currentList[12].value = ''
+
+    //删除FlexNumber第一个字符
+    let FlexNumber = setData.value.FlexNumber.substring(1)
+    let TJStockId = await getStockLoc(
+      item.MaterialCode,
+      item.Lot,
+      FlexNumber,
+      setData.value.warehouseNumber
+    )
+    console.log('清空明细中的仓位2', TJStockId)
+    item.currentList[10].value = TJStockId
   })
-  emit('update:setData', setData.value)
-  emit('update:detailsList', detailsList.value)
-})
+}
 
 // 键盘控制
 const hideTimer = ref<number | null>(null)
@@ -491,16 +506,24 @@ const clearTimer = () => {
   }
 }
 
-watch(
-  () => props.loading,
-  (val) => {
-    if (val && heardList.value.warehouse) {
-      resetFocus()
-      detailsList.value = []
-    }
-  },
-  { deep: true }
-)
+// watch(
+//   () => props.loading,
+//   (val) => {
+//     if (val && heardList.value.warehouse) {
+//       resetFocus()
+//       detailsList.value = []
+//       setData.value = {
+//         fid: 0,
+//         warehouseNumber: '',
+//         warehouseId: '',
+//         FlexNumber: '',
+//         warehouseDisplay: false,
+//         locationDisplay: false
+//       }
+//     }
+//   },
+//   { deep: true }
+// )
 
 onBeforeUnmount(() => {
   clearTimer()
@@ -509,6 +532,7 @@ onBeforeUnmount(() => {
 onBeforeMount(() => {
   getWarehouseList()
   handleFocus()
+  resetFocus()
 })
 </script>
 
@@ -539,7 +563,6 @@ onBeforeMount(() => {
         <u-input v-model="heardList.documentNumber" :disabled="true" shape="round" placeholder="" />
       </view>
     </view>
-
     <!-- 仓库 -->
     <view class="flex items-center py-4rpx w-100%">
       <view class="w-50px flex justify-center">仓库</view>

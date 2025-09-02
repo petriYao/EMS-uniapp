@@ -64,6 +64,44 @@ export function queryBarCode(FilterString: string) {
   return executeBillQueryApi(data)
 }
 
+//即时库存单据查询
+export function queryInventory(FilterString: string) {
+  const data = {
+    parameters: [
+      {
+        FormId: `STK_Inventory`,
+        FieldKeys: 'FMaterialId.fnumber',
+        FilterString: FilterString,
+        OrderString: '',
+        TopRowCount: 0,
+        StartRow: 0,
+        Limit: 2000,
+        SubSystemId: ''
+      }
+    ]
+  }
+  console.log('条码单数据', data)
+  return executeBillQueryApi(data)
+}
+//物料单据查询
+export function queryMaterial(FilterString: string) {
+  const data = {
+    parameters: [
+      {
+        FormId: `BD_MATERIAL`,
+        FieldKeys: 'FNumber,FName,FSpecification',
+        FilterString: FilterString,
+        OrderString: '',
+        TopRowCount: 0,
+        StartRow: 0,
+        Limit: 2000,
+        SubSystemId: ''
+      }
+    ]
+  }
+  console.log('条码单数据', data)
+  return executeBillQueryApi(data)
+}
 //查看生成条码单
 export function lookCreateBarCode(Number: any) {
   const data = {

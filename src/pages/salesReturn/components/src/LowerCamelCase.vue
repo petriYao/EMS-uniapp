@@ -220,8 +220,8 @@ const warehouseChange = debounceSave((val: any) => {
     return
   }
   reactiveData.detailsList[reactiveData.barcodeIndex].currentList[12].value = warehouseId.value
-  reactiveData.detailsList[reactiveData.barcodeIndex].WarehousePosition = warehouseId.Id
-  reactiveData.detailsList[reactiveData.barcodeIndex].WarehousePositionNumber = warehouseId.value
+  reactiveData.detailsList[reactiveData.barcodeIndex].WarehouseId = warehouseId.Id
+  reactiveData.detailsList[reactiveData.barcodeIndex].WarehouseNumber = warehouseId.value
 
   reactiveData.detailsList[reactiveData.barcodeIndex].detailList.location = warehouseId.Id
   reactiveData.detailsList[reactiveData.barcodeIndex].detailList.locationNumber = warehouseId.value
@@ -448,7 +448,7 @@ watch(
 
           <view class="flex">
             <view class="w-50% flex items-center h-20px">
-              <view class="w-50px text-end">可收：</view>
+              <view class="w-50px text-end">可退：</view>
               <view> {{ item.detailList.receivableQuantity }}</view>
             </view>
 

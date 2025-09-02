@@ -5,6 +5,7 @@ import { otherScanBarcode, getOtherCase } from '@/common/returnMaterial/OtherOut
 // import { salesScanBarcode, getSalesCase } from '@/common/returnMaterial/SalesReturn'
 // import { queryBarCode } from '@/api/modules/lowerCamelCase'
 import { useEmitt } from '@/hooks/useEmitt'
+import { debounce } from '@/utils'
 
 const props = defineProps({
   title: {
@@ -93,7 +94,7 @@ const handleDocumentSearch = async () => {
 
   // 处理无结果情况
   if (!queryRes?.dataList?.length) {
-    showToast('未找到相关单据')
+    // showToast('未找到相关单据')
     return
   }
 
@@ -215,18 +216,20 @@ const canAcceptForDetail = (detail: any, queryRes: any): boolean => {
   const simulatedPackagingByLot: Record<string, any> = JSON.parse(
     JSON.stringify(detail.packagingDataFZLOT || {})
   )
-  const simulatedFZLOTList: string[] = Array.isArray(detail.FZLOTList)
-    ? [...detail.FZLOTList]
-    : []
+  const simulatedFZLOTList: string[] = Array.isArray(detail.FZLOTList) ? [...detail.FZLOTList] : []
 
   // 如该 FZLOT 在当前明细中不存在，则以本次条码自带的结构为基础新增
   if (!simulatedFZLOTList.includes(fzlot)) {
     simulatedFZLOTList.push(fzlot)
     simulatedPackagingByLot[fzlot] = JSON.parse(
-      JSON.stringify(queryRes.packagingDataFZLOT?.[fzlot] || { packagingData: {}, packagingSig: [] })
+      JSON.stringify(
+        queryRes.packagingDataFZLOT?.[fzlot] || { packagingData: {}, packagingSig: [] }
+      )
     )
-    if (!simulatedPackagingByLot[fzlot].packagingData) simulatedPackagingByLot[fzlot].packagingData = {}
-    if (!simulatedPackagingByLot[fzlot].packagingSig) simulatedPackagingByLot[fzlot].packagingSig = []
+    if (!simulatedPackagingByLot[fzlot].packagingData)
+      simulatedPackagingByLot[fzlot].packagingData = {}
+    if (!simulatedPackagingByLot[fzlot].packagingSig)
+      simulatedPackagingByLot[fzlot].packagingSig = []
   }
 
   // 确保分装位存在
@@ -446,15 +449,6 @@ const showToast = (title: string) => {
 const resetSearchField = () => {
   reactiveData.searchValue = ''
   focusTm()
-}
-
-// 防抖函数实现
-function debounce<T extends (...args: any[]) => any>(fn: T, delay: number) {
-  let timer: ReturnType<typeof setTimeout> | null = null
-  return function (this: any, ...args: Parameters<T>) {
-    if (timer) clearTimeout(timer)
-    timer = setTimeout(() => fn.apply(this, args), delay)
-  }
 }
 
 const focusTm = () => {

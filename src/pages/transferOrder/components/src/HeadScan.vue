@@ -71,8 +71,6 @@ const searchChange = () => {
       const index = reactiveData.detailsList.findIndex((item: any) => {
         return (
           item.MaterialCode === queryRes.MaterialCode &&
-          item.SourceOrderNo === queryRes.SourceOrderNo &&
-          item.SourceOrderLineNo === queryRes.SourceOrderLineNo &&
           item.WarehousePosition === reactiveData.setData.locationId
         )
       })

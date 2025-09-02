@@ -38,6 +38,31 @@ export function TMQuery(parameters: any) {
   })
 }
 
+//库存查询
+export function QueryInv(Number: any) {
+  const data = {
+    parameters: [Number]
+  }
+  return http({
+    url: '/k3cloud/Kingdee.BOS.TM.WebApi.StockItemCountWebApiService.QueryInv,Kingdee.BOS.TM.WebApi.common.kdsvc',
+    method: 'POST',
+    requestTime: 5000, //等待5秒
+    data: data
+  })
+}
+//条码列表查询
+export function QueryInvByTM(parameters: any) {
+  const data = {
+    parameters: parameters
+  }
+  return http({
+    url: '/k3cloud/Kingdee.BOS.TM.WebApi.StockItemCountWebApiService.QueryInvByTM,Kingdee.BOS.TM.WebApi.common.kdsvc',
+    method: 'POST',
+    requestTime: 5000, //等待5秒
+    data: data
+  })
+}
+
 //条码状态查询
 export function TMStatusQuery(parameters: any) {
   const data = {

@@ -4,7 +4,7 @@ import { onBeforeMount, reactive } from 'vue'
 const props = defineProps({
   title: {
     type: String,
-    default: ''
+    default: '生产入库'
   },
   scanCodeType: {
     type: String,
@@ -51,14 +51,14 @@ const onRightClick = () => {
 //选择扫码类型
 const groupChange = () => {
   //将选择储存到本地缓存
-  uni.setStorageSync('scanCodeType', reactiveData.scanCodeType)
+  uni.setStorageSync(`scanCodeType-${reactiveData.title}`, reactiveData.scanCodeType)
   emit('update:scanCodeType', reactiveData.scanCodeType)
   reactiveData.rightTitleShow = !reactiveData.rightTitleShow
 }
 
 onBeforeMount(() => {
   //获取本地缓存的扫码类型
-  const scanCodeType = uni.getStorageSync('scanCodeType')
+  const scanCodeType = uni.getStorageSync(`scanCodeType-${reactiveData.title}`)
   if (scanCodeType) {
     reactiveData.scanCodeType = scanCodeType
     emit('update:scanCodeType', scanCodeType)

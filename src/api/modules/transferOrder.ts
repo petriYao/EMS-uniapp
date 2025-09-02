@@ -190,3 +190,29 @@ export function queryPurchaseReturn(FilterString: string) {
   }
   return executeBillQueryApi(data)
 }
+
+//盘点
+export function getInventory(Number: any) {
+  const data = {
+    FormId: `QADV_PD`,
+    data: {
+      CreateOrgId: 0,
+      Number: Number,
+      Id: '',
+      IsSortBySeq: 'false'
+    }
+  }
+  return viewApi(data) as any
+}
+
+export function saveInventory(Model: any) {
+  const data = {
+    formid: 'QADV_PD',
+    data: {
+      IsDeleteEntry: false,
+      IsAutoSubmitAndAudit: false,
+      Model: Model
+    }
+  }
+  return saveApi(data) as any
+}

@@ -42,7 +42,7 @@ const onLeftClick = () => {
 
 onBeforeMount(() => {
   //获取本地缓存的扫码类型
-  const scanCodeType = uni.getStorageSync('scanCodeType')
+  const scanCodeType = uni.getStorageSync(`scanCodeType-${reactiveData.title}`)
   if (scanCodeType) {
     reactiveData.scanCodeType = scanCodeType
     emit('update:scanCodeType', scanCodeType)

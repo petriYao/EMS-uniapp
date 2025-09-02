@@ -552,23 +552,26 @@ const searchClick = async () => {
   })
   console.log('扫码结果', res)
   if (res) {
-    //在focusIndex.value为0时，给搜索框赋值
+    const result = res.result
+
     if (focusIndex.value === 0) {
-      reactiveData.searchValue = res.result
+      reactiveData.searchValue = result
       searchChange()
     } else if (focusIndex.value === 2) {
-      //在focusIndex.value为2时，给仓库赋值
-      reactiveData.titleList[2].value = res.result
-      //触发更新事件
-      focusIndex.value = 3
+      reactiveData.titleList[2].value = result
+      warehouseChange(result, true) // 手动调用仓库 change
+      setTimeout(() => {
+        focusIndex.value = 3
+      }, 500)
     } else if (focusIndex.value === 3) {
-      //在focusIndex.value为3时，给仓位赋值
-      reactiveData.titleList[3].value = res.result
-      focusIndex.value = 0
+      reactiveData.titleList[3].value = result
+      warehouseChange(result, false) // 手动调用仓位 change
+      setTimeout(() => {
+        focusIndex.value = 0
+      }, 500)
     } else {
-      searchInput.value.setValue(res.result)
+      searchInput.value.setValue(result)
     }
-    // searchChange()
   }
 }
 
@@ -885,7 +888,7 @@ const backClick = async () => {
   // 声明为异步函数
   if (reactiveData.detailsList.length === 0) {
     uni.showToast({
-      title: '请先扫码',
+      title: '无提交数据',
       icon: 'none'
     })
     return
@@ -1199,6 +1202,7 @@ defineExpose({
         shape="round"
         placeholder="请输入搜索关键词"
         :focus="focusIndex == 0"
+        @focus="focusIndex = 0"
         @blur="searchChange"
       />
     </view>
@@ -1219,7 +1223,6 @@ defineExpose({
           :disabled="item.disabled"
           shape="round"
           placeholder=""
-          :focus="index == focusIndex"
           @focus="focusIndex = 0"
         />
       </view>
@@ -1237,6 +1240,7 @@ defineExpose({
           shape="round"
           placeholder=""
           :focus="index == focusIndex"
+          @focus="focusIndex = index"
           @change="warehouseChange($event, item.label == '仓库')"
           @blur="handleFocus"
         >

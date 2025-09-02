@@ -196,19 +196,33 @@ const getWarehouseList = async () => {
 }
 //扫码获取数据
 const searchClick = async () => {
-  switch (props.title) {
-    case '生产入库':
-      backClick()
-      // searchInput.value.doFocus()
-      // const res: any = await productionGetData(
-      //   reactiveData.searchValue,
-      //   currentWarehousePosition.number
-      // )
-      // console.log('res', res)
-      // // reactiveData.currentList = res.currentList
-      // reactiveData.detailsList.push(res)
-      // reactiveData.datailsIndex = reactiveData.detailsList.length - 1
-      break
+  //uniapp打开扫码
+  const res: any = await uni.scanCode({
+    scanType: ['barCode', 'qrCode'],
+    onlyFromCamera: true
+  })
+  console.log('扫码结果', res)
+  if (res) {
+    const result = res.result
+
+    if (focusIndex.value === 0) {
+      reactiveData.searchValue = result
+      searchChange()
+    } else if (focusIndex.value === 2) {
+      reactiveData.titleList[2].value = result
+      warehouseChange(result, true) // 手动调用仓库 change
+      setTimeout(() => {
+        focusIndex.value = 3
+      }, 500)
+    } else if (focusIndex.value === 3) {
+      reactiveData.titleList[3].value = result
+      warehouseChange(result, false) // 手动调用仓位 change
+      setTimeout(() => {
+        focusIndex.value = 0
+      }, 500)
+    } else {
+      searchInput.value.setValue(result)
+    }
   }
 }
 
@@ -631,6 +645,7 @@ defineExpose({
           shape="round"
           placeholder=""
           :focus="index == focusIndex"
+          @focus="focusIndex = index"
           @change="warehouseChange($event, item.label == '仓库')"
           @blur="handleFocus"
         >

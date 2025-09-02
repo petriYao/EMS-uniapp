@@ -1,6 +1,6 @@
 import { lookBarCode, queryBarCode } from '@/api/modules/storage'
 import { getSalesReturn } from '@/api/modules/transferOrder'
-import { lowerCamelCase2 } from '@/api/modules/storage'
+import { getStockLoc } from '@/common/comModel/Index'
 // 采购入库-扫描条码
 export const purchaseScanBarcode = async (searchValue: any, setData: any) => {
   console.log('条码仓位', setData)
@@ -42,22 +42,22 @@ export const purchaseScanBarcode = async (searchValue: any, setData: any) => {
       return null
     }
     //条码为入库状态
-    if (barCodeData.F_BARSTATUS != 3) {
+    if (barCodeData.F_BARSTATUS != 1) {
       uni.showToast({
-        title: '条码非出库状态',
+        title: '条码非创建状态',
         icon: 'none'
       })
       return null
     }
 
     //源单类型非生产订单
-    if (barCodeData.F_YVRT_YDLX !== '生产订单') {
-      uni.showToast({
-        title: '源单类型非生产订单',
-        icon: 'none'
-      })
-      return null
-    }
+    // if (barCodeData.F_YVRT_YDLX !== '生产订单') {
+    //   uni.showToast({
+    //     title: '源单类型非生产订单',
+    //     icon: 'none'
+    //   })
+    //   return null
+    // }
     const packagingData = {} as any
     const packagingSig = [] as string[] //分装编号
 
@@ -81,6 +81,8 @@ export const purchaseScanBarcode = async (searchValue: any, setData: any) => {
           }
         }
       }
+
+      console.log('分装数量', barCodeData.F_UNITQTY)
       packagingData[barCodeData.F_FZNO].quantity = barCodeData.F_UNITQTY
       packagingData[barCodeData.F_FZNO].unitQty = barCodeData.F_JUNITQTY
       packagingData[barCodeData.F_FZNO].finishedQty = barCodeData.F_UNITQTY / barCodeData.F_JUNITQTY
@@ -158,6 +160,10 @@ export const purchaseScanBarcode = async (searchValue: any, setData: any) => {
       UnitQty: barCodeData.F_JUNITQTY,
       //分装数量
       SplitValue: barCodeData.F_UNITQTY,
+      //总箱数
+      TotalBox: barCodeData.F_TOTALCARTONQTY,
+      //批量
+      F_POQTY: barCodeData.F_POQTY,
       Unit: barCodeData.F_NUMBER.MaterialBase[0].BaseUnitId.Name[0].Value,
       //分装批次号
       FZLOTList: [barCodeData.F_QADV_FZLOT],
@@ -186,7 +192,7 @@ export const getcamelCase = async (searchValue: any) => {
   if (res && res.data) {
     if (res.data.Result?.ResponseStatus?.IsSuccess === false) {
       uni.showToast({
-        title: '采购入库单不存在',
+        title: '销售退货单不存在',
         icon: 'none'
       })
       return { dataList: [], fid: 0 }
@@ -227,19 +233,14 @@ export const getcamelCase = async (searchValue: any) => {
           }
         }
       }
-      let TJStockId = ''
-      let FilterString = `FMaterialId.Fnumber = '${item.MaterialId.Number}'`
-      if (item.Lot_Text !== ' ' && item.Lot_Text !== '') {
-        FilterString += ` AND FLot.Fnumber = '${item.Lot_Text}'`
-      }
-      FilterString += ` AND FStockId.Fnumber = '${item.StockId?.Number}' AND FBaseQty > 0`
-      const FieldKeys = `FStockLocId.F${FlexNumber}.FNumber`
-      const lowerRes: any = await lowerCamelCase2(FilterString, FieldKeys)
-      if (lowerRes && lowerRes.data && lowerRes.data.length > 0) {
-        TJStockId = lowerRes.data.map((item: any) => item[0]).join(',') //推荐仓位
-      }
+      const TJStockId = await getStockLoc(
+        item.MaterialId.Number,
+        item.Lot_Text,
+        FlexNumber,
+        item.StockId?.Number
+      )
 
-      console.log('FlexNumber', FlexNumber)
+      console.log('FlexNumber123', FlexNumber)
       const data = {
         currentList: [
           {
@@ -251,7 +252,8 @@ export const getcamelCase = async (searchValue: any) => {
           },
           {
             label: '源单',
-            value: item.SrcBillNo + '-' + item.F_QADV_YDENTRYID,
+            value:
+              item.SrcBillNo + (item.F_QADV_YDENTRYID !== 0 ? '-' + item.F_QADV_YDENTRYID : ''),
             disabled: true,
             type: 'input',
             style: { width: '100%' }
@@ -287,7 +289,7 @@ export const getcamelCase = async (searchValue: any) => {
 
           {
             label: '合同',
-            value: item.F_QADV_HTNO,
+            value: item.OrderNo + (item.F_QADV_POENTRYID !== 0 ? '-' + item.F_QADV_POENTRYID : ''),
             disabled: true,
             type: 'input',
             style: { width: '65%' }
@@ -389,7 +391,9 @@ export const getcamelCase = async (searchValue: any) => {
         UnitQty: '',
         //可收货数量
         canReceive: item.RealQty,
-        Unit: item.UnitId?.Name[0].Value
+        Unit: item.UnitId?.Name[0].Value,
+        FZLOTList: [],
+        packagingDataFZLOT: {}
       }
       dataList.push(data)
     }

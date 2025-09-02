@@ -33,7 +33,7 @@ const saveClick = async () => {
   //   })
   // }
   for (const item of reactiveData.detailsList) {
-    barcodeList.push(...item.barcodeList.map((item: any) => item.FNumber))
+    barcodeList.push(...item.barcodeList.map((item: any) => item.F_BARCODENO))
   }
 
   if (barcodeList.length == 0) {
@@ -46,13 +46,13 @@ const saveClick = async () => {
   console.log('条码值', barcodeList)
   const tmStatusRes: any = await TMStatusQuery({
     barcodes: barcodeList,
-    status: '3'
+    status: '1'
   })
   console.log('tmStatusRes', tmStatusRes)
   if (tmStatusRes && tmStatusRes.data && tmStatusRes.data.length > 0) {
     //条码状态不为1的提示
     uni.showToast({
-      title: `编码${tmStatusRes.data[0]['material_fnumber']}中，条码${tmStatusRes.data[0]['FNUMBER']}非审核、出库、非作废状态`,
+      title: `编码${tmStatusRes.data[0]['material_fnumber']}中，条码${tmStatusRes.data[0]['FNUMBER']}非审核、创建、未作废状态`,
       icon: 'none',
       duration: 5000
     })
@@ -62,6 +62,20 @@ const saveClick = async () => {
   let isValid = true
   for (let i = 0; i < reactiveData.detailsList.length; i++) {
     const item = reactiveData.detailsList[i]
+    console.log(
+      'item.detailList.locationNumber',
+      reactiveData.locationList,
+      item.detailList.location
+    )
+    if (reactiveData.locationList.length > 0) {
+      if (item.detailList.location == '') {
+        uni.showToast({
+          title: `第${i + 1}行仓位不可为空`,
+          icon: 'none'
+        })
+        return
+      }
+    }
     console.log('item', item.isInteger, item)
     if (!item.isInteger && item.barcodeList.length > 0) {
       // 条码不是整数的提示
@@ -77,7 +91,6 @@ const saveClick = async () => {
   if (!isValid) {
     return // 阻止后续代码的执行
   }
-
   /**************************开始保存*************************/
   const Model = {
     FID: reactiveData.setData.fid,
@@ -100,10 +113,12 @@ const saveClick = async () => {
       },
       FStockLocId: FStockLocId,
       F_QADV_XTSubEntity: item.barcodeList,
-      FQty: item.Quantity2 //实际数量
+      FRealQty: item.Quantity2 //实际数量
     })
   }
   //保存销售退货单
+  console.log('保存销售退货单', JSON.stringify(Model))
+  // return
   const res = await saveSalesReturn(Model)
   console.log('保存结果', res)
   if (res && res.data.Result.ResponseStatus.ErrorCode === 500) {
@@ -123,7 +138,7 @@ const saveClick = async () => {
       TMUpdate({
         barcodes: tmList,
         warehouse: reactiveData.setData.warehouseId,
-        location: item.FStockLocId,
+        location: item.WarehousePositionId,
         documentNumber: numbers,
         documentType: '销售退货单',
         status: '2'
@@ -131,15 +146,27 @@ const saveClick = async () => {
     }
 
     reactiveData.detailsList = []
+    reactiveData.setData = {
+      fid: 0,
+      warehouseNumber: '',
+      warehouseId: '',
+      FlexNumber: '',
+      warehouseDisplay: false,
+      locationDisplay: false
+    }
 
     uni.showToast({
       icon: 'none',
       title: '保存成功',
       duration: 5000
     })
-    reactiveData.loading = true
+    setTimeout(() => {
+      reactiveData.loading = true
+    }, 100)
   }
-  reactiveData.loading = true
+  setTimeout(() => {
+    reactiveData.loading = true
+  }, 100)
 }
 
 //暴露方法
@@ -155,7 +182,6 @@ defineExpose({
       v-model:detailsList="reactiveData.detailsList"
       v-model:setData="reactiveData.setData"
       v-model:locationList="reactiveData.locationList"
-      v-model:loading="reactiveData.loading"
     />
   </view>
   <!-- 内容 -->
