@@ -1,18 +1,17 @@
 import { lookBarCode, queryBarCode } from '@/api/modules/storage'
-import { lookOtherOutbound } from '@/api/modules/transferOrder'
-import { executeBillQueryApi, saveApi } from '@/api/commonHttp'
+import { lookReturn } from '@/api/modules/materialWithdrawal'
+import { getStockLoc } from '@/common/comModel/Index'
 
-//其他出库-扫描单号
-export const getOtherCase = async (searchValue: any) => {
+//生产退料-扫描单号
+export const getcamelCase = async (searchValue: any) => {
   const dataList = [] as any
   let fid = 0
-  const res = await lookOtherOutbound(searchValue)
-  console.log('条码单数据', res.data)
+  const res = await lookReturn(searchValue)
 
   if (res && res.data) {
     if (res.data.Result?.ResponseStatus?.IsSuccess === false) {
       uni.showToast({
-        title: '其他出库单不存在',
+        title: '生产退料单不存在',
         icon: 'none'
       })
       return { dataList: [], fid: 0 }
@@ -25,20 +24,57 @@ export const getOtherCase = async (searchValue: any) => {
       return { dataList: [], fid: 0 }
     }
     fid = res.data.Result.Result.Id
-    const TreeEntity = res.data.Result.Result.BillEntry
-    console.log('生产订单属性', TreeEntity)
+    const TreeEntity = res.data.Result.Result.Entity
+    console.log('生产退料属性', TreeEntity)
     for (const item of TreeEntity) {
-      console.log('item', item, item.CustId)
+      const stockLoc = item.StockLocId
+      let actualValue = null
+
+      // 获取对象的所有 key
+      const FStockLocId = {} as any
+      let FlexNumber = ''
+      // 找到第一个 F10000x 字段，且其值不为 null
+      if (stockLoc != null) {
+        const keys = Object.keys(stockLoc)
+        for (const key of keys) {
+          if (
+            key.startsWith('F10000') &&
+            stockLoc[key] !== null &&
+            typeof stockLoc[key] === 'object'
+          ) {
+            FStockLocId[`FSTOCKLOCID__F` + key] = {
+              Fnumber: stockLoc[key].Number
+            }
+            actualValue = stockLoc[key]
+            FlexNumber = key
+            break
+          }
+        }
+      }
+      //推荐
+      const TJStockId = await getStockLoc(
+        item.MaterialId.Number,
+        item.Lot_Text,
+        FlexNumber,
+        item.StockId?.Number
+      )
+
       const data = {
         currentList: [
           {
             label: '部门',
-            value: res.data.Result.Result.DeptId?.Name[0].Value,
+            value: res.data.Result.Result.F_QADV_SCCJ?.Name[0].Value,
             disabled: true,
             type: 'input',
             style: { width: '100%' }
           },
-
+          {
+            label: '源单',
+            value: item.MoBillNo + (item.MoEntrySeq !== 0 ? '-' + item.MoEntrySeq : ''),
+            disabled: true,
+            type: 'input',
+            style: { width: '100%' }
+          },
           {
             label: '编码',
             value: item.MaterialId.Number,
@@ -70,7 +106,7 @@ export const getOtherCase = async (searchValue: any) => {
 
           {
             label: '合同',
-            value: item.F_QADV_HTNO,
+            value: '',
             disabled: true,
             type: 'input',
             style: { width: '65%' }
@@ -85,7 +121,7 @@ export const getOtherCase = async (searchValue: any) => {
 
           {
             label: '客户',
-            value: item.F_QADV_KH?.Name[0].Value,
+            value: null,
             disabled: true,
             type: 'input',
             style: { width: '65%' }
@@ -97,39 +133,55 @@ export const getOtherCase = async (searchValue: any) => {
             type: 'input',
             style: { width: '35%' }
           },
-
           {
-            label: '可发',
-            value: item.Qty,
+            label: '推荐',
+            value: TJStockId,
             disabled: true,
             type: 'input',
             style: { width: '65%' }
           },
+
           {
             label: '单位',
             value: item.UnitID?.Name[0].Value,
             disabled: true,
             type: 'input',
             style: { width: '35%' }
+          },
+          {
+            label: '仓位',
+            value: actualValue?.Number,
+            disabled: false,
+            type: 'select',
+            style: { width: '100%' }
           }
         ],
         detailList: {
-          //编码，批号，名称，规格，可退，数量，仓位，件数
+          //编码，批号，名称，规格，可收，数量，仓位，件数
           fnumber: item.MaterialId.Number, //编码
           lot: item.Lot_Text, //批号
           name: item.MaterialId?.Name[0].Value, //名称
           specification: item.MaterialId.MultiLanguageText[0].Specification, //规格
-          receivableQuantity: item.Qty, //可退
-          quantity: 0 //数量
+          receivableQuantity: item.Qty, //可收
+          quantity: item.RealQty, //数量
+          location: actualValue?.Number, //仓位
+          locationNumber: actualValue?.Number,
+          FlexNumber: FlexNumber
         },
+        TJStockId: TJStockId,
         barcodeList: [],
+        receivableQuantity: item.Qty, //可收
         entryId: item.Id,
         //是否第一次扫描条码
-        isLowerCamelCase: true,
+        isLowerCamelCase: false,
         //是否整数
         isInteger: true,
         //物料编码
         MaterialCode: item.MaterialId.Number,
+        //源单单号
+        SourceOrderNo: item.SrcBillNo,
+        //源单行号
+        SourceOrderLineNo: item?.SrcEntrySeq,
         //批号
         Lot: item.Lot_Text === ' ' ? '' : item.Lot_Text,
         //名称
@@ -140,26 +192,68 @@ export const getOtherCase = async (searchValue: any) => {
         Quantity: 0,
         //数量
         Quantity2: 0,
-        WarehouseNumber: item.STOCKID?.Number,
+        //仓位位置
+        setFStockLocId: FStockLocId,
+
+        //仓位
+        WarehousePosition: actualValue?.Number,
+        WarehousePositionName: actualValue?.Name[0].Value,
+        WarehousePositionId: actualValue?.Id,
+        FStockLocId: actualValue?.Id,
+        //仓库
+        WarehouseId: item.StockId?.Id,
+        WarehouseNumber: item.StockId?.Number,
+        WarehouseName: item.StockId?.Name[0].Value,
         //部件单位用量
         UnitQty: '',
-        //可退货数量
+        //可退数量
         canReceive: item.Qty,
         Unit: item.UnitID?.Name[0].Value,
-        IsSplit: false,
         FZLOTList: [],
-        packagingDataFZLOT: {} as any
+        packagingDataFZLOT: {}
       }
       dataList.push(data)
     }
+    // 数据合并逻辑
+    const keyMap = new Map()
+
+    for (const item of dataList) {
+      // 新的合并条件：stockName, stockLocName, MaterialCode, Lot
+      const key = `${item.SourceOrderNo}-${item.SourceOrderLineNo}- ${item.WarehouseName}-${item.WarehousePosition}-${item.MaterialCode}-${item.Lot}`
+      console.log('key', key)
+      if (keyMap.has(key)) {
+        const existing = keyMap.get(key)
+
+        // 累加数值字段
+        //existing.canReceive += item.canReceive
+        existing.detailList.quantity += item.detailList.quantity
+        existing.Quantity2 += item.Quantity2
+        existing.detailList.receivableQuantity += item.detailList.receivableQuantity
+        existing.receivableQuantity = existing.detailList.receivableQuantity
+
+        // 将当前条目添加到EntityList
+        existing.EntityList.push(item)
+      } else {
+        // 初始化新条目，EntityList包含自身
+        keyMap.set(key, { ...item, EntityList: [item] })
+      }
+    }
+
+    // 转换为数组并返回结果
+    const mergedDataList = Array.from(keyMap.values())
+
+    console.log('合并后的生产入库明细数据', mergedDataList)
+
+    return { dataList: mergedDataList, fid }
   }
   console.log('生产入库明细数据', dataList)
 
   return { dataList, fid }
 }
 
-// 其他出库-扫描条码
-export const otherScanBarcode = async (searchValue: any) => {
+//条码扫描
+export const purchaseScanBarcode = async (searchValue: any, setData: any) => {
+  console.log('条码仓位', setData)
   const res = await lookBarCode(searchValue)
   if (res && res.data) {
     //条码详情
@@ -198,14 +292,13 @@ export const otherScanBarcode = async (searchValue: any) => {
       return null
     }
     //条码为入库状态
-    if (barCodeData.F_BARSTATUS != 2) {
+    if (barCodeData.F_BARSTATUS != '1' && barCodeData.F_BARSTATUS != '3') {
       uni.showToast({
-        title: '条码非入库状态',
+        title: '条码非创建/出库状态',
         icon: 'none'
       })
       return null
     }
-
     const packagingData = {} as any
     const packagingSig = [] as string[] //分装编号
 
@@ -229,66 +322,59 @@ export const otherScanBarcode = async (searchValue: any) => {
           }
         }
       }
+
+      console.log('分装数量', barCodeData.F_UNITQTY)
       packagingData[barCodeData.F_FZNO].quantity = barCodeData.F_UNITQTY
       packagingData[barCodeData.F_FZNO].unitQty = barCodeData.F_JUNITQTY
       packagingData[barCodeData.F_FZNO].finishedQty = barCodeData.F_UNITQTY / barCodeData.F_JUNITQTY
     }
-    let packData = {} as any
-    //条码单的单据体
-    if (barCodeData.F_QADV_BARCODEENTRY.length > 0) {
-      packData = barCodeData.F_QADV_BARCODEENTRY[barCodeData.F_QADV_BARCODEENTRY.length - 1]
-    }
-    console.log('packData', packData)
-
-    const stockLoc = packData?.F_QADV_STOCKLOCID
-    let actualValue = null
-
-    // 获取对象的所有 key
-    const FStockLocId = {} as any
-    // 找到第一个 F10000x 字段，且其值不为 null
-    if (stockLoc != null) {
-      const keys = Object.keys(stockLoc)
-
-      for (const key of keys) {
-        if (
-          key.startsWith('F10000') &&
-          stockLoc[key] !== null &&
-          typeof stockLoc[key] === 'object'
-        ) {
-          FStockLocId[`FSTOCKLOCID__F` + key] = {
-            Fnumber: stockLoc[key].Number
-          }
-          actualValue = stockLoc[key]
-          break
-        }
-      }
-    }
 
     const data = {
-      barcodeList: {
-        FNumber: barCodeData.Number, //编码
+      barcodeList: [
+        {
+          F_BARCODENO: barCodeData.Number, //条码单号
+          F_UNITQTY: barCodeData.F_UNITQTY, //每箱数量
+          F_FZNO: barCodeData.F_FZNO, //分装编号
+          F_BJNAME: barCodeData.F_BJNAME, //部件名称
+          F_JUNITQTY: barCodeData.F_JUNITQTY, //部件用量
+          F_QADV_NBZQTY: barCodeData.F_QADV_NBZQTY, //内包装件数
+          F_QADV_FZLOT: barCodeData.F_QADV_FZLOT //分装批次号
+        }
+      ],
+      detailList: {
+        //编码，批号，名称，规格，可收，数量，仓位，件数
+        fnumber: barCodeData.F_NUMBER.Number, //编码
+        lot: barCodeData.F_WLLOT, //批号
+        name: barCodeData.F_NUMBER.Name[0].Value, //名称
+        specification: barCodeData.F_NUMBER.MultiLanguageText[0].Specification, //规格
+        receivableQuantity: barCodeData.F_POQTY, //可收
         quantity: barCodeData.F_UNITQTY, //数量
-        subPackageNo: barCodeData.F_FZNO, //分装编号
-        partNumberName: barCodeData.F_BJNAME, //部件名称
-        unitQuantity: barCodeData.F_JUNITQTY, //单位用量
-        FSTOCKName: packData?.F_QADV_FSTOCKID?.Name?.[0]?.Value, //仓库
-        FSTOCKNumber: packData?.F_QADV_FSTOCKID?.Number,
-        STOCKLOCName: actualValue?.Name?.[0]?.Value, //仓位
-        STOCKLOCNumber: actualValue?.Number,
-        FStockLocId: FStockLocId,
-        F_QADV_FSTOCKID: packData.F_QADV_FSTOCKID_Id, //仓库ID
-        F_QADV_STOCKLOCID: packData.F_QADV_STOCKLOCID_Id, //仓位ID
-        FZLOT: barCodeData.F_QADV_FZLOT, //分装编码
-        FLot: barCodeData.F_WLLOT //批次
+        location: setData.locationNumber //仓位
       },
-      //供应商
-      Supplier: barCodeData.F_QADV_GYS?.Name[0].Value,
+      //客户
+      Customer: barCodeData.FCUSTID?.Number,
       //生产部门
       ProductionDepartment: barCodeData.F_ALMA_BM?.Number,
       //条码单编码
       BarCode: searchValue,
       //物料编码
       MaterialCode: barCodeData.F_NUMBER.Number,
+      //源单单号
+      SourceOrderNo: barCodeData.F_SourceFbillno,
+      //源单行号
+      SourceOrderLineNo: barCodeData.F_SourceEntry * 1,
+      //源单行ID
+      // SourceOrderLineId: resOrder.data[0][1],
+      //需求来源
+      SourceOrderType: barCodeData.F_QADV_XQLY,
+      //需求单号
+      SourceOrderNo2: barCodeData.F_YVRT_XQDJ,
+      //需求行号
+      SourceOrderLineNo2: barCodeData.F_YVRT_YDSeq,
+      //合同号
+      ContractNo: barCodeData.F_HTNO,
+      //合同行号
+      ContractLineNo: barCodeData.F_QADV_HTENTRYID,
       //批号
       Lot: barCodeData.F_WLLOT === ' ' ? '' : barCodeData.F_WLLOT,
       //名称
@@ -309,14 +395,17 @@ export const otherScanBarcode = async (searchValue: any) => {
       SplitCode: barCodeData.F_FZNO,
       //仓库
       WarehouseNumber: '',
+      //仓位Id
+      FStockLocId: setData.locationId,
       //部件单位用量
-      unitQty: barCodeData.F_JUNITQTY,
+      UnitQty: barCodeData.F_JUNITQTY,
       //分装数量
       SplitValue: barCodeData.F_UNITQTY,
       //总箱数
       TotalBox: barCodeData.F_TOTALCARTONQTY,
       //批量
       F_POQTY: barCodeData.F_POQTY,
+      Unit: barCodeData.F_NUMBER.MaterialBase[0].BaseUnitId.Name[0].Value,
       //分装批次号
       FZLOTList: [barCodeData.F_QADV_FZLOT],
       packagingDataFZLOT: {} as any
@@ -332,112 +421,4 @@ export const otherScanBarcode = async (searchValue: any) => {
 
     return data
   }
-}
-
-//其他出库单据查询
-export function queryPurchaseReturn(FormId: string, FilterString: string, FieldKeys: string) {
-  const data = {
-    parameters: [
-      {
-        FormId: FormId,
-        FieldKeys: FieldKeys,
-        FilterString: FilterString,
-        OrderString: '',
-        TopRowCount: 0,
-        StartRow: 0,
-        Limit: 2000,
-        SubSystemId: ''
-      }
-    ]
-  }
-  console.log('提货单数据', data)
-  return executeBillQueryApi(data)
-}
-
-//其他出库单保存
-export function savePurchaseReturn(Model: any, IsAutoSubmitAndAudit = true) {
-  const data = {
-    formid: 'STK_MisDelivery',
-    data: {
-      IsDeleteEntry: 'true',
-      IsAutoSubmitAndAudit: IsAutoSubmitAndAudit,
-      Model: Model
-    }
-  }
-  return saveApi(data) as any
-}
-//生产领料单保存
-export function saveMaterialRequisition(Model: any, IsAutoSubmitAndAudit = true) {
-  const data = {
-    formid: 'PRD_PickMtrl',
-    data: {
-      IsDeleteEntry: 'true',
-      IsAutoSubmitAndAudit: IsAutoSubmitAndAudit,
-      Model: Model
-    }
-  }
-  return saveApi(data) as any
-}
-//简单生产领料单保存
-export function saveSimpleMaterialRequisition(Model: any, IsAutoSubmitAndAudit = true) {
-  const data = {
-    formid: 'SP_PickMtrl',
-    data: {
-      IsDeleteEntry: 'true',
-      IsAutoSubmitAndAudit: IsAutoSubmitAndAudit,
-      Model: Model
-    }
-  }
-  return saveApi(data) as any
-}
-//委外生产领料单保存
-export function saveOutsourceMaterialRequisition(Model: any, IsAutoSubmitAndAudit = true) {
-  const data = {
-    formid: 'SUB_PickMtrl',
-    data: {
-      IsDeleteEntry: 'true',
-      IsAutoSubmitAndAudit: IsAutoSubmitAndAudit,
-      Model: Model
-    }
-  }
-  return saveApi(data) as any
-}
-
-//生产退料单保存
-export function saveMaterialReturn(Model: any, IsAutoSubmitAndAudit = true) {
-  const data = {
-    formid: 'PRD_ReturnMtrl',
-    data: {
-      IsDeleteEntry: 'false',
-      IsAutoSubmitAndAudit: IsAutoSubmitAndAudit,
-      Model: Model
-    }
-  }
-  return saveApi(data) as any
-}
-
-//简单生产退料单保存
-export function saveSimpleMaterialReturn(Model: any, IsAutoSubmitAndAudit = true) {
-  const data = {
-    formid: 'SP_ReturnMtrl',
-    data: {
-      IsDeleteEntry: 'false',
-      IsAutoSubmitAndAudit: IsAutoSubmitAndAudit,
-      Model: Model
-    }
-  }
-  return saveApi(data) as any
-}
-
-//委外退料单保存
-export function saveOutsourceMaterialReturn(Model: any, IsAutoSubmitAndAudit = true) {
-  const data = {
-    formid: 'SUB_RETURNMTRL',
-    data: {
-      IsDeleteEntry: 'false',
-      IsAutoSubmitAndAudit: IsAutoSubmitAndAudit,
-      Model: Model
-    }
-  }
-  return saveApi(data) as any
 }

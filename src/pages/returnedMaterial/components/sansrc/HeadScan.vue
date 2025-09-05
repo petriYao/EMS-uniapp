@@ -78,13 +78,13 @@ const searchChange = debounce(async () => {
       //扫描采购订单
       let queryRes: any = {}
       switch (props.title) {
-        case '生产领料':
+        case '生产退料':
           queryRes = await getSanDan(reactiveData.searchValue)
           break
-        case '简单生产领料':
+        case '简单生产退料':
           queryRes = await getSanSimple(reactiveData.searchValue)
           break
-        case '委外领料':
+        case '委外退料':
           queryRes = await getSanOutsourcing(reactiveData.searchValue)
           break
       }
@@ -133,7 +133,7 @@ const searchChange = debounce(async () => {
 
           //当数量大于可领数量时，赋值为可领数量
           if (
-            props.title !== '简单生产领料' &&
+            props.title !== '简单生产退料' &&
             reactiveData.detailsList[index].Quantity2 > reactiveData.detailsList[index].canReceive
           ) {
             reactiveData.detailsList[index].Quantity2 = reactiveData.detailsList[index].canReceive
@@ -148,7 +148,7 @@ const searchChange = debounce(async () => {
           reactiveData.detailsList[index].Quantity2 = Quantity
           //当数量大于可领数量时，赋值为可领数量
           if (
-            props.title !== '简单生产领料' &&
+            props.title !== '简单生产退料' &&
             reactiveData.detailsList[index].Quantity2 > reactiveData.detailsList[index].canReceive
           ) {
             reactiveData.detailsList[index].Quantity2 = reactiveData.detailsList[index].canReceive

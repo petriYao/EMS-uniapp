@@ -36,13 +36,7 @@
         "enablePullDownRefresh": false
       }
     },
-    {
-      "path": "pages/product/product",
-      "style": {
-        "navigationBarTitleText": "产品",
-        "enablePullDownRefresh": false
-      }
-    },
+
     {
       "path": "pages/productionorder/productionorder",
       "style": {
@@ -111,7 +105,7 @@
         "navigationStyle": "custom"
       }
     },
-        {
+    {
       "path": "pages/stockQuery/Index",
       "style": {
         "navigationBarTitleText": "库存查询",
@@ -180,6 +174,27 @@
         "navigationBarTitleText": "盘点",
         "navigationStyle": "custom"
       }
+    },
+    {
+      "path": "pages/returnedMaterial/production/Index",
+      "style": {
+        "navigationBarTitleText": "生产退料",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/returnedMaterial/simple/Index",
+      "style": {
+        "navigationBarTitleText": "简单生产退料",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/returnedMaterial/outsourced/Index",
+      "style": {
+        "navigationBarTitleText": "委外退料",
+        "navigationStyle": "custom"
+      }
     }
   ],
   "tabBar": {
@@ -194,12 +209,7 @@
         "selectedIconPath": "static/index/homefill.png",
         "text": "首页"
       },
-      {
-        "pagePath": "pages/product/product",
-        "iconPath": "static/index/home.png",
-        "selectedIconPath": "static/index/myfill.png",
-        "text": "产品"
-      },
+
       {
         "pagePath": "pages/my/my",
         "iconPath": "static/index/my.png",

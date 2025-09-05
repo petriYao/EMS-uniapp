@@ -20,6 +20,7 @@ const { emitter } = useEmitt()
 
 const reactiveData = reactive({
   detailsList: [] as any,
+  focus: 0,
   barcodeIndex: 0
 })
 
@@ -31,8 +32,16 @@ const clearTimer = () => {
 const quantChange = (val: any, item: any) => {
   console.log('val', val)
   console.log('item', item)
-  reactiveData.detailsList[reactiveData.barcodeIndex].currentList[item.index].value = val
-  emit('update:detailsList', reactiveData.detailsList)
+  // item.value = val
+  // emit('update:detailsList', reactiveData.detailsList)
+}
+
+const clearChange = (val: any) => {
+  console.log('val', val)
+  reactiveData.focus = 0
+  setTimeout(() => {
+    reactiveData.focus = val
+  }, 100)
 }
 
 watch(
@@ -64,7 +73,20 @@ watch(
           :disabled="item.disabled"
           shape="round"
           placeholder=""
-          @cheange="quantChange($event, item)"
+        />
+      </view>
+      <view class="flex-1 mr-20rpx" v-else-if="item.type == 'number'" @click="clearTimer">
+        <u-input
+          v-model="item.value"
+          :showAction="false"
+          :disabled="item.disabled"
+          shape="round"
+          clearable
+          :focus="reactiveData.focus == index"
+          placeholder=""
+          type="number"
+          @clear="clearChange(index)"
+          @change="quantChange($event, item)"
         />
       </view>
     </view>

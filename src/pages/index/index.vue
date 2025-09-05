@@ -57,21 +57,35 @@ const scanCode = async () => {
 onBeforeMount(() => {
   //更新
   //UpdateInstallApp()
-
   let UserAuthority = uni.getStorageSync('UserAuthority')
   crmList.value = []
   crmList2.value = []
+  crmList3.value = []
+  crmList4.value = []
+  crmList5.value = []
+  crmList6.value = []
+
+  // 临时存储各个菜单项
+  const tempLists = {
+    crmList: [] as any[],
+    crmList2: [] as any[],
+    crmList3: [] as any[],
+    crmList4: [] as any[],
+    crmList5: [] as any[],
+    crmList6: [] as any[]
+  }
+
   for (const item of UserAuthority) {
     switch (item) {
       case '8':
-        crmList.value.push({
+        tempLists.crmList.push({
           name: '生产工单',
           icon: '/static/index/workorder.png',
           src: 'productionorder/productionorder'
         })
         break
       case '9':
-        crmList.value.push({
+        tempLists.crmList.push({
           name: '生产报工',
           icon: '/static/index/Reportingforwork.png',
           src: 'productionreporting/productionreporting'
@@ -79,28 +93,28 @@ onBeforeMount(() => {
         break
       /*入库*********************************/
       case '12':
-        crmList2.value.push({
+        tempLists.crmList2.push({
           name: '生产入库',
           icon: '/static/index/Reportingforwork.png',
           src: 'storage/storage?type=生产入库'
         })
         break
       case '16':
-        crmList2.value.push({
+        tempLists.crmList2.push({
           name: '简单入库',
           icon: '/static/index/Reportingforwork.png',
           src: 'storage/storage?type=简单入库'
         })
         break
       case '20':
-        crmList2.value.push({
+        tempLists.crmList2.push({
           name: '采购入库',
           icon: '/static/index/Reportingforwork.png',
           src: 'purchaseStockIn/Index'
         })
         break
       case '24':
-        crmList2.value.push({
+        tempLists.crmList2.push({
           name: '其他入库',
           icon: '/static/index/Reportingforwork.png',
           src: 'otherInbound/Index'
@@ -108,43 +122,51 @@ onBeforeMount(() => {
         break
       /*出库*********************************/
       case '28':
-        crmList3.value.push({
+        tempLists.crmList3.push({
           name: '销售出库',
           icon: '/static/index/Reportingforwork.png',
           src: 'lowerCamelCase/PascalCase'
         })
         break
       case '29':
-        crmList3.value.push({
+        tempLists.crmList3.push({
           name: '出库撤销',
           icon: '/static/index/Reportingforwork.png',
           src: 'cancelOutbound/Index'
         })
         break
+      case '35':
+        tempLists.crmList3.push({
+          name: '销售退货',
+          icon: '/static/index/Reportingforwork.png',
+          src: 'salesReturn/Index'
+        })
+        break
 
+      /*库存管理*********************************/
       case '30':
-        crmList4.value.push({
+        tempLists.crmList4.push({
           name: '条码库存',
           icon: '/static/index/Reportingforwork.png',
           src: 'barCodeStock/Index'
         })
         break
       case '31':
-        crmList4.value.push({
+        tempLists.crmList4.push({
           name: '调拨',
           icon: '/static/index/Reportingforwork.png',
           src: 'transferOrder/Index'
         })
         break
       case '40':
-        crmList4.value.push({
+        tempLists.crmList4.push({
           name: '库存查询',
           icon: '/static/index/Reportingforwork.png',
           src: 'stockQuery/Index'
         })
         break
       case '41':
-        crmList4.value.push({
+        tempLists.crmList4.push({
           name: '盘点',
           icon: '/static/index/Reportingforwork.png',
           src: 'inventory/Index'
@@ -152,67 +174,100 @@ onBeforeMount(() => {
         break
       /*退库退料*********************************/
       case '32':
-        crmList6.value.push({
+        tempLists.crmList6.push({
           name: '采购退货',
           icon: '/static/index/Reportingforwork.png',
           src: 'returnMaterial/purchaseReturn/Index'
         })
         break
-      case '35':
-        crmList6.value.push({
-          name: '销售退货',
+
+      case '42':
+        tempLists.crmList6.push({
+          name: '生产退料',
           icon: '/static/index/Reportingforwork.png',
-          src: 'salesReturn/Index'
+          src: 'returnedMaterial/production/Index'
         })
         break
-
+      case '43':
+        tempLists.crmList6.push({
+          name: '简单生产退料',
+          icon: '/static/index/Reportingforwork.png',
+          src: 'returnedMaterial/simple/Index'
+        })
+        break
+      case '44':
+        tempLists.crmList6.push({
+          name: '委外退料',
+          icon: '/static/index/Reportingforwork.png',
+          src: 'returnedMaterial/outsourced/Index'
+        })
+        break
       /**领料 */
       case '37':
-        crmList5.value.push({
+        tempLists.crmList5.push({
           name: '生产领料',
           icon: '/static/index/Reportingforwork.png',
           src: 'materialWithdrawal/production/Index'
         })
         break
       case '38':
-        crmList5.value.push({
+        tempLists.crmList5.push({
           name: '简单领料', //SP_PickMtrl
           icon: '/static/index/Reportingforwork.png',
           src: 'materialWithdrawal/simple/Index'
         })
         break
       case '39':
-        crmList5.value.push({
+        tempLists.crmList5.push({
           name: '委外领料', //SUB_PickMtrl
           icon: '/static/index/Reportingforwork.png',
           src: 'materialWithdrawal/outsourced/Index'
         })
         break
       case '36':
-        crmList5.value.push({
+        tempLists.crmList5.push({
           name: '其他出库',
           icon: '/static/index/Reportingforwork.png',
           src: 'returnMaterial/otherOutbound/Index'
         })
         break
-      // case '33':
-      //   crmList6.value.push({
-      //     name: '生产退库',
-      //     icon: '/static/index/Reportingforwork.png',
-      //     src: 'returnMaterial/returnStorage/Index'
-      //   })
-      //   break
-      // case '34':
-      //   crmList6.value.push({
-      //     name: '简单退库',
-      //     icon: '/static/index/Reportingforwork.png',
-      //     src: 'returnMaterial/returnStorage/Index'
-      //   })
-      //   break
     }
   }
-  // console.log('reactiveData.1', crmList.value)
-  // console.log('reactiveData.2', crmList2.value)
+
+  // 将临时存储的数据按要求排序后赋值给实际使用的数组
+  // 报工、入库菜单保持原顺序
+  crmList.value = tempLists.crmList
+  crmList2.value = tempLists.crmList2
+  crmList3.value = tempLists.crmList3
+  crmList6.value = tempLists.crmList6
+
+  // 调整领料菜单顺序：生产领料 → 简单领料 → 委外领料 → 其他出库
+  const materialMenus = tempLists.crmList5
+  const reorderedMaterialMenus = []
+
+  // 按照指定顺序重新排列
+  const materialOrder = ['生产领料', '简单领料', '委外领料', '其他出库']
+  for (const name of materialOrder) {
+    const item = materialMenus.find((menu: any) => menu.name === name)
+    if (item) {
+      reorderedMaterialMenus.push(item)
+    }
+  }
+  crmList5.value = reorderedMaterialMenus
+
+  // 调整库存管理菜单顺序：条码库存 → 库存查询 → 调拨 → 盘点
+  const inventoryMenus = tempLists.crmList4
+  const reorderedInventoryMenus = []
+
+  // 按照指定顺序重新排列
+  const inventoryOrder = ['条码库存', '库存查询', '调拨', '盘点']
+  for (const name of inventoryOrder) {
+    const item = inventoryMenus.find((menu: any) => menu.name === name)
+    if (item) {
+      reorderedInventoryMenus.push(item)
+    }
+  }
+  crmList4.value = reorderedInventoryMenus
 })
 </script>
 <template>
@@ -277,7 +332,7 @@ onBeforeMount(() => {
     </view>
     <view class="flex">
       <view class="bg-#FFF mt-20px py-20rpx mx-20px w-100% rounded-6px">
-        <view class="ml-20px mb-20px">退库退料</view>
+        <view class="ml-20px mb-20px">退货退料</view>
 
         <view class="flex flex-wrap">
           <view
@@ -316,7 +371,7 @@ onBeforeMount(() => {
     </view>
     <view class="flex">
       <view class="bg-#FFF mt-20px py-20rpx mx-20px w-100% rounded-6px">
-        <view class="ml-20px mb-20px">库存管理</view>
+        <view class="ml-20px mb-20px">库存</view>
 
         <view class="flex flex-wrap">
           <view

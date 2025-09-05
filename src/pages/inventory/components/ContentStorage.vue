@@ -32,8 +32,11 @@ const saveClick = async () => {
   if (props.scanCodeType == '初盘') {
     Model.F_QADV_PDEntry[0] = {
       FEntryId: reactiveData.detailsList[0].entity,
-      F_QADV_FPQTY: reactiveData.detailsList[0].currentList[13].value,
-      F_QADV_FPCYQTY: reactiveData.detailsList[0].currentList[13].value,
+
+      F_QADV_CPQTY: reactiveData.detailsList[0].currentList[12].value,
+      F_QADV_CYQTY:
+        reactiveData.detailsList[0].currentList[12].value -
+        reactiveData.detailsList[0].currentList[11].value,
       F_QADV_YG: {
         FUSERACCOUNT: username
       },
@@ -42,8 +45,10 @@ const saveClick = async () => {
   } else {
     Model.F_QADV_PDEntry[0] = {
       FEntryId: reactiveData.detailsList[0].entity,
-      F_QADV_CPQTY: reactiveData.detailsList[0].currentList[13].value,
-      F_QADV_CYQTY: reactiveData.detailsList[0].currentList[13].value,
+      F_QADV_FPQTY: reactiveData.detailsList[0].currentList[12].value,
+      F_QADV_FPCYQTY:
+        reactiveData.detailsList[0].currentList[12].value -
+        reactiveData.detailsList[0].currentList[11].value,
       F_QADV_YGFP: {
         FUSERACCOUNT: username
       },

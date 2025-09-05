@@ -187,7 +187,7 @@ const quantChange = debounce((val: any, item: any) => {
       let Quantity = val
       //如果val大于可领数量，赋值为可领数量
       if (
-        props.title !== '简单生产领料' &&
+        props.title !== '简单生产退料' &&
         Quantity > reactiveData.detailsList[reactiveData.barcodeIndex].canReceive
       ) {
         Quantity = reactiveData.detailsList[reactiveData.barcodeIndex].canReceive

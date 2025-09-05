@@ -60,3 +60,45 @@ export function lookOutsourcing(Number: any) {
   }
   return viewApi(data) as any
 }
+
+//查看生产退料单
+export function lookReturn(Number: any) {
+  const data = {
+    FormId: `PRD_ReturnMtrl`,
+    data: {
+      CreateOrgId: 0,
+      Number: Number,
+      Id: '',
+      IsSortBySeq: 'false'
+    }
+  }
+  return viewApi(data) as any
+}
+
+//查看简单生产退料单
+export function lookSimpleReturn(Number: any) {
+  const data = {
+    FormId: `SP_ReturnMtrl`,
+    data: {
+      CreateOrgId: 0,
+      Number: Number,
+      Id: '',
+      IsSortBySeq: 'false'
+    }
+  }
+  return viewApi(data) as any
+}
+
+//查看委外生产退料单
+export function lookOutsourcingReturn(Number: any) {
+  const data = {
+    FormId: `SUB_RETURNMTRL`,
+    data: {
+      CreateOrgId: 0,
+      Number: Number,
+      Id: '',
+      IsSortBySeq: 'false'
+    }
+  }
+  return viewApi(data) as any
+}

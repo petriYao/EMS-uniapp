@@ -17,16 +17,23 @@ export const getcamelCase = async (searchValue: any, scanCodeType: string) => {
       })
       return { dataList: [], fid: 0 }
     }
-    if (res.data.Result?.Result?.DocumentStatus === 'C') {
+    if (res.data.Result?.Result?.DocumentStatus !== 'C') {
       uni.showToast({
         title: '盘点单未审核',
         icon: 'none'
       })
       return { dataList: [], fid: 0 }
     }
-    if (res.data.Result?.Result?.F_QADV_CLOSESTATUS === 'B') {
+    if (res.data.Result?.Result?.F_QADV_CloseStatus === 'B') {
       uni.showToast({
         title: '盘点单已关闭',
+        icon: 'none'
+      })
+      return { dataList: [], fid: 0 }
+    }
+    if (entrySeq > res.data.Result.Result.F_QADV_PDEntry.length) {
+      uni.showToast({
+        title: '无盘点表',
         icon: 'none'
       })
       return { dataList: [], fid: 0 }
@@ -92,7 +99,7 @@ function buildDataList(entry: any, searchValue: string, scanCodeType: string) {
     }
   }
 
-  console.log('actualValue', entry.F_QADV_NUMBER.MaterialStock)
+  console.log('actualValue', entry)
   return {
     currentList: [
       {
@@ -125,39 +132,30 @@ function buildDataList(entry: any, searchValue: string, scanCodeType: string) {
       },
       {
         label: '批号',
-        value: entry.F_QADV_LOT_Text,
+        value:
+          entry.F_QADV_FLOT && entry.F_QADV_FLOT.trim() !== ''
+            ? entry.F_QADV_FLOT
+            : entry.F_QADV_LOT_Text,
         disabled: true,
         type: 'input',
         style: { width: '100%' }
       },
       {
         label: '合同',
-        value: entry.F_QADV_HTNO + (entry.F_QADV_HTENTRY !== '0' ? '-' + entry.F_QADV_HTENTRY : ''),
+        value: entry.F_QADV_HTNO + (entry.F_QADV_HTENTRY !== ' ' ? '-' + entry.F_QADV_HTENTRY : ''),
         disabled: true,
         type: 'input',
-        style: { width: '65%' }
+        style: { width: '100%' }
       },
-      {
-        label: '件数',
-        value: entry.F_QADV_JSQTY,
-        disabled: true,
-        type: 'input',
-        style: { width: '35%' }
-      },
+
       {
         label: '客户',
         value: entry.F_QADV_KH?.Name?.[0]?.Value,
         disabled: true,
         type: 'input',
-        style: { width: '65%' }
+        style: { width: '100%' }
       },
-      {
-        label: '单位',
-        value: entry.F_QADV_NUMBER.MaterialStock[0].StoreUnitID?.Name[0].Value,
-        disabled: true,
-        type: 'input',
-        style: { width: '35%' }
-      },
+
       {
         label: '仓库',
         value: entry.F_QADV_STOCKID?.Name[0].Value,
@@ -174,7 +172,14 @@ function buildDataList(entry: any, searchValue: string, scanCodeType: string) {
       },
       {
         label: '储位',
-        value: actualValue?.Number,
+        value: entry?.F_QADV_CW,
+        disabled: true,
+        type: 'input',
+        style: { width: '100%' }
+      },
+      {
+        label: '单位',
+        value: entry.F_QADV_NUMBER.MaterialStock[0].StoreUnitID?.Name[0].Value,
         disabled: true,
         type: 'input',
         style: { width: '100%' }
@@ -190,7 +195,7 @@ function buildDataList(entry: any, searchValue: string, scanCodeType: string) {
         label: '实盘',
         value: scanCodeType === '初盘' ? entry.F_QADV_CPQTY : entry.F_QADV_FPQTY,
         disabled: false,
-        type: 'input',
+        type: 'number',
         style: { width: '100%' }
       }
     ],

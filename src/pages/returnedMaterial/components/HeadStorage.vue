@@ -26,7 +26,7 @@ const reactiveData = reactive({
       disabled: false
     },
     {
-      name: '扫单领料',
+      name: '扫单退料',
       disabled: false
     }
   ],

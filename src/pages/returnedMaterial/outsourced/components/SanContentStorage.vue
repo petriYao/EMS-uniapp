@@ -8,7 +8,7 @@ import { throttleSave } from '@/utils'
 const reactiveData = reactive({
   detailsList: [] as any,
   setData: {} as any,
-  title: '委外领料',
+  title: '委外退料',
   barcodeIndex: 0,
   loading: true,
   isShow: true

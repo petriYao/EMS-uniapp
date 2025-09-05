@@ -6,11 +6,11 @@ import SanContentStorage from './components/SanContentStorage.vue'
 
 import { debounceSave } from '@/utils'
 
-//委外领料单
+//委外退料单
 const reactiveData = reactive({
   isShow: true, //是否选择
   loading: false, //是否保存
-  title: '委外领料',
+  title: '委外退料',
   FEntity: [] as any, //单据提交
   scanCodeType: '单码双扫'
 })
@@ -19,7 +19,7 @@ const contentStorageRef = ref() //标题组件引用
 const sanContentStorageRef = ref()
 
 const saveClick = debounceSave(async () => {
-  if (reactiveData.scanCodeType == '扫单领料') {
+  if (reactiveData.scanCodeType == '扫单退料') {
     sanContentStorageRef.value?.saveClick()
   } else {
     contentStorageRef.value?.saveClick()
@@ -34,7 +34,7 @@ const saveClick = debounceSave(async () => {
     <view v-if="reactiveData.scanCodeType == '单码双扫'">
       <ContentStorage ref="contentStorageRef" />
     </view>
-    <view v-if="reactiveData.scanCodeType == '扫单领料'">
+    <view v-if="reactiveData.scanCodeType == '扫单退料'">
       <SanContentStorage ref="sanContentStorageRef" />
     </view>
   </scroll-view>

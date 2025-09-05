@@ -52,6 +52,7 @@ const searchChange = () => {
     if (!queryRes?.dataList?.length) {
       // showToast('未找到相关单据')
       searchValue.value = ''
+      resetFocus()
       return
     }
     detailsList.value = queryRes.dataList

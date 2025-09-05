@@ -8,7 +8,7 @@ import { saveMaterialRequisition } from '@/common/returnMaterial/OtherOutbound'
 const reactiveData = reactive({
   detailsList: [] as any,
   setData: {} as any,
-  title: '生产领料',
+  title: '生产退料',
   barcodeIndex: 0,
   loading: true,
   isShow: true
