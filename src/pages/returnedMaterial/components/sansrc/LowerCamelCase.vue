@@ -12,6 +12,10 @@ const props = defineProps({
   title: {
     type: String,
     default: ''
+  },
+  locationList: {
+    type: Array as any,
+    default: () => []
   }
 })
 //类型式声明
@@ -306,6 +310,19 @@ watch(
   () => props.detailsList,
   (val: any) => {
     reactiveData.detailsList = val
+  },
+  { immediate: true, deep: true }
+)
+
+watch(
+  () => props.locationList,
+  (val: any) => {
+    if (val && val.length > 0) {
+      reactiveData.locationList = val
+    } else {
+      reactiveData.locationList = []
+    }
+    console.log('页面数据改动', val)
   },
   { immediate: true, deep: true }
 )
