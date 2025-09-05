@@ -282,7 +282,7 @@ const handleBarcodeAddition = (index: number, queryRes: any) => {
   detailsList.value[index].Quantity++
   detailsList.value[index].IsSplit = queryRes.IsSplit
   detailsList.value[index].currentList[6].value =
-    queryRes.ContractNo + '-' + queryRes.ContractLineNo // 合同
+    queryRes.ContractNo + (queryRes.ContractLineNo !== 0 ? '-' + queryRes.ContractLineNo : '') // 合同
   detailsList.value[index].currentList[7].value = queryRes.F_POQTY // 批量
   detailsList.value[index].currentList[8].value = queryRes.Customer // 客户
   detailsList.value[index].currentList[9].value = queryRes.TotalBox // 总箱数

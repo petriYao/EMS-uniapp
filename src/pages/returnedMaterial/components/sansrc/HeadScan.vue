@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { reactive, onBeforeUnmount, onBeforeMount, ref } from 'vue'
-import { queryStorage } from '@/api/modules/storage'
-import { scanBarCode, getSanDan } from '@/common/materialWithdrawal/Index'
-import { getSanSimple } from '@/common/materialWithdrawal/Simple'
-import { getSanOutsourcing } from '@/common/materialWithdrawal/Outsourced'
+import { queryStorage, lookqueryStorage } from '@/api/modules/storage'
+import { scanBarCode, getSanDan } from '@/common/returnedMaterial/Index'
+import { getSanSimple } from '@/common/returnedMaterial/Simple'
+import { getSanOutsourcing } from '@/common/returnedMaterial/Outsourced'
 import { useEmitt } from '@/hooks/useEmitt'
 import { debounce } from '@/utils'
 
@@ -16,7 +16,7 @@ const props = defineProps({
 
 //数据
 const reactiveData = reactive({
-  searchValue: '', //搜索值
+  searchValue: 'SCTL00000001', //搜索值
   focus: 99,
   heardList: {
     documentNumber: '', //单号
@@ -32,6 +32,7 @@ const reactiveData = reactive({
     locationDisplay: true, //禁用
     FlexNumber: ''
   },
+  locationList: [] as any,
   detailsList: [] as any
 })
 
@@ -46,6 +47,7 @@ const { emitter } = useEmitt()
 const emit = defineEmits<{
   (e: 'update:detailsList', modelValue: any): void
   (e: 'update:setData', modelValue: any): void
+  (e: 'update:locationList', modelValue: any): void
 }>()
 
 const searchInput = ref()
@@ -94,7 +96,8 @@ const searchChange = debounce(async () => {
         reactiveData.setData.fid = queryRes.fid
         reactiveData.detailsList = queryRes.dataList
         reactiveData.heardList.documentNumber = reactiveData.searchValue
-
+        console.log('查询结果2', queryRes.dataList[0])
+        getWarehousePosition(queryRes.dataList[0].stockNumber)
         // 安全检查确保数据存在
         if (queryRes.dataList[0]) {
           reactiveData.heardList.warehouse = queryRes.dataList[0].stockName || ''
@@ -142,8 +145,13 @@ const searchChange = debounce(async () => {
               icon: 'none'
             })
           }
-          reactiveData.detailsList[index].currentList[11].value =
-            reactiveData.detailsList[index].Quantity2
+
+          const inventoryField = reactiveData.detailsList[index].currentList.find(
+            (i: any) => i.label === '数量'
+          )
+          if (inventoryField) {
+            inventoryField.value = reactiveData.detailsList[index].Quantity2
+          }
         } else {
           reactiveData.detailsList[index].Quantity2 = Quantity
           //当数量大于可领数量时，赋值为可领数量
@@ -157,7 +165,13 @@ const searchChange = debounce(async () => {
               icon: 'none'
             })
           }
-          reactiveData.detailsList[index].currentList[11].value = Quantity
+          const inventoryField = reactiveData.detailsList[index].currentList.find(
+            (i: any) => i.label === '数量'
+          )
+          if (inventoryField) {
+            inventoryField.value = Quantity
+          }
+
           reactiveData.detailsList[index].isLowerCamelCase = true
         }
 
@@ -167,18 +181,18 @@ const searchChange = debounce(async () => {
 
         // 循环遍历EntityList，依次分配值给Quantity2，以canReceive为上限
         for (const item of entityList) {
-          if (remainingValue <= 0) break
+          //if (remainingValue <= 0) break
 
           // 计算可以分配给当前项的最大值（不超过canReceive）
           const maxAssignable = Math.min(remainingValue, item.canReceive || 0)
 
           // 分配值给Quantity2
           item.Quantity2 = maxAssignable
-
+          console.log('maxAssignable', maxAssignable)
           // 更新剩余值
           remainingValue -= maxAssignable
         }
-
+        console.log('entityList', entityList)
         // 更新父组件的数据
         emitter.emit('update:barcodeIndex', index)
       } else {
@@ -227,6 +241,62 @@ const getWarehouseList = async () => {
       title: '获取仓库列表失败',
       icon: 'none'
     })
+  }
+}
+
+// 仓库选择器确认
+const pickerConfirm = async (val: any) => {
+  reactiveData.heardList.warehouse = val.text
+  reactiveData.setData.warehouseNumber = val.value
+  reactiveData.setData.warehouseId = val.id
+  //清空明细中的仓位
+
+  getWarehousePosition(val.value)
+  emit('update:setData', reactiveData.setData)
+  emit('update:detailsList', reactiveData.detailsList)
+  warehouseData.show = false
+}
+//获取仓位
+const getWarehousePosition = async (warehouseId: any) => {
+  console.log('获取仓位', warehouseId)
+  //查看仓位
+  if (warehouseId) {
+    const res: any = await lookqueryStorage(warehouseId)
+    console.log('res', res)
+    if (res) {
+      const list = res.data.Result.Result.StockFlexItem[0].StockFlexDetail
+      reactiveData.setData.FlexNumber = res.data.Result.Result.StockFlexItem[0].FlexId?.FlexNumber
+      console.log('list', list)
+      if (list[0].Id === 0) {
+        reactiveData.locationList = []
+        reactiveData.setData.locationDisplay = true
+        focusTm()
+        handleFocus()
+        emit('update:locationList', reactiveData.locationList)
+        return
+      }
+      reactiveData.locationList = list.map((item: any) => {
+        return {
+          Id: item.Id,
+          text: item.FlexEntryId.Name[0].Value,
+          value: item.FlexEntryId.Number
+        }
+      })
+
+      if (reactiveData.locationList.length == 0) {
+        reactiveData.setData.locationDisplay = true
+        focusTm()
+      } else {
+        reactiveData.setData.locationDisplay = false
+        setTimeout(() => {
+          console.log('到我')
+          reactiveData.focus = 2
+        }, 200)
+      }
+      handleFocus()
+      emit('update:locationList', reactiveData.locationList)
+      console.log('reactiveData.locationList', reactiveData.locationList)
+    }
   }
 }
 
@@ -302,7 +372,7 @@ onBeforeUnmount(() => {
     </view>
     <view class="flex items-center py-4rpx w-100%">
       <view class="w-50px flex justify-center">单号</view>
-      <view class="flex-1 mr-20rpx" style="border: 1px solid #f8f8f8" @click="clearTimer">
+      <view class="flex-1 mr-20rpx" style="border: 1px solid #f8f8f8">
         <u-input
           ref="searchInput"
           v-model="reactiveData.heardList.documentNumber"
@@ -311,6 +381,61 @@ onBeforeUnmount(() => {
           shape="round"
           placeholder=""
         />
+      </view>
+    </view>
+    <!-- 仓库 -->
+    <view class="flex items-center py-4rpx w-100%">
+      <view class="w-50px flex justify-center">仓库</view>
+      <view class="flex-1 mr-20rpx" style="border: 1px solid #f8f8f8">
+        <u-input
+          v-model="reactiveData.heardList.warehouse"
+          :focus="reactiveData.focus === 1"
+          shape="round"
+          placeholder=""
+        >
+          <template #suffix>
+            <view @click="warehouseData.show = true">
+              <u-icon name="arrow-down" size="20" />
+            </view>
+            <view>
+              <u-action-sheet
+                :show="warehouseData.show"
+                round="10"
+                :closeOnClickOverlay="true"
+                :closeOnClickAction="true"
+                @close="warehouseData.show = false"
+              >
+                <view class="flex items-center p-20rpx" style="border-bottom: 1px solid #f8f8f8">
+                  <view>搜索</view>
+                  <view class="flex-1">
+                    <u-input
+                      v-model="warehouseData.scValue"
+                      shape="round"
+                      placeholder="请输入搜索关键词"
+                      @blur="handleFocus"
+                    />
+                  </view>
+                </view>
+                <scroll-view scroll-y style="height: 800rpx">
+                  <view
+                    class=""
+                    v-for="(warehouseItem, index) in warehouseData.warehouseList"
+                    :key="index"
+                  >
+                    <view
+                      class="flex justify-center py-10px"
+                      style="border-bottom: 1px solid #f8f8f8"
+                      v-if="warehouseItem.value.indexOf(warehouseData.scValue || '') !== -1"
+                      @tap="pickerConfirm(warehouseItem)"
+                    >
+                      {{ warehouseItem.text }}
+                    </view>
+                  </view>
+                </scroll-view>
+              </u-action-sheet>
+            </view>
+          </template>
+        </u-input>
       </view>
     </view>
   </view>

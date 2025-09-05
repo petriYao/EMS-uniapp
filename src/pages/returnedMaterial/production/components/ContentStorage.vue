@@ -75,6 +75,15 @@ const saveClick = throttleSave(async () => {
         //跳过
         continue
       }
+      if (reactiveData.locationList.length > 0) {
+        if (item.detailList.locationNumber == '') {
+          uni.showToast({
+            title: `第${i + 1}行仓位不可为空`,
+            icon: 'none'
+          })
+          return
+        }
+      }
       const FStockLocPJ = 'FSTOCKLOCID__' + reactiveData.setData.FlexNumber
       const FStockLocId = {} as any
       FStockLocId[FStockLocPJ] = {
@@ -107,12 +116,12 @@ const saveClick = throttleSave(async () => {
     // 查询条码状态
     const tmStatusRes: any = await TMStatusQuery({
       barcodes: barcodeList,
-      status: '2'
+      status: '1,3'
     })
 
     console.log('tmStatusRes', tmStatusRes)
 
-    if (tmStatusRes && tmStatusRes.data && tmStatusRes.data.length !== barcodeList.length) {
+    if (tmStatusRes && tmStatusRes.data && tmStatusRes.data.length > 0) {
       // 条码状态不为1的提示
       uni.showToast({
         title: `编码${tmStatusRes.data[0]['material_fnumber']}中，条码${tmStatusRes.data[0]['FNUMBER']}非审核、创建/出库、非作废状态`,
@@ -128,7 +137,6 @@ const saveClick = throttleSave(async () => {
 
     console.log('Model', Model)
     console.log('Model', JSON.stringify(Model))
-
     // 保存生产退料单
     const res = await saveMaterialReturn(Model)
     console.log('保存结果', res)

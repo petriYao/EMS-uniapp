@@ -408,7 +408,7 @@ export function saveMaterialReturn(Model: any, IsAutoSubmitAndAudit = true) {
   const data = {
     formid: 'PRD_ReturnMtrl',
     data: {
-      IsDeleteEntry: 'false',
+      IsDeleteEntry: 'true',
       IsAutoSubmitAndAudit: IsAutoSubmitAndAudit,
       Model: Model
     }

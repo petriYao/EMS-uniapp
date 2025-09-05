@@ -7,6 +7,7 @@ import { saveMaterialRequisition } from '@/common/returnMaterial/OtherOutbound'
 
 const reactiveData = reactive({
   detailsList: [] as any,
+  locationList: [] as any,
   setData: {} as any,
   title: '生产退料',
   barcodeIndex: 0,
@@ -137,11 +138,15 @@ defineExpose({
       :title="reactiveData.title"
       v-model:detailsList="reactiveData.detailsList"
       v-model:setData="reactiveData.setData"
+      v-model:locationList="reactiveData.locationList"
     />
   </view>
   <!-- 内容 -->
   <view class="bg-#FFF" v-if="reactiveData.loading">
-    <LowerCamelCase v-model:detailsList="reactiveData.detailsList" />
+    <LowerCamelCase
+      v-model:detailsList="reactiveData.detailsList"
+      v-model:locationList="reactiveData.locationList"
+    />
   </view>
 </template>
 <style lang="less" scoped>

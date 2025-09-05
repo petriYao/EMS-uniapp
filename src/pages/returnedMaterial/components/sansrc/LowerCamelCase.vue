@@ -321,7 +321,10 @@ onBeforeMount(() => {
     :current="reactiveData.curNow"
     @change="reactiveData.curNow = $event"
   />
-  <scroll-view scroll-y style="height: calc(100vh - 44px - 44px - 40px - 34px - 40px - 22px)">
+  <scroll-view
+    scroll-y
+    style="height: calc(100vh - 44px - 44px - 40px - 34px - 40px - 40px - 22px)"
+  >
     <!-- 当前 -->
     <view v-if="reactiveData.curNow == 0" class="flex flex-wrap content-input">
       <view
@@ -464,20 +467,14 @@ onBeforeMount(() => {
             </view>
 
             <view class="flex items-center">
-              <view class="min-w-50px text-end">储位：</view>
-              <view class="flex-wrap">{{
-                item.detailList.storageLocation || item.detailList.stockLocName
-              }}</view>
-            </view>
-            <view class="flex items-center">
               <view class="min-w-50px text-end">源单：</view>
               <view class="flex-wrap">{{ item?.SrcBillNo }} - {{ item?.SrcEntrySeq }}</view>
             </view>
 
             <view class="flex">
               <view class="w-33% flex items-center h-20px">
-                <view class="w-50px text-end">库存：</view>
-                <view> {{ item.detailList.inventory }}</view>
+                <view class="w-50px text-end">仓位：</view>
+                <view> {{ item.detailList.stockLocName }}</view>
               </view>
 
               <view class="w-33% flex items-center h-20px">
@@ -532,16 +529,9 @@ onBeforeMount(() => {
             </view>
 
             <view class="flex">
-              <view class="min-w-50px text-end">储位：</view>
-              <view class="flex-wrap">{{
-                item.detailList.storageLocation || item.detailList.stockLocName
-              }}</view>
-            </view>
-
-            <view class="flex">
               <view class="w-33% flex items-center h-20px">
-                <view class="w-50px text-end">仓库：</view>
-                <view> {{ item.detailList.inventory }}</view>
+                <view class="w-50px text-end">仓位：</view>
+                <view> {{ item.detailList.stockLocName }}</view>
               </view>
 
               <view class="w-33% flex items-center h-20px">
