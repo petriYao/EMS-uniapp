@@ -24,8 +24,8 @@ const reactiveData = reactive({
 // 保存方法
 const saveClick = throttleSave(async () => {
   try {
-    console.log('保存1', reactiveData.detailsList)
-    console.log('保存2', reactiveData.setData)
+    console.log('生产退料保存1', reactiveData.detailsList)
+    console.log('生产退料保存2', reactiveData.setData)
 
     if (reactiveData.detailsList.length === 0) {
       uni.showToast({
@@ -34,7 +34,13 @@ const saveClick = throttleSave(async () => {
       })
       return
     }
-
+    if (!reactiveData.setData.warehouseNumber) {
+      uni.showToast({
+        title: '仓库不可为空',
+        icon: 'none'
+      })
+      return
+    }
     const Model = {
       FID: reactiveData.setData.fid,
       FEntity: [] as any[]

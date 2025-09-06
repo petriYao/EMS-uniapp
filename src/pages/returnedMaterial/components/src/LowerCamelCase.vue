@@ -217,13 +217,18 @@ const warehouseChange = debounceSave((val: any) => {
   //获取仓库id替换为仓库名称
   const warehouseId: any = reactiveData.locationList.find((item: any) => item.value === val)
   console.log('warehouseId1', warehouseId)
-  if (!warehouseId && val != '') {
+  if (!warehouseId || val != '') {
     //提示仓库不存在
     uni.showToast({
       title: '仓位不存在',
       icon: 'none'
     })
     reactiveData.detailsList[reactiveData.barcodeIndex].currentList[12].value = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].WarehouseId = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].WarehouseNumber = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].detailList.location = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].detailList.locationNumber = ''
+    console.log('reactiveData.detailsList', reactiveData.detailsList[reactiveData.barcodeIndex])
     return
   }
   reactiveData.detailsList[reactiveData.barcodeIndex].currentList[12].value = warehouseId.value
@@ -256,6 +261,7 @@ const pickerConfirm = (warehouseItem: any) => {
 }
 
 const clearTimer = () => {
+  console.log('清除定时器')
   // 清除定时器
   emitter.emit('update:clearTimer')
 }

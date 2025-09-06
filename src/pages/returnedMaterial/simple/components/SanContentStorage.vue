@@ -2,11 +2,12 @@
 import { reactive } from 'vue'
 import HeadScan from '../../components/sansrc/HeadScan.vue'
 import LowerCamelCase from '../../components/sansrc/LowerCamelCase.vue'
-import { saveSimpleMaterialRequisition } from '@/common/returnMaterial/OtherOutbound'
 import { throttleSave } from '@/utils'
+import { saveSimpleMaterialReturn } from '@/common/returnMaterial/OtherOutbound'
 
 const reactiveData = reactive({
   detailsList: [] as any,
+  locationList: [] as any,
   setData: {} as any,
   title: '简单生产退料',
   barcodeIndex: 0,
@@ -21,6 +22,13 @@ const saveClick = throttleSave(async () => {
   if (reactiveData.detailsList.length == 0) {
     uni.showToast({
       title: '无提交数据',
+      icon: 'none'
+    })
+    return
+  }
+  if (!reactiveData.setData.warehouseNumber) {
+    uni.showToast({
+      title: '仓库不可为空',
       icon: 'none'
     })
     return
@@ -40,15 +48,6 @@ const saveClick = throttleSave(async () => {
     if (item.Quantity2 == 0 || item.Quantity2 == '0') {
       continue
     } else {
-      let cangku = item.currentList.find((i: any) => i.label === '仓库')
-      console.log('cangku', cangku)
-      if (cangku.value == '') {
-        uni.showToast({
-          title: '仓库不可为空',
-          icon: 'none'
-        })
-        return
-      }
       let cangwei = item.currentList.find((i: any) => i.label === '仓位')
       if (!cangwei.disabled && cangwei.value == '') {
         uni.showToast({
@@ -87,17 +86,17 @@ const saveClick = throttleSave(async () => {
         FNumber: item.stockNumber
       },
       FStockLocId: FStockLocId,
-      FActualQty: 0
+      FQty: 0
     } as any
 
     for (const barcode of item.EntityList) {
       FEntity.FEntryID = barcode.entryId
-      FEntity.FActualQty = barcode.Quantity2
+      FEntity.FQty = barcode.Quantity2
       Model.FEntity.push(JSON.parse(JSON.stringify(FEntity)))
     }
   }
   console.log('保存3', Model)
-  const res = await saveSimpleMaterialRequisition(Model)
+  const res = await saveSimpleMaterialReturn(Model)
   if (res && res.data && res.data?.Result?.Number) {
     uni.showToast({
       icon: 'none',
@@ -137,11 +136,15 @@ defineExpose({
       :title="reactiveData.title"
       v-model:detailsList="reactiveData.detailsList"
       v-model:setData="reactiveData.setData"
+      v-model:locationList="reactiveData.locationList"
     />
   </view>
   <!-- 内容 -->
   <view class="bg-#FFF" v-if="reactiveData.loading">
-    <LowerCamelCase v-model:detailsList="reactiveData.detailsList" :title="reactiveData.title" />
+    <LowerCamelCase
+      v-model:detailsList="reactiveData.detailsList"
+      v-model:locationList="reactiveData.locationList"
+    />
   </view>
 </template>
 <style lang="less" scoped>

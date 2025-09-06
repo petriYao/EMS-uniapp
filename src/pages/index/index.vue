@@ -190,7 +190,7 @@ onBeforeMount(() => {
         break
       case '43':
         tempLists.crmList6.push({
-          name: '简单生产退料',
+          name: '简单退料',
           icon: '/static/index/Reportingforwork.png',
           src: 'returnedMaterial/simple/Index'
         })

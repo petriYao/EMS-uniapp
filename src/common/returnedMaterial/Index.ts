@@ -435,7 +435,7 @@ export const getSanDan = async (searchValue: any) => {
     // 处理异常情况
     if (res.data.Result?.ResponseStatus?.IsSuccess === false) {
       uni.showToast({
-        title: '生产领料单不存在',
+        title: '生产退料单不存在',
         icon: 'none'
       })
       return { dataList: [], fid: 0 }
@@ -714,6 +714,16 @@ export const scanBarCode = async (searchValue: any) => {
       Lot: barCodeData.F_WLLOT === ' ' ? '' : barCodeData.F_WLLOT,
       //名称
       Name: barCodeData.F_NUMBER.Name[0].Value,
+      //合同
+      contract:
+        barCodeData.F_HTNO +
+        (barCodeData.F_QADV_HTENTRYID !== 0 ? '-' + barCodeData.F_QADV_HTENTRYID : ''),
+      //批量
+      batch: barCodeData.F_POQTY,
+      //客户
+      customer: barCodeData.FCUSTID?.Name[0].Value,
+      //总箱数
+      totalBox: barCodeData.F_TOTALCARTONQTY,
       //当前条码数量
       CurrentQty: barCodeData.F_UNITQTY
     }

@@ -34,7 +34,13 @@ const saveClick = throttleSave(async () => {
       })
       return
     }
-
+    if (!reactiveData.setData.warehouseNumber) {
+      uni.showToast({
+        title: '仓库不可为空',
+        icon: 'none'
+      })
+      return
+    }
     const Model = {
       FID: reactiveData.setData.fid,
       FEntity: [] as any[]
@@ -75,6 +81,16 @@ const saveClick = throttleSave(async () => {
         //跳过
         continue
       }
+
+      if (reactiveData.locationList.length > 0) {
+        if (item.detailList.locationNumber == '') {
+          uni.showToast({
+            title: `第${i + 1}行仓位不可为空`,
+            icon: 'none'
+          })
+          return
+        }
+      }
       const FStockLocPJ = 'FSTOCKLOCID__' + reactiveData.setData.FlexNumber
       const FStockLocId = {} as any
       FStockLocId[FStockLocPJ] = {
@@ -111,8 +127,7 @@ const saveClick = throttleSave(async () => {
     })
 
     console.log('tmStatusRes', tmStatusRes)
-
-    if (tmStatusRes && tmStatusRes.data && tmStatusRes.data.length !== barcodeList.length) {
+    if (tmStatusRes && tmStatusRes.data && tmStatusRes.data.length > 0) {
       // 条码状态不为1的提示
       uni.showToast({
         title: `编码${tmStatusRes.data[0]['material_fnumber']}中，条码${tmStatusRes.data[0]['FNUMBER']}非审核、创建/出库、非作废状态`,

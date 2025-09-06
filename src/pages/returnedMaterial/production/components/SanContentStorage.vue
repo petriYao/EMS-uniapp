@@ -3,7 +3,7 @@ import { reactive } from 'vue'
 import HeadScan from '../../components/sansrc/HeadScan.vue'
 import LowerCamelCase from '../../components/sansrc/LowerCamelCase.vue'
 import { throttleSave } from '@/utils'
-import { saveMaterialRequisition } from '@/common/returnMaterial/OtherOutbound'
+import { saveMaterialReturn } from '@/common/returnMaterial/OtherOutbound'
 
 const reactiveData = reactive({
   detailsList: [] as any,
@@ -26,6 +26,13 @@ const saveClick = throttleSave(async () => {
     })
     return
   }
+  if (!reactiveData.setData.warehouseNumber) {
+    uni.showToast({
+      title: '仓库不可为空',
+      icon: 'none'
+    })
+    return
+  }
   let index = 1
   let flag = false
   for (const item of reactiveData.detailsList) {
@@ -41,15 +48,6 @@ const saveClick = throttleSave(async () => {
     if (item.Quantity2 == 0 || item.Quantity2 == '0') {
       continue
     } else {
-      let cangku = item.currentList.find((i: any) => i.label === '仓库')
-      console.log('cangku', cangku)
-      if (cangku.value == '') {
-        uni.showToast({
-          title: '仓库不可为空',
-          icon: 'none'
-        })
-        return
-      }
       let cangwei = item.currentList.find((i: any) => i.label === '仓位')
       if (!cangwei.disabled && cangwei.value == '') {
         uni.showToast({
@@ -88,17 +86,17 @@ const saveClick = throttleSave(async () => {
         FNumber: item.stockNumber
       },
       FStockLocId: FStockLocId,
-      FActualQty: 0
+      FQty: 0
     } as any
 
     for (const barcode of item.EntityList) {
       FEntity.FEntryID = barcode.entryId
-      FEntity.FActualQty = barcode.Quantity2
+      FEntity.FQty = barcode.Quantity2
       Model.FEntity.push(JSON.parse(JSON.stringify(FEntity)))
     }
   }
   console.log('保存3', Model)
-  const res = await saveMaterialRequisition(Model)
+  const res = await saveMaterialReturn(Model)
   if (res && res.data && res.data?.Result?.Number) {
     uni.showToast({
       icon: 'none',

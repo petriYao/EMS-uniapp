@@ -5,7 +5,8 @@ import { scanBarCode, getSanDan } from '@/common/returnedMaterial/Index'
 import { getSanSimple } from '@/common/returnedMaterial/Simple'
 import { getSanOutsourcing } from '@/common/returnedMaterial/Outsourced'
 import { useEmitt } from '@/hooks/useEmitt'
-import { debounce } from '@/utils'
+import { debounce, debounceSave } from '@/utils'
+import { getStockLoc } from '@/common/comModel/Index'
 
 const props = defineProps({
   title: {
@@ -16,7 +17,7 @@ const props = defineProps({
 
 //数据
 const reactiveData = reactive({
-  searchValue: 'SCTL00000001', //搜索值
+  searchValue: '', //搜索值
   focus: 99,
   heardList: {
     documentNumber: '', //单号
@@ -105,14 +106,8 @@ const searchChange = debounce(async () => {
           reactiveData.setData.warehouseId = queryRes.dataList[0].stockNumber || '' // 仓库ID通常与编号相同
           reactiveData.setData.FlexNumber = queryRes.dataList[0].FlexNumber || ''
         }
-
         emit('update:setData', reactiveData.setData)
         emit('update:detailsList', reactiveData.detailsList)
-      } else {
-        // uni.showToast({
-        //   title: '未找到相关单据',
-        //   icon: 'none'
-        // })
       }
     } else {
       //调用条码（单据查询）
@@ -172,6 +167,35 @@ const searchChange = debounce(async () => {
             inventoryField.value = Quantity
           }
 
+          //合同，客户，批量，总箱数
+
+          const contractField = reactiveData.detailsList[index].currentList.find(
+            (i: any) => i.label === '合同'
+          )
+          if (contractField) {
+            contractField.value = queryRes.contract
+          }
+
+          const batchField = reactiveData.detailsList[index].currentList.find(
+            (i: any) => i.label === '批量'
+          )
+          if (batchField) {
+            batchField.value = queryRes.batch
+          }
+
+          const customerField = reactiveData.detailsList[index].currentList.find(
+            (i: any) => i.label === '客户'
+          )
+          if (customerField) {
+            customerField.value = queryRes.customer
+          }
+
+          const totalBoxField = reactiveData.detailsList[index].currentList.find(
+            (i: any) => i.label === '总箱数'
+          )
+          if (totalBoxField) {
+            totalBoxField.value = queryRes.totalBox
+          }
           reactiveData.detailsList[index].isLowerCamelCase = true
         }
 
@@ -215,7 +239,58 @@ const searchChange = debounce(async () => {
   }
 }, 200)
 
+// 仓库变更
+const warehouseChange = debounceSave(async (val: string) => {
+  reactiveData.heardList.location = ''
+  const warehouse = warehouseData.warehouseList.find((item: any) => item.value === val)
+  if (!warehouse && val) {
+    uni.showToast({ title: '仓库不存在', icon: 'none' })
+    reactiveData.heardList.warehouse = ''
+    reactiveData.setData.warehouseNumber = ''
+    reactiveData.setData.warehouseId = ''
+    focusTm()
+    setTimeout(() => {
+      reactiveData.focus = 1
+    }, 200)
+    return
+  }
+  reactiveData.heardList.warehouse = warehouse.text
+  reactiveData.setData.warehouseNumber = warehouse.value
+  reactiveData.setData.warehouseId = warehouse.id
+  handleFocus()
+  await getWarehousePosition(val)
+  //清空明细中的仓位,并获取推荐仓位
+  await clearStock()
+  emit('update:setData', reactiveData.setData)
+  emit('update:detailsList', reactiveData.detailsList)
+})
+
+//仓位清空
+const clearStock = async () => {
+  console.log('清空明细中的仓位')
+  reactiveData.detailsList.forEach(async (item: any) => {
+    console.log('清空明细中的仓位1', reactiveData.setData.FlexNumber)
+    item.WarehousePosition = ''
+    item.WarehousePositionName = ''
+    item.WarehousePositionId = ''
+    item.detailList.location = ''
+    item.currentList[12].value = ''
+
+    //删除FlexNumber第一个字符
+    let FlexNumber = reactiveData.setData.FlexNumber.substring(1)
+    let TJStockId = await getStockLoc(
+      item.MaterialCode,
+      item.Lot,
+      FlexNumber,
+      reactiveData.setData.warehouseNumber
+    )
+    console.log('清空明细中的仓位2', TJStockId)
+    item.currentList[10].value = TJStockId
+  })
+}
+
 const focusTm = () => {
+  console.log('光标重聚')
   reactiveData.focus = 0
   setTimeout(() => {
     reactiveData.focus = 99
@@ -290,7 +365,7 @@ const getWarehousePosition = async (warehouseId: any) => {
         reactiveData.setData.locationDisplay = false
         setTimeout(() => {
           console.log('到我')
-          reactiveData.focus = 2
+          reactiveData.focus = 99
         }, 200)
       }
       handleFocus()
@@ -386,12 +461,13 @@ onBeforeUnmount(() => {
     <!-- 仓库 -->
     <view class="flex items-center py-4rpx w-100%">
       <view class="w-50px flex justify-center">仓库</view>
-      <view class="flex-1 mr-20rpx" style="border: 1px solid #f8f8f8">
+      <view class="flex-1 mr-20rpx" style="border: 1px solid #f8f8f8" @click="clearTimer">
         <u-input
           v-model="reactiveData.heardList.warehouse"
           :focus="reactiveData.focus === 1"
           shape="round"
           placeholder=""
+          @change="warehouseChange"
         >
           <template #suffix>
             <view @click="warehouseData.show = true">

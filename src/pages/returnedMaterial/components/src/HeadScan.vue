@@ -467,6 +467,8 @@ const warehouseChange = debounceSave(async (val: string) => {
   if (!warehouse && val) {
     uni.showToast({ title: '仓库不存在', icon: 'none' })
     heardList.value.warehouse = ''
+    setData.value.warehouseNumber = ''
+    setData.value.warehouseId = ''
     resetFocus()
     setTimeout(() => {
       focus.value = 1
@@ -524,7 +526,12 @@ const clearTimer = () => {
     hideTimer.value = null
   }
 }
-
+useEmitt({
+  name: 'update:clearTimer',
+  callback: async () => {
+    clearTimer()
+  }
+})
 onBeforeUnmount(() => {
   clearTimer()
 })
@@ -567,7 +574,7 @@ onBeforeMount(() => {
     <!-- 仓库 -->
     <view class="flex items-center py-4rpx w-100%">
       <view class="w-50px flex justify-center">仓库</view>
-      <view class="flex-1 mr-20rpx" style="border: 1px solid #f8f8f8">
+      <view class="flex-1 mr-20rpx" style="border: 1px solid #f8f8f8" @click="clearTimer">
         <u-input
           v-model="heardList.warehouse"
           :focus="focus === 1"

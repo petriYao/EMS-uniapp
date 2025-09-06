@@ -156,13 +156,14 @@ const pickerConfirm = (warehouseItem: any, name: any) => {
       (i: any) => i.label === '仓位'
     ).value = warehouseItem.text
     reactiveData.detailsList[reactiveData.barcodeIndex].stockLocName = warehouseItem.text
-    reactiveData.detailsList[reactiveData.barcodeIndex].detailList.stockLocName =
-      warehouseItem.value
+    reactiveData.detailsList[reactiveData.barcodeIndex].stockLocNumber = warehouseItem.value
+    reactiveData.detailsList[reactiveData.barcodeIndex].detailList.stockLocName = warehouseItem.text
     //获取仓库，储位
 
     for (const item of reactiveData.detailsList[reactiveData.barcodeIndex].EntityList) {
       item.stockLocName = warehouseItem.text
-      item.detailList.stockLocName = warehouseItem.value
+      item.detailList.stockLocName = warehouseItem.text
+      item.stockLocNumber = warehouseItem.value
     }
   } else {
     /**仓库名称 */
@@ -179,6 +180,7 @@ const pickerConfirm = (warehouseItem: any, name: any) => {
     ).value = ''
     reactiveData.detailsList[reactiveData.barcodeIndex].stockLocName = ''
     reactiveData.detailsList[reactiveData.barcodeIndex].detailList.stockLocName = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].stockLocNumber = ''
   }
   pickerShow.value = false
   emit('update:detailsList', reactiveData.detailsList)
@@ -291,9 +293,15 @@ const locationChange = debounce((val: any) => {
   reactiveData.detailsList[reactiveData.barcodeIndex].stockLocName = location.text
   reactiveData.detailsList[reactiveData.barcodeIndex].detailList.stockLocName = location.text
   reactiveData.detailsList[reactiveData.barcodeIndex].stockLocNumber = location.value
+  console.log(
+    '选择仓位',
+    reactiveData.detailsList[reactiveData.barcodeIndex].stockLocNumber,
+    location.value
+  )
 }, 300)
 
 const clearTimer = () => {
+  console.log('清除定时器')
   // 清除定时器
   emitter.emit('update:clearTimer')
 }
@@ -383,7 +391,6 @@ onBeforeMount(() => {
           class="flex-1 mr-20rpx"
           style="border: 1px solid #f8f8f8"
           v-else-if="item.type == 'select'"
-          @click="clearTimer"
         >
           <u-input
             v-model="item.value"
@@ -392,6 +399,7 @@ onBeforeMount(() => {
             shape="round"
             placeholder=""
             @change="quantChange($event, item)"
+            @click="clearTimer"
           >
             <template #suffix>
               <view @click="openSelect(item.label, item.disabled)">
