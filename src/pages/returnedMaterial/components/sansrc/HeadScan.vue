@@ -65,6 +65,13 @@ const searchClick = async () => {
   }
 }
 
+// 查找全部匹配的行
+const findMatchingDetails = (queryRes: any): any[] => {
+  return reactiveData.detailsList.filter((item: any) => {
+    return item.MaterialCode === queryRes.MaterialCode && item.Lot === queryRes.Lot
+  })
+}
+
 //扫描条码
 const searchChange = debounce(async () => {
   console.log('搜索值', reactiveData.searchValue)
@@ -119,56 +126,43 @@ const searchChange = debounce(async () => {
         return
       }
 
-      const index = reactiveData.detailsList.findIndex((item: any) => {
-        return item.MaterialCode === queryRes.MaterialCode && item.Lot === queryRes.Lot
-      })
+      // 改为查找全部匹配的明细项，支持同 MaterialCode+Lot 多行
+      const matchingDetails = findMatchingDetails(queryRes)
+      if (!matchingDetails.length) {
+        uni.showToast({ title: '条码与明细不符', icon: 'none' })
+        return focusTm()
+      }
 
-      if (index !== -1) {
-        let Quantity = Number(queryRes.CurrentQty || 0)
+      let matched = false
+      for (const detail of matchingDetails) {
+        const index = reactiveData.detailsList.indexOf(detail)
+        const Quantity = Number(queryRes.CurrentQty || 0)
 
+        // 判断是否可接收
+        let newQuantity = reactiveData.detailsList[index].Quantity2
+        if (reactiveData.detailsList[index].isLowerCamelCase) {
+          newQuantity += Quantity
+        } else {
+          newQuantity = Quantity
+        }
+
+        // 检查是否超过可退数量（简单生产退料不做限制）
+        if (
+          props.title !== '简单生产退料' &&
+          newQuantity > reactiveData.detailsList[index].canReceive
+        ) {
+          // 本行接收会超额，尝试下一行
+          continue
+        }
+
+        // 通过可接收性校验后，再真正更新数据
         if (reactiveData.detailsList[index].isLowerCamelCase) {
           reactiveData.detailsList[index].Quantity2 += Quantity
-
-          //当数量大于可领数量时，赋值为可领数量
-          if (
-            props.title !== '简单生产退料' &&
-            reactiveData.detailsList[index].Quantity2 > reactiveData.detailsList[index].canReceive
-          ) {
-            reactiveData.detailsList[index].Quantity2 = reactiveData.detailsList[index].canReceive
-            uni.showToast({
-              title: '实收数量大于可领数量',
-              icon: 'none'
-            })
-          }
-
-          const inventoryField = reactiveData.detailsList[index].currentList.find(
-            (i: any) => i.label === '数量'
-          )
-          if (inventoryField) {
-            inventoryField.value = reactiveData.detailsList[index].Quantity2
-          }
         } else {
           reactiveData.detailsList[index].Quantity2 = Quantity
-          //当数量大于可领数量时，赋值为可领数量
-          if (
-            props.title !== '简单生产退料' &&
-            reactiveData.detailsList[index].Quantity2 > reactiveData.detailsList[index].canReceive
-          ) {
-            reactiveData.detailsList[index].Quantity2 = reactiveData.detailsList[index].canReceive
-            uni.showToast({
-              title: '实收数量大于可领数量',
-              icon: 'none'
-            })
-          }
-          const inventoryField = reactiveData.detailsList[index].currentList.find(
-            (i: any) => i.label === '数量'
-          )
-          if (inventoryField) {
-            inventoryField.value = Quantity
-          }
+          reactiveData.detailsList[index].isLowerCamelCase = true
 
-          //合同，客户，批量，总箱数
-
+          // 更新其他字段
           const contractField = reactiveData.detailsList[index].currentList.find(
             (i: any) => i.label === '合同'
           )
@@ -196,7 +190,14 @@ const searchChange = debounce(async () => {
           if (totalBoxField) {
             totalBoxField.value = queryRes.totalBox
           }
-          reactiveData.detailsList[index].isLowerCamelCase = true
+        }
+
+        // 更新界面显示的数量字段
+        const inventoryField = reactiveData.detailsList[index].currentList.find(
+          (i: any) => i.label === '数量'
+        )
+        if (inventoryField) {
+          inventoryField.value = reactiveData.detailsList[index].Quantity2
         }
 
         // 分配数量到EntityList
@@ -205,24 +206,26 @@ const searchChange = debounce(async () => {
 
         // 循环遍历EntityList，依次分配值给Quantity2，以canReceive为上限
         for (const item of entityList) {
-          //if (remainingValue <= 0) break
-
           // 计算可以分配给当前项的最大值（不超过canReceive）
           const maxAssignable = Math.min(remainingValue, item.canReceive || 0)
 
           // 分配值给Quantity2
           item.Quantity2 = maxAssignable
-          console.log('maxAssignable', maxAssignable)
+
           // 更新剩余值
           remainingValue -= maxAssignable
+          if (remainingValue <= 0) break
         }
-        console.log('entityList', entityList)
+
         // 更新父组件的数据
         emitter.emit('update:barcodeIndex', index)
-      } else {
-        //提示
+        matched = true
+        break
+      }
+
+      if (!matched) {
         uni.showToast({
-          title: '条码与编码或者批号不符',
+          title: '实收数量大于可领数量',
           icon: 'none'
         })
       }
@@ -242,12 +245,20 @@ const searchChange = debounce(async () => {
 // 仓库变更
 const warehouseChange = debounceSave(async (val: string) => {
   reactiveData.heardList.location = ''
+  if (val === '') {
+    reactiveData.heardList.warehouse = ''
+    reactiveData.setData.warehouseNumber = ''
+    reactiveData.setData.warehouseId = ''
+    await clearStock()
+    return
+  }
   const warehouse = warehouseData.warehouseList.find((item: any) => item.value === val)
   if (!warehouse && val) {
     uni.showToast({ title: '仓库不存在', icon: 'none' })
     reactiveData.heardList.warehouse = ''
     reactiveData.setData.warehouseNumber = ''
     reactiveData.setData.warehouseId = ''
+    await clearStock()
     focusTm()
     setTimeout(() => {
       reactiveData.focus = 1
@@ -274,7 +285,8 @@ const clearStock = async () => {
     item.WarehousePositionName = ''
     item.WarehousePositionId = ''
     item.detailList.location = ''
-    item.currentList[12].value = ''
+    item.detailList.stockLocName = ''
+    item.currentList.find((i: any) => i.label === '仓位').value = ''
 
     //删除FlexNumber第一个字符
     let FlexNumber = reactiveData.setData.FlexNumber.substring(1)
@@ -285,7 +297,7 @@ const clearStock = async () => {
       reactiveData.setData.warehouseNumber
     )
     console.log('清空明细中的仓位2', TJStockId)
-    item.currentList[10].value = TJStockId
+    item.currentList.find((i: any) => i.label === '推荐').value = TJStockId
   })
 }
 

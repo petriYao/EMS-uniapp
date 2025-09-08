@@ -463,12 +463,20 @@ const getWarehousePosition = async (warehouseId: string) => {
 // 仓库变更
 const warehouseChange = debounceSave(async (val: string) => {
   heardList.value.location = ''
+  if (val === '') {
+    heardList.value.warehouse = ''
+    setData.value.warehouseNumber = ''
+    setData.value.warehouseId = ''
+    await clearStock()
+    return
+  }
   const warehouse = warehouseData.warehouseList.find((item: any) => item.value === val)
   if (!warehouse && val) {
     uni.showToast({ title: '仓库不存在', icon: 'none' })
     heardList.value.warehouse = ''
     setData.value.warehouseNumber = ''
     setData.value.warehouseId = ''
+    await clearStock()
     resetFocus()
     setTimeout(() => {
       focus.value = 1
@@ -495,7 +503,8 @@ const clearStock = async () => {
     item.WarehousePositionName = ''
     item.WarehousePositionId = ''
     item.detailList.location = ''
-    item.currentList[12].value = ''
+    item.detailList.stockLocName = ''
+    item.currentList.find((i: any) => i.label === '仓位').value = ''
 
     //删除FlexNumber第一个字符
     let FlexNumber = setData.value.FlexNumber.substring(1)
@@ -506,7 +515,7 @@ const clearStock = async () => {
       setData.value.warehouseNumber
     )
     console.log('清空明细中的仓位2', TJStockId)
-    item.currentList[10].value = TJStockId
+    item.currentList.find((i: any) => i.label === '推荐').value = TJStockId
   })
 }
 

@@ -395,7 +395,7 @@ onBeforeMount(() => {
           <u-input
             v-model="item.value"
             :showAction="false"
-            :disabled="item.disabled"
+            :disabled="reactiveData.locationList.length == 0"
             shape="round"
             placeholder=""
             @change="quantChange($event, item)"

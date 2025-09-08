@@ -54,13 +54,13 @@ const saveClick = throttleSave(async () => {
       const item = reactiveData.detailsList[i]
 
       // 当库存小于应发数量时提示
-      if (item.Quantity2 > item.detailList.inventory) {
-        uni.showToast({
-          title: `第${i + 1}行库存不足`,
-          icon: 'none'
-        })
-        return
-      }
+      // if (item.Quantity2 > item.detailList.inventory) {
+      //   uni.showToast({
+      //     title: `第${i + 1}行库存不足`,
+      //     icon: 'none'
+      //   })
+      //   return
+      // }
 
       // 检查条码是否配套
       // console.log('item', item.isInteger, item)
@@ -84,7 +84,7 @@ const saveClick = throttleSave(async () => {
       if (reactiveData.locationList.length > 0) {
         if (item.detailList.locationNumber == '') {
           uni.showToast({
-            title: `第${i + 1}行仓位不可为空`,
+            title: `仓位不可为空`,
             icon: 'none'
           })
           return
@@ -140,7 +140,6 @@ const saveClick = throttleSave(async () => {
     console.log('detailsList', JSON.stringify(Model.FEntity))
 
     /**库存检查***************************************************************** */
-
     console.log('Model', Model)
     console.log('Model', JSON.stringify(Model))
     // 保存生产退料单
