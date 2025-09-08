@@ -345,7 +345,7 @@ onBeforeUnmount(() => {
         />
       </view>
     </view>
-    <view class="flex items-center py-10rpx w-100%">
+    <view class="flex items-center py-4rpx w-100%">
       <view class="w-50px flex justify-center">单号</view>
       <view class="flex-1 mr-20rpx" style="border: 1px solid #f8f8f8" @click="clearTimer">
         <u-input
@@ -358,7 +358,7 @@ onBeforeUnmount(() => {
         />
       </view>
     </view>
-    <view class="flex items-center py-10rpx w-100%">
+    <view class="flex items-center py-4rpx w-100%">
       <view class="w-50px flex justify-center">仓库</view>
       <view class="flex-1 mr-20rpx" style="border: 1px solid #f8f8f8">
         <u-input
@@ -425,7 +425,7 @@ onBeforeUnmount(() => {
       </view>
     </view>
 
-    <view class="flex items-center pb-10rpx w-100%" v-if="false">
+    <view class="flex items-center pb-4rpx w-100%" v-if="false">
       <view class="w-50px flex justify-center">仓位</view>
       <view class="flex-1 mr-20rpx" style="border: 1px solid #f8f8f8">
         <u-input

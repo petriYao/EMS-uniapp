@@ -161,158 +161,160 @@ watch(
     :current="reactiveData.curNow"
     @change="reactiveData.curNow = $event"
   />
-  <!-- 当前 -->
-  <view v-if="reactiveData.curNow == 0" class="flex flex-wrap content-input">
-    <view
-      v-for="(item, index) of reactiveData.detailsList[reactiveData.barcodeIndex]?.currentList ||
-      []"
-      :key="index"
-      class="flex items-center mb-6rpx"
-      :style="item.style"
-    >
-      <view class="w-50px flex justify-center">
-        {{ item.label }}
-      </view>
-      <view class="flex-1 mr-20rpx" v-if="item.type == 'input'">
-        <u-input
-          v-model="item.value"
-          :showAction="false"
-          :disabled="item.disabled"
-          shape="round"
-          placeholder=""
-          @change="quantChange"
-          @click="clearTimer"
-        />
-      </view>
+  <scroll-view scroll-y style="height: calc(100vh - 44px - 44px - 40px - 34px - 80px - 22px)">
+    <!-- 当前 -->
+    <view v-if="reactiveData.curNow == 0" class="flex flex-wrap content-input">
       <view
-        class="flex-1 mr-20rpx"
-        style="border: 1px solid #f8f8f8"
-        v-else-if="item.type == 'select'"
-        @click="clearTimer"
+        v-for="(item, index) of reactiveData.detailsList[reactiveData.barcodeIndex]?.currentList ||
+        []"
+        :key="index"
+        class="flex items-center mb-6rpx"
+        :style="item.style"
       >
-        <u-input
-          v-model="item.value"
-          :showAction="false"
-          :disabled="reactiveData.locationList.length == 0"
-          shape="round"
-          placeholder=""
-          @blur="warehouseChange(item.value)"
+        <view class="w-50px flex justify-center">
+          {{ item.label }}
+        </view>
+        <view class="flex-1 mr-20rpx" v-if="item.type == 'input'">
+          <u-input
+            v-model="item.value"
+            :showAction="false"
+            :disabled="item.disabled"
+            shape="round"
+            placeholder=""
+            @change="quantChange"
+            @click="clearTimer"
+          />
+        </view>
+        <view
+          class="flex-1 mr-20rpx"
+          style="border: 1px solid #f8f8f8"
+          v-else-if="item.type == 'select'"
+          @click="clearTimer"
         >
-          <template #suffix>
-            <view @click="reactiveData.locationList.length == 0 ? '' : (pickerShow = true)">
-              <u-icon name="arrow-down" size="20" />
-            </view>
-            <view>
-              <u-action-sheet
-                :show="pickerShow"
-                round="10"
-                :closeOnClickOverlay="true"
-                :closeOnClickAction="true"
-                @close="pickerShow = false"
-              >
-                <view class="flex items-center p-20rpx" style="border-bottom: 1px solid #f8f8f8">
-                  <view @tap="pickerShow = false">搜索 </view>
-                  <view class="flex-1">
-                    <u-input
-                      id="searchInput2"
-                      v-model="item.scValue2"
-                      :showAction="false"
-                      shape="round"
-                      placeholder="请输入搜索关键词"
-                      @focus="clearTimer"
-                      @blur="clearTimer"
-                    />
-                  </view>
-                </view>
-                <view>
-                  <!-- 滚动条 -->
-                  <scroll-view scroll-y style="height: 800rpx">
-                    <view
-                      class=""
-                      v-for="(warehouseItem, index) of reactiveData.locationList"
-                      :key="index"
-                    >
-                      <view
-                        class="flex justify-center py-10px"
-                        style="border-bottom: 1px solid #f8f8f8"
-                        v-if="warehouseItem.value.indexOf(item.scValue2 || '') !== -1"
-                        @tap="pickerConfirm(warehouseItem)"
-                      >
-                        {{ warehouseItem.text }}
-                      </view>
+          <u-input
+            v-model="item.value"
+            :showAction="false"
+            :disabled="reactiveData.locationList.length == 0"
+            shape="round"
+            placeholder=""
+            @blur="warehouseChange(item.value)"
+          >
+            <template #suffix>
+              <view @click="reactiveData.locationList.length == 0 ? '' : (pickerShow = true)">
+                <u-icon name="arrow-down" size="20" />
+              </view>
+              <view>
+                <u-action-sheet
+                  :show="pickerShow"
+                  round="10"
+                  :closeOnClickOverlay="true"
+                  :closeOnClickAction="true"
+                  @close="pickerShow = false"
+                >
+                  <view class="flex items-center p-20rpx" style="border-bottom: 1px solid #f8f8f8">
+                    <view @tap="pickerShow = false">搜索 </view>
+                    <view class="flex-1">
+                      <u-input
+                        id="searchInput2"
+                        v-model="item.scValue2"
+                        :showAction="false"
+                        shape="round"
+                        placeholder="请输入搜索关键词"
+                        @focus="clearTimer"
+                        @blur="clearTimer"
+                      />
                     </view>
-                  </scroll-view>
-                </view>
-              </u-action-sheet>
-            </view>
-          </template>
-        </u-input>
+                  </view>
+                  <view>
+                    <!-- 滚动条 -->
+                    <scroll-view scroll-y style="height: 800rpx">
+                      <view
+                        class=""
+                        v-for="(warehouseItem, index) of reactiveData.locationList"
+                        :key="index"
+                      >
+                        <view
+                          class="flex justify-center py-10px"
+                          style="border-bottom: 1px solid #f8f8f8"
+                          v-if="warehouseItem.value.indexOf(item.scValue2 || '') !== -1"
+                          @tap="pickerConfirm(warehouseItem)"
+                        >
+                          {{ warehouseItem.text }}
+                        </view>
+                      </view>
+                    </scroll-view>
+                  </view>
+                </u-action-sheet>
+              </view>
+            </template>
+          </u-input>
+        </view>
       </view>
     </view>
-  </view>
-  <view v-if="reactiveData.curNow === 1">
-    <view
-      v-for="(item, index) of props.detailsList || []"
-      :key="index"
-      @click="getBarCode(item, index)"
-      @longpress="longpressClick(item, index)"
-      @touchstart="handleTouchStart"
-      @touchmove="handleTouchMove"
-    >
+    <view v-if="reactiveData.curNow === 1">
       <view
-        class="flex"
-        :class="[
-          index % 2 === 0 ? 'bg-#F2F2F2' : 'bg-white', // 基础黑白交替
-          index === reactiveData.barcodeIndex ? '!bg-[#C4D8EE]' : '' // 覆盖选中状态
-        ]"
+        v-for="(item, index) of props.detailsList || []"
+        :key="index"
+        @click="getBarCode(item, index)"
+        @longpress="longpressClick(item, index)"
+        @touchstart="handleTouchStart"
+        @touchmove="handleTouchMove"
       >
-        <!-- {{ item.detailList }} -->
-        <view class="w-20px flex justify-center items-center">{{ index + 1 }}</view>
-        <view class="flex-1">
-          <view class="flex items-center">
-            <view class="w-50px text-end">编码：</view>
-            <view> {{ item.detailList.fnumber }}</view>
-          </view>
-          <view class="flex items-center">
-            <view class="w-50px text-end">批号：</view>
-            <view>{{ item.detailList.lot }}</view>
-          </view>
-
-          <view class="flex items-center">
-            <view class="w-50px text-end">名称：</view>
-            <view> {{ item.detailList.name }}</view>
-          </view>
-          <view class="flex">
-            <view class="min-w-50px text-end">规格：</view>
-            <view class="flex-wrap">{{ item.detailList.specification }}</view>
-          </view>
-
-          <view class="flex">
-            <view class="w-50% flex items-center h-20px">
-              <view class="w-50px text-end">可收：</view>
-              <view> {{ item.detailList.receivableQuantity }}</view>
+        <view
+          class="flex"
+          :class="[
+            index % 2 === 0 ? 'bg-#F2F2F2' : 'bg-white', // 基础黑白交替
+            index === reactiveData.barcodeIndex ? '!bg-[#C4D8EE]' : '' // 覆盖选中状态
+          ]"
+        >
+          <!-- {{ item.detailList }} -->
+          <view class="w-20px flex justify-center items-center">{{ index + 1 }}</view>
+          <view class="flex-1">
+            <view class="flex items-center">
+              <view class="w-50px text-end">编码：</view>
+              <view> {{ item.detailList.fnumber }}</view>
+            </view>
+            <view class="flex items-center">
+              <view class="w-50px text-end">批号：</view>
+              <view>{{ item.detailList.lot }}</view>
             </view>
 
-            <view class="w-50% flex items-center h-20px">
-              <view class="w-50px text-end">数量：</view>
-              <view> {{ item.Quantity2 }}</view>
+            <view class="flex items-center">
+              <view class="w-50px text-end">名称：</view>
+              <view> {{ item.detailList.name }}</view>
             </view>
-          </view>
-          <view class="flex">
-            <view class="w-50% flex items-center h-20px">
-              <view class="w-50px text-end">仓位：</view>
-              <view>{{ item.detailList.location }}</view>
+            <view class="flex">
+              <view class="min-w-50px text-end">规格：</view>
+              <view class="flex-wrap">{{ item.detailList.specification }}</view>
             </view>
 
-            <!-- <view class="w-50% flex items-center h-20px">
+            <view class="flex">
+              <view class="w-50% flex items-center h-20px">
+                <view class="w-50px text-end">可收：</view>
+                <view> {{ item.detailList.receivableQuantity }}</view>
+              </view>
+
+              <view class="w-50% flex items-center h-20px">
+                <view class="w-50px text-end">数量：</view>
+                <view> {{ item.Quantity2 }}</view>
+              </view>
+            </view>
+            <view class="flex">
+              <view class="w-50% flex items-center h-20px">
+                <view class="w-50px text-end">仓位：</view>
+                <view>{{ item.detailList.location }}</view>
+              </view>
+
+              <!-- <view class="w-50% flex items-center h-20px">
               <view class="w-50px text-end">件数：</view>
               <view> {{ item.barcodeList.length }}</view>
             </view> -->
+            </view>
           </view>
         </view>
       </view>
     </view>
-  </view>
+  </scroll-view>
 </template>
 <style lang="less" scoped>
 ::v-deep .uni-select__selector-scroll {

@@ -192,35 +192,39 @@ watch(
           <view class="w-17% text-center">仓库</view>
           <view class="w-21% text-center">仓位</view>
         </view>
-        <view
-          v-for="(item, index) of reactiveData.detailsList?.barcodeList || []"
-          :key="index"
-          @longpress="longpressDetailsClick(item, index)"
-          @touchstart="handleTouchStart"
-          @touchmove="handleTouchMove"
-        >
+        <scroll-view scroll-y style="height: calc(100vh - 44px - 44px - 40px - 34px - 80px - 22px)">
           <view
-            class="flex flex-wrap py-10rpx"
-            :style="index % 2 == 1 ? 'background-color:#f2f2f2' : ''"
+            v-for="(item, index) of reactiveData.detailsList?.barcodeList || []"
+            :key="index"
+            @longpress="longpressDetailsClick(item, index)"
+            @touchstart="handleTouchStart"
+            @touchmove="handleTouchMove"
           >
-            <view class="w-12% flex justify-center pt-3px">{{ index + 1 }}</view>
-            <view class="w-38% pt-3px">
-              <view style="overflow-wrap: break-word">{{ item.F_BARCODENO }}</view>
-            </view>
-            <view class="w-12% flex justify-center pt-3px">
-              {{ item.F_UNITQTY }}
-            </view>
-            <view class="w-17% flex justify-center">{{ reactiveData.detailsList.warehouse }}</view>
-            <view class="w-21% flex justify-center pt-3px">
-              {{ reactiveData.detailsList.location }}
-            </view>
-            <view class="flex ml-12% items-center" v-if="reactiveData.detailsList.isFE">
-              <view class="mr-8px">分装：{{ item.F_FZNO }}</view>
-              <view class="mr-8px">{{ item.F_BJNAME }}</view>
-              <view class="mr-8px">用量：{{ item.F_JUNITQTY }}</view>
+            <view
+              class="flex flex-wrap py-10rpx"
+              :style="index % 2 == 1 ? 'background-color:#f2f2f2' : ''"
+            >
+              <view class="w-12% flex justify-center pt-3px">{{ index + 1 }}</view>
+              <view class="w-38% pt-3px">
+                <view style="overflow-wrap: break-word">{{ item.F_BARCODENO }}</view>
+              </view>
+              <view class="w-12% flex justify-center pt-3px">
+                {{ item.F_UNITQTY }}
+              </view>
+              <view class="w-17% flex justify-center">{{
+                reactiveData.detailsList.warehouse
+              }}</view>
+              <view class="w-21% flex justify-center pt-3px">
+                {{ reactiveData.detailsList.location }}
+              </view>
+              <view class="flex ml-12% items-center" v-if="reactiveData.detailsList.isFE">
+                <view class="mr-8px">分装：{{ item.F_FZNO }}</view>
+                <view class="mr-8px">{{ item.F_BJNAME }}</view>
+                <view class="mr-8px">用量：{{ item.F_JUNITQTY }}</view>
+              </view>
             </view>
           </view>
-        </view>
+        </scroll-view>
       </view>
     </view>
   </view>

@@ -11,7 +11,7 @@ const props = defineProps<{
 //数据
 const reactiveData = reactive({
   searchValue: '', //搜索值
-  pickupOrderValue: 'FHTZD000008', //单号
+  pickupOrderValue: '', //单号
   containerNoValue: 1, //柜号
   focus: 1,
   detailsList: {} as any,

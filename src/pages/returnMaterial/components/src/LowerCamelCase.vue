@@ -228,164 +228,166 @@ watch(
     :current="reactiveData.curNow"
     @change="reactiveData.curNow = $event"
   />
-  <!-- 当前 -->
-  <view v-if="reactiveData.curNow == 0" class="flex flex-wrap content-input">
-    <view
-      v-for="(item, index) of reactiveData.detailsList[reactiveData.barcodeIndex]?.currentList ||
-      []"
-      :key="index"
-      class="flex items-center mb-6rpx"
-      :style="item.style"
-    >
-      <view class="w-50px flex justify-center">
-        {{ item.label }}
-      </view>
-      <view class="flex-1 mr-20rpx" v-if="item.type == 'input'">
-        <u-input
-          v-model="item.value"
-          :showAction="false"
-          :disabled="item.disabled"
-          shape="round"
-          placeholder=""
-        />
-      </view>
-    </view>
-    <view
-      v-if="reactiveData.detailsList[reactiveData.barcodeIndex]?.barcodeList.length > 0"
-      class="w-100% pl-2px mt-2px"
-    >
-      <view class="flex w-100% px-10px">
-        <view class="w-50% flex items-center">
-          <view>本箱数</view>
-          <view class="ml-20px text-18px mt-2px">{{
-            reactiveData.detailsList[reactiveData.barcodeIndex]?.barcodeList[
-              reactiveData.detailsList[reactiveData.barcodeIndex].barcodeList.length - 1
-            ]?.quantity
-          }}</view>
-        </view>
-        <view class="w-50% flex items-center">
-          <view>合计</view>
-          <view class="ml-20px text-18px mt-2px">
-            {{ reactiveData.detailsList[reactiveData.barcodeIndex]?.Quantity2 }}</view
-          >
-        </view>
-      </view>
+  <scroll-view scroll-y style="height: calc(100vh - 44px - 44px - 40px - 35px - 40px - 22px)">
+    <!-- 当前 -->
+    <view v-if="reactiveData.curNow == 0" class="flex flex-wrap content-input">
       <view
-        class="flex px-10px items-center text-#90BBF5 mt-6rpx text-16px"
-        v-if="reactiveData.detailsList[reactiveData.barcodeIndex]?.IsSplit"
-      >
-        <view class="text-center">{{
-          reactiveData.detailsList[reactiveData.barcodeIndex]?.barcodeList[
-            reactiveData.detailsList[reactiveData.barcodeIndex].barcodeList.length - 1
-          ].subPackageNo
-        }}</view>
-        <view class="ml-8px text-center">{{
-          reactiveData.detailsList[reactiveData.barcodeIndex]?.barcodeList[
-            reactiveData.detailsList[reactiveData.barcodeIndex].barcodeList.length - 1
-          ].partNumberName
-        }}</view>
-      </view>
-    </view>
-  </view>
-  <view v-if="reactiveData.curNow === 1">
-    <view
-      v-for="(item, index) of props.detailsList || []"
-      :key="index"
-      @click="getBarCode(item, index)"
-      @longpress="longpressClick(item, index)"
-      @touchstart="handleTouchStart"
-      @touchmove="handleTouchMove"
-    >
-      <view
-        class="flex"
-        :class="[
-          index % 2 === 0 ? 'bg-#F2F2F2' : 'bg-white', // 基础黑白交替
-          index === reactiveData.barcodeIndex ? '!bg-[#C4D8EE]' : '' // 覆盖选中状态
-        ]"
-      >
-        <view class="w-20px flex justify-center items-center">{{ index + 1 }}</view>
-        <view class="flex-1">
-          <view class="flex items-center">
-            <view class="w-50px text-end">编码：</view>
-            <view> {{ item.detailList.fnumber }}</view>
-          </view>
-          <view class="flex items-center">
-            <view class="w-50px text-end">批号：</view>
-            <view>{{ item.detailList.lot }}</view>
-          </view>
-
-          <view class="flex items-center">
-            <view class="w-50px text-end">名称：</view>
-            <view> {{ item.detailList.name }}</view>
-          </view>
-          <view class="flex">
-            <view class="min-w-50px text-end">规格：</view>
-            <view class="flex-wrap">{{ item.detailList.specification }}</view>
-          </view>
-
-          <view class="flex">
-            <view class="w-33% flex items-center h-20px">
-              <view class="w-50px text-end">可退：</view>
-              <view> {{ item.detailList.receivableQuantity }}</view>
-            </view>
-
-            <view class="w-33% flex items-center h-20px">
-              <view class="w-50px text-end">数量：</view>
-              <view> {{ item.Quantity2 }}</view>
-            </view>
-
-            <view class="w-33% flex items-center h-20px">
-              <view class="w-50px text-end">件数：</view>
-              <view> {{ item.barcodeList.length }}</view>
-            </view>
-          </view>
-        </view>
-      </view>
-    </view>
-  </view>
-  <view v-if="reactiveData.curNow == 2">
-    <view class="flex bg-#f2f2f2 py-10rpx">
-      <view class="w-12% text-center">序号</view>
-      <view class="w-38%">条码编码</view>
-      <view class="w-12% text-center">数量</view>
-      <view class="w-17% text-center">仓库</view>
-      <view class="w-21% text-center">仓位</view>
-    </view>
-    <scroll-view scroll-y style="height: calc(100vh - 44px - 44px - 80px - 34px - 40px - 26px)">
-      <view
-        v-for="(item, index) of reactiveData.detailsList[reactiveData.barcodeIndex]?.barcodeList ||
+        v-for="(item, index) of reactiveData.detailsList[reactiveData.barcodeIndex]?.currentList ||
         []"
         :key="index"
-        @longpress="longpressDetailsClick(item, index)"
+        class="flex items-center mb-6rpx"
+        :style="item.style"
+      >
+        <view class="w-50px flex justify-center">
+          {{ item.label }}
+        </view>
+        <view class="flex-1 mr-20rpx" v-if="item.type == 'input'">
+          <u-input
+            v-model="item.value"
+            :showAction="false"
+            :disabled="item.disabled"
+            shape="round"
+            placeholder=""
+          />
+        </view>
+      </view>
+      <view
+        v-if="reactiveData.detailsList[reactiveData.barcodeIndex]?.barcodeList.length > 0"
+        class="w-100% pl-2px mt-2px"
+      >
+        <view class="flex w-100% px-10px">
+          <view class="w-50% flex items-center">
+            <view>本箱数</view>
+            <view class="ml-20px text-18px mt-2px">{{
+              reactiveData.detailsList[reactiveData.barcodeIndex]?.barcodeList[
+                reactiveData.detailsList[reactiveData.barcodeIndex].barcodeList.length - 1
+              ]?.quantity
+            }}</view>
+          </view>
+          <view class="w-50% flex items-center">
+            <view>合计</view>
+            <view class="ml-20px text-18px mt-2px">
+              {{ reactiveData.detailsList[reactiveData.barcodeIndex]?.Quantity2 }}</view
+            >
+          </view>
+        </view>
+        <view
+          class="flex px-10px items-center text-#90BBF5 mt-6rpx text-16px"
+          v-if="reactiveData.detailsList[reactiveData.barcodeIndex]?.IsSplit"
+        >
+          <view class="text-center">{{
+            reactiveData.detailsList[reactiveData.barcodeIndex]?.barcodeList[
+              reactiveData.detailsList[reactiveData.barcodeIndex].barcodeList.length - 1
+            ].subPackageNo
+          }}</view>
+          <view class="ml-8px text-center">{{
+            reactiveData.detailsList[reactiveData.barcodeIndex]?.barcodeList[
+              reactiveData.detailsList[reactiveData.barcodeIndex].barcodeList.length - 1
+            ].partNumberName
+          }}</view>
+        </view>
+      </view>
+    </view>
+    <view v-if="reactiveData.curNow === 1">
+      <view
+        v-for="(item, index) of props.detailsList || []"
+        :key="index"
+        @click="getBarCode(item, index)"
+        @longpress="longpressClick(item, index)"
         @touchstart="handleTouchStart"
         @touchmove="handleTouchMove"
       >
         <view
-          class="flex flex-wrap py-10rpx"
-          :style="index % 2 == 1 ? 'background-color:#f2f2f2' : ''"
+          class="flex"
+          :class="[
+            index % 2 === 0 ? 'bg-#F2F2F2' : 'bg-white', // 基础黑白交替
+            index === reactiveData.barcodeIndex ? '!bg-[#C4D8EE]' : '' // 覆盖选中状态
+          ]"
         >
-          <view class="w-12% flex justify-center pt-3px">{{ index + 1 }}</view>
-          <view class="w-38% pt-3px">
-            <view style="overflow-wrap: break-word">{{ item.FNumber }}</view>
-          </view>
-          <view class="w-12% flex justify-center pt-3px">
-            {{ item.quantity }}
-          </view>
-          <view class="w-17% flex justify-center">{{ item.FSTOCKName }}</view>
-          <view class="w-21% flex justify-center pt-3px">{{ item.STOCKLOCName }}</view>
+          <view class="w-20px flex justify-center items-center">{{ index + 1 }}</view>
+          <view class="flex-1">
+            <view class="flex items-center">
+              <view class="w-50px text-end">编码：</view>
+              <view> {{ item.detailList.fnumber }}</view>
+            </view>
+            <view class="flex items-center">
+              <view class="w-50px text-end">批号：</view>
+              <view>{{ item.detailList.lot }}</view>
+            </view>
 
-          <view
-            class="flex ml-12% items-center"
-            v-if="item.subPackageNo && item.subPackageNo !== ' ' && item.subPackageNo !== ''"
-          >
-            <view class="mr-8px">分装：{{ item.subPackageNo }}</view>
-            <view class="mr-8px">{{ item.partNumberName }}</view>
-            <view class="mr-8px">用量：{{ item.unitQuantity }}</view>
+            <view class="flex items-center">
+              <view class="w-50px text-end">名称：</view>
+              <view> {{ item.detailList.name }}</view>
+            </view>
+            <view class="flex">
+              <view class="min-w-50px text-end">规格：</view>
+              <view class="flex-wrap">{{ item.detailList.specification }}</view>
+            </view>
+
+            <view class="flex">
+              <view class="w-33% flex items-center h-20px">
+                <view class="w-50px text-end">可退：</view>
+                <view> {{ item.detailList.receivableQuantity }}</view>
+              </view>
+
+              <view class="w-33% flex items-center h-20px">
+                <view class="w-50px text-end">数量：</view>
+                <view> {{ item.Quantity2 }}</view>
+              </view>
+
+              <view class="w-33% flex items-center h-20px">
+                <view class="w-50px text-end">件数：</view>
+                <view> {{ item.barcodeList.length }}</view>
+              </view>
+            </view>
           </view>
         </view>
       </view>
-    </scroll-view>
-  </view>
+    </view>
+    <view v-if="reactiveData.curNow == 2">
+      <view class="flex bg-#f2f2f2 py-10rpx">
+        <view class="w-12% text-center">序号</view>
+        <view class="w-38%">条码编码</view>
+        <view class="w-12% text-center">数量</view>
+        <view class="w-17% text-center">仓库</view>
+        <view class="w-21% text-center">仓位</view>
+      </view>
+      <scroll-view scroll-y style="height: calc(100vh - 44px - 44px - 80px - 34px - 40px - 26px)">
+        <view
+          v-for="(item, index) of reactiveData.detailsList[reactiveData.barcodeIndex]
+            ?.barcodeList || []"
+          :key="index"
+          @longpress="longpressDetailsClick(item, index)"
+          @touchstart="handleTouchStart"
+          @touchmove="handleTouchMove"
+        >
+          <view
+            class="flex flex-wrap py-10rpx"
+            :style="index % 2 == 1 ? 'background-color:#f2f2f2' : ''"
+          >
+            <view class="w-12% flex justify-center pt-3px">{{ index + 1 }}</view>
+            <view class="w-38% pt-3px">
+              <view style="overflow-wrap: break-word">{{ item.FNumber }}</view>
+            </view>
+            <view class="w-12% flex justify-center pt-3px">
+              {{ item.quantity }}
+            </view>
+            <view class="w-17% flex justify-center">{{ item.FSTOCKName }}</view>
+            <view class="w-21% flex justify-center pt-3px">{{ item.STOCKLOCName }}</view>
+
+            <view
+              class="flex ml-12% items-center"
+              v-if="item.subPackageNo && item.subPackageNo !== ' ' && item.subPackageNo !== ''"
+            >
+              <view class="mr-8px">分装：{{ item.subPackageNo }}</view>
+              <view class="mr-8px">{{ item.partNumberName }}</view>
+              <view class="mr-8px">用量：{{ item.unitQuantity }}</view>
+            </view>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+  </scroll-view>
 </template>
 <style lang="less" scoped>
 ::v-deep .uni-select__selector-scroll {
