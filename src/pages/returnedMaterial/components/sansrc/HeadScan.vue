@@ -245,11 +245,12 @@ const searchChange = debounce(async () => {
 // 仓库变更
 const warehouseChange = debounceSave(async (val: string) => {
   reactiveData.heardList.location = ''
+  await clearStock()
+
   if (val === '') {
     reactiveData.heardList.warehouse = ''
     reactiveData.setData.warehouseNumber = ''
     reactiveData.setData.warehouseId = ''
-    await clearStock()
     return
   }
   const warehouse = warehouseData.warehouseList.find((item: any) => item.value === val)
@@ -258,7 +259,6 @@ const warehouseChange = debounceSave(async (val: string) => {
     reactiveData.heardList.warehouse = ''
     reactiveData.setData.warehouseNumber = ''
     reactiveData.setData.warehouseId = ''
-    await clearStock()
     focusTm()
     setTimeout(() => {
       reactiveData.focus = 1
@@ -285,6 +285,7 @@ const clearStock = async () => {
     item.WarehousePositionName = ''
     item.WarehousePositionId = ''
     item.detailList.location = ''
+    item.detailList.locationNumber = ''
     item.detailList.stockLocName = ''
     item.currentList.find((i: any) => i.label === '仓位').value = ''
 

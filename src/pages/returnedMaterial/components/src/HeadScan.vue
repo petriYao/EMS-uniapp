@@ -60,17 +60,11 @@ const searchClick = async () => {
     onlyFromCamera: true
   })
   if (res) {
-    if (focus.value === 0) {
+    if (focus.value === 99) {
       searchValue.value = res.result
       searchChange()
-    } else if (focus.value === 2) {
-      heardList.value.warehouse = res.result
-      focus.value = 3
-    } else if (focus.value === 3) {
-      heardList.value.location = res.result
-      focus.value = 0
-    } else {
-      searchInput.value.setValue(res.result)
+    } else if (focus.value === 1) {
+      resetFocus()
     }
   }
 }
@@ -463,11 +457,12 @@ const getWarehousePosition = async (warehouseId: string) => {
 // 仓库变更
 const warehouseChange = debounceSave(async (val: string) => {
   heardList.value.location = ''
+  await clearStock()
+
   if (val === '') {
     heardList.value.warehouse = ''
     setData.value.warehouseNumber = ''
     setData.value.warehouseId = ''
-    await clearStock()
     return
   }
   const warehouse = warehouseData.warehouseList.find((item: any) => item.value === val)
@@ -476,7 +471,6 @@ const warehouseChange = debounceSave(async (val: string) => {
     heardList.value.warehouse = ''
     setData.value.warehouseNumber = ''
     setData.value.warehouseId = ''
-    await clearStock()
     resetFocus()
     setTimeout(() => {
       focus.value = 1
@@ -503,19 +497,22 @@ const clearStock = async () => {
     item.WarehousePositionName = ''
     item.WarehousePositionId = ''
     item.detailList.location = ''
+    item.detailList.locationNumber = ''
     item.detailList.stockLocName = ''
     item.currentList.find((i: any) => i.label === '仓位').value = ''
 
     //删除FlexNumber第一个字符
-    let FlexNumber = setData.value.FlexNumber.substring(1)
-    let TJStockId = await getStockLoc(
-      item.MaterialCode,
-      item.Lot,
-      FlexNumber,
-      setData.value.warehouseNumber
-    )
-    console.log('清空明细中的仓位2', TJStockId)
-    item.currentList.find((i: any) => i.label === '推荐').value = TJStockId
+    if (setData.value.FlexNumber) {
+      let FlexNumber = setData.value.FlexNumber.substring(1)
+      let TJStockId = await getStockLoc(
+        item.MaterialCode,
+        item.Lot,
+        FlexNumber,
+        setData.value.warehouseNumber
+      )
+      console.log('清空明细中的仓位2', TJStockId)
+      item.currentList.find((i: any) => i.label === '推荐').value = TJStockId
+    }
   })
 }
 

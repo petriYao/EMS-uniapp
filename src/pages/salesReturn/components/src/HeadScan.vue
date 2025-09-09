@@ -44,28 +44,6 @@ const { emitter } = useEmitt()
 
 const searchInput = ref()
 
-// 扫码逻辑
-const searchClick = async () => {
-  const res: any = await uni.scanCode({
-    scanType: ['barCode', 'qrCode'],
-    onlyFromCamera: true
-  })
-  if (res) {
-    if (focus.value === 0) {
-      searchValue.value = res.result
-      searchChange()
-    } else if (focus.value === 2) {
-      heardList.value.warehouse = res.result
-      focus.value = 3
-    } else if (focus.value === 3) {
-      heardList.value.location = res.result
-      focus.value = 0
-    } else {
-      searchInput.value.setValue(res.result)
-    }
-  }
-}
-
 // 搜索变化处理
 const searchChange = () => {
   setTimeout(async () => {
@@ -540,9 +518,7 @@ onBeforeMount(() => {
   <view>
     <!-- 订单号搜索 -->
     <view class="flex items-center pb-20rpx bg-#f2f2f2">
-      <view class="w-50px flex justify-center" @click="searchClick">
-        <u-icon name="scan" size="24" />
-      </view>
+      <view class="w-50px flex justify-center"> 条码 </view>
       <view class="flex-1 mr-20rpx" style="border: 1px solid #f8f8f8" @click="clearTimer">
         <u-input
           ref="searchInput"

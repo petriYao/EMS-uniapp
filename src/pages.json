@@ -119,6 +119,13 @@
         "navigationStyle": "custom"
       }
     },
+        {
+      "path": "pages/storageLocation/Index",
+      "style": {
+        "navigationBarTitleText": "储位",
+        "navigationStyle": "custom"
+      }
+    },
     {
       "path": "pages/purchaseStockIn/Index",
       "style": {

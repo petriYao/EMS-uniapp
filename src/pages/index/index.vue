@@ -99,13 +99,13 @@ onBeforeMount(() => {
           src: 'storage/storage?type=生产入库'
         })
         break
-      case '16':
-        tempLists.crmList2.push({
-          name: '简单入库',
-          icon: '/static/index/Reportingforwork.png',
-          src: 'storage/storage?type=简单入库'
-        })
-        break
+      // case '16':
+      //   tempLists.crmList2.push({
+      //     name: '简单入库',
+      //     icon: '/static/index/Reportingforwork.png',
+      //     src: 'storage/storage?type=简单入库'
+      //   })
+      //   break
       case '20':
         tempLists.crmList2.push({
           name: '采购入库',
@@ -170,6 +170,13 @@ onBeforeMount(() => {
           name: '盘点',
           icon: '/static/index/Reportingforwork.png',
           src: 'inventory/Index'
+        })
+        break
+      case '45':
+        tempLists.crmList4.push({
+          name: '储位',
+          icon: '/static/index/Reportingforwork.png',
+          src: 'storageLocation/Index'
         })
         break
       /*退库退料*********************************/
@@ -260,7 +267,7 @@ onBeforeMount(() => {
   const reorderedInventoryMenus = []
 
   // 按照指定顺序重新排列
-  const inventoryOrder = ['条码库存', '库存查询', '调拨', '盘点']
+  const inventoryOrder = ['条码库存', '库存查询', '调拨', '盘点', '储位']
   for (const name of inventoryOrder) {
     const item = inventoryMenus.find((menu: any) => menu.name === name)
     if (item) {
@@ -275,13 +282,13 @@ onBeforeMount(() => {
   <view class="text-14px">
     <view class="flex">
       <view class="bg-#FFF py-20rpx mx-20px w-100% rounded-6px">
-        <view class="ml-20px mb-20px">报工</view>
+        <view class="ml-20px mb-0px">报工</view>
 
         <view class="flex flex-wrap">
           <view
             v-for="(item, index) in crmList"
             :key="index"
-            class="w-25%"
+            class="w-25% mt-10px"
             @click="NavChange(item.src)"
           >
             <view class="flex justify-center">
@@ -294,13 +301,13 @@ onBeforeMount(() => {
     </view>
     <view class="flex">
       <view class="bg-#FFF mt-20px py-20rpx mx-20px w-100% rounded-6px">
-        <view class="ml-20px mb-20px">入库</view>
+        <view class="ml-20px mb-0px">入库</view>
 
         <view class="flex flex-wrap">
           <view
             v-for="(item, index) in crmList2"
             :key="index"
-            class="w-25%"
+            class="w-25% mt-10px"
             @click="NavChange(item.src)"
           >
             <view class="flex justify-center">
@@ -313,13 +320,13 @@ onBeforeMount(() => {
     </view>
     <view class="flex">
       <view class="bg-#FFF mt-20px py-20rpx mx-20px w-100% rounded-6px">
-        <view class="ml-20px mb-20px">领料</view>
+        <view class="ml-20px mb-0px">领料</view>
 
         <view class="flex flex-wrap">
           <view
             v-for="(item, index) in crmList5"
             :key="index"
-            class="w-25%"
+            class="w-25% mt-10px"
             @click="NavChange(item.src)"
           >
             <view class="flex justify-center">
@@ -332,13 +339,13 @@ onBeforeMount(() => {
     </view>
     <view class="flex">
       <view class="bg-#FFF mt-20px py-20rpx mx-20px w-100% rounded-6px">
-        <view class="ml-20px mb-20px">退货退料</view>
+        <view class="ml-20px mb-0px">退货退料</view>
 
         <view class="flex flex-wrap">
           <view
             v-for="(item, index) in crmList6"
             :key="index"
-            class="w-25%"
+            class="w-25% mt-10px"
             @click="NavChange(item.src)"
           >
             <view class="flex justify-center">
@@ -352,13 +359,13 @@ onBeforeMount(() => {
 
     <view class="flex">
       <view class="bg-#FFF mt-20px py-20rpx mx-20px w-100% rounded-6px">
-        <view class="ml-20px mb-20px">销售</view>
+        <view class="ml-20px mb-0px">销售</view>
 
         <view class="flex flex-wrap">
           <view
             v-for="(item, index) in crmList3"
             :key="index"
-            class="w-25%"
+            class="w-25% mt-10px"
             @click="NavChange(item.src)"
           >
             <view class="flex justify-center">
@@ -371,13 +378,13 @@ onBeforeMount(() => {
     </view>
     <view class="flex">
       <view class="bg-#FFF mt-20px py-20rpx mx-20px w-100% rounded-6px">
-        <view class="ml-20px mb-20px">库存</view>
+        <view class="ml-20px mb-0px">库存</view>
 
         <view class="flex flex-wrap">
           <view
             v-for="(item, index) in crmList4"
             :key="index"
-            class="w-25%"
+            class="w-25% mt-10px"
             @click="NavChange(item.src)"
           >
             <view class="flex justify-center">

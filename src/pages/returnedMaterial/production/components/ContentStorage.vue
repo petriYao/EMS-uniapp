@@ -136,7 +136,6 @@ const saveClick = throttleSave(async () => {
       })
       return
     }
-
     console.log('detailsList', JSON.stringify(Model.FEntity))
 
     /**库存检查***************************************************************** */

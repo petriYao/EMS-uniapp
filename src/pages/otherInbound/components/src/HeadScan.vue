@@ -88,28 +88,6 @@ const searchInput = ref()
 
 // ========== 核心逻辑函数 ==========
 
-// 扫码入口
-const searchClick = async () => {
-  const res: any = await uni.scanCode({
-    scanType: ['barCode', 'qrCode'],
-    onlyFromCamera: true
-  })
-  if (res) {
-    if (reactiveData.focus === 0) {
-      reactiveData.searchValue = res.result
-      searchChange()
-    } else if (reactiveData.focus === 2) {
-      reactiveData.heardList.warehouse = res.result
-      reactiveData.focus = 3
-    } else if (reactiveData.focus === 3) {
-      reactiveData.heardList.location = res.result
-      reactiveData.focus = 0
-    } else {
-      searchInput.value.setValue(res.result)
-    }
-  }
-}
-
 // 搜索处理
 const searchChange = () => {
   if (!reactiveData.searchValue) return
@@ -512,8 +490,8 @@ useEmitt({
   <view>
     <!-- 订单号搜索 -->
     <view class="flex items-center pb-20rpx bg-#f2f2f2">
-      <view class="w-50px flex justify-center" @click="searchClick">
-        <u-icon name="scan" size="24" />
+      <view class="w-50px flex justify-center">
+        <view class="w-50px flex justify-center"> 条码 </view>
       </view>
       <view class="flex-1 mr-20rpx" style="border: 1px solid #f8f8f8" @click="clearTimer">
         <u-input

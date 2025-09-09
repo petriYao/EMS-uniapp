@@ -32,21 +32,6 @@ const emit = defineEmits<{
 const { emitter } = useEmitt()
 
 const searchInput = ref()
-//扫码获取数据
-const searchClick = async () => {
-  //uniapp打开扫码
-  const res: any = await uni.scanCode({
-    scanType: ['barCode', 'qrCode'],
-    onlyFromCamera: true
-  })
-  console.log('扫码结果', res)
-  if (res) {
-    reactiveData.searchValue = res.result
-    searchChange()
-    // searchInput.value.setValue(res.result)
-    // searchChange()
-  }
-}
 
 //扫描条码
 // 使用防抖优化搜索函数，避免频繁触发
@@ -271,27 +256,6 @@ const canAcceptForDetail = (detail: any, queryRes: any): boolean => {
   return simulatedQuantity2 <= detail.canReceive
 }
 
-// 查找匹配的明细项
-const findMatchingDetail = (queryRes: any): number => {
-  return reactiveData.detailsList.findIndex((item: any) => {
-    switch (props.title) {
-      case '采购退货':
-        return (
-          item.MaterialCode === queryRes.MaterialCode && // 编码
-          item.SourceOrderNo === queryRes.SourceOrderNo && // 来源单号
-          item.Supplier === queryRes.Supplier && // 供应商
-          item.Lot === queryRes.Lot // 批次
-        )
-      case '其他出库':
-        console.log('其他出库', item, queryRes)
-        return (
-          item.MaterialCode === queryRes.MaterialCode && // 编码
-          item.Lot === queryRes.Lot
-        )
-    }
-  })
-}
-
 // 检查条码是否重复
 const isBarcodeDuplicate = (index: number, barcode: string): boolean => {
   return reactiveData.detailsList[index].barcodeList.some((item: any) => {
@@ -514,9 +478,7 @@ onBeforeUnmount(() => {
   <view>
     <!-- 订单号搜索 -->
     <view class="flex items-center pb-20rpx bg-#f2f2f2">
-      <view class="w-50px flex justify-center" @click="searchClick">
-        <u-icon name="scan" size="24" />
-      </view>
+      <view class="w-50px flex justify-center"> 条码 </view>
       <view class="flex-1 mr-20rpx" style="border: 1px solid #f8f8f8" @click="clearTimer">
         <u-input
           ref="searchInput"
