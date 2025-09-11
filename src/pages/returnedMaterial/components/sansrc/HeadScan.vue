@@ -244,6 +244,7 @@ const searchChange = debounce(async () => {
 
 // 仓库变更
 const warehouseChange = debounceSave(async (val: string) => {
+  console.log('仓库变更', warehouseData.warehouseList, val)
   reactiveData.heardList.location = ''
   await clearStock()
 
@@ -254,6 +255,7 @@ const warehouseChange = debounceSave(async (val: string) => {
     return
   }
   const warehouse = warehouseData.warehouseList.find((item: any) => item.value === val)
+  console.log('仓库', warehouse)
   if (!warehouse && val) {
     uni.showToast({ title: '仓库不存在', icon: 'none' })
     reactiveData.heardList.warehouse = ''
@@ -270,8 +272,6 @@ const warehouseChange = debounceSave(async (val: string) => {
   reactiveData.setData.warehouseId = warehouse.id
   handleFocus()
   await getWarehousePosition(val)
-  //清空明细中的仓位,并获取推荐仓位
-  await clearStock()
   emit('update:setData', reactiveData.setData)
   emit('update:detailsList', reactiveData.detailsList)
 })
@@ -290,15 +290,17 @@ const clearStock = async () => {
     item.currentList.find((i: any) => i.label === '仓位').value = ''
 
     //删除FlexNumber第一个字符
-    let FlexNumber = reactiveData.setData.FlexNumber.substring(1)
-    let TJStockId = await getStockLoc(
-      item.MaterialCode,
-      item.Lot,
-      FlexNumber,
-      reactiveData.setData.warehouseNumber
-    )
-    console.log('清空明细中的仓位2', TJStockId)
-    item.currentList.find((i: any) => i.label === '推荐').value = TJStockId
+    if (reactiveData.setData.FlexNumber) {
+      let FlexNumber = reactiveData.setData.FlexNumber.substring(1)
+      let TJStockId = await getStockLoc(
+        item.MaterialCode,
+        item.Lot,
+        FlexNumber,
+        reactiveData.setData.warehouseNumber
+      )
+      console.log('清空明细中的仓位2', TJStockId)
+      item.currentList.find((i: any) => i.label === '推荐').value = TJStockId
+    }
   })
 }
 
@@ -338,8 +340,9 @@ const pickerConfirm = async (val: any) => {
   reactiveData.setData.warehouseNumber = val.value
   reactiveData.setData.warehouseId = val.id
   //清空明细中的仓位
+  await getWarehousePosition(val.value)
+  await clearStock()
 
-  getWarehousePosition(val.value)
   emit('update:setData', reactiveData.setData)
   emit('update:detailsList', reactiveData.detailsList)
   warehouseData.show = false

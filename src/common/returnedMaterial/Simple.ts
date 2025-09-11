@@ -213,6 +213,37 @@ export const getSimple = async (searchValue: any) => {
       }
       dataList.push(data)
     }
+    // 数据合并逻辑
+    const keyMap = new Map()
+
+    for (const item of dataList) {
+      // 新的合并条件：stockName, stockLocName, MaterialCode, Lot
+      const key = `${item.WarehouseName}-${item.WarehousePosition}-${item.MaterialCode}-${item.Lot}`
+      console.log('key', key)
+      if (keyMap.has(key)) {
+        const existing = keyMap.get(key)
+
+        // 累加数值字段
+        //existing.canReceive += item.canReceive
+        existing.detailList.quantity += item.detailList.quantity
+        existing.Quantity2 += item.Quantity2
+        existing.detailList.receivableQuantity += item.detailList.receivableQuantity
+        existing.receivableQuantity = existing.detailList.receivableQuantity
+
+        // 将当前条目添加到EntityList
+        existing.EntityList.push(item)
+      } else {
+        // 初始化新条目，EntityList包含自身
+        keyMap.set(key, { ...item, EntityList: [item] })
+      }
+    }
+
+    // 转换为数组并返回结果
+    const mergedDataList = Array.from(keyMap.values())
+
+    console.log('合并后的生产入库明细数据', mergedDataList)
+
+    return { dataList: mergedDataList, fid }
   }
   console.log('生产入库明细数据', dataList)
 

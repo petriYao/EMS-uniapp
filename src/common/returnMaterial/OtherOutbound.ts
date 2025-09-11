@@ -421,7 +421,7 @@ export function saveSimpleMaterialReturn(Model: any, IsAutoSubmitAndAudit = true
   const data = {
     formid: 'SP_ReturnMtrl',
     data: {
-      IsDeleteEntry: 'false',
+      IsDeleteEntry: 'true',
       IsAutoSubmitAndAudit: IsAutoSubmitAndAudit,
       Model: Model
     }
@@ -434,8 +434,21 @@ export function saveOutsourceMaterialReturn(Model: any, IsAutoSubmitAndAudit = t
   const data = {
     formid: 'SUB_RETURNMTRL',
     data: {
-      IsDeleteEntry: 'false',
+      IsDeleteEntry: 'true',
       IsAutoSubmitAndAudit: IsAutoSubmitAndAudit,
+      Model: Model
+    }
+  }
+  return saveApi(data) as any
+}
+
+//储位保存
+export function saveLocation(Model: any) {
+  const data = {
+    formid: 'QADV_CWB',
+    data: {
+      IsDeleteEntry: 'true',
+      IsAutoSubmitAndAudit: false,
       Model: Model
     }
   }

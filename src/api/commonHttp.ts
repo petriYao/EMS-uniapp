@@ -50,6 +50,19 @@ export function QueryInv(Number: any) {
     data: data
   })
 }
+//库存查询-储位
+export function QueryInvByCW(Number: any, CK: any) {
+  const data = {
+    parameters: [Number, CK]
+  }
+  return http({
+    url: '/k3cloud/Kingdee.BOS.TM.WebApi.StockItemCountWebApiService.QueryInvByCW,Kingdee.BOS.TM.WebApi.common.kdsvc',
+    method: 'POST',
+    requestTime: 5000, //等待5秒
+    data: data
+  })
+}
+
 //条码列表查询
 export function QueryInvByTM(parameters: any) {
   const data = {

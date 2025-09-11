@@ -127,7 +127,7 @@ onBeforeUnmount(() => {
       </view>
     </view>
 
-    <view class="pt-20rpx">
+    <view class="pt-10rpx mr-20rpx">
       <view class="flex items-center pb-10rpx w-100%">
         <view class="w-50px flex justify-center">编码</view>
         <view class="flex-1" style="border: 1px solid #f8f8f8">

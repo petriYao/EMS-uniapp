@@ -62,7 +62,7 @@ export const getOutsourcing = async (searchValue: any) => {
       const data = {
         currentList: [
           {
-            label: '部门',
+            label: '供应商',
             value: res.data.Result.Result.SubSupplierId?.Name[0].Value,
             disabled: true,
             type: 'input',
@@ -315,7 +315,7 @@ export const getSanOutsourcing = async (searchValue: any) => {
       const data = {
         currentList: [
           {
-            label: '部门',
+            label: '供应商',
             value: res.data.Result.Result.SubSupplierId?.Name[0].Value,
             disabled: true,
             type: 'input',
@@ -406,6 +406,13 @@ export const getSanOutsourcing = async (searchValue: any) => {
             value: actualValue?.Number,
             disabled: false,
             type: 'select',
+            style: { width: '100%' }
+          },
+          {
+            label: '数量',
+            value: 0,
+            disabled: false,
+            type: 'number',
             style: { width: '100%' }
           }
         ],

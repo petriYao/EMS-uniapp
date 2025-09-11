@@ -49,7 +49,7 @@ const saveClick = throttleSave(async () => {
       continue
     } else {
       let cangwei = item.currentList.find((i: any) => i.label === '仓位')
-      if (!cangwei.disabled && cangwei.value == '') {
+      if (reactiveData.locationList.length > 0 && cangwei.value == '') {
         uni.showToast({
           title: '仓位不可为空',
           icon: 'none'
@@ -75,7 +75,7 @@ const saveClick = throttleSave(async () => {
 
   for (const item of reactiveData.detailsList) {
     const FStockLocId = {} as any
-    const FStockLocPJ = 'FSTOCKLOCID__F' + item.FlexNumber
+    const FStockLocPJ = 'FSTOCKLOCID__' + reactiveData.setData.FlexNumber
 
     FStockLocId[FStockLocPJ] = {
       FNumber: item.stockLocNumber
@@ -83,13 +83,14 @@ const saveClick = throttleSave(async () => {
     let FEntity = {
       FEntryID: 0,
       FStockId: {
-        FNumber: item.stockNumber
+        FNumber: reactiveData.setData.warehouseNumber
       },
       FStockLocId: FStockLocId,
       FQty: 0
     } as any
 
     for (const barcode of item.EntityList) {
+      if (barcode.Quantity2 === 0) continue
       FEntity.FEntryID = barcode.entryId
       FEntity.FQty = barcode.Quantity2
       Model.FEntity.push(JSON.parse(JSON.stringify(FEntity)))

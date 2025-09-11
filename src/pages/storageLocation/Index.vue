@@ -2,25 +2,38 @@
 import { reactive, ref } from 'vue'
 import HeadStorage from './components/HeadStorage.vue'
 import ContentStorage from './components/ContentStorage.vue'
+import { debounceSave } from '@/utils'
 
-//条码库存查询
+//条码储位
 const reactiveData = reactive({
   isShow: true, //是否选择
   loading: false, //是否保存
-  title: '条码库存',
+  title: '储位',
   FEntity: [] as any //单据提交
 })
 
 const contentStorageRef = ref() //标题组件引用
+
+const saveClick = debounceSave(async () => {
+  contentStorageRef.value?.saveClick()
+})
 </script>
 <template>
   <view>
     <HeadStorage :title="reactiveData.title" />
   </view>
-  <scroll-view scroll-y style="height: calc(100vh - 44px - 24px)">
+  <view>
+    <ContentStorage ref="contentStorageRef" />
+  </view>
+  <view class="h-40px">
     <view>
-      <ContentStorage ref="contentStorageRef" />
+      <view
+        class="bg-#56a8fe text-#FFF w-100% h-40px flex justify-center items-center"
+        @click="saveClick"
+      >
+        提交
+      </view>
     </view>
-  </scroll-view>
+  </view>
 </template>
 <style lang="less" scoped></style>

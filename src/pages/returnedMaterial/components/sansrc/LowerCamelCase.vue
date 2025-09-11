@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { reactive, watch, ref, onBeforeMount } from 'vue'
+import { reactive, watch, ref } from 'vue'
 import { debounce } from 'lodash-es'
 import { useEmitt } from '@/hooks/useEmitt'
-import { queryStorage, lookqueryStorage } from '@/api/modules/storage'
 
 const props = defineProps({
   detailsList: {
@@ -40,8 +39,6 @@ const reactiveData = reactive({
 
 const getBarCode = async (item: any, index: number) => {
   reactiveData.barcodeIndex = index
-  getWarehousePosition(reactiveData.detailsList[reactiveData.barcodeIndex]?.stockNumber)
-
   emit('update:barcodeIndex', index)
 }
 
@@ -89,22 +86,6 @@ const handleTouchMove = (e: TouchEvent) => {
     isMoved = true
   }
 }
-// ========== 仓库/仓位相关 ==========
-const getWarehouseList = async () => {
-  const res: any = await queryStorage()
-  if (res) {
-    let data = res.data.map((item: any) => ({
-      id: item[2],
-      text: item[0],
-      value: item[1]
-    }))
-    console.log('获取仓库列表', data)
-    reactiveData.warehouseList = data
-
-    getWarehousePosition(reactiveData.detailsList[0]?.stockNumber)
-  }
-}
-
 const openName = ref('')
 //打开选择
 const openSelect = (item: any, disabled: boolean) => {
@@ -113,40 +94,6 @@ const openSelect = (item: any, disabled: boolean) => {
   openName.value = item
   pickerShow.value = true
 }
-
-//获取仓位列表
-const getWarehousePosition = async (warehouseId: any) => {
-  if (warehouseId) {
-    const res: any = await lookqueryStorage(warehouseId)
-    if (res) {
-      const list = res.data.Result.Result.StockFlexItem[0].StockFlexDetail
-      reactiveData.detailsList[reactiveData.barcodeIndex].FlexNumber =
-        res.data.Result.Result.StockFlexItem[0].FlexId?.FlexNumber?.substring(1)
-
-      if (list[0].Id === 0) {
-        //无列表
-        reactiveData.detailsList[reactiveData.barcodeIndex].currentList.find(
-          (i: any) => i.label === '仓位'
-        ).disabled = true
-        return
-      }
-      reactiveData.detailsList[reactiveData.barcodeIndex].currentList.find(
-        (i: any) => i.label === '仓位'
-      ).disabled = false
-      let locationList = list.map((item: any) => ({
-        Id: item.Id,
-        text: item.FlexEntryId.Name[0].Value,
-        value: item.FlexEntryId.Number
-      }))
-      reactiveData.locationList = locationList
-      console.log('locationList', locationList)
-
-      // 更新父组件的locationList
-      emit('update:locationList', locationList)
-    }
-  }
-}
-
 //手动选择
 const pickerConfirm = (warehouseItem: any, name: any) => {
   console.log('pickerConfirm', warehouseItem)
@@ -157,30 +104,18 @@ const pickerConfirm = (warehouseItem: any, name: any) => {
     ).value = warehouseItem.text
     reactiveData.detailsList[reactiveData.barcodeIndex].stockLocName = warehouseItem.text
     reactiveData.detailsList[reactiveData.barcodeIndex].stockLocNumber = warehouseItem.value
+    reactiveData.detailsList[reactiveData.barcodeIndex].detailList.locationNumber =
+      warehouseItem.value
+
     reactiveData.detailsList[reactiveData.barcodeIndex].detailList.stockLocName = warehouseItem.text
     //获取仓库，储位
 
     for (const item of reactiveData.detailsList[reactiveData.barcodeIndex].EntityList) {
       item.stockLocName = warehouseItem.text
       item.detailList.stockLocName = warehouseItem.text
+      item.detailList.locationNumber = warehouseItem.value
       item.stockLocNumber = warehouseItem.value
     }
-  } else {
-    /**仓库名称 */
-    reactiveData.detailsList[reactiveData.barcodeIndex].stockName = warehouseItem.text
-    reactiveData.detailsList[reactiveData.barcodeIndex].stockNumber = warehouseItem.value
-    reactiveData.detailsList[reactiveData.barcodeIndex].currentList.find(
-      (i: any) => i.label === '仓库'
-    ).value = warehouseItem.text
-
-    getWarehousePosition(warehouseItem.value)
-    /**仓位删除 */
-    reactiveData.detailsList[reactiveData.barcodeIndex].currentList.find(
-      (i: any) => i.label === '仓位'
-    ).value = ''
-    reactiveData.detailsList[reactiveData.barcodeIndex].stockLocName = ''
-    reactiveData.detailsList[reactiveData.barcodeIndex].detailList.stockLocName = ''
-    reactiveData.detailsList[reactiveData.barcodeIndex].stockLocNumber = ''
   }
   pickerShow.value = false
   emit('update:detailsList', reactiveData.detailsList)
@@ -244,45 +179,47 @@ const distributeValueToEntityList = (val: number) => {
 const warehouseChange = debounce((val: any) => {
   const warehouseId = reactiveData.warehouseList.find((item: any) => item.value === val)
   if (!warehouseId && val !== '') {
-    reactiveData.detailsList[reactiveData.barcodeIndex].stockName = ''
-    reactiveData.detailsList[reactiveData.barcodeIndex].stockNumber = ''
-    reactiveData.detailsList[reactiveData.barcodeIndex].currentList.find(
-      (i: any) => i.label === '仓库'
-    ).value = ''
     reactiveData.detailsList[reactiveData.barcodeIndex].currentList.find(
       (i: any) => i.label === '仓位'
     ).value = ''
     reactiveData.detailsList[reactiveData.barcodeIndex].stockLocName = ''
     reactiveData.detailsList[reactiveData.barcodeIndex].stockLocNumber = ''
     reactiveData.detailsList[reactiveData.barcodeIndex].detailList.stockLocName = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].detailList.locationNumber = ''
 
     uni.showToast({ title: '仓库不存在', icon: 'none' })
     return
   } else {
-    reactiveData.detailsList[reactiveData.barcodeIndex].stockName = warehouseId.text
-    reactiveData.detailsList[reactiveData.barcodeIndex].stockNumber = warehouseId.value
-    reactiveData.detailsList[reactiveData.barcodeIndex].currentList.find(
-      (i: any) => i.label === '仓库'
-    ).value = warehouseId.text
-    getWarehousePosition(warehouseId.value)
-
     reactiveData.detailsList[reactiveData.barcodeIndex].currentList.find(
       (i: any) => i.label === '仓位'
     ).value = ''
     reactiveData.detailsList[reactiveData.barcodeIndex].stockLocName = ''
     reactiveData.detailsList[reactiveData.barcodeIndex].stockLocNumber = ''
     reactiveData.detailsList[reactiveData.barcodeIndex].detailList.stockLocName = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].detailList.locationNumber = ''
   }
 }, 300)
 //仓位
 const locationChange = debounce((val: any) => {
   const location = reactiveData.locationList.find((item: any) => item.value === val)
+  if (val === '') {
+    reactiveData.detailsList[reactiveData.barcodeIndex].currentList.find(
+      (i: any) => i.label === '仓位'
+    ).value = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].stockLocName = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].detailList.stockLocName = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].detailList.locationNumber = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].stockLocNumber = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].location = ''
+    return
+  }
   if (!location && val !== '') {
     reactiveData.detailsList[reactiveData.barcodeIndex].currentList.find(
       (i: any) => i.label === '仓位'
     ).value = ''
     reactiveData.detailsList[reactiveData.barcodeIndex].stockLocName = ''
     reactiveData.detailsList[reactiveData.barcodeIndex].detailList.stockLocName = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].detailList.locationNumber = ''
     reactiveData.detailsList[reactiveData.barcodeIndex].stockLocNumber = ''
     uni.showToast({ title: '仓位不存在', icon: 'none' })
     return
@@ -292,6 +229,7 @@ const locationChange = debounce((val: any) => {
   ).value = location.text
   reactiveData.detailsList[reactiveData.barcodeIndex].stockLocName = location.text
   reactiveData.detailsList[reactiveData.barcodeIndex].detailList.stockLocName = location.text
+  reactiveData.detailsList[reactiveData.barcodeIndex].detailList.locationNumber = location.value
   reactiveData.detailsList[reactiveData.barcodeIndex].stockLocNumber = location.value
   console.log(
     '选择仓位',
@@ -310,7 +248,6 @@ useEmitt({
   name: 'update:barcodeIndex',
   callback: async (val: any) => {
     reactiveData.barcodeIndex = val
-    getWarehousePosition(reactiveData.detailsList[val]?.stockNumber)
   }
 })
 
@@ -334,10 +271,6 @@ watch(
   },
   { immediate: true, deep: true }
 )
-
-onBeforeMount(() => {
-  getWarehouseList()
-})
 </script>
 
 <template>

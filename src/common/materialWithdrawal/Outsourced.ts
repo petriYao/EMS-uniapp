@@ -238,17 +238,6 @@ export const getOutsourcing = async (searchValue: any) => {
         const storageLocationArray = [...storageSet].filter((item: unknown) => item !== '')
         existing.detailList.storageLocation = storageLocationArray.join(',')
         console.log('储位', existing.detailList.storageLocation)
-
-        // 同步更新 currentList 中的值（可选）
-        const inventoryField = existing.currentList.find((i: any) => i.label === '库存')
-        if (inventoryField) {
-          inventoryField.value = existing.detailList.inventory
-        }
-
-        const receivableField = existing.currentList.find((i) => i.label === '可领')
-        if (receivableField) {
-          receivableField.value = existing.canReceive
-        }
       } else {
         keyMap.set(key, {
           ...item,
@@ -261,7 +250,6 @@ export const getOutsourcing = async (searchValue: any) => {
     const mergedDataList = Array.from(keyMap.values())
     for (const item of mergedDataList) {
       const stockLocField = item.currentList.find((i: any) => i.label === '储位')
-
       if (stockLocField) {
         stockLocField.value = item.detailList.storageLocation || item.detailList.stockLocName
       }
@@ -269,6 +257,11 @@ export const getOutsourcing = async (searchValue: any) => {
       const inventoryField = item.currentList.find((i: any) => i.label === '库存')
       if (inventoryField) {
         inventoryField.value = item.detailList.inventory
+      }
+
+      const receivableField = item.currentList.find((i) => i.label === '可领')
+      if (receivableField) {
+        receivableField.value = item.canReceive
       }
     }
     console.log('合并后的生产入库明细数据', mergedDataList)

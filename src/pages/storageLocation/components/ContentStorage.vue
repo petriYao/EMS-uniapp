@@ -1,20 +1,76 @@
 <script setup lang="ts">
 import { reactive } from 'vue'
 import HeadScan from './src/HeadScan.vue'
-import LowerCamelCase from './src/LowerCamelCase.vue'
+import { throttleSave } from '@/utils'
+import { saveLocation } from '@/common/returnMaterial/OtherOutbound'
+
 const reactiveData = reactive({
-  detailsList: []
+  loading: true,
+  setData: {} as any,
+  detailsList: [] as any,
+  selectIndex: 0
+})
+
+// 保存方法
+const saveClick = throttleSave(async () => {
+  console.log('保存1', reactiveData.detailsList)
+  console.log('保存2', reactiveData.setData)
+  let details = reactiveData.detailsList[reactiveData.selectIndex]
+  //新增
+  const Model = {
+    FID: details.storagelocationid,
+    F_QADV_WL: {
+      FNUMBER: details.materialcode
+    },
+    F_QADV_WH: {
+      //仓库
+      FNUMBER: reactiveData.setData.warehouseNumber
+    },
+    F_QADV_LOT: details.batchnumber, //批号
+    F_QADV_WHCW: details.locationcode, //仓位名称
+    F_QADV_CW: details.storagelocation //储位
+  }
+  console.log('保存', Model)
+  const res = await saveLocation(Model)
+  console.log('保存结果', res)
+  if (res && res.data.Result.ResponseStatus.ErrorCode === 500) {
+    uni.showToast({
+      icon: 'none',
+      title: res.data.Result.ResponseStatus.Errors[0].Message,
+      duration: 5000
+    })
+    return
+  }
+
+  reactiveData.loading = false
+  reactiveData.detailsList = []
+  reactiveData.setData = {}
+  reactiveData.selectIndex = 0
+  uni.showToast({
+    icon: 'none',
+    title: '保存成功',
+    duration: 5000
+  })
+  setTimeout(() => {
+    reactiveData.loading = true
+  }, 100)
+  console.log('新增', Model)
+})
+
+// 暴露方法
+defineExpose({
+  saveClick
 })
 </script>
 
 <template>
   <!-- 扫描条码 -->
-  <view class="bg-#FFF">
-    <HeadScan v-model:detailsList="reactiveData.detailsList" />
-  </view>
-  <!-- 内容 -->
-  <view class="bg-#FFF">
-    <LowerCamelCase v-model:detailsList="reactiveData.detailsList" />
+  <view class="bg-#FFF" v-if="reactiveData.loading">
+    <HeadScan
+      v-model:detailsList="reactiveData.detailsList"
+      v-model:selectIndex="reactiveData.selectIndex"
+      v-model:setData="reactiveData.setData"
+    />
   </view>
 </template>
 <style lang="less" scoped>

@@ -122,7 +122,7 @@ const saveClick = throttleSave(async () => {
     // 查询条码状态
     const tmStatusRes: any = await TMStatusQuery({
       barcodes: barcodeList,
-      status: '2'
+      status: '1,3'
     })
 
     console.log('tmStatusRes', tmStatusRes)

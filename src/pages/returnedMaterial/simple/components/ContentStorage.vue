@@ -123,7 +123,7 @@ const saveClick = throttleSave(async () => {
     // 查询条码状态
     const tmStatusRes: any = await TMStatusQuery({
       barcodes: barcodeList,
-      status: '2'
+      status: '1,3'
     })
 
     console.log('tmStatusRes', tmStatusRes)
@@ -168,7 +168,7 @@ const saveClick = throttleSave(async () => {
           warehouse: reactiveData.setData.warehouseId,
           location: item.FStockLocId,
           documentNumber: numbers,
-          documentType: '生产退料单',
+          documentType: '简单生产退料单',
           status: '2'
         })
       }
