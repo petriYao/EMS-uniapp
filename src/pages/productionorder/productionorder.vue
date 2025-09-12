@@ -1,42 +1,27 @@
 <template>
   <view>
-    <u-navbar :custom-back="backpage" title="生产工单" placeholder :background="background">
-      <view class="slot-wrap">
-        <u-icon
-          @click="ClosePage"
-          name="close"
-          color="rgb(96, 98, 102)"
-          size="35"
-          style="margin-left: 30rpx"
-        />
-      </view>
-      <view solt="right" />
-    </u-navbar>
+    <u-navbar :custom-back="backpage" title="生产工单" placeholder :background="background" />
     <view class="content">
-      <view class="">
-        <u-row>
-          <u-col span="10">
-            <u-search
-              placeholder="生产单号/生产工单号"
-              :clearabled="true"
-              border-color="#cccccc"
-              margin="20rpx 10rpx"
-              shape="square"
-              :show-action="false"
-              :focus="searchinput"
-              v-model="keyword"
-              @search="search"
-            />
-            <!-- @blur="searchinput=false" -->
-          </u-col>
-          <u-col span="1">
-            <image
-              @click="Fn_ScanCode"
-              src="@/static/process/saoma.png"
-              style="width: 60rpx; height: 60rpx"
-            />
-          </u-col>
-        </u-row>
+      <view class="mx-20rpx flex">
+        <u-search
+          placeholder="生产单号/生产工单号"
+          :clearabled="true"
+          border-color="#cccccc"
+          margin="20rpx 10rpx"
+          shape="square"
+          :show-action="false"
+          :focus="searchinput"
+          v-model="keyword"
+          @search="search"
+        />
+        <!-- @blur="searchinput=false" -->
+        <view class="flex ml-10rpx items-center">
+          <image
+            @click="Fn_ScanCode"
+            src="@/static/process/saoma.png"
+            style="width: 60rpx; height: 60rpx"
+          />
+        </view>
       </view>
       <u-empty v-if="PageItemList.length == 0" text="暂无数据" mode="list" />
       <view
@@ -45,13 +30,13 @@
         v-for="(item, index) in PageItemList"
         :key="index"
       >
-        <u-row gutter="16" justify="space-between" style="margin-top: 20rpx">
-          <u-col span="4">
-            <view class="demo-layout bg-purple card-content-head">{{ item[1] }} </view>
-          </u-col>
-          <u-col span="4">
+        <view class="flex justify-between mt-20rpx mx-20rpx">
+          <view class="text-20px" style="font-weight: bold">
+            {{ item[1] }}
+          </view>
+          <view class="">
             <view
-              class="demo-layout bg-purple-light"
+              class="bg-#FFF-light"
               style="display: flex; justify-content: flex-end; align-items: flex-end"
             >
               <u-tag
@@ -61,78 +46,65 @@
                 color="#ffffff"
               />
             </view>
-          </u-col>
-        </u-row>
-        <u-line class="u-line" margin="20rpx 20rpx" />
+          </view>
+        </view>
+        <u-line class="mt-20rpx mb-10rpx" margin="" />
         <view class="wrap">
-          <u-row gutter="16">
-            <u-col span="10">
-              <view class="demo-layout bg-purple-light card-content">
-                <u-row gutter="16">
-                  <u-col span="6">
-                    <view class="demo-layout bg-purple"> 单据日期 </view>
-                  </u-col>
-                  <u-col span="5">
-                    <view class="demo-layout bg-purple-light" style="text-align: right">
-                      {{ getTime(item[2]) }}
-                    </view>
-                  </u-col>
-                </u-row>
-                <u-row gutter="16">
-                  <u-col span="6">
-                    <view class="demo-layout bg-purple"> 生产车间 </view>
-                  </u-col>
-                  <u-col span="5">
-                    <view class="demo-layout bg-purple-light" style="text-align: right">
-                      {{ item[6] }}
-                    </view>
-                  </u-col>
-                </u-row>
-                <u-row gutter="16">
-                  <u-col span="6">
-                    <view class="demo-layout bg-purple"> 产品编码 </view>
-                  </u-col>
-                  <u-col span="5">
-                    <view class="demo-layout bg-purple-light" style="text-align: right">
-                      {{ item[4] }}
-                    </view>
-                  </u-col>
-                </u-row>
-                <u-row>
-                  <view class="container">
-                    <view class="left">产品名称</view>
-                    <view class="right">{{ Lengthoptimization(item[7]) }}</view>
-                  </view>
-                </u-row>
-                <u-row gutter="16">
-                  <view class="container">
-                    <view class="left">规格型号</view>
-                    <view class="right">{{ Lengthoptimization(item[10]) }}</view>
-                  </view>
-                </u-row>
-                <u-row gutter="16">
-                  <u-col span="6">
-                    <view class="demo-layout bg-purple"> 生产数量 </view>
-                  </u-col>
-                  <u-col span="5">
-                    <view class="demo-layout bg-purple-light" style="text-align: right">
-                      {{ item[3] }}
-                    </view>
-                  </u-col>
-                </u-row>
+          <view class="flex">
+            <view class="flex-1 mx-20rpx mb-10rpx">
+              <view class="flex justify-between">
+                <view class="min-w-70px"> 单据日期 </view>
+                <view>
+                  {{ getTime(item[2]) }}
+                </view>
               </view>
-            </u-col>
-            <u-col span="1">
-              <view class="demo-layout bg-purple-dark card-content-arrow">
+
+              <view class="flex justify-between">
+                <view class="min-w-70px"> 生产车间 </view>
+                <view class="">
+                  {{ item[6] }}
+                </view>
+              </view>
+
+              <view class="flex justify-between">
+                <view class="min-w-70px"> 产品编码 </view>
+                <view class="">
+                  {{ item[4] }}
+                </view>
+              </view>
+              <view class="flex justify-between">
+                <view class="min-w-70px">产品名称</view>
+                <view class="">{{ Lengthoptimization(item[7]) }}</view>
+              </view>
+
+              <view class="flex justify-between">
+                <view class="min-w-70px">规格型号</view>
+                <view class="">{{ Lengthoptimization(item[10]) }}</view>
+              </view>
+              <view class="flex justify-between">
+                <view class="min-w-70px"> 生产数量 </view>
+                <view class="">
+                  {{ item[3] }}
+                </view>
+              </view>
+            </view>
+            <view class="flex items-center mr-40rpx">
+              <view class="demo-layout bg-#FFF-dark card-content-arrow">
                 <u-icon name="arrow-right" />
               </view>
-            </u-col>
-          </u-row>
+            </view>
+          </view>
         </view>
       </view>
       <!-- 提示框 -->
       <u-toast ref="uToast" />
-      <u-modal v-model="msgshow" @confirm="ConfirmationInformation" :content="msgcontent" />
+      <u-modal
+        :show="msgshow"
+        title="提示"
+        contentTextAlign="center"
+        @confirm="ConfirmationInformation"
+        :content="msgcontent"
+      />
     </view>
   </view>
 </template>
@@ -166,6 +138,7 @@ const iconName = ref('')
 // Methods
 const ConfirmationInformation = () => {
   keyword.value = ''
+  msgshow.value = false
 }
 
 const Lengthoptimization = (str: string) => {
@@ -375,6 +348,7 @@ const backpage = () => {
 
 const GotoProcess = (Status: string, code: string, fid: string) => {
   if (Status === '已审核') {
+    console.log('已审核跳转 已审核 138486 2025-06-01', Status, fid, code)
     uni.navigateTo({
       url: `/pages/processlist/processlist?fid=${fid}&code=${code}`
     })
@@ -402,12 +376,11 @@ const Fn_ScanCode = () => {
   })
 }
 
-// Lifecycle
 onMounted(() => {
   YuanData()
 })
 
-// Expose to template
+// 暴露
 defineExpose({
   keyword,
   msgshow,

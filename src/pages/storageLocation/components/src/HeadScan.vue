@@ -1,9 +1,18 @@
 <script setup lang="ts">
-import { reactive, onBeforeUnmount, onBeforeMount, ref } from 'vue'
+import { reactive, onBeforeUnmount, onBeforeMount, ref, watch } from 'vue'
 import { queryBarCode, queryMaterial } from '@/api/modules/lowerCamelCase'
 import { QueryInvByCW } from '@/api/commonHttp'
 import { queryStorage } from '@/api/modules/storage'
 import { debounce, debounceSave } from '@/utils'
+
+const props = defineProps<{
+  loading: {
+    type: Boolean
+    default: false
+  }
+  setData: any
+}>()
+
 //数据
 const reactiveData = reactive({
   searchValue: '', //搜索值
@@ -26,7 +35,8 @@ const reactiveData = reactive({
   heardList: {
     number: '',
     name: '',
-    type: ''
+    type: '',
+    num: ''
   }
 })
 
@@ -59,6 +69,7 @@ const searchChange = debounce(async () => {
     const queryRes1: any = await queryMaterial(`fnumber = '${reactiveData.searchValue}'`)
     console.log('查询结果1', queryRes1)
     if (queryRes1 && queryRes1.data.length > 0) {
+      reactiveData.heardList.num = ''
       let data = queryRes1.data[0]
       reactiveData.heardList.number = data[0]
       reactiveData.heardList.name = data[1]
@@ -67,6 +78,7 @@ const searchChange = debounce(async () => {
       const queryRes: any = await queryBarCode(`fnumber = '${reactiveData.searchValue}'`)
       console.log('查询结果2', queryRes)
       if (queryRes && queryRes.data.length > 0) {
+        reactiveData.heardList.num = ''
         let data = queryRes.data[0]
         reactiveData.heardList.number = data[0]
         reactiveData.heardList.name = data[1]
@@ -93,6 +105,17 @@ const searchChange = debounce(async () => {
       reactiveData.setData.warehouseName
     )
     // const stockRes: any = await QueryStock('AC5879TEX0002')
+    console.log('库存结果2', stockRes)
+    if (stockRes && stockRes.data.length > 0) {
+      //合计数量
+      let num = 0
+      for (const item of stockRes.data) {
+        num += item.inventoryquantity
+      }
+      reactiveData.heardList.num = num == null ? '0' : num.toString()
+    } else {
+      reactiveData.heardList.num = '0'
+    }
     reactiveData.detailsList = stockRes.data
     if (stockRes.data.length > 0) {
       reactiveData.details = reactiveData.detailsList[0]
@@ -160,6 +183,9 @@ const pickerConfirm = async (val: any) => {
   reactiveData.setData.warehouseName = val.text
   reactiveData.setData.warehouseNumber = val.value
   reactiveData.setData.warehouseId = val.id
+  setTimeout(() => {
+    reactiveData.focus = 1
+  }, 100)
   emit('update:setData', reactiveData.setData)
   emit('update:detailsList', reactiveData.detailsList)
   reactiveData.setData.show = false
@@ -193,6 +219,22 @@ const clearTimer = () => {
   }
   console.log('清除定时器', hideTimer.value)
 }
+
+watch(
+  () => props.loading,
+  () => {
+    if (props.loading && props.setData.warehouseNumber) {
+      reactiveData.setData.warehouseName = props.setData.warehouseNumber
+      setTimeout(() => {
+        reactiveData.focus = 1
+      }, 100)
+      warehouseChange(props.setData.warehouseNumber)
+    }
+  },
+  {
+    immediate: true
+  }
+)
 
 onBeforeMount(() => {
   // 组件挂载前的逻辑
@@ -324,7 +366,7 @@ onBeforeUnmount(() => {
             <view class="flex-1" style="border: 1px solid #f8f8f8">
               <u-input
                 ref="searchInput"
-                v-model="reactiveData.details.inventoryquantity"
+                v-model="reactiveData.heardList.num"
                 :showAction="false"
                 :disabled="true"
                 shape="round"

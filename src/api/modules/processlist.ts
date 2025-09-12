@@ -125,19 +125,19 @@ export function FBillStatusStatusColorTo(state) {
   let colorstr = ''
   switch (state) {
     case '已关闭':
-      colorstr = 'default' // #808080"
+      colorstr = '#808080' // #808080"
       break
     case '开工':
-      colorstr = 'primary' //"#55aaff"
+      colorstr = '#55aaff' //"#55aaff"
       break
     case '创建':
-      colorstr = 'warning' //"#FFA500"
+      colorstr = '#FFA500' //"#FFA500"
       break
     case '完工':
-      colorstr = 'success' //"#00aa00"
+      colorstr = '#00aa00' //"#00aa00"
       break
     case '下达':
-      colorstr = 'xiada' //
+      colorstr = '#62d5ff' //
       break
     default:
       colorstr = 'royal' //"#62d5ff"

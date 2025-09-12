@@ -44,7 +44,7 @@ const saveClick = throttleSave(async () => {
 
   reactiveData.loading = false
   reactiveData.detailsList = []
-  reactiveData.setData = {}
+  // reactiveData.setData = {}
   reactiveData.selectIndex = 0
   uni.showToast({
     icon: 'none',
@@ -70,6 +70,7 @@ defineExpose({
       v-model:detailsList="reactiveData.detailsList"
       v-model:selectIndex="reactiveData.selectIndex"
       v-model:setData="reactiveData.setData"
+      :loading="reactiveData.loading"
     />
   </view>
 </template>
