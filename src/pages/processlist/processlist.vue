@@ -1,15 +1,21 @@
 <template>
+  <page-meta
+    :page-style="
+      ZTstateShow || ZYstateShow || ZBstateShow ? 'overflow: hidden;' : 'overflow: auto;'
+    "
+  />
   <view class="prductionOrder_body">
     <u-navbar :custom-back="backpage" placeholder title="工序列表" :background="background">
       <template #left>
         <view @click="backpage">
           <u-icon name="arrow-left" size="20" />
         </view>
-        <view class="ml-20rpx" @click="ClosePage">
+        <view class="ml-50rpx" @click="ClosePage">
           <u-icon name="close" size="20" />
         </view>
       </template>
     </u-navbar>
+
     <view class="content">
       <view class="">
         <view class="flex items-center justify-between ml-20rpx my-20rpx">
@@ -35,8 +41,8 @@
       </view>
       <!-- 条件查询布局 -->
       <view class="wrap">
-        <view class="flex">
-          <view class="w-25%">
+        <view class="flex text-16px">
+          <view class="w-25% flex justify-center items-center">
             <view class="dropdown_Select_item">
               <checkbox-group @change="checkboxChangeAll">
                 <label>
@@ -46,13 +52,13 @@
                     color="black"
                     style="transform: scale(0.7)"
                   />
-                  <text style="font-size: 35rpx">全选</text>
+                  <text style="font-size: 16px">全选</text>
                 </label>
               </checkbox-group>
             </view>
           </view>
-          <view class="w-25%">
-            <view class="dropdown_Select_item text-16px">
+          <view class="w-25% flex justify-center items-center">
+            <view class="dropdown_Select_item">
               <label @click="clickState('状态')">状态</label>
               <u-popup :show="ZTstateShow" @close="ZTstateShow = false">
                 <view class="popup-content">
@@ -102,7 +108,7 @@
               </u-popup>
             </view>
           </view>
-          <view class="w-25%">
+          <view class="w-25% flex justify-center items-center">
             <view class="dropdown_Select_item">
               <label @click="clickState('转移')">转移</label>
               <u-popup :show="ZYstateShow" @close="ZYstateShow = false">
@@ -153,7 +159,7 @@
               </u-popup>
             </view>
           </view>
-          <view class="w-25%">
+          <view class="w-25% flex justify-center items-center">
             <view class="dropdown_Select_item">
               <label @click="clickState('组别')">组别</label>
               <u-popup :show="ZBstateShow" @close="ZBstateShow = false">
@@ -291,7 +297,7 @@
                     <view class="">{{ item.ljname }}</view>
                   </view>
                   <view
-                    class="text-#FFF px-10rpx py-1rpx"
+                    class="text-#FFF px-10rpx py-1rpx flex items-center"
                     :style="`background-color: ${item.bgcolor}; border-radius: 5rpx;`"
                   >
                     {{ item.fbillstatus }}
@@ -358,6 +364,7 @@
           </u-col>
         </u-row>
       </view>
+
       <!-- 提示框 -->
 
       <u-modal
@@ -388,32 +395,18 @@
 import { ref, reactive, onMounted } from 'vue'
 import { onLoad, onShow } from '@dcloudio/uni-app'
 import FromData from '../../common/FromIDs.json'
-import OffkeyboardIcon from '@/static/icon/Offkeyboard.png'
 import {
-  GetProcessList,
   PostExecuteOperation,
   PostPush,
   PushGetProject,
   PostRowClose,
-  FBillStatusStatusColor,
   FBillStatusStatusColorTo
 } from '@/api/modules/processlist'
 import { QueryAssociation } from '@/api/productionorder'
-import { ValidataCodeForMsg, RowStatecodeForMsg } from '@/api/modules/CodeValidate'
-import { FBillStatusForSearch, GetcodeisNull } from '@/common/ScreenSearch'
-import {
-  DepartmentQuery,
-  DepartmentQueryforData,
-  DepartmentQuery_One
-} from '@/api/modules/department'
-import { GetBarcode, GetBarcodeforFenlu } from '@/common/BarcodeParsing'
-import { DraftSubmit, SaveSubmit } from '@/common/Processhandover'
-import {
-  GetProductionFNumber,
-  GetProductionGxAll,
-  GetProductionGxAllXX,
-  GetBarcodeData
-} from '@/api/modules/productionreporting'
+import { RowStatecodeForMsg } from '@/api/modules/CodeValidate'
+import { DepartmentQuery } from '@/api/modules/department'
+import { SaveSubmit } from '@/common/Processhandover'
+import { GetProductionGxAllXX } from '@/api/modules/productionreporting'
 import {
   TM_GetBarcodeData,
   TM_GetYuandanData,
@@ -437,9 +430,7 @@ const keyword = ref('')
 const msgshow = ref(false)
 const msgcontent = ref('')
 const show = ref(false)
-const checked = ref(false)
 const checkedAll = ref(false)
-const selectedOptions = ref([])
 const ZYshow = ref(false)
 const Zbshow = ref(false)
 
@@ -491,26 +482,18 @@ const ZhuangTaiData = ref([
 ])
 
 const GongxuList = ref<any[]>([])
-const FieldsList = ref([])
 const PageItemModel = ref<any[]>([])
-const PageItemList = ref([])
 const F_FID = ref('')
-const GongxuListLength = ref(0)
-const StateColorIndex = ref(0)
-const GongxuListUpdate = ref([])
-const ScreenSearch = ref([]) //筛选条件列表
-const ZYScreenSearch = ref([])
-const ZBieScreenSearch = ref([])
+const ScreenSearch = ref([] as any) //筛选条件列表
+const ZYScreenSearch = ref([] as any)
+const ZBieScreenSearch = ref([] as any)
 const searchinput = ref(false) //搜索框是否获取焦点
 const YuanShiFenLu = ref<any[]>([]) //原始分录列表，排序用
 const hiddSCGDNo = ref('') //生产工单号
 const Scanbarcodestorage = ref<string[]>([]) //扫码集合
 const submittoshow = ref(false) //转移提示框
-const showIcon = ref(true)
-const iconName = ref(OffkeyboardIcon)
 const F_DepartmentAll = ref<any[]>([]) //车间名称存储
 const GxAllList = ref<any[]>([]) //所有工序内容
-const scrollTop = ref(0)
 const old = reactive({
   scrollTop: 0
 })
@@ -519,9 +502,6 @@ const checkboxCheckedList = ref<string[]>([]) //选中的分录索引
 const UserAuthoritylist = ref<string[]>([]) //权限
 
 // 弹窗引用
-const popup = ref()
-const popupzy = ref()
-const popupzb = ref()
 const msg_popup = ref(false)
 const zy_popup = ref(false)
 
@@ -564,11 +544,6 @@ const scroll = (e: any) => {
   old.scrollTop = e.detail.scrollTop
 }
 
-const submittoFncancel = () => {
-  zy_popup.value = false
-  submittoshow.value = false
-}
-
 const LookDetail = (title: string, content: string) => {
   msgshow.value = true
   msgcontent.value = content
@@ -580,11 +555,11 @@ const Lengthoptimization = (str: string) => {
 
 const LoadDepartment = async () => {
   //部门加载
-  const { data: res } = await DepartmentQuery()
+  const { data: res }: any = await DepartmentQuery()
   F_DepartmentAll.value = res
   let bumen: any[] = []
   if (res.length > 0) {
-    res.forEach((item: any, index: number) => {
+    res.forEach((item: any) => {
       bumen.push({
         text: item[0],
         checked: false,
@@ -641,22 +616,6 @@ const clickState = (str: string) => {
   if (str == '组别') {
     ZBstateShow.value = true
   }
-}
-
-const ZbieShow = (e: any) => {
-  Zbshow.value = true
-}
-
-const ZhuanyiShow = (e: any) => {
-  ZYshow.value = true
-}
-
-const ZhuangtaiShow = (e: any) => {
-  show.value = true
-}
-
-const changeType = (type: any) => {
-  checked.value = !checked.value
 }
 
 const ZbiecheckboxChange = (e: any) => {
@@ -737,12 +696,12 @@ const checkboxChangeAll = (e: any) => {
   checkboxCheckedList.value = []
   if (ccall.length > 0) {
     //全部选中时
-    GongxuList.value.forEach((item: any, index: number) => {
+    GongxuList.value.forEach((item: any) => {
       item.checked = true
       checkboxCheckedList.value.push(item.value)
     })
   } else {
-    GongxuList.value.forEach((item: any, index: number) => {
+    GongxuList.value.forEach((item: any) => {
       item.checked = false
     })
   }
@@ -878,12 +837,12 @@ const search = async (e: any) => {
   }
   if (insertVal.includes('TM')) {
     //扫描条码列表生成的条码
-    const { data: res } = await TM_GetBarcodeData(insertVal)
+    const { data: res }: any = await TM_GetBarcodeData(insertVal)
     let data = res
     if (data.length > 0) {
       //源单内码
       let ydnm = data[0][0]
-      const { data: ress } = await TM_GetYuandanData(ydnm)
+      const { data: ress }: any = await TM_GetYuandanData(ydnm)
       if (ress.length == 0) {
         msgcontent.value = '暂无数据！'
         msg_popup.value = true
@@ -899,7 +858,7 @@ const search = async (e: any) => {
 
       //源单分录号
       let ydflh = data[0][1]
-      const { data: ress2 } = await TM_GetSourceBillNoData(ydnm, ydflh)
+      const { data: ress2 }: any = await TM_GetSourceBillNoData(ydnm, ydflh)
       if (ress2.length == 0) {
         return
       } else {
@@ -913,7 +872,7 @@ const search = async (e: any) => {
     if (JMcode.length > 1) {
       //套打条码解析查询
       console.log('解析参数', JMcode[0], JMcode[1])
-      const { data: res } = await TM_GetSource_F_SCDNumberData_GXH_TOP(JMcode[0], JMcode[1])
+      const { data: res }: any = await TM_GetSource_F_SCDNumberData_GXH_TOP(JMcode[0], JMcode[1])
       if (res.length == 0) {
         msgcontent.value = '暂无数据！'
         msg_popup.value = true
@@ -926,7 +885,7 @@ const search = async (e: any) => {
         Scanbarcodestorage.value.push(insertVal)
         YuandanGetProess(res)
       }
-      const { data: ress } = await TM_GetSource_F_SCDNumberData_GXH(JMcode[0], JMcode[1])
+      const { data: ress }: any = await TM_GetSource_F_SCDNumberData_GXH(JMcode[0], JMcode[1])
       if (ress.length == 0) {
         return
       } else {
@@ -936,7 +895,7 @@ const search = async (e: any) => {
       }
     } else {
       // 条码数据单解析查询
-      const { data: res } = await TM_GetSource_F_SCDNumberData_TOP(insertVal)
+      const { data: res }: any = await TM_GetSource_F_SCDNumberData_TOP(insertVal)
       if (res.length == 0) {
         msgcontent.value = '暂无数据！'
         msg_popup.value = true
@@ -950,7 +909,7 @@ const search = async (e: any) => {
         YuandanGetProess(res)
       }
 
-      const { data: ress } = await TM_GetSource_F_SCDNumberData(insertVal)
+      const { data: ress }: any = await TM_GetSource_F_SCDNumberData(insertVal)
       if (ress.length == 0) {
         return
       } else {
@@ -965,7 +924,7 @@ const search = async (e: any) => {
 
 const YuandanGetProess = (Arr: any[]) => {
   PageItemModel.value = []
-  Arr.forEach(async (item: any, index: number) => {
+  Arr.forEach(async (item: any) => {
     F_FID.value = item[7]
     hiddSCGDNo.value = item[0]
     const res: any = await departmentName(item[2])
@@ -978,7 +937,7 @@ const YuandanGetProess = (Arr: any[]) => {
 }
 
 const GxGetAll = async () => {
-  const { data: res } = await GetProductionGxAllXX()
+  const { data: res }: any = await GetProductionGxAllXX()
   GxAllList.value = res
 }
 
@@ -1050,7 +1009,7 @@ const Getmaterial = async (id: string) => {
       IsSortBySeq: 'false'
     }
   }
-  const { data: res } = await QueryAssociation(newdata)
+  const { data: res }: any = await QueryAssociation(newdata)
   //console.log(res);
   if (res.Result.Result != null) {
     fulllist = res.Result.Result.Number
@@ -1080,8 +1039,8 @@ const getTime = (time: string) => {
     year = date.getFullYear(),
     month = date.getMonth() + 1,
     day = date.getDate(),
-    hour = date.getHours() < 10 ? '0' + date.getHours() : date.getHours(),
-    minute = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes(),
+    //hour = date.getHours() < 10 ? '0' + date.getHours() : date.getHours(),
+    //minute = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes(),
     second = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds()
   month >= 1 && month <= 9 ? (month = '0' + month) : ''
   day >= 0 && day <= 9 ? (day = '0' + day) : ''
@@ -1091,8 +1050,9 @@ const getTime = (time: string) => {
 }
 
 const backpage = () => {
+  //返回上一页
   uni.navigateBack({
-    url: '/pages/productionorder/productionorder'
+    delta: 1 // 返回的页面数，如果 delta 大于现有页面数，则返回到首页
   })
 }
 
@@ -1187,11 +1147,11 @@ const zhuanyi_fn = async () => {
   //console.log("GXBHarr", GXBHarr);
   if (GXBHarr.length > 0) {
     antishake.value = false
-    const { data: res } = await PostPush(F_FEntryid_Arr.join(','))
+    const { data: res }: any = await PostPush(F_FEntryid_Arr.join(','))
     //console.log("下推返回", res);
     let ResultID = res.Result.ResponseStatus.SuccessEntitys[0].Id
     //查询下推后工序交接单内容
-    const { data: pushpro } = await PushGetProject(ResultID)
+    const { data: pushpro }: any = await PushGetProject(ResultID)
     //console.log("pushpro", pushpro);
 
     let ResultObjArr = pushpro.Result.Result.FGXJJDEntry
@@ -1220,7 +1180,6 @@ const zhuanyi_fn = async () => {
         F_SCDEntry: item.F_SCDEntry, //生产订单行号
         FSCGDNumber: item.FSCGDNumber, //生产工单编号
         F_LJName: item.F_LJName, //零件名称
-        F_GDSCQty: item.F_GDSCQty, //生产数量 -
         F_GXNO: item.F_GXNO, //转出工序号
         FGYLXBB: item.FGYLXBB, //工艺路线版本
         F_GYLXType: item.F_GYLXType, // 工艺路线类型
@@ -1253,7 +1212,6 @@ const closeOnClose = async () => {
   //点击[关闭/反关闭]，状态为创建、下达、开工、完工的分录状态改为"关闭"，
   //状态为关闭的分录改为关闭前的状态（注：生产工单分录"状态"每次更新时、"上一状态"记录 状态更新前的状态）。
   // 调用行关闭APi PostRowClose
-  let Fidstr = '' //生产工单内码
 
   let sArr = GongxuList.value
   let rows = sArr.filter((item: any) => checkboxCheckedList.value.includes(item.value))
@@ -1262,7 +1220,6 @@ const closeOnClose = async () => {
     msg_popup.value = true
     return false
   } else {
-    Fidstr = rows[0].fid
     uni.showLoading({
       title: '正在操作中……'
     })
@@ -1285,11 +1242,11 @@ const closeOnClose = async () => {
       if (responseCode == 0) {
         //提交成功
         //刷新界面
-        GongxuList.value.forEach((item: any, index: number) => {
+        GongxuList.value.forEach((item: any) => {
           if (checkboxCheckedList.value.includes(item.value)) {
             item.fbillstatus = '已关闭'
             item.closeRowState = 2
-            item.bgcolor = 'defult'
+            item.bgcolor = '#808080'
           }
         })
       }
@@ -1298,16 +1255,15 @@ const closeOnClose = async () => {
       }, 1000)
     }
     if (ygbEntryIds.length > 0) {
-      const { data: res } = await PostRowClose('FROWClose', F_FID.value, ygbEntryIds.join(','))
+      const { data: res }: any = await PostRowClose('FROWClose', F_FID.value, ygbEntryIds.join(','))
       let responseCode = res.Result.ResponseStatus.MsgCode
       if (responseCode == 0) {
         for (var i = 0; i < ygbEntryIds.length; i++) {
           let itemgx = ygbEntryIds[i]
-          const { data: ress } = await TM_GetSourceBillNoData_Gxitems(itemgx)
-          GongxuList.value.forEach((item: any, index: number) => {
+          const { data: ress }: any = await TM_GetSourceBillNoData_Gxitems(itemgx)
+          GongxuList.value.forEach((item: any) => {
             if (checkboxCheckedList.value.includes(item.value) && item.fentryID === ress[0][2]) {
               let dataState = RowStatecodeForMsg(ress[0][1], ress[0][0])
-              let fbillstatusitem = ress[0][0]
               item.fbillstatus = dataState
               item.closeRowState = 1
               item.bgcolor = FBillStatusStatusColorTo(dataState)
@@ -1325,14 +1281,13 @@ const closeOnClose = async () => {
 const KaigongFn = async () => {
   let Fidstr = '' //生产工单内码
   let Entry_Ids: any[] = [] //分录内码，工序列表ID
-  let f_FBillNo = ''
   //获取所选数据行数，对应的分录信息id
   let rowsData: any[] = [] //选中行数据
-  GongxuList.value.forEach((item: any, index: number) => {
+  GongxuList.value.forEach((item: any) => {
     console.log('item', item, checkboxCheckedList.value)
     if (checkboxCheckedList.value.includes(item.value)) {
       Fidstr = item.fid
-      f_FBillNo = item.fbillno
+      //f_FBillNo = item.fbillno
       let ch_data = [item.fentryID, item.fbillstatus, item.closeRowState]
       rowsData.push(ch_data) //item[11] 状态，需要判断是否是 下达 状态
     }
@@ -1371,7 +1326,7 @@ const KaigongFn = async () => {
       IgnoreInterationFlag: ''
     }
   }
-  const { data: res } = await PostExecuteOperation(postData)
+  const { data: res }: any = await PostExecuteOperation(postData)
   let responseCode = res.Result.ResponseStatus.MsgCode
   if (responseCode == 0) {
     //提交成功
@@ -1379,18 +1334,6 @@ const KaigongFn = async () => {
     const ress: any = await TM_GetSourceBillNoData_Refresh(Fidstr)
     dataprocess(ress.data)
   }
-}
-
-const closeDropdown = () => {
-  // @ts-ignore
-  this.$refs.uDropdown.close()
-}
-
-const getScancode = (code: string) => {
-  // 有些PDA会自带换行符，trim函数处理下
-  code = code.trim()
-  //code就是扫描获取的值
-  console.log(code)
 }
 
 const ClosePage = () => {
@@ -1402,8 +1345,6 @@ const ClosePage = () => {
   })
 }
 
-const radioGroupChange = () => {}
-
 const Fn_ScanCode = () => {
   uni.scanCode({
     onlyFromCamera: true,
@@ -1414,57 +1355,6 @@ const Fn_ScanCode = () => {
     }
   })
 }
-
-const onSelected = (res: any) => {}
-
-const dateChange = (d: string) => {
-  uni.showToast({
-    icon: 'none',
-    title: d
-  })
-}
-
-// 导出给模板使用的属性和方法
-defineExpose({
-  backpage,
-  close,
-  confirm,
-  scroll,
-  submittoFncancel,
-  LookDetail,
-  Lengthoptimization,
-  LoadDepartment,
-  FnResetting,
-  clickState,
-  ZbieShow,
-  ZhuanyiShow,
-  ZhuangtaiShow,
-  changeType,
-  ZbiecheckboxChange,
-  ZYcheckboxChange,
-  GongxuListcheckboxChange,
-  checkboxChangeAll,
-  ConditionalSearch,
-  checkboxChange,
-  search,
-  YuandanGetProess,
-  GxGetAll,
-  dataprocess,
-  Getmaterial,
-  departmentName,
-  getTime,
-  startclick,
-  zhuanyi_fn,
-  closeOnClose,
-  KaigongFn,
-  closeDropdown,
-  getScancode,
-  ClosePage,
-  radioGroupChange,
-  Fn_ScanCode,
-  onSelected,
-  dateChange
-})
 </script>
 
 <style lang="scss" scoped>

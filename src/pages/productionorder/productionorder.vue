@@ -1,6 +1,6 @@
 <template>
   <view>
-    <u-navbar :custom-back="backpage" title="生产工单" placeholder :background="background" />
+    <u-navbar autoBack title="生产工单" placeholder />
     <view class="content">
       <view class="mx-20rpx flex">
         <u-search
@@ -34,18 +34,11 @@
           <view class="text-20px" style="font-weight: bold">
             {{ item[1] }}
           </view>
-          <view class="">
-            <view
-              class="bg-#FFF-light"
-              style="display: flex; justify-content: flex-end; align-items: flex-end"
-            >
-              <u-tag
-                :text="item[0]"
-                :border-color="item[11].bgcolor"
-                :bg-color="item[11].bgcolor"
-                color="#ffffff"
-              />
-            </view>
+          <view
+            class="text-#FFF px-10rpx py-1rpx flex items-center"
+            :style="`background-color: ${item[11].bgcolor}; border-radius: 5rpx;`"
+          >
+            {{ item[0] }}
           </view>
         </view>
         <u-line class="mt-20rpx mb-10rpx" margin="" />
@@ -122,18 +115,10 @@ import { ref, onMounted } from 'vue'
 const keyword = ref('')
 const msgshow = ref(false)
 const msgcontent = ref('')
-const background = ref({
-  backgroundColor: '#55aaff'
-})
 const documentList = ref<any[]>([])
 const PageItemList = ref<any[]>([])
 const FieldsList = ref<any[]>([])
-const FullNames = ref<any[]>([]) //所有部门
 const searchinput = ref(false) //搜索框是否获取焦点
-const Keyboardswitch = ref(false)
-const showIcon = ref(true)
-// const iconName = ref(require('@/static/icon/Offkeyboard.png'))
-const iconName = ref('')
 
 // Methods
 const ConfirmationInformation = () => {
@@ -340,12 +325,6 @@ const getTime = (time: string | number | Date) => {
   return timer
 }
 
-const backpage = () => {
-  uni.switchTab({
-    url: '/pages/index/index'
-  })
-}
-
 const GotoProcess = (Status: string, code: string, fid: string) => {
   if (Status === '已审核') {
     console.log('已审核跳转 已审核 138486 2025-06-01', Status, fid, code)
@@ -356,12 +335,6 @@ const GotoProcess = (Status: string, code: string, fid: string) => {
     msgcontent.value = `【${Status}】无法进行操作！`
     msgshow.value = true
   }
-}
-
-const ClosePage = () => {
-  uni.switchTab({
-    url: '/pages/index/index'
-  })
 }
 
 //调用摄像头进行扫码
@@ -378,30 +351,6 @@ const Fn_ScanCode = () => {
 
 onMounted(() => {
   YuanData()
-})
-
-// 暴露
-defineExpose({
-  keyword,
-  msgshow,
-  msgcontent,
-  background,
-  documentList,
-  PageItemList,
-  FieldsList,
-  FullNames,
-  searchinput,
-  Keyboardswitch,
-  showIcon,
-  iconName,
-  ConfirmationInformation,
-  Lengthoptimization,
-  search,
-  getTime,
-  backpage,
-  GotoProcess,
-  ClosePage,
-  Fn_ScanCode
 })
 </script>
 

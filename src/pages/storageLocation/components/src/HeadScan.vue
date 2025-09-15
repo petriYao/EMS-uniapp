@@ -249,24 +249,26 @@ onBeforeUnmount(() => {
 
 <template>
   <view>
-    <view class="flex items-center pb-20rpx bg-#f2f2f2">
-      <view class="w-50px flex justify-center" @click="searchClick">
-        <u-icon name="scan" size="24" />
+    <u-sticky offsetTop="68px" zIndex="100">
+      <view class="flex items-center pb-20rpx bg-#f2f2f2">
+        <view class="w-50px flex justify-center" @click="searchClick">
+          <u-icon name="scan" size="24" />
+        </view>
+        <view class="flex-1 mr-20rpx" style="border: 1px solid #f8f8f8" @click="clearTimer">
+          <u-input
+            id="fnk-input-native"
+            ref="searchInput"
+            v-model="reactiveData.searchValue"
+            :showAction="false"
+            customStyle="background: #FFF;"
+            shape="round"
+            :focus="reactiveData.focus == 1"
+            placeholder=""
+            @blur="searchChange"
+          />
+        </view>
       </view>
-      <view class="flex-1 mr-20rpx" style="border: 1px solid #f8f8f8" @click="clearTimer">
-        <u-input
-          id="fnk-input-native"
-          ref="searchInput"
-          v-model="reactiveData.searchValue"
-          :showAction="false"
-          customStyle="background: #FFF;"
-          shape="round"
-          :focus="reactiveData.focus == 1"
-          placeholder=""
-          @blur="searchChange"
-        />
-      </view>
-    </view>
+    </u-sticky>
     <!-- 仓库 -->
     <view class="flex items-center pt-10rpx w-100%">
       <view class="w-50px flex justify-center">仓库</view>
@@ -406,7 +408,7 @@ onBeforeUnmount(() => {
       </view>
     </view>
     <view v-if="reactiveData.detailsList.length > 0">
-      <scroll-view scroll-y style="height: calc(100vh - 44px - 44px - 198px - 40px - 40px - 40px)">
+      <view class="mb-40px">
         <view
           v-for="(item, index) of reactiveData.detailsList"
           :key="index"
@@ -445,8 +447,7 @@ onBeforeUnmount(() => {
             </view>
           </view>
         </view>
-      </scroll-view>
+      </view>
     </view>
-    <view v-else style="height: calc(100vh - 44px - 44px - 198px - 40px - 40px - 40px)" />
   </view>
 </template>

@@ -53,6 +53,20 @@ const groupChange = () => {
 }
 
 onBeforeMount(() => {
+  let UserAuthority = uni.getStorageSync('UserAuthority')
+  console.log('UserAuthority', UserAuthority)
+  // 判断权限
+  if (UserAuthority) {
+    if (UserAuthority.indexOf('21') === -1) {
+      //扫码入库
+      reactiveData.radioList[0].disabled = true
+    }
+
+    if (UserAuthority.indexOf('22') === -1) {
+      //扫单入库
+      reactiveData.radioList[1].disabled = true
+    }
+  }
   //获取本地缓存的扫码类型
   const scanCodeType = uni.getStorageSync(`scanCodeType-${reactiveData.title}`)
   if (scanCodeType) {

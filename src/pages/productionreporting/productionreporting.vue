@@ -2,40 +2,31 @@
   <view class="prductionOrder_body">
     <u-navbar :custom-back="backpage" title="生产报工" placeholder :background="background">
       <template #left>
-        <view class="slot-wrap">
-          <u-icon
-            @click="ClosePage"
-            name="close"
-            color="rgb(96, 98, 102)"
-            size="35"
-            style="margin-left: 30rpx"
-          />
+        <view @click="backpage">
+          <u-icon name="arrow-left" size="20" />
+        </view>
+        <view class="ml-50rpx" @click="ClosePage">
+          <u-icon name="close" size="20" />
         </view>
       </template>
       <template #right>
-        <view>
-          <u-icon
-            style="margin-right: 30rpx"
-            @click="Fnseeting"
-            name="setting-fill"
-            color="rgb(96, 98, 102)"
-            size="50"
-          />
+        <view @click="show = true">
+          <u-icon style="" name="setting-fill" color="rgb(96, 98, 102)" size="20" />
         </view>
       </template>
     </u-navbar>
     <view class="content">
       <!-- 正文内容 -->
-      <u-popup :show="show" mode="top" @close="show = false">
+      <u-popup v-model:show="show" mode="top">
         <view>
           <u-card title="设置报工类型">
             <template #body>
               <view class="">
                 <view class="u-body-item u-flex u-border-bottom u-col-between u-p-t-0">
-                  <u-radio-group v-model="JTypevalue" :wrap="true" @change="radioGroupChange">
-                    <u-radio label="个人计件" />
-                    <u-radio label="团体计件" />
-                    <u-radio label="仅报工" />
+                  <u-radio-group v-model="JTypevalue" placement="column" @change="radioGroupChange">
+                    <u-radio label="个人计件" name="1" />
+                    <u-radio label="团体计件" name="2" />
+                    <u-radio label="仅报工" name="3" />
                   </u-radio-group>
                 </view>
               </view>
@@ -60,7 +51,7 @@
             @blur="searchinput = false"
           />
         </view>
-        <view class="scan-box">
+        <view class="flex items-center">
           <image
             @click="Fn_ScanCode"
             src="@/static/process/saoma.png"
@@ -71,172 +62,145 @@
       <!-- 内容展示 -->
       <u-empty v-if="selectedRow.length == 0" text="暂无数据" mode="list" />
       <view class="content_list" v-if="selectedRow.length > 0">
-        <view class="content-row">
-          <view class="content-col">
-            <view class="demo-layout bg-purple">
-              {{ selectedRow[2] }}
-            </view>
+        <view class="flex items-center">
+          <view class="w-80px">
+            {{ selectedRow[2] }}
           </view>
-          <view class="content-col">
-            <view class="demo-layout bg-purple-light" style="text-align: right">
-              {{ selectedRow[3] }}
-            </view>
+          <view class="flex-1 text-end">
+            {{ selectedRow[3] }}
           </view>
-          <view class="content-col">
-            <view class="demo-layout bg-purple-light" style="text-align: right">
-              <u-tag
-                :text="selectedRow[0]"
-                :border-color="selectedRow.length > 0 ? selectedRow[StateColorIndex].bgcolor : ''"
-                :bg-color="selectedRow.length > 0 ? selectedRow[StateColorIndex].bgcolor : ''"
-                color="#ffffff"
-              />
-            </view>
+          <view class="w-80px text-end">
+            <u-tag
+              :text="selectedRow[0]"
+              :border-color="selectedRow.length > 0 ? selectedRow[StateColorIndex].bgcolor : ''"
+              :bg-color="selectedRow.length > 0 ? selectedRow[StateColorIndex].bgcolor : ''"
+              color="#ffffff"
+            />
           </view>
         </view>
 
-        <view class="content-row">
-          <view class="content-col">
-            <view class="demo-layout bg-purple"> 物料编码 </view>
-          </view>
-          <view class="content-col">
-            <view class="demo-layout bg-purple-light" style="text-align: right">
-              {{ selectedRow[5] }}
-            </view>
+        <view class="flex justify-between mb-4px">
+          <view> 物料编码 </view>
+          <view>
+            {{ selectedRow[5] }}
           </view>
         </view>
 
-        <view class="content-row" @click="LookDetail('物料名称', selectedRow[6])">
-          <view class="container_list">
-            <view class="left">物料名称</view>
-            <view class="right">{{ Lengthoptimization(selectedRow[6]) }}</view>
-          </view>
+        <view class="flex justify-between mb-4px" @click="LookDetail('物料名称', selectedRow[6])">
+          <view>物料名称</view>
+          <view>{{ Lengthoptimization(selectedRow[6]) }}</view>
         </view>
-        <view class="content-row" @click="LookDetail('规格型号', selectedRow[7])">
-          <view class="container_list">
-            <view class="left">规格型号</view>
-            <view class="right">{{ Lengthoptimization(selectedRow[7]) }}</view>
-          </view>
+        <view class="flex justify-between mb-4px" @click="LookDetail('规格型号', selectedRow[7])">
+          <view>规格型号</view>
+          <view>{{ Lengthoptimization(selectedRow[7]) }}</view>
         </view>
 
-        <view class="content-row">
-          <view class="content-col">
-            <view class="container_list">
-              <view class="left" style="margin-left: -2rpx">生产数量</view>
-              <view style="display: flex; justify-content: flex-end; right: 0">
+        <view class="flex">
+          <view class="w-50%">
+            <view class="flex">
+              <view class="w-70px">生产数量</view>
+              <view class="flex-1 text-center">
                 {{ selectedRow[11] }}
               </view>
             </view>
           </view>
-          <view class="content-col">
+          <view class="w-50%">
             <view class="container_list">
-              <view class="leftwg">未完工数量</view>
-              <view style="display: flex; justify-content: flex-end; right: 0">
+              <view class="w-70px">未完工数量</view>
+              <view class="flex-1 text-end">
                 {{ selectedRow[12] }}
               </view>
             </view>
           </view>
         </view>
 
-        <view class="content-row content_list_row_teshu" style="margin-top: 20rpx">
-          <view class="content-col">
-            <view class="demo-layout bg-purple"> 生产组别 </view>
-          </view>
-          <view class="content-col">
-            <view style="display: flex">
-              <view
-                style="
-                  flex: 1 1 0%;
-                  display: flex;
-                  justify-content: center;
-                  flex-direction: column;
-                  flex-wrap: nowrap;
-                  align-content: flex-start;
-                "
-              >
-                <label @click="SCZBshow = true" style="font-size: 26rpx">{{
-                  selectedRow[BSYIndex].SCZBText == '' ? '请选择' : selectedRow[BSYIndex].SCZBText
-                }}</label>
-              </view>
-              <view style="flex: 0 0 200rpx">
-                <u-search
-                  right-icon="scan"
-                  @blur="testandverify('ZB', $event)"
-                  class="field_zb"
-                  label-width="0"
-                  placeholder="请输入"
-                  :clearable="false"
-                  :focus="SCZBNoFocus"
-                  @input="onInputChange('SCZBNo', $event)"
+        <view class="flex items-center">
+          <view class="w-50%"> 生产组别 </view>
+          <view class="w-50% flex items-center">
+            <view @click="SCZBshow = true" style="font-size: 26rpx">
+              {{ selectedRow[BSYIndex].SCZBText == '' ? '请选择' : selectedRow[BSYIndex].SCZBText }}
+            </view>
+            <view class="flex-1 flex">
+              <view class="mr-[-10rpx]">
+                <u-input
                   v-model="selectedRow[BSYIndex].SCZBNo"
+                  inputAlign="right"
+                  shape="square"
+                  border-color="#FFF"
+                  bgColor="#FFF"
+                  searchIcon=""
+                  placeholder="请输入"
+                  :clearabled="false"
+                  :focus="SCZBNoFocus"
+                  :show-action="false"
+                  height="24px"
+                  @blur="testandverify('ZB', $event)"
+                  @change="onInputChange('SCZBNo', $event)"
                   @focus="GuangBiaoThis('SCZBNoFocus')"
-                  input-align="right"
-                  confirm-type="search"
-                  @confirm="doTab"
                 />
               </view>
-            </view>
-          </view>
-        </view>
-        <view class="content-row content_list_row_teshu">
-          <view class="container_list">
-            <view class="left">报工数量</view>
-            <view style="display: flex; justify-content: flex-end; right: 0">
-              <u-search
-                right-icon="scan"
-                type="number"
-                :focus="BaoGongnumberFocus"
-                label-width="0"
-                placeholder="请输入"
-                @input="onInputChange('BaoGongnumber', $event)"
-                v-model="selectedRow[BSYIndex].BaoGongnumber"
-                :clearable="false"
-                @focus="GuangBiaoThis('BaoGongnumberFocus')"
-                style="width: 175rpx; margin-right: 14rpx"
-                input-align="right"
-                confirm-type="search"
-                @confirm="doTab"
-              />
+              <view class="flex items-center">
+                <u-icon name="scan" color="#c0c4cc" size="14" />
+              </view>
             </view>
           </view>
         </view>
 
-        <view class="content-row content_list_row_teshu" v-if="isShowDisplay">
-          <view class="content-col">
-            <view class="demo-layout bg-purple"> 员工 </view>
+        <view class="flex items-center">
+          <view class="w-30%"> 报工数量 </view>
+          <view class="flex-1 flex justify-end">
+            <view class="mr-[-10rpx]">
+              <u-input
+                v-model="selectedRow[BSYIndex].BaoGongnumber"
+                inputAlign="right"
+                shape="square"
+                border-color="#FFF"
+                bgColor="#FFF"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                type="number"
+                searchIcon=""
+                placeholder="请输入"
+                :clearabled="false"
+                :focus="BaoGongnumberFocus"
+                :show-action="false"
+                height="24px"
+                @change="onInputChange('BaoGongnumber', $event)"
+                @focus="GuangBiaoThis('BaoGongnumberFocus')"
+              />
+            </view>
+            <view class="flex items-center">
+              <u-icon name="scan" color="#c0c4cc" size="14" />
+            </view>
           </view>
-          <view class="content-col">
-            <view style="display: flex">
-              <view
-                style="
-                  flex: 1 1 0%;
-                  display: flex;
-                  justify-content: center;
-                  flex-direction: column;
-                  flex-wrap: nowrap;
-                  align-content: flex-start;
-                "
-              >
-                <label @click="YGshow = !YGNoDisabled" style="font-size: 26rpx">{{
-                  selectedRow[BSYIndex].YGText == '' ? '请选择' : selectedRow[BSYIndex].YGText
-                }}</label>
-              </view>
-              <view style="flex: 0 0 200rpx">
-                <u-search
-                  right-icon="scan"
-                  @blur="testandverify('YG', $event)"
-                  class="field_zb"
-                  @input="onInputChange('YGNo', $event)"
-                  label-width="0"
-                  placeholder="请输入"
-                  :focus="YGNoFocus"
-                  :clearable="false"
+        </view>
+        <view class="flex items-center" v-if="isShowDisplay">
+          <view class="w-50%"> 员工 </view>
+          <view class="w-50% flex items-center">
+            <view @click="YGshow = !YGNoDisabled" style="font-size: 26rpx">
+              {{ selectedRow[BSYIndex].YGText == '' ? '请选择' : selectedRow[BSYIndex].YGText }}
+            </view>
+            <view class="flex-1 flex">
+              <view class="mr-[-10rpx]">
+                <u-input
                   v-model="selectedRow[BSYIndex].YGNo"
-                  :disabled="YGNoDisabled"
+                  inputAlign="right"
+                  shape="square"
+                  border-color="#FFF"
+                  bgColor="#FFF"
+                  searchIcon=""
+                  placeholder="请输入"
+                  :clearabled="false"
+                  :focus="YGNoFocus"
+                  :show-action="false"
+                  height="24px"
                   @focus="GuangBiaoThis('YGNoFocus')"
-                  input-align="right"
-                  confirm-type="search"
-                  @confirm="doTab"
+                  @blur="testandverify('YG', $event)"
+                  @change="onInputChange('YGNo', $event)"
                 />
+              </view>
+              <view class="flex items-center">
+                <u-icon name="scan" color="#c0c4cc" size="14" />
               </view>
             </view>
           </view>
@@ -251,12 +215,12 @@
         >
           <view class="Fl_items_list">
             <view style="width: 8%">
-              <u-checkbox-group style="margin-left: 10rpx">
-                <u-checkbox
-                  @change="checkboxChange"
-                  v-model="item[CheckIndex].checked"
-                  :name="index"
-                />
+              <u-checkbox-group
+                style="margin-left: 10rpx"
+                v-model="item[CheckIndex].checked"
+                @change="checkboxChange($event, index)"
+              >
+                <u-checkbox :name="index" />
               </u-checkbox-group>
             </view>
             <view
@@ -296,23 +260,23 @@
         <view style="height: 130rpx" />
       </view>
       <!-- 底部操作按钮 -->
-      <view class="bottom-btn-container" v-if="antishake">
-        <view class="btn-wrapper">
-          <view
-            class="btn-item"
+      <view class="bottom_btn_list" v-if="antishake">
+        <u-row justify="center">
+          <u-col
+            span="6"
+            style="display: flex; justify-content: center"
             v-if="UserAuthoritylist.includes('10')"
-            @tap="startclick('delete')"
           >
-            <span>删除</span>
-          </view>
-          <show
-            class="btn-item"
+            <span @tap="startclick('delete')">删除</span>
+          </u-col>
+          <u-col
+            span="5"
+            style="display: flex; justify-content: center"
             v-if="UserAuthoritylist.includes('11')"
-            @tap="startclick('submit')"
           >
-            <span>提交</span>
-          </show>
-        </view>
+            <span @tap="startclick('submit')">提交</span>
+          </u-col>
+        </u-row>
       </view>
     </view>
     <u-toast ref="uToast" />
@@ -342,16 +306,16 @@
     <u-picker
       :show="SCZBshow"
       mode="selector"
-      :range="SCZBList"
-      range-key="label"
+      :columns="[SCZBList]"
+      keyName="label"
       @confirm="SCZBconfirm"
     />
     <!-- 选择员工 -->
     <u-picker
       :show="YGshow"
       mode="selector"
-      :range="YGList"
-      range-key="label"
+      :columns="[YGList]"
+      keyName="label"
       @confirm="YGconfirm"
     />
   </view>
@@ -375,8 +339,8 @@ import { PDA_GetBarcodeData, PDA_GetTMcodeData } from '@/api/modules/PDAScanCode
 import { Listprocess } from '@/common/Entrypushdown.js'
 import { ref, onMounted, nextTick } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
-
-const Keyboardswitch_BG = ref(false)
+import { debounce } from 'lodash-es'
+// 响应式数据
 const UserAuthoritylist = ref<Array<any>>([]) //权限
 const background = ref({
   backgroundColor: '#55aaff'
@@ -385,11 +349,9 @@ const msgtitle = ref('提示')
 const msgshow = ref(false)
 const msgcontent = ref('')
 const show = ref(false)
-const checked = ref(false)
 const JTypevalue = ref('1') //个人计件
 const BaoGongnumber = ref('')
 const keyword = ref('')
-const PageList = ref<Array<any>>([]) // 列表数据
 const SaoMaList = ref<Array<any>>([]) //存储多条扫码内容
 const Listindexs = ref<Array<any>>([]) // 多选列表选中数据
 const SCZBshow = ref(false)
@@ -410,7 +372,6 @@ const BaoGongnumberFocus = ref(false) //报工数量
 const SCZBNoFocus = ref(false) //生产组别
 const YGNoFocus = ref(false) //员工
 const Unfinishedquantity = ref(0) //未完工数量
-const BarcodedataState = ref(false)
 const Scanbarcodestorage = ref<Array<any>>([]) //扫码记录存储，验证是否重复扫码
 const BSYIndex = ref(0) //分录中报工数量，组别，员工 所在的索引位置
 const SaoMaListRowIndex = ref(0) //选中分录行
@@ -422,9 +383,6 @@ const submittoshow = ref(false) //报工提交提示框
 const DepartmentList = ref<Array<any>>([]) //部门列表
 const selectedRow = ref<Array<any>>([])
 const requestQueue = ref<Array<any>>([]) // 定义一个请求队列
-const timer_ppg = ref(null) //定时器名称
-const showIcon = ref(true)
-const iconName = ref('@/static/icon/Offkeyboard.png')
 const rowsTMBaoGongnumber = ref(0)
 const antishake = ref(true) //防抖提交
 const AppscreenWidth = ref(0) //设备屏幕度
@@ -445,6 +403,7 @@ const getscreenWidth = () => {
 }
 
 const doTab = () => {
+  console.log('doTab')
   SCZBNoFocus.value = false
   BaoGongnumberFocus.value = false
   YGNoFocus.value = false
@@ -452,14 +411,11 @@ const doTab = () => {
   nextTick(() => {
     if (selectedRow.value[BSYIndex.value].SCZBNo === '') {
       SCZBNoFocus.value = true
-    }
-    if (selectedRow.value[BSYIndex.value].BaoGongnumber === '') {
+    } else if (selectedRow.value[BSYIndex.value].BaoGongnumber === '') {
       BaoGongnumberFocus.value = true
-    }
-    if (selectedRow.value[BSYIndex.value].YGNo === '') {
+    } else if (selectedRow.value[BSYIndex.value].YGNo === '') {
       YGNoFocus.value = true
-    }
-    if (keyword.value === '') {
+    } else if (keyword.value === '') {
       searchinput.value = true
     }
   })
@@ -469,19 +425,23 @@ const ConfirmationInformation = () => {
   nextTick(() => {
     keyword.value = ''
   })
+  msgshow.value = false
 }
 
-const testandverify = (str: string, e: any) => {
-  let strvalue = e.detail.value
+const testandverify = debounce((str: string, e: any) => {
+  let strvalue = e
   if (str === 'ZB') {
     let isc = false
-    SCZBList.value.forEach((item, index) => {
+    SCZBNoFocus.value = false
+    SCZBList.value.forEach((item) => {
       if (strvalue.length > 0) {
-        if (strvalue.toUpperCase() == item.value.toUpperCase()) {
+        if (strvalue.toUpperCase() == item.id.toUpperCase()) {
           isc = true
+          doTab()
         }
       } else {
         isc = true
+        doTab()
       }
     })
     if (!isc) {
@@ -492,18 +452,21 @@ const testandverify = (str: string, e: any) => {
       })
       uni.showToast({
         title: '不存在该组别！',
-        icon: 'error',
+        icon: 'none',
         duration: 2000
       })
     }
   }
   if (str === 'YG') {
     let isc = false
+    YGNoFocus.value = false
+
     if (strvalue === '') return
     for (var i = 0; i < YGList.value.length; i++) {
       let item = YGList.value[i]
       if (strvalue.toUpperCase() == item.value.toUpperCase()) {
         isc = true
+        doTab()
       }
     }
     if (!isc) {
@@ -512,15 +475,15 @@ const testandverify = (str: string, e: any) => {
         selectedRow.value[BSYIndex.value].YGText = '选员工'
         YGNoFocus.value = true
       })
+
       uni.showToast({
         title: '员工不存在！',
-        icon: 'error',
+        icon: 'none',
         duration: 2000
       })
     }
   }
-}
-
+}, 300)
 const Lengthoptimization = (str: string) => {
   if (str != undefined) {
     return str.length > 18 ? str.slice(0, 18) + '...' : str
@@ -591,13 +554,13 @@ const Getchromatographyprinting = async (val: string) => {
       }
     })
   }
-  const { data: pdares } = await PDA_GetBarcodeData(Dannumber, Gxh)
+  const { data: pdares }: any = await PDA_GetBarcodeData(Dannumber, Gxh)
   let newdocument = pdares
   //console.log("newdocument", newdocument);
   if (newdocument.length === 0) {
     uni.showToast({
       title: '暂无数据！',
-      icon: 'error',
+      icon: 'none',
       duration: 2000
     })
     searchinput.value = false
@@ -612,17 +575,17 @@ const Getchromatographyprinting = async (val: string) => {
     let statename = RowStatecodeForMsg(item[1], item[0])
     item[0] = statename
     item[5] = await Getmaterial(item[5])
-    const { data: zb } = await GetZubieForFid(item[26])
+    const { data: zb }: any = await GetZubieForFid(item[26])
     SCZBText.value = zb[0][0]
     SCZBNo.value = zb[0][1]
-    const resss = await GetProductionFNumber(item[10])
+    const resss: any = await GetProductionFNumber(item[10])
     //console.log("resss", resss);
     let ressdata = resss.data
     if (ressdata.length > 0) {
       item[10] = ressdata[0][0]
       item[9] = ressdata[0][1]
     }
-    const res2 = await departmentName(item[4])
+    const res2: any = await departmentName(item[4])
     item[4] = res2.Value
     item.push(
       {
@@ -693,14 +656,14 @@ const GetTMScanCode = async (val: string) => {
   }
   // 设置标识符为 true
   isGetBarcodeDataProcessing.value = true
-  const { data: res } = await GetBarcodeData(val)
+  const { data: res }: any = await GetBarcodeData(val)
   // 设置标识符为 false
   isGetBarcodeDataProcessing.value = false
   if (res.length > 0) {
     if (Scanbarcodestorage.value.includes(val)) {
       uni.showToast({
         title: '重复扫码',
-        icon: 'error',
+        icon: 'none',
         duration: 2000
       })
       searchinput.value = false
@@ -713,13 +676,13 @@ const GetTMScanCode = async (val: string) => {
       Scanbarcodestorage.value.push(val)
     }
     hid = res[0][1]
-    // 班组，员工姓名，报工数量 反��
+    // 班组，员工姓名，报工数量 反填
     Get_TM_dataSetData(res)
     if (res[0][2] == 0) {
       //条码表信息查询后数量为0 表示已经完成扫码
       uni.showToast({
         title: '重复扫码',
-        icon: 'error',
+        icon: 'none',
         duration: 2000
       })
       searchinput.value = false
@@ -734,7 +697,7 @@ const GetTMScanCode = async (val: string) => {
   } else {
     uni.showToast({
       title: '暂无数据',
-      icon: 'error',
+      icon: 'none',
       duration: 2000
     })
     searchinput.value = false
@@ -771,9 +734,9 @@ const Get_TM_dataSetData = async (res: any[]) => {
     }
 
     //console.log("生产组别", zbnumber);
-    const { data: zblist } = await GetZubieForFid(zbnumber)
+    const { data: zblist }: any = await GetZubieForFid(zbnumber)
     //console.log("看看情况", zblist);
-    zblist.forEach((zb) => {
+    zblist.forEach((zb: any) => {
       SCZBText.value = zb[0]
       SCZBNo.value = zb[1]
     })
@@ -782,24 +745,26 @@ const Get_TM_dataSetData = async (res: any[]) => {
 
 //********************************************生产组别  开始
 const SCZBconfirm = (e: any) => {
-  const selectedItem = SCZBList.value[e.index]
+  const selectedItem = SCZBList.value[e.indexs[0]]
   selectedRow.value[BSYIndex.value].SCZBNo = selectedItem.value
   selectedRow.value[BSYIndex.value].SCZBText = selectedItem.label
   // 同步修改数据列表中的数据
   Object.assign(SaoMaList.value[SaoMaListRowIndex.value], selectedRow.value)
+  SCZBshow.value = false
 }
 
 const GetSCZB = async () => {
   //查询生产组别
-  const { data: res } = await DepartmentQuery()
+  const { data: res }: any = await DepartmentQuery()
   DepartmentList.value = res
   let newres = [] as any
 
   //加工数据
-  res.forEach((item, index) => {
+  res.forEach((item: any) => {
     newres.push({
       label: item[0],
-      value: item[1]
+      value: item[1],
+      id: item[1]
     })
   })
   SCZBList.value = newres
@@ -808,11 +773,13 @@ const GetSCZB = async () => {
 
 //********************************************员工  开始
 const YGconfirm = (e: any) => {
-  const selectedItem = YGList.value[e.index]
+  const selectedItem = YGList.value[e.indexs[0]]
   selectedRow.value[BSYIndex.value].YGNo = selectedItem.value
   selectedRow.value[BSYIndex.value].YGText = selectedItem.label
   // 同步修改数据列表中的数据
   Object.assign(SaoMaList.value[SaoMaListRowIndex.value], selectedRow.value)
+  YGshow.value = false
+  console.log('selectedItem', selectedItem)
 }
 
 const GetYG = async () => {
@@ -823,13 +790,14 @@ const GetYG = async () => {
       FieldKeys: 'FName,FNumber,FID'
     }
   }
-  const { data: res } = await GetProductionOrderList(qudata)
+  const { data: res }: any = await GetProductionOrderList(qudata)
   GetYGList.value = res
   let newres = [] as any
   //加工数据
-  res.forEach((item, index) => {
+  res.forEach((item: any) => {
     newres.push({
       label: item[0],
+      id: item[1],
       value: item[1]
     })
   })
@@ -837,11 +805,12 @@ const GetYG = async () => {
 }
 //********************************************员工  结束
 
-const checkboxChange = (e: any) => {
-  if (e.value) {
+const checkboxChange = (e: any, index: number) => {
+  console.log('checkboxChange', e)
+  if (e.length > 0) {
     if (Listindexs.value.length > 0) {
       for (var i = 0; i < Listindexs.value.length; i++) {
-        if (Listindexs.value[i].name != e.name) {
+        if (Listindexs.value[i].name != index) {
           Listindexs.value.push(e)
           break
         }
@@ -851,7 +820,7 @@ const checkboxChange = (e: any) => {
     }
   } else {
     Listindexs.value.forEach((item, index) => {
-      if (e.name == item.name) {
+      if (index == item.name) {
         Listindexs.value.splice(index, 1)
       }
     })
@@ -864,6 +833,7 @@ const submittoFn = async () => {
   let arr: any[] = [] //需要分组的数据
   let containTM: any[] = [] //TM表数
   if (SaoMaList_new.length == 0) {
+    submittoshow.value = false
     msgshow.value = true
     msgtitle.value = '提示'
     msgcontent.value = '页面没有任何可提交数据！'
@@ -880,6 +850,7 @@ const submittoFn = async () => {
           containTM.push(item)
         }
       } else {
+        submittoshow.value = false
         msgshow.value = true
         msgtitle.value = '提示'
         msgcontent.value = '只有【开工】状态数据才可以报工！'
@@ -929,7 +900,7 @@ const submittoFn = async () => {
       if (item[BSYIndex.value].BaoGongnumber == 0) {
         uni.showToast({
           title: `报工数量必填`,
-          icon: 'error',
+          icon: 'none',
           duration: 2000
         })
         selectedRow.value[BSYIndex.value].BaoGongnumber = ''
@@ -937,6 +908,7 @@ const submittoFn = async () => {
         nextTick(() => {
           BaoGongnumberFocus.value = true
         })
+        submittoshow.value = false
         return
       } else {
         if (parseFloat(item[12]) >= parseFloat(item[BSYIndex.value].BaoGongnumber)) {
@@ -944,7 +916,7 @@ const submittoFn = async () => {
         } else {
           uni.showToast({
             title: `报工数量不能大于未完工数量`,
-            icon: 'error',
+            icon: 'none',
             duration: 2000
           })
           selectedRow.value[BSYIndex.value].BaoGongnumber = ''
@@ -952,6 +924,7 @@ const submittoFn = async () => {
           nextTick(() => {
             BaoGongnumberFocus.value = true
           })
+          submittoshow.value = false
           return
         }
       }
@@ -960,13 +933,14 @@ const submittoFn = async () => {
         if (item[BSYIndex.value].YGNo.length == 0) {
           uni.showToast({
             title: `员工选项必填!`,
-            icon: 'error',
+            icon: 'none',
             duration: 2000
           })
           YGNoFocus.value = false
           nextTick(() => {
             YGNoFocus.value = true
           })
+          submittoshow.value = false
           return
         }
       }
@@ -974,13 +948,14 @@ const submittoFn = async () => {
       if (item[BSYIndex.value].SCZBNo.length == 0) {
         uni.showToast({
           title: `产品组别必填!`,
-          icon: 'error',
+          icon: 'none',
           duration: 2000
         })
         SCZBNoFocus.value = false
         nextTick(() => {
           SCZBNoFocus.value = true
         })
+        submittoshow.value = false
         return
       }
     }
@@ -988,9 +963,10 @@ const submittoFn = async () => {
     if (JTypevalue.value == '') {
       uni.showToast({
         title: `计件类型为空，请选择!`,
-        icon: 'error',
+        icon: 'none',
         duration: 2000
       })
+      submittoshow.value = false
       return
     }
     //分录ID处理
@@ -1012,18 +988,19 @@ const submittoFn = async () => {
       if (zongshu > parseFloat(item[0][12])) {
         uni.showToast({
           title: `累计汇报数量大于工序数量`,
-          icon: 'error',
+          icon: 'none',
           duration: 2000
         })
+        submittoshow.value = false
         return
       }
     }
     //console.log("okarr", okarr);
     //console.log("groupedList", Object.keys(okarr));
     //下推思密达
-    const { data: respush } = await PushProduction(fenlulist.join(','))
+    const { data: respush }: any = await PushProduction(fenlulist.join(','))
     let ResultID = respush.Result.ResponseStatus.SuccessEntitys[0].Id
-    const { data: getdata } = await PushGetProject(ResultID)
+    const { data: getdata }: any = await PushGetProject(ResultID)
     //console.log("原始信息", getdata);
     //获取单据体
     let danjubody = JSON.parse(JSON.stringify(getdata))
@@ -1147,13 +1124,14 @@ const submittoFn = async () => {
       searchinput.value = true
     })
   }
+  submittoshow.value = false
 }
 
 const deleteFn = async () => {
   let checkedArr: any[] = []
   if (SaoMaList.value.length > 0) {
     SaoMaList.value.forEach((item) => {
-      if (item[CheckIndex.value].checked == true) {
+      if (item[CheckIndex.value].checked.length > 0) {
         let code = item[barcodeIndex.value].barcode
         let newcodelist: any[] = []
         Scanbarcodestorage.value.forEach((co) => {
@@ -1162,8 +1140,7 @@ const deleteFn = async () => {
           }
         })
         Scanbarcodestorage.value = newcodelist
-      }
-      if (item[CheckIndex.value].checked == false) {
+      } else {
         checkedArr.push(item)
       }
     })
@@ -1174,6 +1151,7 @@ const deleteFn = async () => {
   } else {
     GetRowsData(0, 'click') //默认选中索引0的数据展示
   }
+  deleteshow.value = false
 }
 
 const submittoFncancel = () => {
@@ -1185,14 +1163,15 @@ const deleteFncancel = () => {
 }
 
 const startclick = (str: string) => {
-  console.log(str)
+  console.log(str, SaoMaList.value)
   if (str === 'delete') {
     let deleteitem: any[] = []
     SaoMaList.value.forEach((item) => {
-      if (item[CheckIndex.value].checked == true) {
+      if (item[CheckIndex.value].checked.length > 0) {
         deleteitem.push(item)
       }
     })
+    console.log('deleteitem', deleteitem)
     if (deleteitem.length === 0) {
       msgshow.value = true
       msgtitle.value = '警告'
@@ -1208,7 +1187,7 @@ const startclick = (str: string) => {
   }
 }
 
-const onInputChange = async (name: string, e: any) => {
+const onInputChange = debounce(async (name: string, e: any) => {
   // 修改选中行的数据
   if (name === 'BaoGongnumber') {
     let wwgnumber = selectedRow.value[12] //未完工数量
@@ -1217,7 +1196,7 @@ const onInputChange = async (name: string, e: any) => {
       if (rowsTMBaoGongnumber.value < parseFloat(e)) {
         uni.showToast({
           title: `数量不能大于条码数量`,
-          icon: 'error',
+          icon: 'none',
           duration: 2000
         })
         selectedRow.value[BSYIndex.value].BaoGongnumber = ''
@@ -1236,9 +1215,11 @@ const onInputChange = async (name: string, e: any) => {
         nextTick(() => {
           BaoGongnumberFocus.value = true
         })
+        console.log('wwgnumber', selectedRow.value)
+
         uni.showToast({
           title: `报工数量不能大于未完工数量`,
-          icon: 'error',
+          icon: 'none',
           duration: 2000
         })
         return
@@ -1250,7 +1231,7 @@ const onInputChange = async (name: string, e: any) => {
   }
   if (name === 'YGNo') {
     selectedRow.value[BSYIndex.value].YGNo = e
-    YGList.value.forEach((item, index: any) => {
+    YGList.value.forEach((item) => {
       if (e.toUpperCase() == item.value.toUpperCase()) {
         selectedRow.value[BSYIndex.value].YGNo = item.value
         selectedRow.value[BSYIndex.value].YGText = item.label
@@ -1259,7 +1240,7 @@ const onInputChange = async (name: string, e: any) => {
   }
   // 同步修改数据列表中的数据
   await Object.assign(SaoMaList.value[SaoMaListRowIndex.value], selectedRow.value)
-}
+}, 300)
 
 const GetRowsData = async (index: number, typestr: string) => {
   //index 数据行索引
@@ -1319,14 +1300,14 @@ const Getmaterial = async (id: string) => {
   return fulllist
 }
 
-const pageloadData = async (FEntryid: string) => {
-  const { data: res } = await PDA_GetTMcodeData(FEntryid)
+const pageloadData = async (FEntryid: any) => {
+  const { data: res }: any = await PDA_GetTMcodeData(FEntryid)
   selectedRow.value = []
   if (res[0].length == 0) {
     SaoMaList.value = []
     uni.showToast({
       title: '暂无数据',
-      icon: 'error',
+      icon: 'none',
       duration: 2000
     })
     keyword.value = ''
@@ -1344,7 +1325,7 @@ const pageloadData = async (FEntryid: string) => {
       item[10] = ressdata[0][0]
       item[9] = ressdata[0][1]
     }
-    const res2 = await departmentName(item[4])
+    const res2: any = await departmentName(item[4])
     item[4] = res2.Value
     item.push(
       {
@@ -1378,10 +1359,6 @@ const pageloadData = async (FEntryid: string) => {
   }, 100)
 }
 
-const Fnseeting = () => {
-  show.value = !show.value
-}
-
 const backpage = () => {
   uni.reLaunch({
     url: '/pages/index/index',
@@ -1392,11 +1369,11 @@ const backpage = () => {
 
 // 选中任一radio时，由radio-group触发
 const radioGroupChange = (e: any) => {
-  show.value = !show.value
+  console.log('存储报工类型数据状态', e)
   //存储报工类型数据状态
   JTypevalue.value = e
   uni.setStorageSync('F_WOMW__JJType', e)
-  if (JTypevalue.value !== '个人计件') {
+  if (JTypevalue.value !== '1') {
     YGNoDisabled.value = true //不可编辑员工
     isShowDisplay.value = false
     YGNo.value = ''
@@ -1405,6 +1382,7 @@ const radioGroupChange = (e: any) => {
     isShowDisplay.value = true
   }
   GuangbiaoInsert('show')
+  show.value = false
 }
 
 //调用摄像头进行扫码
@@ -1432,25 +1410,9 @@ const Fn_ScanCode = () => {
 }
 
 const ClosePage = () => {
-  uni.reLaunch({
-    url: '/pages/index/index',
-    animationType: 'pop-out',
-    animationDuration: 200
+  uni.switchTab({
+    url: '/pages/index/index'
   })
-}
-
-const getTime = function (time: any) {
-  var date = new Date(time),
-    year = date.getFullYear(),
-    month: any = date.getMonth() + 1,
-    day: any = date.getDate(),
-    hour = date.getHours() < 10 ? '0' + date.getHours() : date.getHours(),
-    minute = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes(),
-    second = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds()
-  month >= 1 && month <= 9 ? (month = '0' + month) : ''
-  day >= 0 && day <= 9 ? (day = '0' + day) : ''
-  var timer = year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second
-  return timer
 }
 
 // Lifecycle hooks
@@ -1492,6 +1454,8 @@ onMounted(() => {
     YGNoDisabled.value = false //可编辑员工
     isShowDisplay.value = true
   }
+
+  uni.hideKeyboard()
 })
 </script>
 
@@ -1523,6 +1487,7 @@ onMounted(() => {
 
 .content_list {
   margin: 10rpx 10rpx 5rpx 10rpx;
+  padding: 10rpx;
   background-color: white;
   border: solid white 1rpx;
   border-radius: 5rpx;

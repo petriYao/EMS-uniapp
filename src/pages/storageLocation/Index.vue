@@ -25,15 +25,11 @@ const saveClick = debounceSave(async () => {
   <view>
     <ContentStorage ref="contentStorageRef" />
   </view>
-  <view class="h-40px">
-    <view>
-      <view
-        class="bg-#56a8fe text-#FFF w-100% h-40px flex justify-center items-center"
-        @click="saveClick"
-      >
-        提交
-      </view>
-    </view>
+  <view
+    class="bg-#56a8fe fixed bottom-0 text-#FFF w-100% h-40px flex justify-center items-center"
+    @click="saveClick"
+  >
+    提交
   </view>
 </template>
 <style lang="less" scoped></style>
