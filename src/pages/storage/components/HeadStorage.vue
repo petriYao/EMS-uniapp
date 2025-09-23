@@ -57,15 +57,6 @@ const groupChange = () => {
 }
 
 onBeforeMount(() => {
-  //获取本地缓存的扫码类型
-  const scanCodeType = uni.getStorageSync(`scanCodeType-${reactiveData.title}`)
-  if (scanCodeType) {
-    reactiveData.scanCodeType = scanCodeType
-    emit('update:scanCodeType', scanCodeType)
-  } else {
-    reactiveData.scanCodeType = '扫码入库'
-  }
-
   let UserAuthority = uni.getStorageSync('UserAuthority')
   console.log('生产入库1', UserAuthority)
   switch (props.title) {
@@ -84,17 +75,17 @@ onBeforeMount(() => {
         reactiveData.radioList[2].disabled = false
       }
       break
-    case '简单生产入库':
-      if (UserAuthority.includes('17')) {
-        reactiveData.radioList[0].disabled = false
-      }
-      if (UserAuthority.includes('18')) {
-        reactiveData.radioList[1].disabled = false
-      }
-      if (UserAuthority.includes('19')) {
-        reactiveData.radioList[2].disabled = false
-      }
-      break
+    // case '简单生产入库':
+    //   if (UserAuthority.includes('17')) {
+    //     reactiveData.radioList[0].disabled = false
+    //   }
+    //   if (UserAuthority.includes('18')) {
+    //     reactiveData.radioList[1].disabled = false
+    //   }
+    //   if (UserAuthority.includes('19')) {
+    //     reactiveData.radioList[2].disabled = false
+    //   }
+    //   break
     case '采购入库':
       if (UserAuthority.includes('21')) {
         reactiveData.radioList[0].disabled = false
@@ -118,6 +109,31 @@ onBeforeMount(() => {
       }
       break
   }
+
+  //获取本地缓存的扫码类型
+  const scanCodeType = uni.getStorageSync(`scanCodeType-${reactiveData.title}`)
+  // 如果三个选项都被禁用，则默认不选择任何选项
+  if (
+    reactiveData.radioList[0].disabled &&
+    reactiveData.radioList[1].disabled &&
+    reactiveData.radioList[2].disabled
+  ) {
+    reactiveData.scanCodeType = scanCodeType // 默认空值
+    console.log('生产入库1', scanCodeType)
+  } else if (
+    scanCodeType &&
+    !reactiveData.radioList.find((item) => item.name === scanCodeType)?.disabled
+  ) {
+    console.log('生产入库2', scanCodeType)
+    // 如果缓存的类型存在且未被禁用，则使用缓存值
+    reactiveData.scanCodeType = scanCodeType
+  } else {
+    console.log('生产入库3', scanCodeType)
+    // 否则选择第一个未被禁用的选项
+    const firstEnabled = reactiveData.radioList.find((item) => !item.disabled)
+    reactiveData.scanCodeType = firstEnabled ? firstEnabled.name : ''
+  }
+  emit(`update:scanCodeType`, reactiveData.scanCodeType)
   console.log('生产入库2', reactiveData.radioList)
 })
 </script>

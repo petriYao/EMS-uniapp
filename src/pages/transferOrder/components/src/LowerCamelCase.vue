@@ -297,7 +297,7 @@ watch(
             :disabled="reactiveData.locationList.length == 0"
             shape="round"
             placeholder=""
-            @change="warehouseChange(item.value)"
+            @blur="warehouseChange(item.value)"
           >
             <template #suffix>
               <view @click="reactiveData.locationList.length == 0 ? '' : (pickerShow = true)">
@@ -313,7 +313,7 @@ watch(
                 >
                   <view class="flex items-center p-20rpx" style="border-bottom: 1px solid #f8f8f8">
                     <view @tap="pickerShow = false">搜索 </view>
-                    <view class="flex-1">
+                    <view class="flex-1" @click="clearTimer">
                       <u-input
                         id="searchInput2"
                         v-model="item.scValue2"
@@ -420,7 +420,7 @@ watch(
               <view class="flex-wrap">{{ item.detailList.specification }}</view>
             </view>
 
-            <view class="flex">
+            <view class="flex line-height-20px">
               <view class="w-30% flex items-center h-20px">
                 <view class="min-w-50px text-end">数量：</view>
                 <view> {{ item.Quantity2 }}</view>

@@ -31,6 +31,7 @@ const reactiveData = reactive({
   subsectionList: ['当前', '明细'],
   locationList: [] as any,
   curNow: 0,
+  focus: 0,
   barcodeList: [] as any, //条码
   barcodeIndex: 0
 })
@@ -97,6 +98,14 @@ const warehouseChange = debounceSave((val: any) => {
       icon: 'none'
     })
     reactiveData.detailsList[reactiveData.barcodeIndex].currentList[12].value = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].WarehousePosition = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].WarehousePositionNumber = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].detailList.location = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].detailList.locationNumber = ''
+    reactiveData.focus = 0
+    setTimeout(() => {
+      reactiveData.focus = 12
+    }, 100)
     return
   }
   reactiveData.detailsList[reactiveData.barcodeIndex].currentList[12].value = warehouseId.value
@@ -108,7 +117,7 @@ const warehouseChange = debounceSave((val: any) => {
 
   pickerShow.value = false
   emit('update:detailsList', reactiveData.detailsList)
-  emitter.emit('update:handleFocus')
+  // emitter.emit('update:handleFocus')
 })
 
 const pickerConfirm = (warehouseItem: any) => {
@@ -121,17 +130,22 @@ const pickerConfirm = (warehouseItem: any) => {
   reactiveData.detailsList[reactiveData.barcodeIndex].currentList[12].value = warehouseItem.text
   pickerShow.value = false
   emit('update:detailsList', reactiveData.detailsList)
-  emitter.emit('update:handleFocus')
+  // emitter.emit('update:handleFocus')
 }
 
 const quantChange = (val: any) => {
-  console.log('val', val)
   reactiveData.detailsList[reactiveData.barcodeIndex].Quantity2 = val * 1
   reactiveData.detailsList[reactiveData.barcodeIndex].currentList[13].value = val * 1
 }
 
+function sectionChange(index: any) {
+  reactiveData.curNow = index
+  reactiveData.focus = 999
+}
+
 const clearTimer = () => {
   // 清除定时器
+  emitter.emit('update:focus')
   emitter.emit('update:clearTimer')
 }
 watch(
@@ -146,7 +160,6 @@ watch(
 watch(
   () => props.locationList,
   (val: any) => {
-    console.log('页面数据改动', val)
     if (val && val.length > 0) {
       reactiveData.locationList = val
     }
@@ -159,7 +172,7 @@ watch(
   <u-subsection
     :list="reactiveData.subsectionList"
     :current="reactiveData.curNow"
-    @change="reactiveData.curNow = $event"
+    @change="sectionChange"
   />
   <scroll-view scroll-y style="height: calc(100vh - 44px - 44px - 40px - 34px - 80px - 22px)">
     <!-- 当前 -->
@@ -188,6 +201,22 @@ watch(
         <view
           class="flex-1 mr-20rpx"
           style="border: 1px solid #f8f8f8"
+          v-else-if="item.type == 'number'"
+        >
+          <u-input
+            v-model="item.value"
+            :showAction="false"
+            :disabled="item.disabled"
+            shape="round"
+            placeholder=""
+            type="number"
+            @change="quantChange"
+            @click="clearTimer"
+          />
+        </view>
+        <view
+          class="flex-1 mr-20rpx"
+          style="border: 1px solid #f8f8f8"
           v-else-if="item.type == 'select'"
           @click="clearTimer"
         >
@@ -197,6 +226,7 @@ watch(
             :disabled="reactiveData.locationList.length == 0"
             shape="round"
             placeholder=""
+            :focus="reactiveData.focus == index"
             @blur="warehouseChange(item.value)"
           >
             <template #suffix>
@@ -213,7 +243,7 @@ watch(
                 >
                   <view class="flex items-center p-20rpx" style="border-bottom: 1px solid #f8f8f8">
                     <view @tap="pickerShow = false">搜索 </view>
-                    <view class="flex-1">
+                    <view class="flex-1" @click="clearTimer">
                       <u-input
                         id="searchInput2"
                         v-model="item.scValue2"

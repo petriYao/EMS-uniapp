@@ -294,7 +294,7 @@ onBeforeUnmount(() => {
               >
                 <view class="flex items-center p-20rpx" style="border-bottom: 1px solid #f8f8f8">
                   <view>搜索</view>
-                  <view class="flex-1">
+                  <view class="flex-1" @click="clearTimer">
                     <u-input
                       v-model="reactiveData.setData.scValue"
                       shape="round"

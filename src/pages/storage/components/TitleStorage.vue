@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { reactive, watch, onBeforeMount, ref, onBeforeUnmount } from 'vue'
+import { reactive, watch, onBeforeMount, ref } from 'vue'
 import { debounceSave } from '@/utils'
 import { productionGetData, getInboundOrder } from '@/common/storage/production'
 import { lowerCamelCase2 } from '@/api/modules/storage'
 import { queryStorage, lookqueryStorage } from '@/api/modules/storage'
 import { TMStatusQuery } from '@/api/commonHttp'
+import { useEmitt } from '@/hooks/useEmitt'
 
 const props = defineProps({
   title: {
@@ -102,6 +103,7 @@ const reactiveData = reactive({
   barcodeList: [] //条码
 })
 const searchInput = ref()
+const { emitter } = useEmitt()
 //订单号输入框
 const searchChange = async () => {
   handleFocus()
@@ -402,149 +404,6 @@ const getWarehouseList = async () => {
 }
 //扫码获取数据
 const searchClick = async () => {
-  /*
-  let list = [
-    'PE650010A000325070001',
-    'PE650010A000425070001',
-    'PE650010A000525070001',
-    'PE650010A000625070001',
-    'PE650010A000725070001',
-    'PE650010A000825070001',
-    'PE650010A001025070001',
-    'PE650010A001125070001',
-    'PE650010A001225070001',
-    'PE650010A001325070001',
-    'PE650010A001425070001',
-    'PE650010A001525070001',
-    'PE650010A001625070001',
-    'PE650010A001725070001',
-    'PE650010A001825070001',
-    'PE650010A001925070001',
-    'PE650010A002025070001',
-    'PE650010A002125070001',
-    'PE650010A002225070001',
-    'PE650010A002325070001',
-    'PE650010A002425070001',
-    'PE650031A0001.000125070001',
-    'PE650031A0002.000125070001',
-    'HA77001B000125070002',
-    'HA77001B000125070003',
-    'HC73003A000125070002',
-    'HC73003A000125070003',
-    'PE650010A000125070002',
-    'PE650010A000125070003',
-    'PE650010A000325070003',
-    'PE650010A000325070002',
-    'PE650010A000225070003',
-    'PE650010A000225070002',
-    'PE650010A000425070002',
-    'PE650010A000425070003',
-    'PE650010A000525070002',
-    'PE650010A000525070003',
-    'PE650010A000725070003',
-    'PE650010A000725070002',
-    'PE650010A000625070003',
-    'PE650010A000625070002',
-    'PE650010A000825070002',
-    'PE650010A000825070003',
-    'PE650010A001025070002',
-    'PE650010A001025070003',
-    'PE650010A001125070002',
-    'PE650010A001125070003',
-    'PE650010A001225070002',
-    'PE650010A001225070003',
-    'PE650010A001325070002',
-    'PE650010A001325070003',
-    'PE650010A001425070002',
-    'PE650010A001425070003',
-    'PE650010A001525070002',
-    'PE650010A001525070003',
-    'PE650010A001625070002',
-    'PE650010A001625070003',
-    'PE650010A001725070002',
-    'PE650010A001725070003',
-    'PE650010A001825070002',
-    'PE650010A001825070003',
-    'PE650010A001925070002',
-    'PE650010A001925070003',
-    'PE650010A002025070002',
-    'PE650010A002025070003',
-    'PE650010A002125070002',
-    'PE650010A002125070003',
-    'PE650010A002225070002',
-    'PE650010A002225070003',
-    'PE650010A002325070002',
-    'PE650010A002325070003',
-    'PE650010A002425070002',
-    'PE650010A002425070003',
-    'PE650031A0001.000125070002',
-    'PE650031A0001.000125070003',
-    'PE650031A0002.000125070002',
-    'PE650031A0002.000125070003',
-    'PE650010A000125070004',
-    'PE650010A000225070004',
-    'PE650010A000325070004',
-    'PE650010A000425070004',
-    'PE650010A000525070004',
-    'PE650010A000625070004',
-    'PE650010A000725070004',
-    'PE650010A000825070004',
-    'PE650010A001325070004',
-    'PE650010A001225070004',
-    'PE650010A001125070004',
-    'PE650010A001025070004',
-    'PE650010A001425070004',
-    'PE650010A001525070004',
-    'PE650010A001625070004',
-    'PE650010A001725070004',
-    'PE650010A001825070004',
-    'PE650010A001925070004',
-    'PE650010A002025070004',
-    'PE650010A002125070004',
-    'PE650010A000125070005',
-    'PE650010A002425070004',
-    'PE650010A002325070004',
-    'PE650010A002225070004',
-    'PE650010A000225070005',
-    'PE650010A000325070005',
-    'PE650010A000425070005',
-    'PE650010A000525070005',
-    'PE650010A001025070005',
-    'PE650010A000825070005',
-    'PE650010A000725070005',
-    'PE650010A000625070005',
-    'PE650010A001125070005',
-    'PE650010A001225070005',
-    'PE650010A001325070005',
-    'PE650010A001425070005',
-    'PE650010A001525070005',
-    'PE650010A001625070005',
-    'PE650010A001725070005',
-    'PE650010A001825070005',
-    'PE650010A002225070005',
-    'PE650010A002125070005',
-    'PE650010A002025070005',
-    'PE650010A001925070005',
-    'PE650010A002325070005',
-    'PE650010A002425070005',
-    'PE650031A0001.000125070004',
-    'PE650031A0002.000125070004'
-  ]
-
-  //每两秒读取一个值给搜索框赋值
-  let b = 0
-  const intervalId = setInterval(() => {
-    if (b >= list.length) {
-      clearInterval(intervalId) // 停止定时器
-      return
-    }
-
-    reactiveData.searchValue = list[b]
-    searchChange()
-    b++
-  }, 1000)
-  return
-  */
   //uniapp打开扫码
   const res: any = await uni.scanCode({
     scanType: ['barCode', 'qrCode'],
@@ -559,13 +418,13 @@ const searchClick = async () => {
       searchChange()
     } else if (focusIndex.value === 2) {
       reactiveData.titleList[2].value = result
-      warehouseChange(result, true) // 手动调用仓库 change
+      warehouseChange(result, 3, true) // 手动调用仓库 change
       setTimeout(() => {
         focusIndex.value = 3
       }, 500)
     } else if (focusIndex.value === 3) {
       reactiveData.titleList[3].value = result
-      warehouseChange(result, false) // 手动调用仓位 change
+      warehouseChange(result, 2, false) // 手动调用仓位 change
       setTimeout(() => {
         focusIndex.value = 0
       }, 500)
@@ -577,28 +436,46 @@ const searchClick = async () => {
 
 function sectionChange(index: any) {
   reactiveData.curNow = index
+  focusIndex.value = 999
 }
 
 //仓库扫出数据
 const warehouseChange = debounceSave(
-  async (val: any, iswarehouse: boolean, iswarehousePosition?: boolean) => {
+  async (val: any, iswarehouse: boolean, focus: number, iswarehousePosition?: boolean) => {
+    console.log('warehouseChange', focusIndex.value, focus)
+    if (focusIndex.value == focus) {
+      handleFocus()
+    }
+    if (val == '') return
     if (iswarehouse) {
       //获取仓库id替换为仓库名称
-      const warehouseId: any = warehouseList.value.find((item: any) => item.value === val)
-      if (!warehouseId && val != '') {
+      const warehouseId: any = warehouseList.value.find(
+        (item: any) => item.value === val || item.text === val
+      )
+      if (!warehouseId) {
         //提示仓库不存在
         uni.showToast({
           title: '仓库不存在',
           icon: 'none'
         })
         reactiveData.titleList[2].value = ''
+        currentWarehouse.number = ''
+        currentWarehouse.name = ''
+        currentWarehouse.id = ''
+        //清空所有仓位
+        clearAllPositions()
         //重新回到光标位置
-        focusIndex.value = 20
-        setTimeout(() => {
-          focusIndex.value = 2
-        }, 500)
+        if (focusIndex.value == focus) {
+          focusIndex.value = 20
+          setTimeout(() => {
+            focusIndex.value = 2
+          }, 200)
+        }
+
         return
       }
+      if (currentWarehouse.name == warehouseId.text) return
+
       console.log('warehouseId', warehouseId)
       reactiveData.titleList[2].value = warehouseId.text
       currentWarehouse.name = warehouseId.text
@@ -609,24 +486,42 @@ const warehouseChange = debounceSave(
       //获取仓位id替换为仓位名称
       if (warehousePositionList.value.length !== 0) {
         const warehouseId: any = warehousePositionList.value.find((item: any) => item.value === val)
-        if (!warehouseId && val != '') {
+        if (!warehouseId) {
           //提示仓位不存在
           uni.showToast({
             title: '仓位不存在',
             icon: 'none'
           })
-          reactiveData.titleList[3].value = ''
-          //重新回到光标位置
-          focusIndex.value = 20
-          setTimeout(() => {
-            focusIndex.value = 3
-          }, 500)
+
+          if (!iswarehousePosition) {
+            if (focusIndex.value == focus) {
+              focusIndex.value = 20
+
+              //重新回到光标位置
+              setTimeout(() => {
+                focusIndex.value = 3
+              }, 200)
+            }
+            reactiveData.titleList[3].value = ''
+          } else {
+            reactiveData.detailsList[reactiveData.datailsIndex].currentList[12].value = ''
+            currentWarehousePosition.name = ''
+            currentWarehousePosition.number = ''
+            if (focusIndex.value == focus) {
+              focusIndex.value = 20
+
+              //重新回到光标位置
+              setTimeout(() => {
+                focusIndex.value = 12
+              }, 200)
+            }
+          }
           return
         }
-        if (reactiveData.detailsList.length !== 0) {
-          reactiveData.detailsList[reactiveData.datailsIndex].currentList[12].value =
-            warehouseId.text
-        }
+        // if (reactiveData.detailsList.length !== 0) {
+        //   reactiveData.detailsList[reactiveData.datailsIndex].currentList[12].value =
+        //     warehouseId.text
+        // }
         if (!iswarehousePosition) {
           reactiveData.titleList[3].value = warehouseId.text
           currentWarehousePosition.name = warehouseId.text
@@ -638,29 +533,56 @@ const warehouseChange = debounceSave(
               warehouseId.value
             reactiveData.detailsList[reactiveData.datailsIndex].WarehousePositionId = warehouseId.id
           }
+          if (focusIndex.value == focus) {
+            focusIndex.value = 0
+          }
+        } else {
+          reactiveData.detailsList[reactiveData.datailsIndex].currentList[12].value =
+            warehouseId.text
+          reactiveData.detailsList[reactiveData.datailsIndex].WarehousePosition = warehouseId.value
+          reactiveData.detailsList[reactiveData.datailsIndex].WarehousePositionId = warehouseId.id
         }
-
-        focusIndex.value = 0
       } else {
         reactiveData.titleList[3].value = ''
       }
-      console.log('warehouseChange', reactiveData.detailsList[reactiveData.datailsIndex])
     }
   }
 )
-//选择仓库
-const warehouseClick = async (val: any) => {
-  //清空仓位
+
+// 清空所有仓位功能
+const clearAllPositions = () => {
+  // 清空表头仓位显示
   currentWarehousePosition.name = ''
   currentWarehousePosition.number = ''
   currentWarehousePosition.id = ''
   reactiveData.titleList[3].value = ''
+
+  // 清空明细列表中所有项目的仓位信息
+  if (reactiveData.detailsList && reactiveData.detailsList.length > 0) {
+    reactiveData.detailsList.forEach((item: any) => {
+      // 清空仓位编号和ID
+      item.WarehousePosition = ''
+      item.WarehousePositionId = ''
+      item.WarehousePositionName = ''
+
+      // 如果有currentList且包含仓位字段，则清空该字段的值
+      if (item.currentList && item.currentList.length > 12) {
+        item.currentList[12].value = ''
+      }
+    })
+  }
+}
+
+//选择仓库
+const warehouseClick = async (val: any) => {
+  //清空仓位
+  clearAllPositions()
   //查看仓位
   if (val) {
     const res: any = await lookqueryStorage(val)
     if (res) {
       const list = res.data.Result.Result.StockFlexItem[0].StockFlexDetail
-      FlexNumber.value = res.data.Result.Result.StockFlexItem[0].FlexId.FlexNumber
+      FlexNumber.value = res.data.Result.Result.StockFlexItem[0].FlexId?.FlexNumber
       if (list[0].Id === 0) {
         warehousePositionList.value = []
         reactiveData.titleList[3].disabled = true
@@ -682,12 +604,12 @@ const warehouseClick = async (val: any) => {
         reactiveData.titleList[3].disabled = false
         setTimeout(() => {
           focusIndex.value = 3
-        }, 200)
+        }, 100)
       }
-      handleFocus()
     }
   }
 }
+
 //仓库选择器确认
 const pickerConfirm = async (val: any) => {
   currentWarehouse.id = val.id
@@ -695,11 +617,10 @@ const pickerConfirm = async (val: any) => {
   currentWarehouse.number = val.value
 
   reactiveData.titleList[2].value = val.text
-  handleFocus()
-  focusIndex.value = 3
   warehouseClick(val.value)
   pickerShow.value = false
 }
+
 //仓位选择器确认(iswarehousePosition为true时，表示表头仓位选择器，否则为当前仓位选择器)
 const pickerConfirm2 = (val: any, iswarehousePosition?: boolean) => {
   if (iswarehousePosition) {
@@ -707,6 +628,7 @@ const pickerConfirm2 = (val: any, iswarehousePosition?: boolean) => {
     currentWarehousePosition.id = val.id
     currentWarehousePosition.name = val.text
     currentWarehousePosition.number = val.value
+    focusIndex.value = 0
   } else {
     //无论选择哪个，有明细时都是会变的
     if (reactiveData.detailsList.length !== 0) {
@@ -715,8 +637,6 @@ const pickerConfirm2 = (val: any, iswarehousePosition?: boolean) => {
       reactiveData.detailsList[reactiveData.datailsIndex].WarehousePositionId = val.id
     }
   }
-  handleFocus()
-  focusIndex.value = 0
   pickerShow2.value = false
   pickerShow3.value = false
 }
@@ -746,6 +666,7 @@ const longpressClick = (item: any, index: number) => {
     }
   })
 }
+
 //长按事件 删除条码明细
 let startX = 0
 let startY = 0
@@ -855,6 +776,7 @@ const longpressDetailsClick = (item: any, index: number) => {
     }
   })
 }
+
 //重新计算总额
 const reCompute = (val: any) => {
   let sum = 0
@@ -864,25 +786,6 @@ const reCompute = (val: any) => {
   return sum
 }
 
-const hideTimer = ref<number | null>(null)
-const ds = ref(0)
-const handleFocus = () => {
-  // 设置定时器
-  if (!hideTimer.value) {
-    hideTimer.value = setInterval(() => {
-      uni.hideKeyboard()
-      ds.value++
-    }, 50) as unknown as number
-  }
-}
-const clearTimer = () => {
-  // 清除定时器
-  if (hideTimer.value) {
-    clearInterval(hideTimer.value)
-    ds.value = 0
-    hideTimer.value = null
-  }
-}
 //返回到父组件
 const backClick = async () => {
   // 声明为异步函数
@@ -1113,6 +1016,15 @@ const backClick = async () => {
     currentData
   } // 返回填充后的数据
 }
+
+const clearTimer = () => {
+  // 清除定时器
+  emitter.emit('update:clearTimer')
+}
+const handleFocus = () => {
+  emitter.emit('update:handleFocus')
+}
+
 //监听
 watch(
   () => props.scanCodeType,
@@ -1169,13 +1081,8 @@ watch(
   { immediate: true, deep: true }
 )
 
-// 组件卸载时清理
-onBeforeUnmount(() => {
-  clearTimer()
-})
 onBeforeMount(() => {
   // 组件挂载前的逻辑
-  handleFocus()
   getWarehouseList()
 })
 
@@ -1227,22 +1134,16 @@ defineExpose({
         />
       </view>
       <view class="flex-1 mr-20rpx" style="border: 1px solid #f8f8f8" v-else @click="clearTimer">
-        <!-- <uni-data-select
-          :focus="index == focusIndex"
-          v-model="item.value"
-          :localdata="item.label == '仓库' ? warehouseList : warehousePositionList"
-          @change="selectChange($event, item.change)"
-        /> -->
+        <!-- 仓库 -->
         <u-input
           v-model="item.value"
           :showAction="false"
           :disabled="item.disabled"
           shape="round"
           placeholder=""
-          :focus="index == focusIndex"
+          :focus="index == focusIndex && !item.display"
           @focus="focusIndex = index"
-          @change="warehouseChange($event, item.label == '仓库')"
-          @blur="handleFocus"
+          @blur="warehouseChange($event, item.label == '仓库', index)"
         >
           <template #suffix>
             <view
@@ -1264,13 +1165,9 @@ defineExpose({
                 :closeOnClickAction="true"
                 @close="pickerShow = false"
               >
-                <view
-                  class="flex items-center p-20rpx"
-                  style="border-bottom: 1px solid #f8f8f8"
-                  @click="clearTimer"
-                >
+                <view class="flex items-center p-20rpx" style="border-bottom: 1px solid #f8f8f8">
                   <view @tap="pickerShow = false">搜索 </view>
-                  <view class="flex-1">
+                  <view class="flex-1" @click="clearTimer">
                     <u-input
                       id="searchInput1"
                       v-model="item.scValue"
@@ -1298,6 +1195,7 @@ defineExpose({
                 </view>
               </u-action-sheet>
             </view>
+            <!-- 仓位 -->
             <view>
               <u-action-sheet
                 :show="pickerShow2"
@@ -1380,6 +1278,7 @@ defineExpose({
             class="flex-1 mr-20rpx"
             style="border: 1px solid #f8f8f8"
             v-else-if="item.type == 'select'"
+            @click="clearTimer"
           >
             <u-input
               v-model="item.value"
@@ -1388,7 +1287,8 @@ defineExpose({
               shape="round"
               placeholder=""
               :focus="index == focusIndex"
-              @change="warehouseChange($event, item.label == '仓库', true)"
+              @focus="focusIndex = index"
+              @blur="warehouseChange($event, item.label == '仓库', index, true)"
             >
               <template #suffix>
                 <view @click="warehousePositionList.length == 0 ? '' : (pickerShow3 = true)">
@@ -1407,7 +1307,7 @@ defineExpose({
                       style="border-bottom: 1px solid #f8f8f8"
                     >
                       <view @tap="pickerShow3 = false">搜索 </view>
-                      <view class="flex-1">
+                      <view class="flex-1" @click="clearTimer">
                         <u-input
                           id="searchInput2"
                           v-model="item.scValue2"
@@ -1551,6 +1451,7 @@ defineExpose({
     </view>
   </view>
 </template>
+
 <style lang="less" scoped>
 ::v-deep .uni-select__selector-scroll {
   max-height: 140px !important;

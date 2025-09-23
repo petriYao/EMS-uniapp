@@ -98,9 +98,7 @@ const saveClick = async () => {
   //保存
   CustomParams.Numbers = Array.from(new Set(CustomParams.Numbers))
   let EntryIds = CustomParams.Numbers.map((item: any) => item).join(',')
-  console.log('CustomParams', JSON.stringify(CustomParams.FEntry))
   const res = await pushClient(EntryIds, CustomParams.FEntry)
-  console.log('保存结果', res)
   if (res && res.data.Result.ResponseStatus.ErrorCode === 500) {
     uni.showToast({
       icon: 'none',

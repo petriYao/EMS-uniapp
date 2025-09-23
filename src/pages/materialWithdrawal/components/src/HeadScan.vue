@@ -419,13 +419,15 @@ const reCompute = (val: any) => {
 const hideTimer = ref<number | null>(null)
 
 const handleFocus = () => {
-  if (!hideTimer.value) {
-    hideTimer.value = setInterval(() => {
-      uni.hideKeyboard()
-    }, 50) as unknown as number
+  // 总是先清除已存在的定时器，再创建新的
+  if (hideTimer.value) {
+    clearInterval(hideTimer.value)
   }
-}
 
+  hideTimer.value = setInterval(() => {
+    uni.hideKeyboard()
+  }, 50) as unknown as number
+}
 const clearTimer = () => {
   if (hideTimer.value) {
     clearInterval(hideTimer.value)

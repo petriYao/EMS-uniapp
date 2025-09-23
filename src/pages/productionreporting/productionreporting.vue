@@ -1,6 +1,6 @@
 <template>
   <view class="prductionOrder_body">
-    <u-navbar :custom-back="backpage" title="生产报工" placeholder :background="background">
+    <u-navbar title="生产报工" placeholder :background="background">
       <template #left>
         <view @click="backpage">
           <u-icon name="arrow-left" size="20" />
@@ -497,6 +497,7 @@ const LookDetail = (title: string, content: string) => {
 }
 
 const GuangBiaoThis = (state: string) => {
+  clearTimer()
   if (state === 'BaoGongnumberFocus') {
     GuangbiaoState.value = 'BaoGongnumberFocus'
   }
@@ -509,6 +510,25 @@ const GuangBiaoThis = (state: string) => {
   if (state === 'searchinput') {
     GuangbiaoState.value = 'searchinput'
   }
+}
+const hideTimer = ref<number | null>(null)
+const handleFocus = () => {
+  // 总是先清除已存在的定时器，再创建新的
+  if (hideTimer.value) {
+    clearInterval(hideTimer.value)
+  }
+
+  hideTimer.value = setInterval(() => {
+    uni.hideKeyboard()
+  }, 50) as unknown as number
+}
+const clearTimer = () => {
+  // 清除定时器
+  if (hideTimer.value) {
+    clearInterval(hideTimer.value)
+    hideTimer.value = null
+  }
+  console.log('清除定时器', hideTimer.value)
 }
 
 const handleInput = (e: string) => {
@@ -602,7 +622,7 @@ const Getchromatographyprinting = async (val: string) => {
         bgcolor: FBillStatusStatusColor(statename)
       },
       {
-        checked: false
+        checked: []
       }
     )
     SaoMaList.value.unshift(item)
@@ -1342,7 +1362,7 @@ const pageloadData = async (FEntryid: any) => {
         bgcolor: FBillStatusStatusColor(statename)
       },
       {
-        checked: false
+        checked: []
       }
     )
     SaoMaList.value.unshift(item)
@@ -1360,10 +1380,9 @@ const pageloadData = async (FEntryid: any) => {
 }
 
 const backpage = () => {
-  uni.reLaunch({
-    url: '/pages/index/index',
-    animationType: 'pop-out',
-    animationDuration: 200
+  //返回上一页
+  uni.navigateBack({
+    delta: 1
   })
 }
 
@@ -1429,6 +1448,7 @@ onLoad((option: any) => {
 })
 
 onMounted(() => {
+  handleFocus()
   UserAuthoritylist.value = uni.getStorageSync('UserAuthority')
   //加载生产组别数据
   GetSCZB()
@@ -1454,8 +1474,6 @@ onMounted(() => {
     YGNoDisabled.value = false //可编辑员工
     isShowDisplay.value = true
   }
-
-  uni.hideKeyboard()
 })
 </script>
 

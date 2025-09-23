@@ -324,6 +324,7 @@ watch(
           class="flex-1 mr-20rpx"
           style="border: 1px solid #f8f8f8"
           v-else-if="item.type == 'select'"
+          @click="clearTimer"
         >
           <u-input
             v-model="item.value"
@@ -331,8 +332,7 @@ watch(
             :disabled="reactiveData.locationList.length == 0"
             shape="round"
             placeholder=""
-            @change="quantChange($event, item)"
-            @click="clearTimer"
+            @blur="quantChange($event, item)"
           >
             <template #suffix>
               <view @click="openSelect(item.label, item.disabled)">
@@ -348,7 +348,7 @@ watch(
                 >
                   <view class="flex items-center p-20rpx" style="border-bottom: 1px solid #f8f8f8">
                     <view @tap="pickerShow = false">搜索 </view>
-                    <view class="flex-1">
+                    <view class="flex-1" @click="clearTimer">
                       <u-input
                         id="searchInput2"
                         v-model="item.scValue2"

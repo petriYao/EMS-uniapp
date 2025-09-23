@@ -23,11 +23,11 @@ const reactiveData = reactive({
   radioList: [
     {
       name: '单码双扫',
-      disabled: false
+      disabled: true
     },
     {
       name: '扫单退料',
-      disabled: false
+      disabled: true
     }
   ],
   scanCodeType: props.scanCodeType
@@ -53,15 +53,67 @@ const groupChange = () => {
 }
 
 onBeforeMount(() => {
+  let UserAuthority = uni.getStorageSync('UserAuthority')
+  console.log('UserAuthority', UserAuthority)
+  // 判断权限
+  switch (reactiveData.title) {
+    case '生产退料':
+      if (UserAuthority) {
+        if (UserAuthority.includes('42-1')) {
+          //生产退料-单码双扫
+          reactiveData.radioList[0].disabled = false
+        }
+
+        if (UserAuthority.includes('42-2')) {
+          //生产退料-扫单退料
+          reactiveData.radioList[1].disabled = false
+        }
+      }
+      break
+    case '简单生产退料':
+      if (UserAuthority) {
+        if (UserAuthority.includes('43-1')) {
+          //单码双扫
+          reactiveData.radioList[0].disabled = false
+        }
+
+        if (UserAuthority.includes('43-2')) {
+          //扫单退料
+          reactiveData.radioList[1].disabled = false
+        }
+      }
+      break
+    case '委外退料':
+      if (UserAuthority) {
+        if (UserAuthority.includes('44-1')) {
+          //单码双扫
+          reactiveData.radioList[0].disabled = false
+        }
+
+        if (UserAuthority.includes('44-2')) {
+          //扫单退料
+          reactiveData.radioList[1].disabled = false
+        }
+      }
+      break
+  }
   //获取本地缓存的扫码类型
   const scanCodeType = uni.getStorageSync(`scanCodeType-${reactiveData.title}`)
-  if (scanCodeType) {
-    console.log('scanCodeType', scanCodeType)
-    reactiveData.scanCodeType = scanCodeType || '单码双扫'
-    emit('update:scanCodeType', scanCodeType)
+  // 如果两个选项都不被禁用，则默认不选择任何选项
+  if (reactiveData.radioList[0].disabled && reactiveData.radioList[1].disabled) {
+    reactiveData.scanCodeType = scanCodeType // 默认空值
+  } else if (
+    scanCodeType &&
+    !reactiveData.radioList.find((item) => item.name === scanCodeType)?.disabled
+  ) {
+    // 如果缓存的类型存在且未被禁用，则使用缓存值
+    reactiveData.scanCodeType = scanCodeType
   } else {
-    reactiveData.scanCodeType = '单码双扫'
+    // 否则选择第一个未被禁用的选项
+    const firstEnabled = reactiveData.radioList.find((item) => !item.disabled)
+    reactiveData.scanCodeType = firstEnabled ? firstEnabled.name : ''
   }
+  emit(`update:scanCodeType`, reactiveData.scanCodeType)
 })
 </script>
 

@@ -23,11 +23,11 @@ const reactiveData = reactive({
   radioList: [
     {
       name: '初盘',
-      disabled: false
+      disabled: true
     },
     {
       name: '复盘',
-      disabled: false
+      disabled: true
     }
   ],
   scanCodeType: props.scanCodeType
@@ -53,15 +53,37 @@ const groupChange = () => {
 }
 
 onBeforeMount(() => {
+  let UserAuthority = uni.getStorageSync('UserAuthority')
+  // 判断权限
+  if (UserAuthority) {
+    if (UserAuthority.includes('41-1')) {
+      //初盘
+      reactiveData.radioList[0].disabled = false
+    }
+
+    if (UserAuthority.includes('41-2')) {
+      //复盘
+      reactiveData.radioList[1].disabled = false
+    }
+  }
+
   //获取本地缓存的扫码类型
   const scanCodeType = uni.getStorageSync(`scanCodeType-${reactiveData.title}`)
-  if (scanCodeType) {
-    console.log('scanCodeType', scanCodeType)
-    reactiveData.scanCodeType = scanCodeType || '初盘'
-    emit('update:scanCodeType', scanCodeType)
+  // 如果两个选项都不被禁用，则默认不选择任何选项
+  if (reactiveData.radioList[0].disabled && reactiveData.radioList[1].disabled) {
+    reactiveData.scanCodeType = scanCodeType // 默认空值
+  } else if (
+    scanCodeType &&
+    !reactiveData.radioList.find((item) => item.name === scanCodeType)?.disabled
+  ) {
+    // 如果缓存的类型存在且未被禁用，则使用缓存值
+    reactiveData.scanCodeType = scanCodeType
   } else {
-    reactiveData.scanCodeType = '初盘'
+    // 否则选择第一个未被禁用的选项
+    const firstEnabled = reactiveData.radioList.find((item) => !item.disabled)
+    reactiveData.scanCodeType = firstEnabled ? firstEnabled.name : ''
   }
+  emit(`update:scanCodeType`, reactiveData.scanCodeType)
 })
 </script>
 

@@ -394,17 +394,15 @@ const getWarehousePosition = async (warehouseId: any) => {
 const hideTimer = ref<number | null>(null)
 
 const handleFocus = () => {
-  // 清除之前的定时器
+  // 总是先清除已存在的定时器，再创建新的
   if (hideTimer.value) {
     clearInterval(hideTimer.value)
   }
 
-  // 设置新的定时器
   hideTimer.value = setInterval(() => {
     uni.hideKeyboard()
   }, 50) as unknown as number
 }
-
 const clearTimer = () => {
   // 清除定时器
   if (hideTimer.value) {
@@ -483,7 +481,7 @@ onBeforeUnmount(() => {
           :focus="reactiveData.focus === 1"
           shape="round"
           placeholder=""
-          @change="warehouseChange"
+          @blur="warehouseChange"
         >
           <template #suffix>
             <view @click="warehouseData.show = true">
@@ -499,7 +497,7 @@ onBeforeUnmount(() => {
               >
                 <view class="flex items-center p-20rpx" style="border-bottom: 1px solid #f8f8f8">
                   <view>搜索</view>
-                  <view class="flex-1">
+                  <view class="flex-1" @click="clearTimer">
                     <u-input
                       v-model="warehouseData.scValue"
                       shape="round"

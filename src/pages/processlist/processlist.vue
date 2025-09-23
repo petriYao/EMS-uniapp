@@ -1,9 +1,4 @@
 <template>
-  <page-meta
-    :page-style="
-      ZTstateShow || ZYstateShow || ZBstateShow ? 'overflow: hidden;' : 'overflow: auto;'
-    "
-  />
   <view class="prductionOrder_body">
     <u-navbar :custom-back="backpage" placeholder title="工序列表" :background="background">
       <template #left>
@@ -62,35 +57,37 @@
               <label @click="clickState('状态')">状态</label>
               <u-popup :show="ZTstateShow" @close="ZTstateShow = false">
                 <view class="popup-content">
-                  <checkbox-group @change="checkboxChange">
-                    <label v-for="item in ZhuangTaiData" :key="item.value">
-                      <view
-                        style="
-                          display: flex;
-                          flex-flow: row nowrap;
-                          place-content: center space-evenly;
-                          align-items: center;
-                          padding-bottom: 20rpx;
-                          flex-direction: row;
-                          flex-wrap: nowrap;
-                          align-content: center;
-                          justify-content: flex-start;
-                          margin-left: 40rpx;
-                        "
-                      >
-                        <view>
-                          <checkbox
-                            :value="item.value"
-                            :checked="item.checked"
-                            style="transform: scale(0.7)"
-                          />
+                  <scroll-view scroll-y style="height: 450rpx">
+                    <checkbox-group @change="checkboxChange">
+                      <label v-for="item in ZhuangTaiData" :key="item.value">
+                        <view
+                          style="
+                            display: flex;
+                            flex-flow: row nowrap;
+                            place-content: center space-evenly;
+                            align-items: center;
+                            padding-bottom: 20rpx;
+                            flex-direction: row;
+                            flex-wrap: nowrap;
+                            align-content: center;
+                            justify-content: flex-start;
+                            margin-left: 40rpx;
+                          "
+                        >
+                          <view>
+                            <checkbox
+                              :value="item.value"
+                              :checked="item.checked"
+                              style="transform: scale(0.7)"
+                            />
+                          </view>
+                          <view>
+                            <text style="color: #5d5d5d">{{ item.text }}</text>
+                          </view>
                         </view>
-                        <view>
-                          <text style="color: #5d5d5d">{{ item.text }}</text>
-                        </view>
-                      </view>
-                    </label>
-                  </checkbox-group>
+                      </label>
+                    </checkbox-group>
+                  </scroll-view>
                 </view>
                 <view
                   style="
@@ -113,35 +110,37 @@
               <label @click="clickState('转移')">转移</label>
               <u-popup :show="ZYstateShow" @close="ZYstateShow = false">
                 <view class="popup-content">
-                  <checkbox-group @change="ZYcheckboxChange">
-                    <label v-for="item in ZhuanyiData" :key="item.value">
-                      <view
-                        style="
-                          display: flex;
-                          flex-flow: row nowrap;
-                          place-content: center space-evenly;
-                          align-items: center;
-                          padding-bottom: 20rpx;
-                          flex-direction: row;
-                          flex-wrap: nowrap;
-                          align-content: center;
-                          justify-content: flex-start;
-                          margin-left: 40rpx;
-                        "
-                      >
-                        <view>
-                          <checkbox
-                            :value="item.value"
-                            :checked="item.checked"
-                            style="transform: scale(0.7)"
-                          />
+                  <scroll-view scroll-y style="height: 450rpx">
+                    <checkbox-group @change="ZYcheckboxChange">
+                      <label v-for="item in ZhuanyiData" :key="item.value">
+                        <view
+                          style="
+                            display: flex;
+                            flex-flow: row nowrap;
+                            place-content: center space-evenly;
+                            align-items: center;
+                            padding-bottom: 20rpx;
+                            flex-direction: row;
+                            flex-wrap: nowrap;
+                            align-content: center;
+                            justify-content: flex-start;
+                            margin-left: 40rpx;
+                          "
+                        >
+                          <view>
+                            <checkbox
+                              :value="item.value"
+                              :checked="item.checked"
+                              style="transform: scale(0.7)"
+                            />
+                          </view>
+                          <view>
+                            <text style="color: #5d5d5d">{{ item.text }}</text>
+                          </view>
                         </view>
-                        <view>
-                          <text style="color: #5d5d5d">{{ item.text }}</text>
-                        </view>
-                      </view>
-                    </label>
-                  </checkbox-group>
+                      </label>
+                    </checkbox-group>
+                  </scroll-view>
                 </view>
                 <view
                   style="
@@ -166,8 +165,8 @@
                 <view class="popup-content">
                   <scroll-view
                     scroll-top="scrollTop"
-                    scroll-y="true"
-                    class="scroll-Y"
+                    scroll-y
+                    style="height: 450rpx"
                     @scroll="scroll"
                   >
                     <checkbox-group @change="ZbiecheckboxChange" width="700">

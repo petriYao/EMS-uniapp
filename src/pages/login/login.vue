@@ -7,13 +7,13 @@ import { onLoad } from '@dcloudio/uni-app'
 const reactiveData = reactive({
   username: '',
   password: 'lxq888',
-  checked: true,
+  checked: [] as string[],
   msgshow: false,
   msgcontent: ''
 })
 
 const checkboxChange = () => {
-  if (reactiveData.checked == false) {
+  if (reactiveData.checked.length > 0) {
     uni.removeStorageSync('username')
   }
 }
@@ -31,7 +31,7 @@ const checkboxChange = () => {
 //11 提交
 //获取权限
 const NavChange = async () => {
-  if (reactiveData.checked == true) {
+  if (reactiveData.checked.length > 0) {
     uni.setStorageSync('username', reactiveData.username)
   }
   if (reactiveData.username.length == 0) {
@@ -47,7 +47,7 @@ const NavChange = async () => {
   }
   console.log('登录中')
   try {
-    const { data: res } = await login(newdata)
+    const { data: res }: any = await login(newdata)
     console.log('登录', res)
     let userid = 0
     if (res != null) {
@@ -62,14 +62,14 @@ const NavChange = async () => {
         let KDSVCSessionId = res.KDSVCSessionId
         uni.setStorageSync('KDSVCSessionId', KDSVCSessionId) // 注释：cookie的 kdservice-sessionid 值，需要用这个值写入cookie，同时写入reqeust的headers， kdservice-sessionid = a7066f3d-f09c-44eb-8fa5-d2a971e109dc 。
         //验证PDA用户信息是否存在
-        const { data: res_user } = await loginPDAUser(reactiveData.username)
+        const { data: res_user }: any = await loginPDAUser(reactiveData.username)
         console.log('res_user', res_user)
         if (res_user.length > 0) {
           for (var i = 0; i < res_user.length; i++) {
             let item = res_user[i]
             let userFid = item[5]
             if (userid == userFid) {
-              const { data: roles } = await loginPDAUserRole(item[4])
+              const { data: roles }: any = await loginPDAUserRole(item[4])
               console.log('roles', roles)
               if (roles.length > 0) {
                 let Filter = ''
@@ -81,7 +81,7 @@ const NavChange = async () => {
                 Filter = Filter.substring(0, Filter.length - 1)
                 console.log('Filter123', Filter)
 
-                const { data: auxRes } = await getAuxiliaryMaterials(
+                const { data: auxRes }: any = await getAuxiliaryMaterials(
                   'FNumber,FDataValue,FMASTERID',
                   `FMASTERID in (${Filter})`
                 )
@@ -127,10 +127,10 @@ const NavChange = async () => {
   }
 }
 
-onLoad((option) => {
+onLoad(() => {
   if (uni.getStorageSync('username') != '') {
     reactiveData.username = uni.getStorageSync('username')
-    reactiveData.checked = true
+    reactiveData.checked = ['1']
   }
 })
 </script>
@@ -165,7 +165,13 @@ onLoad((option) => {
       <u-button type="primary" color="#0789c1" text="登录" @click="NavChange" />
     </view>
     <view class="clearfix" />
-    <u-modal v-model="reactiveData.msgshow" :content="reactiveData.msgcontent" />
+    <u-modal
+      :show="reactiveData.msgshow"
+      title="提示"
+      :content="reactiveData.msgcontent"
+      contentTextAlign="center"
+      @confirm="reactiveData.msgshow = false"
+    />
   </view>
 </template>
 <style lang="scss" scoped>

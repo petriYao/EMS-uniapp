@@ -12,7 +12,7 @@ const reactiveData = reactive({
   loading: false, //是否保存
   title: '简单生产退料',
   FEntity: [] as any, //单据提交
-  scanCodeType: '单码双扫'
+  scanCodeType: ''
 })
 
 const contentStorageRef = ref() //标题组件引用

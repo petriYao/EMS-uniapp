@@ -456,7 +456,7 @@ export const getcamelCase = async (searchValue: any) => {
             label: '数量',
             value: item.RealQty,
             disabled: false,
-            type: 'input',
+            type: 'number',
             style: { width: '100%' }
           }
         ],

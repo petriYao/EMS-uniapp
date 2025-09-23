@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { onLoad } from '@dcloudio/uni-app'
-import { reactive, ref } from 'vue'
+import { reactive, ref, onBeforeUnmount, watch } from 'vue'
 import HeadStorage from './components/HeadStorage.vue'
 import TitleStorage from './components/TitleStorage.vue'
 import TitleStorageB from './components/TitleStorageB.vue'
 import { saveProductionOrder } from '@/api/modules/storage'
 import { throttleSave } from '@/utils'
 import { TMUpdate } from '@/api/commonHttp'
+import { useEmitt } from '@/hooks/useEmitt'
 
 const reactiveData = reactive({
   isShow: true, //是否选择
@@ -126,6 +127,54 @@ const saveClick = throttleSave(async () => {
       break
   }
 }) //调用标题组件的保存方法
+
+// 组件卸载时清理
+const hideTimer = ref<number | null>(null)
+const handleFocus = () => {
+  // 清除之前的定时器（如果存在）
+  if (hideTimer.value) {
+    clearInterval(hideTimer.value)
+  }
+
+  // 设置新的定时器
+  hideTimer.value = setInterval(() => {
+    uni.hideKeyboard()
+  }, 50) as unknown as number
+}
+
+const clearTimer = () => {
+  // 清除定时器
+  if (hideTimer.value) {
+    clearInterval(hideTimer.value)
+    hideTimer.value = null
+  }
+}
+useEmitt({
+  name: 'update:handleFocus',
+  callback: async () => {
+    console.log('设置定时器')
+    handleFocus()
+  }
+})
+useEmitt({
+  name: 'update:clearTimer',
+  callback: async () => {
+    clearTimer()
+  }
+})
+
+watch(
+  () => reactiveData.scanCodeType,
+  () => {
+    handleFocus()
+  },
+  { immediate: true, deep: true }
+)
+
+onBeforeUnmount(() => {
+  // 组件卸载时清理
+  clearTimer()
+})
 
 onLoad((e: any) => {
   console.log('ee', e)

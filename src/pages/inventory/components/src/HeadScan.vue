@@ -76,11 +76,15 @@ const resetFocus = () => {
 // 键盘控制
 const hideTimer = ref<number | null>(null)
 const handleFocus = () => {
-  if (!hideTimer.value) {
-    hideTimer.value = setInterval(() => {
-      uni.hideKeyboard()
-    }, 50) as unknown as number
+  // 清除之前的定时器（如果存在）
+  if (hideTimer.value) {
+    clearInterval(hideTimer.value)
   }
+
+  // 设置新的定时器
+  hideTimer.value = setInterval(() => {
+    uni.hideKeyboard()
+  }, 50) as unknown as number
 }
 
 const clearTimer = () => {

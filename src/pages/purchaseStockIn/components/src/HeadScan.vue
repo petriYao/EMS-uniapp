@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, onBeforeUnmount, onBeforeMount, ref, watch } from 'vue'
+import { reactive, onBeforeMount, ref, watch } from 'vue'
 import { queryStorage, lookqueryStorage } from '@/api/modules/storage'
 import { purchaseScanBarcode } from '@/common/purchaseStockIn/Index'
 // import { queryBarCode } from '@/api/modules/lowerCamelCase'
@@ -274,7 +274,7 @@ const focusTm = () => {
   reactiveData.focus = 0
   setTimeout(() => {
     reactiveData.focus = 99
-  }, 200)
+  }, 100)
 }
 
 //重新计算总额
@@ -307,10 +307,9 @@ const pickerConfirm = async (val: any) => {
   reactiveData.heardList.warehouse = val.text
   reactiveData.setData.warehouseNumber = val.value
   reactiveData.setData.warehouseId = val.id
+  //清空所有仓位
+  clearAllPositions()
 
-  reactiveData.setData.locationNumber = ''
-  reactiveData.setData.locationId = ''
-  reactiveData.heardList.location = ''
   getWarehousePosition(val.value)
   emit('update:setData', reactiveData.setData)
   warehouseData.show = false
@@ -329,8 +328,11 @@ const getWarehousePosition = async (warehouseId: any) => {
       if (list[0].Id === 0) {
         locationData.locationList = []
         reactiveData.setData.locationDisplay = true
-        focusTm()
-        handleFocus()
+        if (reactiveData.focus !== 0) {
+          //重新回到光标位置
+          focusTm()
+          handleFocus()
+        }
         emit('update:locationList', locationData.locationList)
         return
       }
@@ -344,7 +346,10 @@ const getWarehousePosition = async (warehouseId: any) => {
 
       if (locationData.locationList.length == 0) {
         reactiveData.setData.locationDisplay = true
-        focusTm()
+        if (reactiveData.focus !== 0) {
+          //重新回到光标位置
+          focusTm()
+        }
       } else {
         reactiveData.setData.locationDisplay = false
         setTimeout(() => {
@@ -374,10 +379,12 @@ const locationPickerConfirm = (val: any) => {
 
 //仓库
 const warehouseChange = debounceSave((val: any) => {
-  reactiveData.heardList.location = ''
   //获取仓库id替换为仓库名称
-  const warehouseId: any = warehouseData.warehouseList.find((item: any) => item.value === val)
+  const warehouseId: any = warehouseData.warehouseList.find(
+    (item: any) => item.value === val || item.text === val
+  )
   console.log('warehouseId1', warehouseId)
+
   if (!warehouseId && val != '') {
     //提示仓库不存在
     uni.showToast({
@@ -385,27 +392,34 @@ const warehouseChange = debounceSave((val: any) => {
       icon: 'none'
     })
     reactiveData.heardList.warehouse = ''
+    reactiveData.setData.warehouseNumber = ''
+    reactiveData.setData.warehouseId = ''
+    clearAllPositions()
 
-    //重新回到光标位置
-    reactiveData.focus = 0
-    setTimeout(() => {
-      reactiveData.focus = 1
-    }, 200)
+    if (reactiveData.focus !== 0) {
+      //重新回到光标位置
+      reactiveData.focus = 0
+      setTimeout(() => {
+        reactiveData.focus = 1
+      }, 100)
+    }
+
     return
   }
+  if (warehouseId.value == reactiveData.setData.warehouseNumber) return
+
   reactiveData.heardList.warehouse = warehouseId.text
   reactiveData.setData.warehouseNumber = warehouseId.value
   reactiveData.setData.warehouseId = warehouseId.id
   handleFocus()
+  clearAllPositions()
   getWarehousePosition(val)
   emit('update:setData', reactiveData.setData)
 })
 
 //仓位
 const locationChange = debounceSave((val: any) => {
-  console.log('locationChange', val)
   const location: any = locationData.locationList.find((item: any) => item.value === val)
-  console.log('location', location)
   if (!location && val != '') {
     //提示仓位不存在
     uni.showToast({
@@ -413,43 +427,74 @@ const locationChange = debounceSave((val: any) => {
       icon: 'none'
     })
     reactiveData.heardList.location = ''
+    console.log('仓位不存在', location)
+    if (reactiveData.focus !== 0) {
+      //重新回到光标位置
+      reactiveData.focus = 0
+      setTimeout(() => {
+        reactiveData.focus = 1
+      }, 200)
+    }
+    return
+  }
+  reactiveData.heardList.location = location.text
+  reactiveData.setData.locationNumber = location.value
+  reactiveData.setData.locationId = location.Id
+
+  if (reactiveData.focus !== 0) {
+    handleFocus()
+
     //重新回到光标位置
     reactiveData.focus = 0
     setTimeout(() => {
-      reactiveData.focus = 2
+      reactiveData.focus = 99
     }, 200)
-    return
   }
-  reactiveData.heardList.location = location.value
-  reactiveData.setData.locationNumber = location.value
-  reactiveData.setData.locationId = location.Id
-  handleFocus()
-
-  reactiveData.focus = 0
-  setTimeout(() => {
-    reactiveData.focus = 99
-  }, 200)
   emit('update:setData', reactiveData.setData)
 })
 
-const hideTimer = ref<number | null>(null)
-const handleFocus = () => {
-  // 设置定时器
-  if (!hideTimer.value) {
-    hideTimer.value = setInterval(() => {
-      uni.hideKeyboard()
-    }, 50) as unknown as number
-  }
-}
+// 清空所有仓位功能
+const clearAllPositions = () => {
+  // 清空表头仓位显示
+  reactiveData.heardList.location = ''
+  reactiveData.setData.locationNumber = ''
+  reactiveData.setData.locationId = ''
+  reactiveData.setData.locationDisplay = true
 
+  // 清空仓位列表
+  locationData.locationList = []
+
+  // 清空明细列表中所有项目的仓位信息（如果存在）
+  if (reactiveData.detailsList && reactiveData.detailsList.length > 0) {
+    reactiveData.detailsList.forEach((item: any) => {
+      // 清空仓位相关字段
+      if (item.currentList.length > 0) {
+        item.currentList.find((i: any) => i.label === '仓位').value = ''
+      }
+      // 如果有其他仓位相关字段，也在这里清空
+      item.FStockLocId = ''
+      item.detailList.location = ''
+    })
+  }
+
+  // 触发更新事件
+  emit('update:setData', reactiveData.setData)
+  emit('update:locationList', locationData.locationList)
+  emit('update:detailsList', reactiveData.detailsList)
+}
 const clearTimer = () => {
   // 清除定时器
-  if (hideTimer.value) {
-    clearInterval(hideTimer.value)
-    hideTimer.value = null
-  }
-  console.log('清除定时器', hideTimer.value)
+  emitter.emit('update:clearTimer')
 }
+const handleFocus = () => {
+  emitter.emit('update:handleFocus')
+}
+useEmitt({
+  name: 'update:focus',
+  callback: async () => {
+    reactiveData.focus = 0
+  }
+})
 
 watch(
   () => props.loading,
@@ -466,30 +511,9 @@ watch(
     deep: true // 开启深度监听
   }
 )
-
-useEmitt({
-  name: 'update:handleFocus',
-  callback: async () => {
-    console.log('设置定时器')
-    handleFocus()
-  }
-})
-useEmitt({
-  name: 'update:clearTimer',
-  callback: async () => {
-    console.log('清除定时器')
-    clearTimer()
-  }
-})
 onBeforeMount(() => {
   // 组件挂载前的逻辑
-  handleFocus()
   getWarehouseList()
-})
-onBeforeUnmount(() => {
-  // 组件卸载时清理
-  console.log('离开')
-  clearTimer()
 })
 </script>
 
@@ -513,19 +537,6 @@ onBeforeUnmount(() => {
         />
       </view>
     </view>
-    <!-- <view class="flex items-center py-4rpx w-100%">
-      <view class="w-50px flex justify-center">单号</view>
-      <view class="flex-1 mr-20rpx" style="border: 1px solid #f8f8f8" @click="clearTimer">
-        <u-input
-          ref="searchInput"
-          v-model="reactiveData.heardList.documentNumber"
-          :showAction="false"
-          :disabled="true"
-          shape="round"
-          placeholder=""
-        />
-      </view>
-    </view> -->
     <view class="flex items-center py-4rpx w-100%">
       <view class="w-50px flex justify-center">仓库</view>
       <view class="flex-1 mr-20rpx" style="border: 1px solid #f8f8f8" @click="clearTimer">
@@ -538,7 +549,7 @@ onBeforeUnmount(() => {
           :disabled="reactiveData.setData.warehouseDisplay"
           shape="round"
           placeholder=""
-          @change="warehouseChange"
+          @blur="warehouseChange"
         >
           <template #suffix>
             <view @click="warehouseData.show = true">
@@ -552,13 +563,9 @@ onBeforeUnmount(() => {
                 :closeOnClickAction="true"
                 @close="warehouseData.show = false"
               >
-                <view
-                  class="flex items-center p-20rpx"
-                  style="border-bottom: 1px solid #f8f8f8"
-                  @click="clearTimer"
-                >
+                <view class="flex items-center p-20rpx" style="border-bottom: 1px solid #f8f8f8">
                   <view @tap="warehouseData.show = false">搜索 </view>
-                  <view class="flex-1">
+                  <view class="flex-1" @click="clearTimer">
                     <u-input
                       id="searchInput1"
                       v-model="warehouseData.scValue"
@@ -607,7 +614,7 @@ onBeforeUnmount(() => {
           :disabled="reactiveData.setData.locationDisplay"
           shape="round"
           placeholder=""
-          @change="locationChange"
+          @blur="locationChange"
         >
           <template #suffix>
             <view @click="!reactiveData.setData.locationDisplay ? (locationData.show = true) : ''">
@@ -621,13 +628,9 @@ onBeforeUnmount(() => {
                 :closeOnClickAction="true"
                 @close="locationData.show = false"
               >
-                <view
-                  class="flex items-center p-20rpx"
-                  style="border-bottom: 1px solid #f8f8f8"
-                  @click="clearTimer"
-                >
+                <view class="flex items-center p-20rpx" style="border-bottom: 1px solid #f8f8f8">
                   <view @tap="locationData.show = false">搜索 </view>
-                  <view class="flex-1">
+                  <view class="flex-1" @click="clearTimer">
                     <u-input
                       id="searchInput1"
                       v-model="warehouseData.scValue"

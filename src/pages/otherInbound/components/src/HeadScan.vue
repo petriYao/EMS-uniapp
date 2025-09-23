@@ -437,13 +437,15 @@ const focusTm = () => {
 const hideTimer = ref<number | null>(null)
 
 const handleFocus = () => {
-  if (!hideTimer.value) {
-    hideTimer.value = setInterval(() => {
-      uni.hideKeyboard()
-    }, 50) as unknown as number
+  // 总是先清除已存在的定时器，再创建新的
+  if (hideTimer.value) {
+    clearInterval(hideTimer.value)
   }
-}
 
+  hideTimer.value = setInterval(() => {
+    uni.hideKeyboard()
+  }, 50) as unknown as number
+}
 const clearTimer = () => {
   if (hideTimer.value) {
     clearInterval(hideTimer.value)
@@ -517,7 +519,7 @@ useEmitt({
           :disabled="reactiveData.setData.warehouseDisplay"
           shape="round"
           placeholder=""
-          @change="warehouseChange"
+          @blur="warehouseChange"
         >
           <template #suffix>
             <view @click="warehouseData.show = true">
@@ -537,7 +539,7 @@ useEmitt({
                   @click="clearTimer"
                 >
                   <view @tap="warehouseData.show = false">搜索 </view>
-                  <view class="flex-1">
+                  <view class="flex-1" @click="clearTimer">
                     <u-input
                       id="searchInput1"
                       v-model="warehouseData.scValue"
@@ -585,7 +587,7 @@ useEmitt({
           :disabled="reactiveData.setData.locationDisplay"
           shape="round"
           placeholder=""
-          @change="locationChange"
+          @blur="locationChange"
         >
           <template #suffix>
             <view @click="!reactiveData.setData.locationDisplay ? (locationData.show = true) : ''">
@@ -599,13 +601,9 @@ useEmitt({
                 :closeOnClickAction="true"
                 @close="locationData.show = false"
               >
-                <view
-                  class="flex items-center p-20rpx"
-                  style="border-bottom: 1px solid #f8f8f8"
-                  @click="clearTimer"
-                >
+                <view class="flex items-center p-20rpx" style="border-bottom: 1px solid #f8f8f8">
                   <view @tap="locationData.show = false">搜索 </view>
-                  <view class="flex-1">
+                  <view class="flex-1" @click="clearTimer">
                     <u-input
                       id="searchInput1"
                       v-model="warehouseData.scValue"

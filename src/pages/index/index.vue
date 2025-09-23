@@ -74,20 +74,20 @@ onBeforeMount(() => {
     crmList5: [] as any[],
     crmList6: [] as any[]
   }
-
+  console.log('更新', UserAuthority)
   for (const item of UserAuthority) {
     switch (item) {
       case '8':
         tempLists.crmList.push({
           name: '生产工单',
-          icon: '/static/index/workorder.png',
+          icon: '/static/index/生产工单.png',
           src: 'productionorder/productionorder'
         })
         break
       case '9':
         tempLists.crmList.push({
           name: '生产报工',
-          icon: '/static/index/Reportingforwork.png',
+          icon: '/static/index/生产报工.png',
           src: 'productionreporting/productionreporting'
         })
         break
@@ -95,28 +95,28 @@ onBeforeMount(() => {
       case '12':
         tempLists.crmList2.push({
           name: '生产入库',
-          icon: '/static/index/Reportingforwork.png',
+          icon: '/static/index/生产入库.png',
           src: 'storage/storage?type=生产入库'
         })
         break
       // case '16':
       //   tempLists.crmList2.push({
       //     name: '简单入库',
-      //     icon: '/static/index/Reportingforwork.png',
+      //     icon: '/static/index/简单入库.png',
       //     src: 'storage/storage?type=简单入库'
       //   })
       //   break
       case '20':
         tempLists.crmList2.push({
           name: '采购入库',
-          icon: '/static/index/Reportingforwork.png',
+          icon: '/static/index/采购入库.png',
           src: 'purchaseStockIn/Index'
         })
         break
       case '24':
         tempLists.crmList2.push({
           name: '其他入库',
-          icon: '/static/index/Reportingforwork.png',
+          icon: '/static/index/其他入库.png',
           src: 'otherInbound/Index'
         })
         break
@@ -124,21 +124,21 @@ onBeforeMount(() => {
       case '28':
         tempLists.crmList3.push({
           name: '销售出库',
-          icon: '/static/index/Reportingforwork.png',
+          icon: '/static/index/销售出库.png',
           src: 'lowerCamelCase/PascalCase'
         })
         break
       case '29':
         tempLists.crmList3.push({
           name: '出库撤销',
-          icon: '/static/index/Reportingforwork.png',
+          icon: '/static/index/出库撤销.png',
           src: 'cancelOutbound/Index'
         })
         break
       case '35':
         tempLists.crmList3.push({
           name: '销售退货',
-          icon: '/static/index/Reportingforwork.png',
+          icon: '/static/index/销售退货.png',
           src: 'salesReturn/Index'
         })
         break
@@ -147,35 +147,35 @@ onBeforeMount(() => {
       case '30':
         tempLists.crmList4.push({
           name: '条码库存',
-          icon: '/static/index/Reportingforwork.png',
+          icon: '/static/index/条码库存.png',
           src: 'barCodeStock/Index'
         })
         break
       case '31':
         tempLists.crmList4.push({
           name: '调拨',
-          icon: '/static/index/Reportingforwork.png',
+          icon: '/static/index/调拨.png',
           src: 'transferOrder/Index'
         })
         break
       case '40':
         tempLists.crmList4.push({
           name: '库存查询',
-          icon: '/static/index/Reportingforwork.png',
+          icon: '/static/index/库存查询.png',
           src: 'stockQuery/Index'
         })
         break
       case '41':
         tempLists.crmList4.push({
           name: '盘点',
-          icon: '/static/index/Reportingforwork.png',
+          icon: '/static/index/盘点.png',
           src: 'inventory/Index'
         })
         break
       case '45':
         tempLists.crmList4.push({
           name: '储位',
-          icon: '/static/index/Reportingforwork.png',
+          icon: '/static/index/储位.png',
           src: 'storageLocation/Index'
         })
         break
@@ -183,7 +183,7 @@ onBeforeMount(() => {
       case '32':
         tempLists.crmList6.push({
           name: '采购退货',
-          icon: '/static/index/Reportingforwork.png',
+          icon: '/static/index/采购退货.png',
           src: 'returnMaterial/purchaseReturn/Index'
         })
         break
@@ -191,21 +191,21 @@ onBeforeMount(() => {
       case '42':
         tempLists.crmList6.push({
           name: '生产退料',
-          icon: '/static/index/Reportingforwork.png',
+          icon: '/static/index/生产退料.png',
           src: 'returnedMaterial/production/Index'
         })
         break
       case '43':
         tempLists.crmList6.push({
           name: '简单退料',
-          icon: '/static/index/Reportingforwork.png',
+          icon: '/static/index/简单退料.png',
           src: 'returnedMaterial/simple/Index'
         })
         break
       case '44':
         tempLists.crmList6.push({
           name: '委外退料',
-          icon: '/static/index/Reportingforwork.png',
+          icon: '/static/index/委外退料.png',
           src: 'returnedMaterial/outsourced/Index'
         })
         break
@@ -213,28 +213,28 @@ onBeforeMount(() => {
       case '37':
         tempLists.crmList5.push({
           name: '生产领料',
-          icon: '/static/index/Reportingforwork.png',
+          icon: '/static/index/生产领料.png',
           src: 'materialWithdrawal/production/Index'
         })
         break
       case '38':
         tempLists.crmList5.push({
           name: '简单领料', //SP_PickMtrl
-          icon: '/static/index/Reportingforwork.png',
+          icon: '/static/index/简单领料.png',
           src: 'materialWithdrawal/simple/Index'
         })
         break
       case '39':
         tempLists.crmList5.push({
           name: '委外领料', //SUB_PickMtrl
-          icon: '/static/index/Reportingforwork.png',
+          icon: '/static/index/委外领料.png',
           src: 'materialWithdrawal/outsourced/Index'
         })
         break
       case '36':
         tempLists.crmList5.push({
           name: '其他出库',
-          icon: '/static/index/Reportingforwork.png',
+          icon: '/static/index/其他出库.png',
           src: 'returnMaterial/otherOutbound/Index'
         })
         break
@@ -247,7 +247,7 @@ onBeforeMount(() => {
   crmList2.value = tempLists.crmList2
   crmList3.value = tempLists.crmList3
   crmList6.value = tempLists.crmList6
-
+  console.log('crmList6', crmList6.value)
   // 调整领料菜单顺序：生产领料 → 简单领料 → 委外领料 → 其他出库
   const materialMenus = tempLists.crmList5
   const reorderedMaterialMenus = []
@@ -280,7 +280,7 @@ onBeforeMount(() => {
 <template>
   <!-- <TestInput /> -->
   <view class="text-14px">
-    <view class="flex">
+    <view class="flex" v-if="crmList.length > 0">
       <view class="bg-#FFF py-20rpx mx-20px w-100% rounded-6px">
         <view class="ml-20px mb-0px">报工</view>
 
@@ -299,7 +299,7 @@ onBeforeMount(() => {
         </view>
       </view>
     </view>
-    <view class="flex">
+    <view class="flex" v-if="crmList2.length > 0">
       <view class="bg-#FFF mt-20px py-20rpx mx-20px w-100% rounded-6px">
         <view class="ml-20px mb-0px">入库</view>
 
@@ -318,7 +318,7 @@ onBeforeMount(() => {
         </view>
       </view>
     </view>
-    <view class="flex">
+    <view class="flex" v-if="crmList5.length > 0">
       <view class="bg-#FFF mt-20px py-20rpx mx-20px w-100% rounded-6px">
         <view class="ml-20px mb-0px">领料</view>
 
@@ -337,7 +337,7 @@ onBeforeMount(() => {
         </view>
       </view>
     </view>
-    <view class="flex">
+    <view class="flex" v-if="crmList6.length > 0">
       <view class="bg-#FFF mt-20px py-20rpx mx-20px w-100% rounded-6px">
         <view class="ml-20px mb-0px">退货退料</view>
 
@@ -357,7 +357,7 @@ onBeforeMount(() => {
       </view>
     </view>
 
-    <view class="flex">
+    <view class="flex" v-if="crmList3.length > 0">
       <view class="bg-#FFF mt-20px py-20rpx mx-20px w-100% rounded-6px">
         <view class="ml-20px mb-0px">销售</view>
 
@@ -376,7 +376,7 @@ onBeforeMount(() => {
         </view>
       </view>
     </view>
-    <view class="flex">
+    <view class="flex" v-if="crmList4.length > 0">
       <view class="bg-#FFF mt-20px py-20rpx mx-20px w-100% rounded-6px">
         <view class="ml-20px mb-0px">库存</view>
 
@@ -395,7 +395,7 @@ onBeforeMount(() => {
         </view>
       </view>
     </view>
-    <view class="h-100px">&nbsp;</view>
+    <view class="h-20px">&nbsp;</view>
   </view>
   <view
     class="toShoppingCart bg-#409DF4 border-2 border-#F7F8F7 rounded-100rpx"

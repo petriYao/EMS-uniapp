@@ -1,21 +1,16 @@
 <script setup lang="ts">
-import { reactive, onBeforeMount, ref, onBeforeUnmount } from 'vue'
+import { reactive, onBeforeMount, ref } from 'vue'
 import { debounceSave } from '@/utils'
 import { camelCaseProduction, getcamelCase } from '@/common/storage/production'
 import { productionOrder } from '@/api/modules/storage'
 import { queryStorage, lookqueryStorage } from '@/api/modules/storage'
-const props = defineProps({
-  title: {
-    type: String,
-    default: ''
-  }
-})
+import { useEmitt } from '@/hooks/useEmitt'
 
 //加载
 const loading = ref(false)
 const pageLoading = ref(true)
 const focusIndex = ref(0) // 当前焦点索引
-
+const { emitter } = useEmitt()
 //仓库选择器
 const pickerShow = ref(false)
 //仓位选择器
@@ -77,11 +72,11 @@ const searchInput = ref()
 //订单号输入框
 const searchChange = async () => {
   setTimeout(async () => {
-    handleFocus()
-
     if (reactiveData.searchValue === '') {
       return
     }
+    handleFocus()
+
     /*在扫单入库的情况下第一次扫描单号*********************************/
     if (reactiveData.titleList[0].value === '') {
       const res = await getcamelCase(reactiveData.searchValue)
@@ -210,13 +205,13 @@ const searchClick = async () => {
       searchChange()
     } else if (focusIndex.value === 2) {
       reactiveData.titleList[2].value = result
-      warehouseChange(result, true) // 手动调用仓库 change
+      warehouseChange(result, 2, true) // 手动调用仓库 change
       setTimeout(() => {
         focusIndex.value = 3
       }, 500)
     } else if (focusIndex.value === 3) {
       reactiveData.titleList[3].value = result
-      warehouseChange(result, false) // 手动调用仓位 change
+      warehouseChange(result, 3, false) // 手动调用仓位 change
       setTimeout(() => {
         focusIndex.value = 0
       }, 500)
@@ -228,24 +223,43 @@ const searchClick = async () => {
 
 function sectionChange(index: any) {
   reactiveData.curNow = index
+  focusIndex.value = 999
 }
 
 //仓库扫出数据
 const warehouseChange = debounceSave(
-  async (val: any, iswarehouse: boolean, iswarehousePosition?: boolean) => {
-    console.log('warehouseChange', val, iswarehouse)
+  async (val: any, iswarehouse: boolean, focus: number, iswarehousePosition?: boolean) => {
+    // if (focusIndex.value == focus) {
+    //   handleFocus()
+    // }
+    if (val == '') return
+
     if (iswarehouse) {
+      clearAllPositions()
       //获取仓库id替换为仓库名称
-      const warehouseId: any = warehouseList.value.find((item: any) => item.value === val)
-      console.log('warehouseId', warehouseId)
+      const warehouseId: any = warehouseList.value.find(
+        (item: any) => item.value === val || item.text === val
+      )
       if (!warehouseId) {
         //提示仓库不存在
         uni.showToast({
           title: '仓库不存在',
           icon: 'none'
         })
+        reactiveData.titleList[2].value = ''
+        currentWarehouse.name = ''
+        currentWarehouse.number = ''
+        console.log('warehouseId', reactiveData.titleList[2].value)
+        //重新回到光标位置
+        focusIndex.value = 20
+        setTimeout(() => {
+          focusIndex.value = 2
+        }, 200)
+
         return
       }
+      if (currentWarehouse.name == warehouseId.text) return
+      focusIndex.value = 0
       reactiveData.titleList[2].value = warehouseId.text
       currentWarehouse.name = warehouseId.text
       currentWarehouse.number = warehouseId.value
@@ -260,6 +274,9 @@ const warehouseChange = debounceSave(
             title: '仓位不存在',
             icon: 'none'
           })
+          reactiveData.detailsList[reactiveData.datailsIndex].currentList[12].value = ''
+          currentWarehousePosition.name = ''
+          currentWarehousePosition.number = ''
           return
         }
         if (reactiveData.detailsList.length !== 0) {
@@ -275,6 +292,11 @@ const warehouseChange = debounceSave(
               warehouseId.value
           }
           console.log('仓位', reactiveData.detailsList)
+        } else {
+          reactiveData.detailsList[reactiveData.datailsIndex].currentList[12].value =
+            warehouseId.text
+          reactiveData.detailsList[reactiveData.datailsIndex].WarehousePosition = warehouseId.value
+          reactiveData.detailsList[reactiveData.datailsIndex].WarehousePositionId = warehouseId.id
         }
 
         focusIndex.value = 0
@@ -286,7 +308,6 @@ const warehouseChange = debounceSave(
 )
 //选择仓库
 const warehouseClick = async (val: any) => {
-  console.log('选择仓库', val)
   //清空仓位
   currentWarehousePosition.name = ''
   currentWarehousePosition.number = ''
@@ -294,15 +315,12 @@ const warehouseClick = async (val: any) => {
   //查看仓位
   if (val) {
     const res: any = await lookqueryStorage(val)
-    console.log('res', res)
+    console.log('查看仓位', res)
     if (res) {
       const list = res.data.Result.Result.StockFlexItem[0].StockFlexDetail
-      FlexNumber.value = res.data.Result.Result.StockFlexItem[0].FlexId.FlexNumber
-      console.log('list', list)
+      FlexNumber.value = res.data.Result.Result.StockFlexItem[0].FlexId?.FlexNumber
       if (list[0].Id === 0) {
         warehousePositionList.value = []
-        reactiveData.titleList[3].disabled = true
-        focusIndex.value = 0
         return
       }
       warehousePositionList.value = list.map((item: any) => {
@@ -311,38 +329,24 @@ const warehouseClick = async (val: any) => {
           value: item.FlexEntryId.Number
         }
       })
-
-      if (warehousePositionList.value.length == 0) {
-        reactiveData.titleList[3].disabled = true
-        focusIndex.value = 0
-      } else {
-        reactiveData.titleList[3].disabled = false
-        setTimeout(() => {
-          focusIndex.value = 3
-        }, 300)
-      }
-      console.log('focusIndex', focusIndex.value)
     }
   }
 }
 //仓库选择器确认
 const pickerConfirm = async (val: any) => {
-  console.log('pickerConfirm', val)
   currentWarehouse.name = val.text
   currentWarehouse.number = val.value
   reactiveData.titleList[2].value = val.text
-  focusIndex.value = 3
+  clearAllPositions()
+
   warehouseClick(val.value)
   pickerShow.value = false
-  console.log('pickerShow.value ', warehousePositionList.value)
 }
 //仓位选择器确认
 const pickerConfirm2 = (val: any, iswarehousePosition?: boolean) => {
-  console.log('选择仓位2', reactiveData.detailsList, reactiveData.datailsIndex, iswarehousePosition)
   if (reactiveData.detailsList.length !== 0) {
     reactiveData.detailsList[reactiveData.datailsIndex].currentList[12].value = val.text
   }
-  console.log('仓位3')
   if (!iswarehousePosition) {
     reactiveData.titleList[3].value = val.value
     currentWarehousePosition.name = val.text
@@ -350,11 +354,7 @@ const pickerConfirm2 = (val: any, iswarehousePosition?: boolean) => {
     if (reactiveData.detailsList.length !== 0) {
       reactiveData.detailsList[reactiveData.datailsIndex].WarehousePosition = val.value
     }
-
-    console.log('仓位', reactiveData.detailsList)
   }
-  console.log('仓位4')
-  focusIndex.value = 0
   pickerShow2.value = false
   pickerShow3.value = false
 }
@@ -382,25 +382,30 @@ const longpressClick = (item: any, index: number) => {
     }
   })
 }
-const hideTimer = ref<number | null>(null)
-const handleFocus = () => {
-  // clearTimer()
-  uni.hideKeyboard()
-  // 设置定时器
-  if (!hideTimer.value) {
-    hideTimer.value = setInterval(() => {
-      uni.hideKeyboard()
-    }, 50) as unknown as number
+
+//清空仓位
+const clearAllPositions = () => {
+  // 清空当前仓位信息
+  currentWarehousePosition.name = ''
+  currentWarehousePosition.number = ''
+
+  // 清空表头仓位显示
+  reactiveData.titleList[3].value = ''
+
+  // 清空明细列表中所有项目的仓位信息
+  if (reactiveData.detailsList && reactiveData.detailsList.length > 0) {
+    reactiveData.detailsList.forEach((item: any) => {
+      // 清空仓位编号
+      item.WarehousePosition = ''
+      item.WarehousePositionName = ''
+      // 清空仓位相关字段
+      if (item.currentList.length > 0) {
+        item.currentList.find((i: any) => i.label === '仓位').value = ''
+      }
+    })
   }
 }
-const clearTimer = () => {
-  // 清除定时器
-  if (hideTimer.value) {
-    clearInterval(hideTimer.value)
-    hideTimer.value = null
-  }
-  console.log('清除定时器', hideTimer.value)
-}
+
 //返回到父组件
 const backClick = async () => {
   // 声明为异步函数
@@ -578,15 +583,17 @@ const quantChange = (val: any) => {
   reactiveData.detailsList[reactiveData.datailsIndex].Quantity2 = val
   reactiveData.detailsList[reactiveData.datailsIndex].currentList[13].value = val
 }
-// 组件卸载时清理
-onBeforeUnmount(() => {
-  console.log('离开')
-  clearTimer()
-})
+
+const clearTimer = () => {
+  // 清除定时器
+  emitter.emit('update:clearTimer')
+}
+const handleFocus = () => {
+  emitter.emit('update:handleFocus')
+}
+
 onBeforeMount(() => {
   // 组件挂载前的逻辑
-  console.log('组件即将挂载')
-  handleFocus()
   getWarehouseList()
 })
 
@@ -613,6 +620,7 @@ defineExpose({
         shape="round"
         placeholder="请输入搜索关键词"
         :focus="focusIndex == 0"
+        @focus="focusIndex = 0"
         @blur="searchChange"
       />
     </view>
@@ -636,7 +644,6 @@ defineExpose({
           :focus="index == focusIndex"
         />
       </view>
-
       <view class="flex-1 mr-20rpx" style="border: 1px solid #f8f8f8" v-else @click="clearTimer">
         <u-input
           v-model="item.value"
@@ -646,8 +653,7 @@ defineExpose({
           placeholder=""
           :focus="index == focusIndex"
           @focus="focusIndex = index"
-          @change="warehouseChange($event, item.label == '仓库')"
-          @blur="handleFocus"
+          @blur="warehouseChange($event, item.label == '仓库', index)"
         >
           <template #suffix>
             <view
@@ -755,136 +761,139 @@ defineExpose({
       :current="reactiveData.curNow"
       @change="sectionChange"
     />
-    <view class="pt-6rpx">
-      <!-- 当前 -->
-      <view v-if="reactiveData.curNow == 0" class="flex flex-wrap">
-        <view
-          v-for="(item, index) of reactiveData.detailsList[reactiveData.datailsIndex]
-            ?.currentList || []"
-          :key="index"
-          class="flex items-center mb-6rpx"
-          :style="item.style"
-        >
-          <view class="w-50px flex justify-center">
-            {{ item.label }}
-          </view>
+    <scroll-view scroll-y style="height: calc(100vh - 44px - 44px - 80px - 34px - 40px - 26px)">
+      <view class="pt-6rpx">
+        <!-- 当前 -->
+        <view v-if="reactiveData.curNow == 0" class="flex flex-wrap">
           <view
-            class="flex-1 mr-20rpx"
-            style="border: 1px solid #f8f8f8"
-            v-if="item.type == 'input'"
-            @click="clearTimer"
+            v-for="(item, index) of reactiveData.detailsList[reactiveData.datailsIndex]
+              ?.currentList || []"
+            :key="index"
+            class="flex items-center mb-6rpx"
+            :style="item.style"
           >
-            <u-input
-              v-model="item.value"
-              :showAction="false"
-              :disabled="item.disabled"
-              shape="round"
-              placeholder=""
-              :type="item.label === '数量' ? 'number' : 'text'"
-              @change="quantChange"
-            />
-          </view>
-          <view
-            class="flex-1 mr-20rpx"
-            style="border: 1px solid #f8f8f8"
-            v-else-if="item.type == 'select'"
-          >
-            <u-input
-              v-model="item.value"
-              :showAction="false"
-              :disabled="warehousePositionList.length == 0"
-              shape="round"
-              placeholder=""
-              :focus="index == focusIndex"
-              @change="warehouseChange($event, item.label == '仓库', true)"
+            <view class="w-50px flex justify-center">
+              {{ item.label }}
+            </view>
+            <view
+              class="flex-1 mr-20rpx"
+              style="border: 1px solid #f8f8f8"
+              v-if="item.type == 'input'"
+              @click="clearTimer"
             >
-              <template #suffix>
-                <view @click="warehousePositionList.length !== 0 ? (pickerShow3 = true) : ''">
-                  <u-icon name="arrow-down" size="20" />
-                </view>
-                <view>
-                  <u-action-sheet
-                    :show="pickerShow3"
-                    round="10"
-                    :closeOnClickOverlay="true"
-                    :closeOnClickAction="true"
-                    @close="pickerShow3 = false"
-                  >
-                    <view
-                      class="flex items-center p-20rpx"
-                      style="border-bottom: 1px solid #f8f8f8"
+              <u-input
+                v-model="item.value"
+                :showAction="false"
+                :disabled="item.disabled"
+                shape="round"
+                placeholder=""
+                :type="item.label === '数量' ? 'number' : 'text'"
+                @change="quantChange"
+              />
+            </view>
+            <view
+              class="flex-1 mr-20rpx"
+              style="border: 1px solid #f8f8f8"
+              v-else-if="item.type == 'select'"
+              @click="clearTimer"
+            >
+              <u-input
+                v-model="item.value"
+                :showAction="false"
+                :disabled="warehousePositionList.length == 0"
+                shape="round"
+                placeholder=""
+                :focus="index == focusIndex"
+                @blur="warehouseChange($event, item.label == '仓库', index, true)"
+              >
+                <template #suffix>
+                  <view @click="warehousePositionList.length !== 0 ? (pickerShow3 = true) : ''">
+                    <u-icon name="arrow-down" size="20" />
+                  </view>
+                  <view>
+                    <u-action-sheet
+                      :show="pickerShow3"
+                      round="10"
+                      :closeOnClickOverlay="true"
+                      :closeOnClickAction="true"
+                      @close="pickerShow3 = false"
                     >
-                      <view @tap="pickerShow3 = false">搜索 </view>
-                      <view class="flex-1" @click="clearTimer">
-                        <u-input
-                          id="searchInput2"
-                          v-model="item.scValue2"
-                          :showAction="false"
-                          shape="round"
-                          placeholder="请输入搜索关键词"
-                          @blur="handleFocus"
-                        />
-                      </view>
-                    </view>
-                    <view>
-                      <!-- 滚动条 -->
-                      <scroll-view scroll-y style="height: 800rpx">
-                        <view
-                          class=""
-                          v-for="(warehouseItem, index) of warehousePositionList"
-                          :key="index"
-                        >
-                          <view
-                            class="flex justify-center py-10px"
-                            style="border-bottom: 1px solid #f8f8f8"
-                            v-if="warehouseItem.value.indexOf(item.scValue2 || '') !== -1"
-                            @tap="pickerConfirm2(warehouseItem, false)"
-                          >
-                            {{ warehouseItem.text }}
-                          </view>
+                      <view
+                        class="flex items-center p-20rpx"
+                        style="border-bottom: 1px solid #f8f8f8"
+                      >
+                        <view @tap="pickerShow3 = false">搜索 </view>
+                        <view class="flex-1" @click="clearTimer">
+                          <u-input
+                            id="searchInput2"
+                            v-model="item.scValue2"
+                            :showAction="false"
+                            shape="round"
+                            placeholder="请输入搜索关键词"
+                            @blur="handleFocus"
+                          />
                         </view>
-                      </scroll-view>
-                    </view>
-                  </u-action-sheet>
-                </view>
-              </template>
-            </u-input>
+                      </view>
+                      <view>
+                        <!-- 滚动条 -->
+                        <scroll-view scroll-y style="height: 800rpx">
+                          <view
+                            class=""
+                            v-for="(warehouseItem, index) of warehousePositionList"
+                            :key="index"
+                          >
+                            <view
+                              class="flex justify-center py-10px"
+                              style="border-bottom: 1px solid #f8f8f8"
+                              v-if="warehouseItem.value.indexOf(item.scValue2 || '') !== -1"
+                              @tap="pickerConfirm2(warehouseItem, false)"
+                            >
+                              {{ warehouseItem.text }}
+                            </view>
+                          </view>
+                        </scroll-view>
+                      </view>
+                    </u-action-sheet>
+                  </view>
+                </template>
+              </u-input>
+            </view>
           </view>
         </view>
-      </view>
-      <!-- 明细 -->
-      <view v-else-if="reactiveData.curNow == 1">
-        <view
-          v-for="(item, index) of reactiveData.detailsList"
-          :key="index"
-          class="flex items-center mb-6rpx"
-          :class="[
-            index % 2 === 0 ? 'bg-#F2F2F2' : 'bg-white', // 基础黑白交替
-            index === reactiveData.datailsIndex ? '!bg-[#C4D8EE]' : '' // 覆盖选中状态
-          ]"
-          @click="reactiveData.datailsIndex = index"
-          @longpress="longpressClick(item, index)"
-        >
-          <view class="w-20px flex justify-center">{{ index + 1 }}</view>
-          <view class="flex-1 mr-20rpx">
-            <view class="flex">
-              <view class=""> 编码： {{ item.MaterialCode }}</view>
-            </view>
-            <view class=""> 批号： {{ item.Lot }}</view>
+        <!-- 明细 -->
+        <view v-else-if="reactiveData.curNow == 1">
+          <view
+            v-for="(item, index) of reactiveData.detailsList"
+            :key="index"
+            class="flex items-center mb-6rpx"
+            :class="[
+              index % 2 === 0 ? 'bg-#F2F2F2' : 'bg-white', // 基础黑白交替
+              index === reactiveData.datailsIndex ? '!bg-[#C4D8EE]' : '' // 覆盖选中状态
+            ]"
+            @click="reactiveData.datailsIndex = index"
+            @longpress="longpressClick(item, index)"
+          >
+            <view class="w-20px flex justify-center">{{ index + 1 }}</view>
+            <view class="flex-1 mr-20rpx">
+              <view class="flex">
+                <view class=""> 编码： {{ item.MaterialCode }}</view>
+              </view>
+              <view class=""> 批号： {{ item.Lot }}</view>
 
-            <view> 名称： {{ item.Name }}</view>
-            <view class="flex-wrap"> 规格： {{ item.Specification }}</view>
-            <view class="flex">
-              <view class="w-50%"> 可收： {{ item.canReceive }}</view>
-              <view class="w-50%"> 数量： {{ item.Quantity2 }}</view>
-            </view>
-            <view class="flex">
-              <view class="w-50%"> 仓位： {{ item.WarehousePosition }}</view>
+              <view> 名称： {{ item.Name }}</view>
+              <view class="flex-wrap"> 规格： {{ item.Specification }}</view>
+              <view class="flex">
+                <view class="w-50%"> 可收： {{ item.canReceive }}</view>
+                <view class="w-50%"> 数量： {{ item.Quantity2 }}</view>
+              </view>
+              <view class="flex">
+                <view class="w-50%"> 仓位： {{ item.WarehousePosition }}</view>
+              </view>
             </view>
           </view>
         </view>
       </view>
-    </view>
+    </scroll-view>
   </view>
 </template>
 <style lang="less" scoped>

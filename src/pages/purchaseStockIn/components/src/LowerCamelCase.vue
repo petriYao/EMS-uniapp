@@ -27,6 +27,7 @@ const reactiveData = reactive({
   locationList: [] as any,
   curNow: 1,
   barcodeList: [] as any, //条码
+  focus: 0,
   barcodeIndex: 0
 })
 
@@ -217,13 +218,23 @@ const warehouseChange = debounceSave((val: any) => {
       icon: 'none'
     })
     reactiveData.detailsList[reactiveData.barcodeIndex].currentList[12].value = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].WarehousePosition = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].WarehousePositionNumber = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].detailList.location = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].detailList.locationNumber = ''
+    reactiveData.focus = 0
+    setTimeout(() => {
+      reactiveData.focus = 12
+    }, 100)
     return
   }
-  reactiveData.detailsList[reactiveData.barcodeIndex].currentList[12].value = warehouseId.value
+  reactiveData.detailsList[reactiveData.barcodeIndex].FStockLocId = warehouseId.Id
+  reactiveData.detailsList[reactiveData.barcodeIndex].currentList[12].value = warehouseId.text
+  reactiveData.detailsList[reactiveData.barcodeIndex].detailList.location = warehouseId.text
+
   reactiveData.detailsList[reactiveData.barcodeIndex].WarehousePosition = warehouseId.Id
   reactiveData.detailsList[reactiveData.barcodeIndex].WarehousePositionNumber = warehouseId.value
 
-  reactiveData.detailsList[reactiveData.barcodeIndex].detailList.location = warehouseId.Id
   reactiveData.detailsList[reactiveData.barcodeIndex].detailList.locationNumber = warehouseId.value
 
   pickerShow.value = false
@@ -241,8 +252,14 @@ const pickerConfirm = (warehouseItem: any) => {
   emitter.emit('update:handleFocus')
 }
 
+function sectionChange(index: any) {
+  reactiveData.curNow = index
+  reactiveData.focus = 999
+}
+
 const clearTimer = () => {
   // 清除定时器
+  emitter.emit('update:focus')
   emitter.emit('update:clearTimer')
 }
 
@@ -280,7 +297,7 @@ watch(
   <u-subsection
     :list="reactiveData.subsectionList"
     :current="reactiveData.curNow"
-    @change="reactiveData.curNow = $event"
+    @change="sectionChange"
   />
   <scroll-view scroll-y style="height: calc(100vh - 44px - 44px - 40px - 34px - 80px - 22px)">
     <!-- 当前 -->
@@ -316,6 +333,7 @@ watch(
             :disabled="reactiveData.locationList.length == 0"
             shape="round"
             placeholder=""
+            :focus="reactiveData.focus == 12"
             @blur="warehouseChange(item.value)"
           >
             <template #suffix>

@@ -10,7 +10,7 @@ const reactiveData = reactive({
   isShow: true, //是否选择
   loading: false, //是否保存
   title: '盘点',
-  scanCodeType: '初盘',
+  scanCodeType: '',
   FEntity: [] as any //单据提交
 })
 
@@ -25,7 +25,7 @@ const saveClick = throttleSave(async () => {
     <HeadStorage :title="reactiveData.title" v-model:scanCodeType="reactiveData.scanCodeType" />
   </view>
   <scroll-view scroll-y style="height: calc(100vh - 40px - 44px - 24px)">
-    <view>
+    <view v-if="reactiveData.scanCodeType == '初盘' || reactiveData.scanCodeType == '复盘'">
       <ContentStorage ref="contentStorageRef" :scanCodeType="reactiveData.scanCodeType" />
     </view>
   </scroll-view>

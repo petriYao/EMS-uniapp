@@ -470,11 +470,14 @@ const clearStock = async () => {
 // 键盘控制
 const hideTimer = ref<number | null>(null)
 const handleFocus = () => {
-  if (!hideTimer.value) {
-    hideTimer.value = setInterval(() => {
-      uni.hideKeyboard()
-    }, 50) as unknown as number
+  // 总是先清除已存在的定时器，再创建新的
+  if (hideTimer.value) {
+    clearInterval(hideTimer.value)
   }
+
+  hideTimer.value = setInterval(() => {
+    uni.hideKeyboard()
+  }, 50) as unknown as number
 }
 
 const clearTimer = () => {
@@ -542,14 +545,14 @@ onBeforeMount(() => {
     <!-- 仓库 -->
     <view class="flex items-center py-4rpx w-100%">
       <view class="w-50px flex justify-center">仓库</view>
-      <view class="flex-1 mr-20rpx" style="border: 1px solid #f8f8f8">
+      <view class="flex-1 mr-20rpx" style="border: 1px solid #f8f8f8" @click="clearTimer">
         <u-input
           v-model="heardList.warehouse"
           :focus="focus === 1"
           :disabled="setData.warehouseDisplay"
           shape="round"
           placeholder=""
-          @change="warehouseChange"
+          @blur="warehouseChange"
         >
           <template #suffix>
             <view @click="warehouseData.show = true">
@@ -565,7 +568,7 @@ onBeforeMount(() => {
               >
                 <view class="flex items-center p-20rpx" style="border-bottom: 1px solid #f8f8f8">
                   <view>搜索</view>
-                  <view class="flex-1">
+                  <view class="flex-1" @click="clearTimer">
                     <u-input
                       v-model="warehouseData.scValue"
                       shape="round"

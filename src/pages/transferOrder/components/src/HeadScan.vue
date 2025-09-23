@@ -370,15 +370,15 @@ const locationChange = debounceSave((val: any) => {
 
 const hideTimer = ref<number | null>(null)
 const handleFocus = () => {
-  console.log('设置定时器')
-  // 设置定时器
-  if (!hideTimer.value) {
-    hideTimer.value = setInterval(() => {
-      uni.hideKeyboard()
-    }, 50) as unknown as number
+  // 总是先清除已存在的定时器，再创建新的
+  if (hideTimer.value) {
+    clearInterval(hideTimer.value)
   }
-}
 
+  hideTimer.value = setInterval(() => {
+    uni.hideKeyboard()
+  }, 50) as unknown as number
+}
 const clearTimer = () => {
   // 清除定时器
   if (hideTimer.value) {
@@ -439,7 +439,7 @@ onBeforeUnmount(() => {
             :disabled="reactiveData.setData.warehouseDisplay"
             shape="round"
             placeholder=""
-            @change="warehouseChange"
+            @blur="warehouseChange"
           >
             <template #suffix>
               <view
@@ -509,7 +509,7 @@ onBeforeUnmount(() => {
             :disabled="reactiveData.setData.locationDisplay"
             shape="round"
             placeholder=""
-            @change="locationChange"
+            @blur="locationChange"
           >
             <template #suffix>
               <view
@@ -525,13 +525,9 @@ onBeforeUnmount(() => {
                   :closeOnClickAction="true"
                   @close="locationData.show = false"
                 >
-                  <view
-                    class="flex items-center p-20rpx"
-                    style="border-bottom: 1px solid #f8f8f8"
-                    @click="clearTimer"
-                  >
+                  <view class="flex items-center p-20rpx" style="border-bottom: 1px solid #f8f8f8">
                     <view @tap="locationData.show = false">搜索 </view>
-                    <view class="flex-1">
+                    <view class="flex-1" @click="clearTimer">
                       <u-input
                         id="searchInput1"
                         v-model="warehouseData.scValue"
