@@ -147,7 +147,6 @@ const addNewBarcodeDetail = async (queryRes: any) => {
   const FMaterialId = queryRes.MaterialCode //物料编码FMaterialId.Fnumber
   const FLot = queryRes.Lot //批号FLot
   const FStockId = reactiveData.setData.warehouseNumber //仓库FStockId.Fname
-  console.log('获取推荐仓位（根据物料编码、批号、仓库查库存表）', reactiveData.setData.FlexNumber)
   if (reactiveData.setData.FlexNumber !== '') {
     let FilterString = `FMaterialId.Fnumber = '${FMaterialId}'`
     if (FLot !== '') {
@@ -223,9 +222,8 @@ const getWarehousePosition = async (warehouseId: any) => {
   if (warehouseId) {
     const res: any = await lookqueryStorage(warehouseId)
     if (res) {
-      const list = res.data.Result.Result.StockFlexItem[0].StockFlexDetail
-      reactiveData.setData.FlexNumber = res.data.Result.Result.StockFlexItem[0].FlexId?.FlexNumber
-
+      const list = res.data.Result.Result?.StockFlexItem[0]?.StockFlexDetail
+      reactiveData.setData.FlexNumber = res.data.Result.Result?.StockFlexItem[0].FlexId?.FlexNumber
       if (list[0].Id === 0) {
         locationData.locationList = []
         reactiveData.setData.locationDisplay = true
@@ -250,8 +248,6 @@ const getWarehousePosition = async (warehouseId: any) => {
           reactiveData.focus = 2
         }, 200)
       }
-
-      handleFocus()
       emit('update:locationList', locationData.locationList)
     }
   }
@@ -283,43 +279,66 @@ const locationPickerConfirm = (val: any) => {
 
 // ========== 输入处理 ==========
 const warehouseChange = debounce((val: any) => {
-  reactiveData.heardList.location = ''
-  const warehouseId = warehouseData.warehouseList.find((item: any) => item.value === val)
-  if (!warehouseId && val !== '') {
+  if (val === '') {
+    //reactiveData.setData值全部重置
+    reactiveData.heardList.location = ''
+    reactiveData.setData.warehouseNumber = ''
+    reactiveData.setData.warehouseId = ''
+    reactiveData.setData.locationNumber = ''
+    reactiveData.setData.locationId = ''
+    emit('update:setData', reactiveData.setData)
+    return
+  }
+  const warehouseId = warehouseData.warehouseList.find(
+    (item: any) => item.value === val || item.text === val
+  )
+  if (!warehouseId) {
     uni.showToast({ title: '仓库不存在', icon: 'none' })
     reactiveData.heardList.warehouse = ''
     reactiveData.focus = 0
     setTimeout(() => (reactiveData.focus = 1), 200)
     return
   }
+  //跳走时
+  if (reactiveData.focus == 1) {
+    handleFocus()
+  }
+  if (reactiveData.setData.warehouseNumber == warehouseId.value) return
 
   reactiveData.heardList.warehouse = warehouseId.text
   reactiveData.setData.warehouseNumber = warehouseId.value
   reactiveData.setData.warehouseId = warehouseId.id
-  handleFocus()
-  getWarehousePosition(val)
+
+  reactiveData.setData.locationNumber = ''
+  reactiveData.setData.locationId = ''
+  reactiveData.heardList.location = ''
+  getWarehousePosition(warehouseId.value)
   emit('update:setData', reactiveData.setData)
-}, 300)
+}, 100)
 
 const locationChange = debounce((val: any) => {
-  const location = locationData.locationList.find((item: any) => item.value === val)
+  const location = locationData.locationList.find(
+    (item: any) => item.value === val || item.text === val
+  )
   if (!location && val !== '') {
     uni.showToast({ title: '仓位不存在', icon: 'none' })
     reactiveData.heardList.location = ''
     reactiveData.focus = 0
-    setTimeout(() => (reactiveData.focus = 2), 200)
+    setTimeout(() => (reactiveData.focus = 2), 100)
     return
   }
-
+  if (reactiveData.focus == 2) {
+    handleFocus()
+  }
+  if (reactiveData.setData.locationNumber == location.value) return
   reactiveData.heardList.location = location.value
   reactiveData.setData.locationNumber = location.value
   reactiveData.setData.locationId = location.Id
-  handleFocus()
 
   reactiveData.focus = 0
-  setTimeout(() => (reactiveData.focus = 99), 200)
+  setTimeout(() => (reactiveData.focus = 99), 100)
   emit('update:setData', reactiveData.setData)
-}, 300)
+}, 100)
 
 // ========== 工具函数 ==========
 const findMaterialIndex = (queryRes: any) => {
@@ -408,7 +427,6 @@ const calculateTotalQuantity = (index: number) => {
   reactiveData.detailsList[index].FZLOTList.forEach((item: any) => {
     sum += reactiveData.detailsList[index].packagingDataFZLOT[item].FZquantity
   })
-  console.log('分装合计', reactiveData.detailsList[index])
   reactiveData.detailsList[index].Quantity2 = sum
 }
 
@@ -486,6 +504,13 @@ useEmitt({
   name: 'update:clearTimer',
   callback: async () => clearTimer()
 })
+
+useEmitt({
+  name: 'update:focus',
+  callback: async () => {
+    reactiveData.focus = 0
+  }
+})
 </script>
 
 <template>
@@ -504,6 +529,7 @@ useEmitt({
           shape="round"
           placeholder="请输入搜索关键词"
           :focus="reactiveData.focus == 99"
+          @focus="reactiveData.focus = 99"
           @blur="searchChange"
         />
       </view>
@@ -516,6 +542,7 @@ useEmitt({
           v-model="reactiveData.heardList.warehouse"
           :showAction="false"
           :focus="reactiveData.focus == 1"
+          @focus="reactiveData.focus = 1"
           :disabled="reactiveData.setData.warehouseDisplay"
           shape="round"
           placeholder=""
@@ -541,7 +568,6 @@ useEmitt({
                   <view @tap="warehouseData.show = false">搜索 </view>
                   <view class="flex-1" @click="clearTimer">
                     <u-input
-                      id="searchInput1"
                       v-model="warehouseData.scValue"
                       :showAction="false"
                       shape="round"
@@ -584,6 +610,7 @@ useEmitt({
           v-model="reactiveData.heardList.location"
           :showAction="false"
           :focus="reactiveData.focus == 2"
+          @focus="reactiveData.focus = 2"
           :disabled="reactiveData.setData.locationDisplay"
           shape="round"
           placeholder=""
@@ -605,8 +632,7 @@ useEmitt({
                   <view @tap="locationData.show = false">搜索 </view>
                   <view class="flex-1" @click="clearTimer">
                     <u-input
-                      id="searchInput1"
-                      v-model="warehouseData.scValue"
+                      v-model="locationData.scValue"
                       :showAction="false"
                       shape="round"
                       placeholder="请输入搜索关键词"
@@ -619,16 +645,16 @@ useEmitt({
                   <scroll-view scroll-y style="height: 800rpx">
                     <view
                       class=""
-                      v-for="(warehouseItem, index) of locationData.locationList"
+                      v-for="(locationItem, index) of locationData.locationList"
                       :key="index"
                     >
                       <view
                         class="flex justify-center py-10px"
                         style="border-bottom: 1px solid #f8f8f8"
-                        v-if="warehouseItem.value.indexOf(warehouseData.scValue || '') !== -1"
-                        @tap="locationPickerConfirm(warehouseItem)"
+                        v-if="locationItem.value.indexOf(locationData.scValue || '') !== -1"
+                        @tap="locationPickerConfirm(locationItem)"
                       >
-                        {{ warehouseItem.text }}
+                        {{ locationItem.text }}
                       </view>
                     </view>
                   </scroll-view>

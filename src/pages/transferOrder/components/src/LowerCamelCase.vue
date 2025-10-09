@@ -26,6 +26,7 @@ const reactiveData = reactive({
   subsectionList: ['当前', '明细', '条码'],
   locationList: [] as any,
   curNow: 1,
+  focus: 0, //光标位置
   barcodeList: [] as any, //条码
   barcodeIndex: 0
 })
@@ -188,7 +189,9 @@ const reCompute = (val: any) => {
 //仓库
 const warehouseChange = debounceSave((val: any) => {
   //获取仓库id替换为仓库名称
-  const warehouseId: any = reactiveData.locationList.find((item: any) => item.value === val)
+  const warehouseId: any = reactiveData.locationList.find(
+    (item: any) => item.value === val || item.Id === val
+  )
   console.log('warehouseId1', warehouseId)
   if (!warehouseId && val != '') {
     //提示仓库不存在
@@ -197,8 +200,22 @@ const warehouseChange = debounceSave((val: any) => {
       icon: 'none'
     })
     reactiveData.detailsList[reactiveData.barcodeIndex].currentList[11].value = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].WarehousePosition = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].WarehousePositionNumber = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].detailList.location = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].detailList.locationNumber = ''
+
+    reactiveData.focus = 0
+    setTimeout(() => {
+      reactiveData.focus = 12
+    }, 100)
     return
   }
+  if (
+    reactiveData.detailsList[reactiveData.barcodeIndex].WarehousePositionNumber ===
+    warehouseId.value
+  )
+    return
   reactiveData.detailsList[reactiveData.barcodeIndex].currentList[11].value = warehouseId.value
   reactiveData.detailsList[reactiveData.barcodeIndex].WarehousePosition = warehouseId.Id
   reactiveData.detailsList[reactiveData.barcodeIndex].WarehousePositionNumber = warehouseId.value
@@ -225,9 +242,13 @@ const pickerConfirm = (warehouseItem: any) => {
   emit('update:detailsList', reactiveData.detailsList)
   emitter.emit('update:handleFocus')
 }
-
+const subsectionChange = (val: any) => {
+  reactiveData.curNow = val
+  reactiveData.focus = 0
+}
 const clearTimer = () => {
   // 清除定时器
+  emitter.emit('update:focus')
   emitter.emit('update:clearTimer')
 }
 
@@ -261,7 +282,7 @@ watch(
   <u-subsection
     :list="reactiveData.subsectionList"
     :current="reactiveData.curNow"
-    @change="reactiveData.curNow = $event"
+    @change="subsectionChange"
   />
   <scroll-view scroll-y style="height: calc(100vh - 265px)">
     <!-- 当前 -->
@@ -297,6 +318,7 @@ watch(
             :disabled="reactiveData.locationList.length == 0"
             shape="round"
             placeholder=""
+            :focus="reactiveData.focus == 12"
             @blur="warehouseChange(item.value)"
           >
             <template #suffix>

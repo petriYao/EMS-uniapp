@@ -225,20 +225,28 @@ const locationPickerConfirm = (val: any) => {
 
 //仓库
 const warehouseChange = debounceSave((val: any) => {
-  if (reactiveData.focus !== 0) {
+  if (reactiveData.focus == 1) {
     handleFocus()
   }
-  reactiveData.heardList.location = ''
+  if (val == '') {
+    reactiveData.heardList.warehouse = ''
+    reactiveData.setData.warehouseNumber = ''
+    reactiveData.setData.warehouseId = ''
+    ///清空所有仓位
+    clearAllPositions()
+    return
+  }
   //获取仓库id替换为仓库名称
   const warehouseId: any = warehouseData.warehouseList.find(
     (item: any) => item.value === val || item.text === val
   )
-  if (!warehouseId && val != '') {
+  if (!warehouseId) {
     //提示仓库不存在
     uni.showToast({
       title: '仓库不存在',
       icon: 'none'
     })
+    reactiveData.heardList.location = ''
     reactiveData.heardList.warehouse = ''
     reactiveData.setData.warehouseNumber = ''
     reactiveData.setData.warehouseId = ''
@@ -255,7 +263,7 @@ const warehouseChange = debounceSave((val: any) => {
     return
   }
   if (warehouseId.value == reactiveData.setData.warehouseNumber) return
-
+  reactiveData.heardList.location = ''
   reactiveData.heardList.warehouse = warehouseId.text
   reactiveData.setData.warehouseNumber = warehouseId.value
   reactiveData.setData.warehouseId = warehouseId.id
@@ -367,6 +375,7 @@ onBeforeMount(() => {
           shape="round"
           placeholder="请输入搜索关键词"
           :focus="reactiveData.focus == 99"
+          @focus="reactiveData.focus = 99"
           @blur="searchChange"
         />
       </view>
@@ -394,6 +403,7 @@ onBeforeMount(() => {
           :focus="reactiveData.focus == 1"
           shape="round"
           placeholder=""
+          @focus="reactiveData.focus = 1"
           @blur="warehouseChange"
         >
           <template #suffix>

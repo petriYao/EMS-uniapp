@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, onBeforeUnmount, onBeforeMount, ref } from 'vue'
+import { reactive, onBeforeMount, ref } from 'vue'
 import { queryStorage } from '@/api/modules/storage'
 import { scanBarCode, getSanDan } from '@/common/materialWithdrawal/Index'
 import { getSanSimple } from '@/common/materialWithdrawal/Simple'
@@ -71,7 +71,7 @@ const searchChange = debounce(async () => {
     return
   }
 
-  handleFocus()
+  emitter.emit('update:handleFocus')
 
   try {
     if (!reactiveData.heardList.documentNumber) {
@@ -88,7 +88,6 @@ const searchChange = debounce(async () => {
           queryRes = await getSanOutsourcing(reactiveData.searchValue)
           break
       }
-      console.log('查询结果', queryRes)
 
       if (queryRes && queryRes.dataList?.length > 0) {
         reactiveData.setData.fid = queryRes.fid
@@ -229,53 +228,12 @@ const getWarehouseList = async () => {
     })
   }
 }
-
-const hideTimer = ref<number | null>(null)
-
-const handleFocus = () => {
-  // 清除之前的定时器
-  if (hideTimer.value) {
-    clearInterval(hideTimer.value)
-  }
-
-  // 设置新的定时器
-  hideTimer.value = setInterval(() => {
-    uni.hideKeyboard()
-  }, 50) as unknown as number
-}
-
 const clearTimer = () => {
-  // 清除定时器
-  if (hideTimer.value) {
-    clearInterval(hideTimer.value)
-    hideTimer.value = null
-  }
+  emitter.emit('update:clearTimer')
 }
-
-useEmitt({
-  name: 'update:handleFocus',
-  callback: async () => {
-    handleFocus()
-  }
-})
-
-useEmitt({
-  name: 'update:clearTimer',
-  callback: async () => {
-    clearTimer()
-  }
-})
-
 onBeforeMount(() => {
   // 组件挂载前的逻辑
-  handleFocus()
   getWarehouseList()
-})
-
-onBeforeUnmount(() => {
-  // 组件卸载时清理
-  console.log('离开')
-  clearTimer()
 })
 </script>
 
@@ -296,13 +254,12 @@ onBeforeUnmount(() => {
           placeholder="请输入搜索关键词"
           :focus="reactiveData.focus == 99"
           @blur="searchChange"
-          @confirm="searchChange"
         />
       </view>
     </view>
     <view class="flex items-center py-4rpx w-100%">
       <view class="w-50px flex justify-center">单号</view>
-      <view class="flex-1 mr-20rpx" style="border: 1px solid #f8f8f8" @click="clearTimer">
+      <view class="flex-1 mr-20rpx" style="border: 1px solid #f8f8f8">
         <u-input
           ref="searchInput"
           v-model="reactiveData.heardList.documentNumber"

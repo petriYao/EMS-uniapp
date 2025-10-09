@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref, onBeforeUnmount, onBeforeMount, watch } from 'vue'
+import { reactive, ref, onBeforeUnmount, watch } from 'vue'
 import HeadStorage from './components/HeadStorage.vue'
 import ContentStorage from './components/ContentStorage.vue'
 import SanContentStorage from './sanComponents/SanContentStorage.vue'

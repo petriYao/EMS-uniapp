@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { onBeforeMount, reactive } from 'vue'
+import { reactive, onBeforeUnmount, onBeforeMount, ref } from 'vue'
+import { useEmitt } from '@/hooks/useEmitt'
 
 const props = defineProps({
   title: {
@@ -120,6 +121,48 @@ onBeforeMount(() => {
 
   // 统一触发更新事件
   emit('update:scanCodeType', reactiveData.scanCodeType)
+})
+
+const hideTimer = ref<number | null>(null)
+
+const handleFocus = () => {
+  // 总是先清除已存在的定时器，再创建新的
+  if (hideTimer.value) {
+    clearInterval(hideTimer.value)
+  }
+
+  hideTimer.value = setInterval(() => {
+    uni.hideKeyboard()
+  }, 50) as unknown as number
+}
+const clearTimer = () => {
+  if (hideTimer.value) {
+    clearInterval(hideTimer.value)
+    hideTimer.value = null
+  }
+}
+
+useEmitt({
+  name: 'update:handleFocus',
+  callback: async () => {
+    handleFocus()
+  }
+})
+
+useEmitt({
+  name: 'update:clearTimer',
+  callback: async () => {
+    clearTimer()
+    console.log('关闭定时器')
+  }
+})
+
+onBeforeMount(() => {
+  handleFocus()
+})
+
+onBeforeUnmount(() => {
+  clearTimer()
 })
 </script>
 

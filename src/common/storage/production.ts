@@ -410,7 +410,9 @@ export const productionGetData = async (
 
         {
           label: '合同',
-          value: barCodeData.F_HTNO + '-' + barCodeData.F_QADV_HTENTRYID,
+          value:
+            barCodeData.F_HTNO +
+            (barCodeData.F_QADV_HTENTRYID !== ' ' ? '-' + barCodeData.F_QADV_HTENTRYID : ''),
           disabled: true,
           type: 'input',
           style: { width: '65%' }

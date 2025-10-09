@@ -17,7 +17,6 @@ const props = defineProps({
 //类型式声明
 const emit = defineEmits<{
   (e: 'update:detailsList', modelValue: any): void
-  (e: 'update:barcodeIndex', modelValue: any): void
   (e: 'update:locationList', modelValue: any): void
 }>()
 const { emitter } = useEmitt()
@@ -36,9 +35,8 @@ const reactiveData = reactive({
 
 const getBarCode = async (item: any, index: number) => {
   reactiveData.barcodeIndex = index
+  console.log('触发获取仓位', item, index)
   getWarehousePosition(reactiveData.detailsList[reactiveData.barcodeIndex]?.stockNumber)
-
-  emit('update:barcodeIndex', index)
 }
 
 //长按事件 删除明细
@@ -96,8 +94,6 @@ const getWarehouseList = async () => {
     }))
     console.log('获取仓库列表', data)
     reactiveData.warehouseList = data
-
-    getWarehousePosition(reactiveData.detailsList[0]?.stockNumber)
   }
 }
 
@@ -112,8 +108,10 @@ const openSelect = (item: any, disabled: boolean) => {
 
 //获取仓位列表
 const getWarehousePosition = async (warehouseId: any) => {
+  console.log('获取仓位列表11111111111111', warehouseId)
   if (warehouseId) {
     const res: any = await lookqueryStorage(warehouseId)
+    console.log('获取仓位列表', res)
     if (res) {
       const list = res.data.Result.Result.StockFlexItem[0].StockFlexDetail
       reactiveData.detailsList[reactiveData.barcodeIndex].FlexNumber =
@@ -167,8 +165,8 @@ const pickerConfirm = (warehouseItem: any, name: any) => {
     reactiveData.detailsList[reactiveData.barcodeIndex].currentList.find(
       (i: any) => i.label === '仓库'
     ).value = warehouseItem.text
-
-    getWarehousePosition(warehouseItem.value)
+    console.log('仓库名称', warehouseItem.value)
+    //getWarehousePosition(warehouseItem.value)
     /**仓位删除 */
     reactiveData.detailsList[reactiveData.barcodeIndex].currentList.find(
       (i: any) => i.label === '仓位'
@@ -211,7 +209,7 @@ const quantChange = debounce((val: any, item: any) => {
       break
   }
   emit('update:detailsList', reactiveData.detailsList)
-}, 300)
+}, 100)
 
 const distributeValueToEntityList = (val: number) => {
   const entityList = reactiveData.detailsList[reactiveData.barcodeIndex]?.EntityList || []
@@ -232,12 +230,27 @@ const distributeValueToEntityList = (val: number) => {
   }
 
   // 更新父组件的数据
-  emit('update:detailsList', reactiveData.detailsList)
+  // emit('update:detailsList', reactiveData.detailsList)
 }
 // ========== 输入处理 ==========
 const warehouseChange = debounce((val: any) => {
-  const warehouseId = reactiveData.warehouseList.find((item: any) => item.value === val)
-  if (!warehouseId && val !== '') {
+  if (val === '') {
+    reactiveData.detailsList[reactiveData.barcodeIndex].stockName = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].stockNumber = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].currentList.find(
+      (i: any) => i.label === '仓库'
+    ).value = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].currentList.find(
+      (i: any) => i.label === '仓位'
+    ).value = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].stockLocName = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].stockLocNumber = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].detailList.stockLocName = ''
+  }
+  const warehouseId = reactiveData.warehouseList.find(
+    (item: any) => item.value === val || item.text === val
+  )
+  if (!warehouseId) {
     reactiveData.detailsList[reactiveData.barcodeIndex].stockName = ''
     reactiveData.detailsList[reactiveData.barcodeIndex].stockNumber = ''
     reactiveData.detailsList[reactiveData.barcodeIndex].currentList.find(
@@ -253,11 +266,14 @@ const warehouseChange = debounce((val: any) => {
     uni.showToast({ title: '仓库不存在', icon: 'none' })
     return
   } else {
+    if (reactiveData.detailsList[reactiveData.barcodeIndex].stockNumber === warehouseId.value)
+      return
     reactiveData.detailsList[reactiveData.barcodeIndex].stockName = warehouseId.text
     reactiveData.detailsList[reactiveData.barcodeIndex].stockNumber = warehouseId.value
     reactiveData.detailsList[reactiveData.barcodeIndex].currentList.find(
       (i: any) => i.label === '仓库'
     ).value = warehouseId.text
+    console.log('仓库warehouseChange', warehouseId.value)
     getWarehousePosition(warehouseId.value)
 
     reactiveData.detailsList[reactiveData.barcodeIndex].currentList.find(
@@ -267,10 +283,12 @@ const warehouseChange = debounce((val: any) => {
     reactiveData.detailsList[reactiveData.barcodeIndex].stockLocNumber = ''
     reactiveData.detailsList[reactiveData.barcodeIndex].detailList.stockLocName = ''
   }
-}, 300)
+}, 50)
 //仓位
 const locationChange = debounce((val: any) => {
-  const location = reactiveData.locationList.find((item: any) => item.value === val)
+  const location = reactiveData.locationList.find(
+    (item: any) => item.value === val || item.text === val
+  )
   if (!location && val !== '') {
     reactiveData.detailsList[reactiveData.barcodeIndex].currentList.find(
       (i: any) => i.label === '仓位'
@@ -281,13 +299,15 @@ const locationChange = debounce((val: any) => {
     uni.showToast({ title: '仓位不存在', icon: 'none' })
     return
   }
+  if (reactiveData.detailsList[reactiveData.barcodeIndex].stockLocNumber === location.value) return
+
   reactiveData.detailsList[reactiveData.barcodeIndex].currentList.find(
     (i: any) => i.label === '仓位'
   ).value = location.text
   reactiveData.detailsList[reactiveData.barcodeIndex].stockLocName = location.text
   reactiveData.detailsList[reactiveData.barcodeIndex].detailList.stockLocName = location.text
   reactiveData.detailsList[reactiveData.barcodeIndex].stockLocNumber = location.value
-}, 300)
+}, 50)
 
 const clearTimer = () => {
   // 清除定时器
@@ -298,7 +318,7 @@ useEmitt({
   name: 'update:barcodeIndex',
   callback: async (val: any) => {
     reactiveData.barcodeIndex = val
-    getWarehousePosition(reactiveData.detailsList[val]?.stockNumber)
+    //getWarehousePosition(reactiveData.detailsList[val]?.stockNumber)
   }
 })
 
@@ -306,6 +326,10 @@ watch(
   () => props.detailsList,
   (val: any) => {
     reactiveData.detailsList = val
+    console.log('detailsList222', val)
+    if (val.length >= reactiveData.barcodeIndex) {
+      getWarehousePosition(val[reactiveData.barcodeIndex]?.stockNumber)
+    }
   },
   { immediate: true, deep: true }
 )

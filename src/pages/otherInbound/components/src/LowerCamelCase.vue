@@ -203,30 +203,34 @@ const reCompute = (val: any) => {
   return sum
 }
 
-//仓库
+//仓位
 const warehouseChange = debounceSave((val: any) => {
-  //获取仓库id替换为仓库名称
+  //获取仓位id替换为仓位名称
   const warehouseId: any = reactiveData.locationList.find((item: any) => item.value === val)
   console.log('warehouseId1', warehouseId)
   if (!warehouseId && val != '') {
-    //提示仓库不存在
+    //提示仓位不存在
     uni.showToast({
       title: '仓位不存在',
       icon: 'none'
     })
-    reactiveData.detailsList[reactiveData.barcodeIndex].currentList[12].value = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].currentList[11].value = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].WarehousePosition = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].detailList.location = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].WarehousePositionNumber = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].locationNumber = ''
     return
   }
-  reactiveData.detailsList[reactiveData.barcodeIndex].currentList[12].value = warehouseId.value
+  reactiveData.detailsList[reactiveData.barcodeIndex].currentList[11].value = warehouseId.value
   reactiveData.detailsList[reactiveData.barcodeIndex].WarehousePosition = warehouseId.Id
   reactiveData.detailsList[reactiveData.barcodeIndex].WarehousePositionNumber = warehouseId.value
 
-  reactiveData.detailsList[reactiveData.barcodeIndex].detailList.location = warehouseId.Id
-  reactiveData.detailsList[reactiveData.barcodeIndex].detailList.locationNumber = warehouseId.value
+  reactiveData.detailsList[reactiveData.barcodeIndex].detailList.location = warehouseId.text
+  reactiveData.detailsList[reactiveData.barcodeIndex].locationNumber = warehouseId.value
 
   pickerShow.value = false
   emit('update:detailsList', reactiveData.detailsList)
-  emitter.emit('update:handleFocus')
+  //emitter.emit('update:handleFocus')
 })
 
 const pickerConfirm = (warehouseItem: any) => {
@@ -237,11 +241,12 @@ const pickerConfirm = (warehouseItem: any) => {
   reactiveData.detailsList[reactiveData.barcodeIndex].detailList.location = warehouseItem.text
   pickerShow.value = false
   emit('update:detailsList', reactiveData.detailsList)
-  emitter.emit('update:handleFocus')
+  // emitter.emit('update:handleFocus')
 }
 
 const clearTimer = () => {
   // 清除定时器
+  emitter.emit('update:focus')
   emitter.emit('update:clearTimer')
 }
 
@@ -291,9 +296,7 @@ watch(
         class="flex items-center mb-6rpx"
         :style="item.style"
       >
-        <view class="w-50px flex justify-center">
-          {{ item.label }}
-        </view>
+        <view class="w-50px flex justify-center"> {{ item.label }} </view>
         <view class="flex-1 mr-20rpx" v-if="item.type == 'input'">
           <u-input
             v-model="item.value"

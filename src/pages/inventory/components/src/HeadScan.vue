@@ -32,12 +32,8 @@ const searchClick = async () => {
     onlyFromCamera: true
   })
   if (res) {
-    if (focus.value === 0) {
-      searchValue.value = res.result
-      searchChange()
-    } else {
-      searchInput.value.setValue(res.result)
-    }
+    searchValue.value = res.result
+    searchChange()
   }
 }
 

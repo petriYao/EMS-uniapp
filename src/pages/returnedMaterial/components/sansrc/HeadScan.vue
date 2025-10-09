@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, onBeforeUnmount, onBeforeMount, ref } from 'vue'
+import { reactive, onBeforeMount, ref } from 'vue'
 import { queryStorage, lookqueryStorage } from '@/api/modules/storage'
 import { scanBarCode, getSanDan } from '@/common/returnedMaterial/Index'
 import { getSanSimple } from '@/common/returnedMaterial/Simple'
@@ -75,14 +75,11 @@ const findMatchingDetails = (queryRes: any): any[] => {
 //扫描条码
 const searchChange = debounce(async () => {
   console.log('搜索值', reactiveData.searchValue)
-
   // 防止空值搜索
   if (!reactiveData.searchValue.trim()) {
     return
   }
-
-  handleFocus()
-
+  //handleFocus()
   try {
     if (!reactiveData.heardList.documentNumber) {
       //扫描采购订单
@@ -245,8 +242,6 @@ const searchChange = debounce(async () => {
 // 仓库变更
 const warehouseChange = debounceSave(async (val: string) => {
   console.log('仓库变更', warehouseData.warehouseList, val)
-  reactiveData.heardList.location = ''
-  await clearStock()
 
   if (val === '') {
     reactiveData.heardList.warehouse = ''
@@ -254,23 +249,30 @@ const warehouseChange = debounceSave(async (val: string) => {
     reactiveData.setData.warehouseId = ''
     return
   }
-  const warehouse = warehouseData.warehouseList.find((item: any) => item.value === val)
+  const warehouse = warehouseData.warehouseList.find(
+    (item: any) => item.value === val || item.text === val
+  )
   console.log('仓库', warehouse)
   if (!warehouse && val) {
     uni.showToast({ title: '仓库不存在', icon: 'none' })
     reactiveData.heardList.warehouse = ''
     reactiveData.setData.warehouseNumber = ''
     reactiveData.setData.warehouseId = ''
+    reactiveData.heardList.location = ''
+    await clearStock()
     focusTm()
     setTimeout(() => {
       reactiveData.focus = 1
     }, 200)
     return
   }
+  if (reactiveData.setData.warehouseNumber === warehouse.value) return
   reactiveData.heardList.warehouse = warehouse.text
   reactiveData.setData.warehouseNumber = warehouse.value
   reactiveData.setData.warehouseId = warehouse.id
-  handleFocus()
+  reactiveData.heardList.location = ''
+  await clearStock()
+  //handleFocus()
   await getWarehousePosition(val)
   emit('update:setData', reactiveData.setData)
   emit('update:detailsList', reactiveData.detailsList)
@@ -362,7 +364,7 @@ const getWarehousePosition = async (warehouseId: any) => {
         reactiveData.locationList = []
         reactiveData.setData.locationDisplay = true
         focusTm()
-        handleFocus()
+        //handleFocus()
         emit('update:locationList', reactiveData.locationList)
         return
       }
@@ -384,57 +386,18 @@ const getWarehousePosition = async (warehouseId: any) => {
           reactiveData.focus = 99
         }, 200)
       }
-      handleFocus()
+      //handleFocus()
       emit('update:locationList', reactiveData.locationList)
       console.log('reactiveData.locationList', reactiveData.locationList)
     }
   }
 }
-
-const hideTimer = ref<number | null>(null)
-
-const handleFocus = () => {
-  // 总是先清除已存在的定时器，再创建新的
-  if (hideTimer.value) {
-    clearInterval(hideTimer.value)
-  }
-
-  hideTimer.value = setInterval(() => {
-    uni.hideKeyboard()
-  }, 50) as unknown as number
-}
 const clearTimer = () => {
-  // 清除定时器
-  if (hideTimer.value) {
-    clearInterval(hideTimer.value)
-    hideTimer.value = null
-  }
+  emitter.emit('update:clearTimer')
 }
-
-useEmitt({
-  name: 'update:handleFocus',
-  callback: async () => {
-    handleFocus()
-  }
-})
-
-useEmitt({
-  name: 'update:clearTimer',
-  callback: async () => {
-    clearTimer()
-  }
-})
-
 onBeforeMount(() => {
   // 组件挂载前的逻辑
-  handleFocus()
   getWarehouseList()
-})
-
-onBeforeUnmount(() => {
-  // 组件卸载时清理
-  console.log('离开')
-  clearTimer()
 })
 </script>
 
@@ -502,7 +465,6 @@ onBeforeUnmount(() => {
                       v-model="warehouseData.scValue"
                       shape="round"
                       placeholder="请输入搜索关键词"
-                      @blur="handleFocus"
                     />
                   </view>
                 </view>

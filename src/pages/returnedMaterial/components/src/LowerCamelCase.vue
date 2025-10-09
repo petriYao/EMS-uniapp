@@ -212,11 +212,10 @@ const reCompute = (val: any) => {
   return sum
 }
 
-//仓库
+//仓位
 const warehouseChange = debounceSave((val: any) => {
-  //获取仓库id替换为仓库名称
-  const warehouseId: any = reactiveData.locationList.find((item: any) => item.value === val)
-  console.log('warehouseId1', warehouseId)
+  //获取仓位id替换为仓位名称
+
   if (val == '') {
     reactiveData.detailsList[reactiveData.barcodeIndex].detailList.location = ''
     reactiveData.detailsList[reactiveData.barcodeIndex].detailList.locationNumber = ''
@@ -224,8 +223,13 @@ const warehouseChange = debounceSave((val: any) => {
     console.log('reactiveData.detailsList', reactiveData.detailsList[reactiveData.barcodeIndex])
     return
   }
-  if (!warehouseId && val != '') {
-    //提示仓库不存在
+  const warehouseId: any = reactiveData.locationList.find(
+    (item: any) => item.value === val || item.text === val
+  )
+  console.log('warehouseId1', warehouseId)
+
+  if (!warehouseId) {
+    //提示仓位不存在
     uni.showToast({
       title: '仓位不存在',
       icon: 'none'
@@ -238,6 +242,8 @@ const warehouseChange = debounceSave((val: any) => {
     console.log('reactiveData.detailsList', reactiveData.detailsList[reactiveData.barcodeIndex])
     return
   }
+  if (reactiveData.detailsList[reactiveData.barcodeIndex].WarehouseNumber === warehouseId.value)
+    return
   reactiveData.detailsList[reactiveData.barcodeIndex].currentList[12].value = warehouseId.value
   reactiveData.detailsList[reactiveData.barcodeIndex].WarehouseId = warehouseId.Id
   reactiveData.detailsList[reactiveData.barcodeIndex].WarehouseNumber = warehouseId.value
@@ -270,7 +276,7 @@ const pickerConfirm = (warehouseItem: any) => {
 const clearTimer = () => {
   console.log('清除定时器')
   // 清除定时器
-  emitter.emit('update:clearTimer1')
+  emitter.emit('update:clearTimer')
 }
 
 useEmitt({

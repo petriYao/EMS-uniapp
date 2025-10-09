@@ -208,24 +208,37 @@ const reCompute = (val: any) => {
 //仓库
 const warehouseChange = debounceSave((val: any) => {
   //获取仓库id替换为仓库名称
+  if (val == '') {
+    reactiveData.detailsList[reactiveData.barcodeIndex].currentList[12].value = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].WarehouseId = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].detailList.location = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].detailList.locationNumber = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].WarehouseNumber = ''
+    return
+  }
   const warehouseId: any = reactiveData.locationList.find((item: any) => item.value === val)
   console.log('warehouseId1', warehouseId)
-  if (!warehouseId && val != '') {
+  if (!warehouseId) {
     //提示仓库不存在
     uni.showToast({
       title: '仓位不存在',
       icon: 'none'
     })
     reactiveData.detailsList[reactiveData.barcodeIndex].currentList[12].value = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].WarehouseId = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].detailList.location = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].detailList.locationNumber = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].WarehouseNumber = ''
     return
   }
+  if (reactiveData.detailsList[reactiveData.barcodeIndex].WarehouseId === warehouseId.Id) return
   reactiveData.detailsList[reactiveData.barcodeIndex].currentList[12].value = warehouseId.value
   reactiveData.detailsList[reactiveData.barcodeIndex].WarehouseId = warehouseId.Id
   reactiveData.detailsList[reactiveData.barcodeIndex].WarehouseNumber = warehouseId.value
 
-  reactiveData.detailsList[reactiveData.barcodeIndex].detailList.location = warehouseId.Id
+  reactiveData.detailsList[reactiveData.barcodeIndex].detailList.location = warehouseId.text
   reactiveData.detailsList[reactiveData.barcodeIndex].detailList.locationNumber = warehouseId.value
-
+  reactiveData.detailsList[reactiveData.barcodeIndex].FStockLocId = warehouseId.Id
   pickerShow.value = false
   emit('update:detailsList', reactiveData.detailsList)
   emitter.emit('update:handleFocus')
@@ -303,9 +316,7 @@ watch(
         class="flex items-center mb-6rpx"
         :style="item.style"
       >
-        <view class="w-50px flex justify-center">
-          {{ item.label }}
-        </view>
+        <view class="w-50px flex justify-center"> {{ item.label }} </view>
         <view class="flex-1 mr-20rpx" v-if="item.type == 'input'">
           <u-input
             v-model="item.value"

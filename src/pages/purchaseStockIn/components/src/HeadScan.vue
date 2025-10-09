@@ -267,7 +267,7 @@ const searchChange = () => {
 
     reactiveData.searchValue = ''
     focusTm()
-  }, 500)
+  }, 300)
 }
 
 const focusTm = () => {
@@ -379,6 +379,18 @@ const locationPickerConfirm = (val: any) => {
 
 //仓库
 const warehouseChange = debounceSave((val: any) => {
+  console.log('warehouseChange', val)
+  if (val == '') {
+    reactiveData.setData.warehouseNumber = ''
+    reactiveData.setData.warehouseId = ''
+    reactiveData.setData.locationNumber = ''
+    reactiveData.setData.locationId = ''
+    reactiveData.heardList.warehouse = ''
+    reactiveData.heardList.location = ''
+    reactiveData.setData.locationDisplay = true
+    return
+  }
+  console.log('warehouseChange1', val)
   //获取仓库id替换为仓库名称
   const warehouseId: any = warehouseData.warehouseList.find(
     (item: any) => item.value === val || item.text === val
@@ -396,7 +408,7 @@ const warehouseChange = debounceSave((val: any) => {
     reactiveData.setData.warehouseId = ''
     clearAllPositions()
 
-    if (reactiveData.focus !== 0) {
+    if (reactiveData.focus == 1) {
       //重新回到光标位置
       reactiveData.focus = 0
       setTimeout(() => {
@@ -533,6 +545,7 @@ onBeforeMount(() => {
           shape="round"
           placeholder="请输入搜索关键词"
           :focus="reactiveData.focus == 99"
+          @focus="reactiveData.focus = 99"
           @blur="searchChange"
         />
       </view>

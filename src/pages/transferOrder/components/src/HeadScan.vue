@@ -201,7 +201,7 @@ const searchChange = () => {
     emit('update:detailsList', reactiveData.detailsList)
 
     focusTm()
-  }, 500)
+  }, 300)
 }
 
 const focusTm = () => {
@@ -312,7 +312,9 @@ const locationPickerConfirm = (val: any) => {
 const warehouseChange = debounceSave((val: any) => {
   reactiveData.heardList.location = ''
   //获取仓库id替换为仓库名称
-  const warehouseId: any = warehouseData.warehouseList.find((item: any) => item.value === val)
+  const warehouseId: any = warehouseData.warehouseList.find(
+    (item: any) => item.value === val || item.text === val
+  )
   console.log('warehouseId1', warehouseId)
   if (!warehouseId && val != '') {
     //提示仓库不存在
@@ -321,7 +323,8 @@ const warehouseChange = debounceSave((val: any) => {
       icon: 'none'
     })
     reactiveData.heardList.warehouse = ''
-
+    reactiveData.setData.warehouseNumber = ''
+    reactiveData.setData.warehouseId = ''
     //重新回到光标位置
     reactiveData.focus = 0
     setTimeout(() => {
@@ -329,6 +332,7 @@ const warehouseChange = debounceSave((val: any) => {
     }, 200)
     return
   }
+  if (reactiveData.setData.warehouseNumber == warehouseId.value) return
   reactiveData.heardList.warehouse = warehouseId.text
   reactiveData.setData.warehouseNumber = warehouseId.value
   reactiveData.setData.warehouseId = warehouseId.id
@@ -339,7 +343,9 @@ const warehouseChange = debounceSave((val: any) => {
 //仓位
 const locationChange = debounceSave((val: any) => {
   console.log('locationChange', val)
-  const location: any = locationData.locationList.find((item: any) => item.value === val)
+  const location: any = locationData.locationList.find(
+    (item: any) => item.value === val || item.text === val
+  )
   console.log('location', location)
   if (!location && val != '') {
     //提示仓位不存在
@@ -348,23 +354,27 @@ const locationChange = debounceSave((val: any) => {
       icon: 'none'
     })
     reactiveData.heardList.location = ''
-    //重新回到光标位置
+    reactiveData.setData.locationNumber = ''
+    reactiveData.setData.locationId = ''
+
     reactiveData.focus = 0
     setTimeout(() => {
       reactiveData.focus = 2
-    }, 200)
+    }, 100)
     return
   }
   reactiveData.heardList.location = location.value
   reactiveData.setData.locationNumber = location.value
   reactiveData.setData.locationId = location.Id
   reactiveData.setData.warehouseDisplay = true
-  handleFocus()
+  if (reactiveData.focus == 2) {
+    handleFocus()
 
-  reactiveData.focus = 0
-  setTimeout(() => {
-    reactiveData.focus = 3
-  }, 200)
+    reactiveData.focus = 0
+    setTimeout(() => {
+      reactiveData.focus = 3
+    }, 200)
+  }
   emit('update:setData', reactiveData.setData)
 })
 
@@ -387,6 +397,13 @@ const clearTimer = () => {
   }
   console.log('清除定时器', hideTimer.value)
 }
+useEmitt({
+  name: 'update:focus',
+  callback: async () => {
+    console.log('清除定时器')
+    reactiveData.focus = 0
+  }
+})
 
 useEmitt({
   name: 'update:clearTimer',
@@ -408,7 +425,7 @@ watch(
   (val: any) => {
     console.log('val', val)
     reactiveData.detailsList = val
-    focusTm()
+    //focusTm()
   },
   { deep: true }
 )
@@ -506,6 +523,7 @@ onBeforeUnmount(() => {
             v-model="reactiveData.heardList.location"
             :showAction="false"
             :focus="reactiveData.focus == 2"
+            @focus="reactiveData.focus = 2"
             :disabled="reactiveData.setData.locationDisplay"
             shape="round"
             placeholder=""
@@ -572,6 +590,7 @@ onBeforeUnmount(() => {
             v-model="reactiveData.heardList.barcode"
             :showAction="false"
             :focus="reactiveData.focus == 3"
+            @focus="reactiveData.focus = 3"
             shape="round"
             placeholder=""
             @blur="searchChange"

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, onBeforeUnmount, onBeforeMount, ref } from 'vue'
+import { reactive, ref } from 'vue'
 import { purchaseScanBarcode, getcamelCase } from '@/common/materialWithdrawal/Index'
 import { getSimple } from '@/common/materialWithdrawal/Simple'
 import { getOutsourcing } from '@/common/materialWithdrawal/Outsourced'
@@ -45,7 +45,7 @@ const searchClick = async () => {
 // 防抖搜索
 const searchChange = debounce(async () => {
   if (!reactiveData.searchValue) return
-  handleFocus()
+  emitter.emit('update:handleFocus')
   try {
     if (!reactiveData.documentNumber) {
       await handleDocumentSearch()
@@ -206,8 +206,6 @@ const handleBarcodeScan = async () => {
   let queryRes: any = {}
   queryRes = await purchaseScanBarcode(reactiveData.searchValue)
 
-  console.log('queryRes', queryRes)
-
   if (!queryRes) {
     // showToast('无效条码')
     return
@@ -283,12 +281,10 @@ const updateDetailItem = (index: number, queryRes: any) => {
 
   if (detail.IsSplit) {
     handleSplitPackage(detail, queryRes)
-    console.log('分装逻辑处理', detail)
   } else {
     detail.Quantity2 += queryRes.Quantity2
     detail.isInteger = true
   }
-  console.log('更新明细项数据', detail.Quantity2)
   if (detail.Quantity2 > detail.canReceive) {
     uni.showToast({ title: '实领数量大于应领数量', icon: 'none' })
   }
@@ -315,7 +311,6 @@ const handleSplitPackage = (detail: any, queryRes: any) => {
   packagingData.finishedQty = packagingData.quantity / packagingData.unitQty
 
   const productsQuantity = calculateProductsQuantity(detail, fzlot)
-  console.log('productsQuantity', fzlot)
   updatePackageStatus(detail, fzlot, productsQuantity)
 }
 
@@ -344,13 +339,10 @@ const updatePackageStatus = (detail: any, fzlot: string, productsQuantity: numbe
   const packagingData = detail.packagingDataFZLOT[fzlot]
 
   const isInteger = productsQuantity > 0 && productsQuantity % 1 === 0
-  console.log('数量1', detail)
   packagingData.isInteger = isInteger
   detail.isInteger = isInteger
-  console.log('分装状态3', isInteger)
   if (isInteger) {
     packagingData.packagingSig.forEach((key: string) => {
-      console.log('数量2', packagingData.packagingData[key]?.finishedQty)
       if (packagingData.packagingData[key]?.finishedQty !== productsQuantity) {
         packagingData.isInteger = false
         detail.isInteger = false
@@ -416,46 +408,9 @@ const reCompute = (val: any) => {
   return sum
 }
 
-const hideTimer = ref<number | null>(null)
-
-const handleFocus = () => {
-  // 总是先清除已存在的定时器，再创建新的
-  if (hideTimer.value) {
-    clearInterval(hideTimer.value)
-  }
-
-  hideTimer.value = setInterval(() => {
-    uni.hideKeyboard()
-  }, 50) as unknown as number
-}
 const clearTimer = () => {
-  if (hideTimer.value) {
-    clearInterval(hideTimer.value)
-    hideTimer.value = null
-  }
+  emitter.emit('update:clearTimer')
 }
-
-useEmitt({
-  name: 'update:handleFocus',
-  callback: async () => {
-    handleFocus()
-  }
-})
-
-useEmitt({
-  name: 'update:clearTimer',
-  callback: async () => {
-    clearTimer()
-  }
-})
-
-onBeforeMount(() => {
-  handleFocus()
-})
-
-onBeforeUnmount(() => {
-  clearTimer()
-})
 </script>
 
 <template>

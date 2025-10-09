@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { onBeforeMount, reactive } from 'vue'
+import { onBeforeMount, onBeforeUnmount, reactive, ref } from 'vue'
+import { useEmitt } from '@/hooks/useEmitt'
 
 const props = defineProps({
   title: {
@@ -50,6 +51,7 @@ const groupChange = () => {
   uni.setStorageSync(`scanCodeType-${reactiveData.title}`, reactiveData.scanCodeType)
   emit(`update:scanCodeType`, reactiveData.scanCodeType)
   reactiveData.rightTitleShow = !reactiveData.rightTitleShow
+  handleFocus()
 }
 
 onBeforeMount(() => {
@@ -114,6 +116,51 @@ onBeforeMount(() => {
     reactiveData.scanCodeType = firstEnabled ? firstEnabled.name : ''
   }
   emit(`update:scanCodeType`, reactiveData.scanCodeType)
+})
+
+const hideTimer = ref<number | null>(null)
+
+const handleFocus = () => {
+  // 总是先清除已存在的定时器，再创建新的
+  if (hideTimer.value) {
+    clearInterval(hideTimer.value)
+  }
+
+  hideTimer.value = setInterval(() => {
+    uni.hideKeyboard()
+  }, 50) as unknown as number
+}
+const clearTimer = () => {
+  // 清除定时器
+  if (hideTimer.value) {
+    clearInterval(hideTimer.value)
+    hideTimer.value = null
+  }
+}
+
+useEmitt({
+  name: 'update:handleFocus',
+  callback: async () => {
+    handleFocus()
+  }
+})
+
+useEmitt({
+  name: 'update:clearTimer',
+  callback: async () => {
+    clearTimer()
+  }
+})
+
+onBeforeMount(() => {
+  // 组件挂载前的逻辑
+  handleFocus()
+})
+
+onBeforeUnmount(() => {
+  // 组件卸载时清理
+  console.log('离开')
+  clearTimer()
 })
 </script>
 

@@ -101,7 +101,7 @@ export const transferScanBarcode = async (searchValue: any, setData: any, locati
         }
       }
     }
-    console.log('测试123', actualValue)
+    console.log('测试123', barCodeData.F_QADV_HTENTRYID)
     const data = {
       currentList: [
         {
@@ -157,7 +157,12 @@ export const transferScanBarcode = async (searchValue: any, setData: any, locati
         },
         {
           label: '合同',
-          value: barCodeData.F_HTNO + '-' + barCodeData.F_QADV_HTENTRYID,
+          //value: barCodeData.F_HTNO + '-' + barCodeData.F_QADV_HTENTRYID,
+          value:
+            barCodeData.F_HTNO +
+            (barCodeData.F_QADV_HTENTRYID !== ' ' && barCodeData.F_QADV_HTENTRYID != 0
+              ? '-' + barCodeData.F_QADV_HTENTRYID
+              : ''),
           disabled: true,
           type: 'input',
           style: { width: '65%' }

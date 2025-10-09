@@ -413,7 +413,6 @@ const getWarehousePosition = async (warehouseId: string) => {
         //   focus.value = 2
         // }, 200)
       }
-      handleFocus()
       emit('update:locationList', locationData.locationList)
     }
   }
@@ -421,21 +420,30 @@ const getWarehousePosition = async (warehouseId: string) => {
 
 // 仓库变更
 const warehouseChange = debounceSave(async (val: string) => {
-  heardList.value.location = ''
-  const warehouse = warehouseData.warehouseList.find((item: any) => item.value === val)
+  const warehouse = warehouseData.warehouseList.find(
+    (item: any) => item.value === val || item.text === val
+  )
   if (!warehouse && val) {
     uni.showToast({ title: '仓库不存在', icon: 'none' })
+    heardList.value.location = ''
     heardList.value.warehouse = ''
-    resetFocus()
+    setData.value.warehouseNumber = ''
+    setData.value.warehouseId = ''
+    await clearStock()
+    focus.value = 999
     setTimeout(() => {
       focus.value = 1
     }, 200)
     return
   }
+  if (setData.value.warehouseNumber !== warehouse.value) return
+  heardList.value.location = ''
   heardList.value.warehouse = warehouse.text
   setData.value.warehouseNumber = warehouse.value
   setData.value.warehouseId = warehouse.id
-  handleFocus()
+  if (focus.value === 1) {
+    handleFocus()
+  }
   await getWarehousePosition(val)
   //清空明细中的仓位,并获取推荐仓位
   await clearStock()
@@ -479,7 +487,12 @@ const handleFocus = () => {
     uni.hideKeyboard()
   }, 50) as unknown as number
 }
-
+useEmitt({
+  name: 'update:clearTimer',
+  callback: async () => {
+    clearTimer()
+  }
+})
 const clearTimer = () => {
   if (hideTimer.value) {
     clearInterval(hideTimer.value)

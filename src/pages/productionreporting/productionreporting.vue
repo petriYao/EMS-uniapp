@@ -1144,6 +1144,7 @@ const submittoFn = async () => {
       searchinput.value = true
     })
   }
+  antishake.value = true
   submittoshow.value = false
 }
 

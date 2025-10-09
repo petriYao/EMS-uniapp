@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, onBeforeUnmount, onBeforeMount } from 'vue'
+import { ref, reactive, onBeforeMount } from 'vue'
 import { queryStorage, lookqueryStorage } from '@/api/modules/storage'
 import { purchaseScanBarcode, getcamelCase } from '@/common/returnedMaterial/Index'
 import { getSimple } from '@/common/returnedMaterial/Simple'
@@ -73,7 +73,7 @@ const searchClick = async () => {
 const searchChange = () => {
   setTimeout(async () => {
     if (!searchValue.value) return
-    handleFocus()
+    //handleFocus()
     if (!heardList.value.documentNumber) {
       await handleScanPurchaseOrder()
     } else {
@@ -431,7 +431,7 @@ const getWarehousePosition = async (warehouseId: string) => {
         locationData.locationList = []
         setData.value.locationDisplay = true
         resetFocus()
-        handleFocus()
+        //handleFocus()
         emit('update:locationList', locationData.locationList)
         return
       }
@@ -448,7 +448,7 @@ const getWarehousePosition = async (warehouseId: string) => {
         //   focus.value = 2
         // }, 200)
       }
-      handleFocus()
+      //handleFocus()
       emit('update:locationList', locationData.locationList)
     }
   }
@@ -456,31 +456,37 @@ const getWarehousePosition = async (warehouseId: string) => {
 
 // 仓库变更
 const warehouseChange = debounceSave(async (val: string) => {
-  heardList.value.location = ''
-  await clearStock()
-
   if (val === '') {
     heardList.value.warehouse = ''
     setData.value.warehouseNumber = ''
     setData.value.warehouseId = ''
     return
   }
-  const warehouse = warehouseData.warehouseList.find((item: any) => item.value === val)
-  if (!warehouse && val) {
+  const warehouse = warehouseData.warehouseList.find(
+    (item: any) => item.value === val || item.text === val
+  )
+  if (!warehouse) {
     uni.showToast({ title: '仓库不存在', icon: 'none' })
+    heardList.value.location = ''
+
     heardList.value.warehouse = ''
     setData.value.warehouseNumber = ''
     setData.value.warehouseId = ''
-    resetFocus()
+    //resetFocus()
+    await clearStock()
     setTimeout(() => {
       focus.value = 1
     }, 200)
     return
   }
+  console.log('仓库变更', warehouse, setData.value.warehouseId === warehouse.id)
+  if (setData.value.warehouseId === warehouse.id) return
+  heardList.value.location = ''
+
   heardList.value.warehouse = warehouse.text
   setData.value.warehouseNumber = warehouse.value
   setData.value.warehouseId = warehouse.id
-  handleFocus()
+  //handleFocus()
   await getWarehousePosition(val)
   //清空明细中的仓位,并获取推荐仓位
   await clearStock()
@@ -516,40 +522,12 @@ const clearStock = async () => {
   })
 }
 
-// 键盘控制
-const hideTimer = ref<number | null>(null)
-const handleFocus = () => {
-  // 清除之前的定时器
-  if (hideTimer.value) {
-    clearInterval(hideTimer.value)
-  }
-
-  // 设置新的定时器
-  hideTimer.value = setInterval(() => {
-    uni.hideKeyboard()
-  }, 50) as unknown as number
-}
 const clearTimer = () => {
-  if (hideTimer.value) {
-    clearInterval(hideTimer.value)
-    hideTimer.value = null
-  }
+  emitter.emit('update:clearTimer')
 }
-useEmitt({
-  name: 'update:clearTimer1',
-  callback: async () => {
-    console.log('clearTimer收到')
-    clearTimer()
-  }
-})
-onBeforeUnmount(() => {
-  clearTimer()
-})
 
 onBeforeMount(() => {
   getWarehouseList()
-  handleFocus()
-  resetFocus()
 })
 </script>
 
@@ -612,7 +590,6 @@ onBeforeMount(() => {
                       v-model="warehouseData.scValue"
                       shape="round"
                       placeholder="请输入搜索关键词"
-                      @blur="handleFocus"
                     />
                   </view>
                 </view>
