@@ -55,7 +55,6 @@ const groupChange = () => {
 
 onBeforeMount(() => {
   let UserAuthority = uni.getStorageSync('UserAuthority')
-  console.log('UserAuthority', UserAuthority, UserAuthority.includes('37-1'))
   // 判断权限
   switch (reactiveData.title) {
     case '生产领料':
@@ -101,7 +100,6 @@ onBeforeMount(() => {
 
   //获取本地缓存的扫码类型
   const scanCodeType = uni.getStorageSync(`scanCodeType-${reactiveData.title}`)
-  console.log('scanCodeType', reactiveData.radioList[1].disabled)
   // 如果两个选项都不被禁用，则默认不选择任何选项
   if (reactiveData.radioList[0].disabled && reactiveData.radioList[1].disabled) {
     reactiveData.scanCodeType = scanCodeType // 默认空值
@@ -111,12 +109,10 @@ onBeforeMount(() => {
   ) {
     // 如果缓存的类型存在且未被禁用，则使用缓存值
     reactiveData.scanCodeType = scanCodeType
-    console.log('scanCodeType2', scanCodeType)
   } else {
     // 否则选择第一个未被禁用的选项
     const firstEnabled = reactiveData.radioList.find((item) => !item.disabled)
     reactiveData.scanCodeType = firstEnabled ? firstEnabled.name : ''
-    console.log('scanCodeType3', scanCodeType)
   }
 
   // 统一触发更新事件
@@ -153,7 +149,6 @@ useEmitt({
   name: 'update:clearTimer',
   callback: async () => {
     clearTimer()
-    console.log('关闭定时器')
   }
 })
 

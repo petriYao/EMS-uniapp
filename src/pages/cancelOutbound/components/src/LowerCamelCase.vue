@@ -64,7 +64,6 @@ const longpressDetailsClick = (item: any, index: number) => {
     content: '是否删除当前条码明细',
     success: (res) => {
       if (res.confirm) {
-        console.log('用户点击确定')
         reactiveData.detailsList.barcodeList.splice(index, 1)
         reactiveData.detailsList.packagingData[item.F_FZNO].quantity -= item.F_UNITQTY
         reactiveData.detailsList.packagingData[item.F_FZNO].finishedQty =
@@ -80,17 +79,14 @@ const longpressDetailsClick = (item: any, index: number) => {
         const minQty = Math.min(...finishedQtys)
 
         if (!isAllEqual) {
-          console.log(`finishedQty 不全相等， 最小值为：${minQty}`)
           reactiveData.detailsList.FRealQty = minQty
           reactiveData.detailsList.isInteger = false
         } else {
           const isInteger = finishedQtys.every((qty) => Number.isInteger(qty))
           if (isInteger) {
-            console.log(`finishedQty 全相等，且为整数`, minQty)
             reactiveData.detailsList.FRealQty = minQty
             reactiveData.detailsList.isInteger = true
           } else {
-            console.log(`finishedQty 全相等，但不是整数`, minQty)
             reactiveData.detailsList.FRealQty = minQty
             reactiveData.detailsList.isInteger = false
           }
@@ -109,8 +105,6 @@ watch(
   () => props.lowerCamelCaseList,
   (val: any) => {
     reactiveData.detailsList = val
-    console.log('页面数据改动', reactiveData.detailsList)
-    console.log('页面数据改动2', reactiveData.packagingSig, reactiveData.packagingData)
   },
   { immediate: true, deep: true }
 )

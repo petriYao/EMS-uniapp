@@ -38,14 +38,12 @@ const getBarCode = async (item: any, index: number) => {
 const longpressClick = (item: any, index: number) => {
   if (isMoved) return // 如果有移动，不触发长按事件
 
-  console.log('长按事件', item, index)
   //弹出删除提示框
   uni.showModal({
     title: '提示',
     content: '是否删除当前明细',
     success: (res) => {
       if (res.confirm) {
-        console.log('用户点击确定')
         //删除当前明细
         reactiveData.detailsList.splice(index, 1)
         if (reactiveData.detailsList.length === 0) {
@@ -84,7 +82,6 @@ const handleTouchMove = (e: TouchEvent) => {
 
 const longpressDetailsClick = (item: any, index: number) => {
   if (isMoved) return // 如果有移动，不触发长按事件
-  console.log('长按事件', item, index)
   //弹出删除提示框
   uni.showModal({
     title: '提示',
@@ -207,7 +204,6 @@ const reCompute = (val: any) => {
 const warehouseChange = debounceSave((val: any) => {
   //获取仓位id替换为仓位名称
   const warehouseId: any = reactiveData.locationList.find((item: any) => item.value === val)
-  console.log('warehouseId1', warehouseId)
   if (!warehouseId && val != '') {
     //提示仓位不存在
     uni.showToast({
@@ -234,7 +230,6 @@ const warehouseChange = debounceSave((val: any) => {
 })
 
 const pickerConfirm = (warehouseItem: any) => {
-  console.log('pickerConfirm', warehouseItem)
   reactiveData.detailsList[reactiveData.barcodeIndex].FStockLocId = warehouseItem.Id
   reactiveData.detailsList[reactiveData.barcodeIndex].locationNumber = warehouseItem.value
   reactiveData.detailsList[reactiveData.barcodeIndex].currentList[11].value = warehouseItem.text
@@ -260,7 +255,6 @@ useEmitt({
 watch(
   () => props.detailsList,
   (val: any) => {
-    console.log('val', val)
     reactiveData.detailsList = val
   },
   { immediate: true, deep: true }
@@ -274,7 +268,6 @@ watch(
     } else {
       reactiveData.locationList = []
     }
-    console.log('页面数据改动', val)
   },
   { immediate: true, deep: true }
 )

@@ -39,14 +39,12 @@ const getBarCode = async (item: any, index: number) => {
 const longpressClick = (item: any, index: number) => {
   if (isMoved) return // 如果有移动，不触发长按事件
 
-  console.log('长按事件', item, index)
   //弹出删除提示框
   uni.showModal({
     title: '提示',
     content: '是否删除当前明细',
     success: (res) => {
       if (res.confirm) {
-        console.log('用户点击确定')
         //删除当前明细
         reactiveData.detailsList.splice(index, 1)
         if (reactiveData.detailsList.length === 0) {
@@ -86,7 +84,6 @@ const handleTouchMove = (e: TouchEvent) => {
 
 const longpressDetailsClick = (item: any, index: number) => {
   if (isMoved) return // 如果有移动，不触发长按事件
-  console.log('长按事件', item, index)
   //弹出删除提示框
   uni.showModal({
     title: '提示',
@@ -149,7 +146,6 @@ const deleteBarcode = (item: any, index: number) => {
 
     // 如果存在任何一个 0，或者所有值都是无效的，则设为 0
     const productsQuantity = hasZero || minNonZero === Infinity ? 0 : minNonZero
-    console.log('productsQuantity', productsQuantity)
     //计算单分装数量
     reactiveData.detailsList[reactiveData.barcodeIndex].packagingDataFZLOT[
       item.F_QADV_FZLOT
@@ -185,10 +181,6 @@ const deleteBarcode = (item: any, index: number) => {
     reactiveData.detailsList[reactiveData.barcodeIndex].Quantity2 = reCompute(
       reactiveData.detailsList[reactiveData.barcodeIndex]
     )
-    console.log(
-      'reactiveData.detailsList[reactiveData.barcodeIndex].Quantity2',
-      reactiveData.detailsList[reactiveData.barcodeIndex].Quantity2
-    )
   } else {
     //非分装情况下
     reactiveData.detailsList[reactiveData.barcodeIndex].Quantity-- //件数
@@ -205,9 +197,7 @@ const deleteBarcode = (item: any, index: number) => {
 const reCompute = (val: any) => {
   let sum = 0
   val.FZLOTList.forEach((item: any) => {
-    console.log('item', val.packagingDataFZLOT[item])
     sum += val.packagingDataFZLOT[item].FZquantity
-    console.log('sum', sum)
   })
   return sum
 }
@@ -220,13 +210,11 @@ const warehouseChange = debounceSave((val: any) => {
     reactiveData.detailsList[reactiveData.barcodeIndex].detailList.location = ''
     reactiveData.detailsList[reactiveData.barcodeIndex].detailList.locationNumber = ''
     reactiveData.detailsList[reactiveData.barcodeIndex].detailList.stockLocName = ''
-    console.log('reactiveData.detailsList', reactiveData.detailsList[reactiveData.barcodeIndex])
     return
   }
   const warehouseId: any = reactiveData.locationList.find(
     (item: any) => item.value === val || item.text === val
   )
-  console.log('warehouseId1', warehouseId)
 
   if (!warehouseId) {
     //提示仓位不存在
@@ -239,7 +227,6 @@ const warehouseChange = debounceSave((val: any) => {
     reactiveData.detailsList[reactiveData.barcodeIndex].WarehouseNumber = ''
     reactiveData.detailsList[reactiveData.barcodeIndex].detailList.location = ''
     reactiveData.detailsList[reactiveData.barcodeIndex].detailList.locationNumber = ''
-    console.log('reactiveData.detailsList', reactiveData.detailsList[reactiveData.barcodeIndex])
     return
   }
   if (reactiveData.detailsList[reactiveData.barcodeIndex].WarehouseNumber === warehouseId.value)
@@ -257,7 +244,6 @@ const warehouseChange = debounceSave((val: any) => {
 })
 
 const pickerConfirm = (warehouseItem: any) => {
-  console.log('pickerConfirm', warehouseItem)
   reactiveData.detailsList[reactiveData.barcodeIndex].FStockLocId = warehouseItem.Id
   reactiveData.detailsList[reactiveData.barcodeIndex].currentList[12].value = warehouseItem.text
   reactiveData.detailsList[reactiveData.barcodeIndex].detailList.location = warehouseItem.text
@@ -265,16 +251,11 @@ const pickerConfirm = (warehouseItem: any) => {
     warehouseItem.value
   pickerShow.value = false
 
-  console.log(
-    '  reactiveData.detailsList[reactiveData.barcodeIndex]',
-    reactiveData.detailsList[reactiveData.barcodeIndex]
-  )
   emit('update:detailsList', reactiveData.detailsList)
   emitter.emit('update:handleFocus')
 }
 
 const clearTimer = () => {
-  console.log('清除定时器')
   // 清除定时器
   emitter.emit('update:clearTimer')
 }
@@ -290,7 +271,6 @@ useEmitt({
 useEmitt({
   name: 'deleteBarcode',
   callback: async (val) => {
-    console.log('删除条码', val)
     deleteBarcode(val.item, val.index)
   }
 })
@@ -298,7 +278,6 @@ useEmitt({
 watch(
   () => props.detailsList,
   (val: any) => {
-    console.log('val', val)
     reactiveData.detailsList = val
   },
   { immediate: true, deep: true }
@@ -312,7 +291,6 @@ watch(
     } else {
       reactiveData.locationList = []
     }
-    console.log('页面数据改动', val)
   },
   { immediate: true, deep: true }
 )

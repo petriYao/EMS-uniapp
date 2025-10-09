@@ -35,7 +35,6 @@ const reactiveData = reactive({
 
 const getBarCode = async (item: any, index: number) => {
   reactiveData.barcodeIndex = index
-  console.log('触发获取仓位', item, index)
   getWarehousePosition(reactiveData.detailsList[reactiveData.barcodeIndex]?.stockNumber)
 }
 
@@ -92,7 +91,6 @@ const getWarehouseList = async () => {
       text: item[0],
       value: item[1]
     }))
-    console.log('获取仓库列表', data)
     reactiveData.warehouseList = data
   }
 }
@@ -100,7 +98,6 @@ const getWarehouseList = async () => {
 const openName = ref('')
 //打开选择
 const openSelect = (item: any, disabled: boolean) => {
-  console.log('打开选择', item)
   if (disabled) return
   openName.value = item
   pickerShow.value = true
@@ -108,10 +105,8 @@ const openSelect = (item: any, disabled: boolean) => {
 
 //获取仓位列表
 const getWarehousePosition = async (warehouseId: any) => {
-  console.log('获取仓位列表11111111111111', warehouseId)
   if (warehouseId) {
     const res: any = await lookqueryStorage(warehouseId)
-    console.log('获取仓位列表', res)
     if (res) {
       const list = res.data.Result.Result.StockFlexItem[0].StockFlexDetail
       reactiveData.detailsList[reactiveData.barcodeIndex].FlexNumber =
@@ -133,8 +128,6 @@ const getWarehousePosition = async (warehouseId: any) => {
         value: item.FlexEntryId.Number
       }))
       reactiveData.locationList = locationList
-      console.log('locationList', locationList)
-
       // 更新父组件的locationList
       emit('update:locationList', locationList)
     }
@@ -143,7 +136,6 @@ const getWarehousePosition = async (warehouseId: any) => {
 
 //手动选择
 const pickerConfirm = (warehouseItem: any, name: any) => {
-  console.log('pickerConfirm', warehouseItem)
   if (name === '仓位') {
     // 修改仓位
     reactiveData.detailsList[reactiveData.barcodeIndex].currentList.find(
@@ -165,7 +157,6 @@ const pickerConfirm = (warehouseItem: any, name: any) => {
     reactiveData.detailsList[reactiveData.barcodeIndex].currentList.find(
       (i: any) => i.label === '仓库'
     ).value = warehouseItem.text
-    console.log('仓库名称', warehouseItem.value)
     //getWarehousePosition(warehouseItem.value)
     /**仓位删除 */
     reactiveData.detailsList[reactiveData.barcodeIndex].currentList.find(
@@ -179,7 +170,6 @@ const pickerConfirm = (warehouseItem: any, name: any) => {
 }
 
 const quantChange = debounce((val: any, item: any) => {
-  console.log('val', val, item)
   switch (item.label) {
     case '数量':
       let Quantity = val
@@ -201,11 +191,9 @@ const quantChange = debounce((val: any, item: any) => {
       break
     case '仓库':
       warehouseChange(val)
-      console.log('仓库', reactiveData.detailsList)
       break
     case '仓位':
       locationChange(val)
-      console.log('仓位', reactiveData.detailsList)
       break
   }
   emit('update:detailsList', reactiveData.detailsList)
@@ -273,7 +261,6 @@ const warehouseChange = debounce((val: any) => {
     reactiveData.detailsList[reactiveData.barcodeIndex].currentList.find(
       (i: any) => i.label === '仓库'
     ).value = warehouseId.text
-    console.log('仓库warehouseChange', warehouseId.value)
     getWarehousePosition(warehouseId.value)
 
     reactiveData.detailsList[reactiveData.barcodeIndex].currentList.find(
@@ -326,7 +313,6 @@ watch(
   () => props.detailsList,
   (val: any) => {
     reactiveData.detailsList = val
-    console.log('detailsList222', val)
     if (val.length >= reactiveData.barcodeIndex) {
       getWarehousePosition(val[reactiveData.barcodeIndex]?.stockNumber)
     }

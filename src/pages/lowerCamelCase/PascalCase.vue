@@ -30,7 +30,6 @@ const saveClick = throttleSave(async () => {
   if (reactiveData.TMdisabled) return
   reactiveData.loading = true //显示保存按钮
   const results12 = await contentStorageRef.value?.saveClick()
-  console.log('保存', results12)
   /***保存数据 */
   if (!results12 || (results12 && results12.isError)) {
     // uni.showToast({
@@ -44,7 +43,6 @@ const saveClick = throttleSave(async () => {
     barcodes: results12.ThFilter.tmList,
     status: '2'
   })
-  console.log('tmStatusRes', tmStatusRes)
   if (tmStatusRes && tmStatusRes.data && tmStatusRes.data.length > 0) {
     //条码状态不为1的提示
     uni.showToast({
@@ -57,9 +55,7 @@ const saveClick = throttleSave(async () => {
   }
 
   //调用发货通知单单据查询验证出运分柜数量是否超发货通知数量
-  console.log('查询出运分柜数量是否超发货通知数量', results12.ThFilter.filtersString)
   const pickupRes1: any = await CYFGQuery(results12.ThFilter.filtersString)
-  console.log('pickupRes1', pickupRes1)
   if (pickupRes1 && pickupRes1.data && pickupRes1.data.length > 0) {
     //条码状态不为1的提示
     uni.showToast({
@@ -70,9 +66,7 @@ const saveClick = throttleSave(async () => {
     reactiveData.loading = false
     return
   }
-  console.log('model', JSON.stringify(results12.model))
   const res1 = await saveSalesOrder(results12.model)
-  console.log('res', res1)
   if (res1 && res1.data && res1.data?.Result?.Number) {
     EditCKTM({
       barcodes: results12.ThFilter.tmList,
@@ -85,14 +79,11 @@ const saveClick = throttleSave(async () => {
     const res2: any = await shipmentSubContainer(
       `F_QADV_THDNO_LSN = '${results12.Numbers}' and F_QADV_FGH = '${results12.containerNoValue}'`
     )
-    console.log('res2', res2)
     //2.进行下推
     if (res2 && res2.data.length === 0) {
       let Numbers = results12.ThFilter.EntryIds.map((item: any) => item.id).join(',')
       const pushRes = await pushClient(Numbers, 'QADV_THDFG')
-      console.log('pushRes', pushRes)
       if (pushRes && pushRes.data?.Result?.ResponseStatus?.IsSuccess) {
-        console.log('出运分柜单号', pushRes.data.Result.ResponseStatus.SuccessEntitys[0])
         let pushResData = pushRes.data.Result.ResponseStatus.SuccessEntitys[0]
         let Model = {
           FID: pushResData.Id,
@@ -101,7 +92,6 @@ const saveClick = throttleSave(async () => {
         }
         await Promise.all(
           pushResData.EntryIds.FEntity.map(async (item: any, i: number) => {
-            console.log('item', item)
             let item2 = {
               FEntryID: item,
               F_QADV_QTY: results12.ThFilter.EntryIds[i].quantity
@@ -109,10 +99,8 @@ const saveClick = throttleSave(async () => {
             Model.FEntity.push(item2)
           })
         )
-        console.log('Model', Model)
         //3.保存出运分柜单
-        const pushResSaveData = shipmentSubContainerSave(Model)
-        console.log('pushResSaveData', pushResSaveData)
+        await shipmentSubContainerSave(Model)
       }
     } else {
       //有这张出运分柜的情况下(判断是否有相同，有新增的情况下（源单单号+源单行号匹配提货单，直接按提货单的内容新增）)
@@ -130,8 +118,6 @@ const saveClick = throttleSave(async () => {
         }
         Model.FEntity.push(item2)
       }
-
-      console.log('Model', Model)
 
       await Promise.all(
         results12.lowerCamelCaseList.map(async (item: any) => {
@@ -174,12 +160,10 @@ const saveClick = throttleSave(async () => {
           }
         })
       )
-      console.log('Model', Model)
       //反审核出运分柜单
       await UnAuditApiClient('QADV_THDFG', Model.FID)
       //3.保存出运分柜单
-      const pushResSaveData = shipmentSubContainerSave(Model, false)
-      console.log('pushResSaveData', pushResSaveData)
+      await shipmentSubContainerSave(Model, false)
     }
 
     reactiveData.isShow = false //隐藏标题组件
@@ -187,8 +171,6 @@ const saveClick = throttleSave(async () => {
       reactiveData.isShow = true //显示标题组件
       reactiveData.containerNoValue = results12.containerNoValue
       reactiveData.pickupOrderValue = results12.Numbers
-      console.log('reactiveData.pickupOrderValue', reactiveData.pickupOrderValue)
-      console.log('reactiveData.containerNoValue', reactiveData.containerNoValue)
     }, 500)
   } else {
     uni.showToast({

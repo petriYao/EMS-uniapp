@@ -58,13 +58,9 @@ const groupChange = () => {
 
 onBeforeMount(() => {
   let UserAuthority = uni.getStorageSync('UserAuthority')
-  console.log('生产入库1', UserAuthority)
   switch (props.title) {
     case '生产入库':
       //如果UserAuthority中有13，说明有扫码入库的权限，如果有14，说明有扫单入库的权限，如果有15，说明有单码双扫的权限
-      console.log('生产入库3', UserAuthority.includes('13'))
-      console.log('生产入库4', UserAuthority.includes('14'))
-      console.log('生产入库5', UserAuthority.includes('15'))
       if (UserAuthority.includes('13')) {
         reactiveData.radioList[0].disabled = false
       }
@@ -119,22 +115,18 @@ onBeforeMount(() => {
     reactiveData.radioList[2].disabled
   ) {
     reactiveData.scanCodeType = scanCodeType // 默认空值
-    console.log('生产入库1', scanCodeType)
   } else if (
     scanCodeType &&
     !reactiveData.radioList.find((item) => item.name === scanCodeType)?.disabled
   ) {
-    console.log('生产入库2', scanCodeType)
     // 如果缓存的类型存在且未被禁用，则使用缓存值
     reactiveData.scanCodeType = scanCodeType
   } else {
-    console.log('生产入库3', scanCodeType)
     // 否则选择第一个未被禁用的选项
     const firstEnabled = reactiveData.radioList.find((item) => !item.disabled)
     reactiveData.scanCodeType = firstEnabled ? firstEnabled.name : ''
   }
   emit(`update:scanCodeType`, reactiveData.scanCodeType)
-  console.log('生产入库2', reactiveData.radioList)
 })
 </script>
 

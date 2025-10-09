@@ -19,7 +19,6 @@ export const productionGetData = async (
   containerNoValue: any
 ) => {
   const BarCoderes: any = await lookBarCode(searchValue)
-  console.log('查询条码数据', BarCoderes)
   if (BarCoderes.data.Result.Result == null) {
     uni.showToast({
       title: '条码不存在',
@@ -29,10 +28,8 @@ export const productionGetData = async (
   }
 
   const barCodeData = BarCoderes.data?.Result?.Result
-  console.log('分装', barCodeData.F_CHECKBOXFZ)
   if (BarCoderes && BarCoderes.data) {
     //条码-明细
-    console.log('条码-明细', barCodeData)
     if (barCodeData == null) {
       uni.showToast({
         title: '条码单不存在',
@@ -74,7 +71,6 @@ export const productionGetData = async (
     }
     if (barCodeData.CreateDate) {
       const Timeres: any = await QueryCheckoutTime(barCodeData.CreateDate)
-      console.log('查询时间', Timeres)
       if (Timeres && Timeres.data === 'False') {
         uni.showToast({
           title: '不允许撤销当期以前的单据',
@@ -88,7 +84,6 @@ export const productionGetData = async (
   const res = await salesOrder(
     ` F_BARCODENO = '${searchValue}' AND FSrcBillNo='${pickupOrderValue}' AND F_QADV_FGH='${containerNoValue}' `
   )
-  console.log('单据查询销售出库，按提货单号+柜号+编码', res.data)
   if (res.data.length === 0) {
     uni.showToast({
       title: '条码与出运分柜单不符',
@@ -101,12 +96,10 @@ export const productionGetData = async (
     `FBillNo = '${pickupOrderValue}' AND FEntity_FEntryID = '${res.data[0][3]}' `,
     'FQty,FJoinOutQty'
   )
-  console.log('提货单，获取关联出库数量，出货数量', pickupOrderRes.data[0])
   //查看出库单
   const lookRes: any = await lookSalesOrder(res.data[0][0])
 
   const ckData = lookRes.data.Result.Result
-  console.log('查看出库单', ckData)
 
   const lowerCamelCaseList = {
     currentList: [] as any,
@@ -139,8 +132,6 @@ export const productionGetData = async (
       const keys = Object.keys(stockLoc)
 
       for (const key of keys) {
-        console.log('key', key)
-
         if (
           key.startsWith('F10000') &&
           stockLoc[key] !== null &&
@@ -155,8 +146,6 @@ export const productionGetData = async (
       }
     }
 
-    console.log('index', ckData.SAL_OUTSTOCKENTRY[index])
-    console.log('错误', ckData.SAL_OUTSTOCKENTRY[index].StockLocID)
     lowerCamelCaseList.FENTRYID = ckData.SAL_OUTSTOCKENTRY[index].Id
     lowerCamelCaseList.warehouse = ckData.SAL_OUTSTOCKENTRY[index].StockID.Name[0].Value
     lowerCamelCaseList.location = actualValue?.Name[0].Value
@@ -239,9 +228,6 @@ export const productionGetData = async (
     ]
   }
   //仓库仓位
-  console.log('Model', Model)
-  console.log('lowerCamelCaseList', lowerCamelCaseList)
-  console.log('F_CHECKBOXFZ', barCodeData.F_CHECKBOXFZ)
   const data = {
     Model, //提交数据
     FEntityIndex: index,
@@ -253,9 +239,7 @@ export const productionGetData = async (
   //   (item: any) => item.F_BARCODENO !== searchValue
   // )
 
-  // console.log('Model', Model)
   // const saveRes = await saveSalesOrder(Model, false)
-  // console.log('保存出库单', saveRes)
   return data
 }
 
@@ -266,23 +250,19 @@ export async function changeOutbound(
   number: string,
   num: number
 ) {
-  console.log('修改出运分柜', pickupOrderValue, containerNoValue, number, num)
   //单据查询哪张分柜单
   const res: any = await shipmentSubContainer(
     `F_QADV_THDNO_LSN = '${pickupOrderValue}' AND F_QADV_FGH ='${containerNoValue}' and F_QADV_NUMBER.fnumber = '${number}'`
   )
-  console.log('分柜单查询结果', res)
   if (res.data.length > 0) {
     const lookRes: any = await lookShipmentSubContainer(res.data[0][0])
     const ckData: any = lookRes.data.Result.Result
-    console.log('出运分柜查看结果', ckData)
     const Model = {
       FID: ckData.Id,
       FEntity: [] as any
     }
     for (const SALitem of ckData.QADV_THDFGEntry) {
       if (res.data[0][6] == SALitem.Id) {
-        console.log('SALitem', SALitem.F_QADV_QTY, num)
         if (SALitem.F_QADV_QTY - num > 0) {
           Model.FEntity.push({
             FENTRYID: SALitem.Id,

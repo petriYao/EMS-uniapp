@@ -15,7 +15,6 @@ const reactiveData = reactive({
 })
 
 const getBarCode = async (item: any, index: number, curNow = 1) => {
-  console.log('条码', item, index)
   const res: any = await QueryInvByTM([
     {
       materialId: item.materialid,
@@ -25,7 +24,6 @@ const getBarCode = async (item: any, index: number, curNow = 1) => {
     }
   ])
   reactiveData.barcodeList = res.data
-  console.log('条码', res)
   // reactiveData.barcodeList = item.F_BARCODE
   reactiveData.curNow = curNow
 }
@@ -33,7 +31,6 @@ const getBarCode = async (item: any, index: number, curNow = 1) => {
 watch(
   () => props.detailsList,
   (val: any) => {
-    console.log('val', val.length)
     if (val.length == 0) return
     getBarCode(val[0], 0, 0)
   },

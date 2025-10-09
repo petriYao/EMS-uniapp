@@ -15,9 +15,6 @@ const reactiveData = reactive({
 
 //保存
 const saveClick = async () => {
-  console.log('保存1', reactiveData.detailsList)
-  console.log('保存2', reactiveData.setData)
-
   if (!reactiveData.setData.warehouseNumber) {
     uni.showToast({
       title: '仓库不可为空',
@@ -43,12 +40,10 @@ const saveClick = async () => {
     })
     return
   }
-  console.log('条码值', barcodeList)
   const tmStatusRes: any = await TMStatusQuery({
     barcodes: barcodeList,
     status: '1'
   })
-  console.log('tmStatusRes', tmStatusRes)
   if (tmStatusRes && tmStatusRes.data && tmStatusRes.data.length > 0) {
     //条码状态不为1的提示
     uni.showToast({
@@ -62,11 +57,6 @@ const saveClick = async () => {
   let isValid = true
   for (let i = 0; i < reactiveData.detailsList.length; i++) {
     const item = reactiveData.detailsList[i]
-    console.log(
-      'item.detailList.locationNumber',
-      reactiveData.locationList,
-      item.detailList.location
-    )
     if (reactiveData.locationList.length > 0) {
       if (item.detailList.location == '') {
         uni.showToast({
@@ -76,7 +66,6 @@ const saveClick = async () => {
         return
       }
     }
-    console.log('item', item.isInteger, item)
     if (!item.isInteger && item.barcodeList.length > 0) {
       // 条码不是整数的提示
       uni.showToast({
@@ -117,10 +106,8 @@ const saveClick = async () => {
     })
   }
   //保存销售退货单
-  console.log('保存销售退货单', JSON.stringify(Model))
   // return
   const res = await saveSalesReturn(Model)
-  console.log('保存结果', res)
   if (res && res.data.Result.ResponseStatus.ErrorCode === 500) {
     uni.showToast({
       icon: 'none',

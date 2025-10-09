@@ -15,8 +15,6 @@ const reactiveData = reactive({
 
 //保存
 const saveClick = async () => {
-  console.log('保存1', reactiveData.detailsList)
-  console.log('保存2', reactiveData.setData)
   if (reactiveData.detailsList.length == 0) {
     uni.showToast({
       title: '无提交数据',
@@ -42,12 +40,10 @@ const saveClick = async () => {
   for (const item of reactiveData.detailsList) {
     barcodeList.push(...item.barcodeList.map((item: any) => item.F_BARCODENO))
   }
-  console.log('条码值', barcodeList)
   const tmStatusRes: any = await TMStatusQuery({
     barcodes: barcodeList,
     status: '1'
   })
-  console.log('tmStatusRes', tmStatusRes)
 
   if (tmStatusRes && tmStatusRes.data && tmStatusRes.data.length > 0) {
     //条码状态不为1的提示
@@ -63,7 +59,6 @@ const saveClick = async () => {
   let isValid = true
   for (let i = 0; i < reactiveData.detailsList.length; i++) {
     const item = reactiveData.detailsList[i]
-    console.log('item', item.isInteger, item)
     if (!item.isInteger && item.barcodeList.length > 0) {
       // 条码不是整数的提示
       uni.showToast({
@@ -122,7 +117,6 @@ const saveClick = async () => {
   //保存其他入库单
 
   const res = await saveOtherInbound(Model)
-  console.log('保存结果', res)
   if (res && res.data.Result.ResponseStatus.ErrorCode === 500) {
     uni.showToast({
       icon: 'none',

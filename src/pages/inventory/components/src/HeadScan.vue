@@ -44,7 +44,6 @@ const searchChange = () => {
     handleFocus()
 
     const queryRes: any = await getcamelCase(searchValue.value, props.scanCodeType)
-    console.log('查询结果', queryRes)
     if (!queryRes?.dataList?.length) {
       // showToast('未找到相关单据')
       searchValue.value = ''

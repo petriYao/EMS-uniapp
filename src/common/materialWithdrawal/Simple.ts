@@ -5,8 +5,6 @@ import { lowerCamelCase2, lowerCamelCase3 } from '@/api/modules/storage'
 export const getSimple = async (searchValue: any) => {
   let fid = 0
   const res = await lookSimple(searchValue)
-  console.log('条码单数据', res.data)
-
   if (res && res.data) {
     if (res.data.Result?.ResponseStatus?.IsSuccess === false) {
       uni.showToast({
@@ -25,7 +23,6 @@ export const getSimple = async (searchValue: any) => {
 
     fid = res.data.Result.Result.Id
     const TreeEntity = res.data.Result.Result.Entity
-    console.log('简单生产领料属性', TreeEntity)
 
     const tempDataList = []
 
@@ -199,7 +196,6 @@ export const getSimple = async (searchValue: any) => {
 
       tempDataList.push(data)
     }
-    console.log('tempDataList', tempDataList)
     // 合并相同项
     const keyMap = new Map()
 
@@ -247,7 +243,6 @@ export const getSimple = async (searchValue: any) => {
         if (existing.detailList.storageLocation.endsWith(',')) {
           existing.detailList.storageLocation = existing.detailList.storageLocation.slice(0, -1)
         }
-        console.log('储位', existing.detailList.storageLocation)
 
         // 同步更新 currentList 中的值（可选）
         const receivableField = existing.currentList.find((i: any) => i.label === '可领')
@@ -276,7 +271,6 @@ export const getSimple = async (searchValue: any) => {
         inventoryField.value = item.detailList.inventory
       }
     }
-    console.log('合并后的生产入库明细数据', mergedDataList)
 
     return { dataList: mergedDataList, fid }
   }
@@ -286,7 +280,6 @@ export const getSanSimple = async (searchValue: any) => {
   let fid = 0 // 存储单据ID
   // 调用生产领料单接口
   const res = await lookSimple(searchValue)
-  console.log('条码单数据', res.data)
 
   // 判断接口返回数据有效性
   if (res && res.data) {
@@ -310,7 +303,6 @@ export const getSanSimple = async (searchValue: any) => {
     // 提取基础数据
     fid = res.data.Result.Result.Id
     const TreeEntity = res.data.Result.Result.Entity
-    console.log('生产领料属性', TreeEntity[0].StockLocId)
 
     // 处理原始数据
     const tempDataList = []
@@ -334,7 +326,6 @@ export const getSanSimple = async (searchValue: any) => {
           }
         }
       }
-      console.log('实际仓位', FlexNumber)
       // 查询库存信息
       let inventory = 0
       const FilterString = `FMaterialId.Fnumber = '${item.MaterialId.Number}' ${
@@ -571,7 +562,6 @@ export const getSanSimple = async (searchValue: any) => {
         inventoryField.value = item.detailList.inventory
       }
     }
-    console.log('合并后的生产入库明细数据', mergedDataList)
 
     return { dataList: mergedDataList, fid }
   }

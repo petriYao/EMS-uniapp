@@ -53,14 +53,12 @@ const handleTouchMove = (e: TouchEvent) => {
 const longpressClick = (item: any, index: number) => {
   if (isMoved) return // 如果有移动，不触发长按事件
 
-  console.log('长按事件', item, index)
   //弹出删除提示框
   uni.showModal({
     title: '提示',
     content: '是否删除当前明细',
     success: (res) => {
       if (res.confirm) {
-        console.log('用户点击确定')
         //删除当前明细
         reactiveData.detailsList.splice(index, 1)
         if (reactiveData.detailsList.length === 0) {
@@ -96,8 +94,6 @@ const longpressDetailsClick = (item: any, index: number, content = '是否删除
 const deleteBarcode = (item: any, index: number) => {
   //删除当前明细
   reactiveData.detailsList[reactiveData.datailsIndex].barcodeList.splice(index, 1)
-  console.log('用户点击确定2', item, index)
-  console.log('用户点击确定4', reactiveData.detailsList[reactiveData.datailsIndex])
   reactiveData.detailsList[reactiveData.datailsIndex].currentList[10].value =
     reactiveData.detailsList[reactiveData.datailsIndex].barcodeList.length
   //分装情况下
@@ -181,7 +177,6 @@ const deleteBarcode = (item: any, index: number) => {
     }
     reactiveData.detailsList[reactiveData.datailsIndex].currentTotal = total
   } else {
-    console.log('非分装情况下', item)
     //非分装情况下
     reactiveData.detailsList[reactiveData.datailsIndex].currentTotal -= item.quantity //数量
   }
@@ -196,7 +191,6 @@ const deleteBarcode = (item: any, index: number) => {
   reactiveData.detailsList[reactiveData.datailsIndex].currentList[9].value =
     reactiveData.detailsList[reactiveData.datailsIndex].currentList[7].value -
     reactiveData.detailsList[reactiveData.datailsIndex].currentList[8].value
-  console.log('删除后的值：', reactiveData.detailsList)
   emit('update:lowerCamelCaseList', reactiveData.detailsList)
 }
 
@@ -211,7 +205,6 @@ useEmitt({
 useEmitt({
   name: 'deleteBarcode',
   callback: async (val) => {
-    console.log('删除条码', val)
     deleteBarcode(val.item, val.index)
     //提示
     uni.showToast({
@@ -224,8 +217,6 @@ watch(
   () => props.lowerCamelCaseList,
   (val: any) => {
     reactiveData.detailsList = val
-    // console.log('页面数据改动', reactiveData.detailsList)
-    // console.log('页面数据改动2', reactiveData.detailsList[reactiveData.datailsIndex])
   },
   { immediate: true, deep: true }
 )

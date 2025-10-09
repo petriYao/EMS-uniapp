@@ -66,7 +66,6 @@ const searchChange = () => {
       focusTm()
       return
     }
-    console.log('查询结果', queryRes, reactiveData.detailsList)
     if (reactiveData.detailsList && reactiveData.detailsList.length > 0) {
       const index = reactiveData.detailsList.findIndex((item: any) => {
         return (
@@ -74,7 +73,6 @@ const searchChange = () => {
           item.WarehousePosition === reactiveData.setData.locationId
         )
       })
-      console.log('index', index)
 
       if (index !== -1) {
         //判断仓库是否一样
@@ -109,7 +107,6 @@ const searchChange = () => {
           const index2 = reactiveData.detailsList[index].FZLOTList.findIndex((item: any) => {
             return item === queryRes.FZLOTList[0]
           })
-          console.log('选中的明细1', index2)
           if (index2 === -1) {
             reactiveData.detailsList[index].FZLOTList.push(queryRes.FZLOTList[0])
 
@@ -164,7 +161,6 @@ const searchChange = () => {
           reactiveData.detailsList[index].packagingDataFZLOT[queryRes.FZLOTList[0]].isInteger =
             productsQuantity % 1 === 0 && productsQuantity !== 0
 
-          console.log('是否整数', reactiveData.detailsList)
           //计算单分装数量
           reactiveData.detailsList[index].packagingDataFZLOT[queryRes.FZLOTList[0]].FZquantity =
             Math.floor(productsQuantity)
@@ -172,7 +168,6 @@ const searchChange = () => {
           //计算总数量
           reactiveData.detailsList[index].Quantity2 = reCompute(reactiveData.detailsList[index])
         } else {
-          console.log('未封装新增', reactiveData.detailsList[index])
           reactiveData.detailsList[index].Quantity2 += queryRes.Quantity2
           reactiveData.detailsList[index].isInteger = true //是否整数
         }
@@ -224,7 +219,6 @@ const reCompute = (val: any) => {
 //获取仓库列表
 const getWarehouseList = async () => {
   const res: any = await queryStorage()
-  console.log('获取仓库列表', res)
   if (res) {
     warehouseData.warehouseList = res.data.map((item: any) => {
       return {
@@ -233,12 +227,10 @@ const getWarehouseList = async () => {
         value: item[1]
       }
     })
-    console.log('内容', warehouseData.warehouseList)
   }
 }
 //仓库选择器确认
 const pickerConfirm = async (val: any) => {
-  console.log('pickerConfirm', val)
   reactiveData.heardList.warehouse = val.text
   reactiveData.setData.warehouseNumber = val.value
   reactiveData.setData.warehouseId = val.id
@@ -257,11 +249,9 @@ const getWarehousePosition = async (warehouseId: any) => {
   //查看仓位
   if (warehouseId) {
     const res: any = await lookqueryStorage(warehouseId)
-    console.log('res', res)
     if (res) {
       const list = res.data.Result.Result.StockFlexItem[0].StockFlexDetail
       reactiveData.setData.FlexNumber = res.data.Result.Result.StockFlexItem[0].FlexId?.FlexNumber
-      console.log('list', list)
       if (list[0].Id === 0) {
         locationData.locationList = []
         reactiveData.setData.locationDisplay = true
@@ -283,13 +273,11 @@ const getWarehousePosition = async (warehouseId: any) => {
       } else {
         reactiveData.setData.locationDisplay = false
         reactiveData.focus = 0
-        console.log('到我')
         setTimeout(() => {
           reactiveData.focus = 2
         }, 500)
       }
       emit('update:locationList', locationData.locationList)
-      console.log('focusIndex', reactiveData.focus)
     }
   }
 }
@@ -315,7 +303,6 @@ const warehouseChange = debounceSave((val: any) => {
   const warehouseId: any = warehouseData.warehouseList.find(
     (item: any) => item.value === val || item.text === val
   )
-  console.log('warehouseId1', warehouseId)
   if (!warehouseId && val != '') {
     //提示仓库不存在
     uni.showToast({
@@ -342,11 +329,9 @@ const warehouseChange = debounceSave((val: any) => {
 })
 //仓位
 const locationChange = debounceSave((val: any) => {
-  console.log('locationChange', val)
   const location: any = locationData.locationList.find(
     (item: any) => item.value === val || item.text === val
   )
-  console.log('location', location)
   if (!location && val != '') {
     //提示仓位不存在
     uni.showToast({
@@ -395,12 +380,10 @@ const clearTimer = () => {
     clearInterval(hideTimer.value)
     hideTimer.value = null
   }
-  console.log('清除定时器', hideTimer.value)
 }
 useEmitt({
   name: 'update:focus',
   callback: async () => {
-    console.log('清除定时器')
     reactiveData.focus = 0
   }
 })
@@ -408,14 +391,12 @@ useEmitt({
 useEmitt({
   name: 'update:clearTimer',
   callback: async () => {
-    console.log('清除定时器')
     clearTimer()
   }
 })
 useEmitt({
   name: 'update:handleFocus',
   callback: async () => {
-    console.log('设置定时器')
     handleFocus()
   }
 })
@@ -423,7 +404,6 @@ useEmitt({
 watch(
   () => props.detailsList,
   (val: any) => {
-    console.log('val', val)
     reactiveData.detailsList = val
     //focusTm()
   },
@@ -437,7 +417,6 @@ onBeforeMount(() => {
 })
 onBeforeUnmount(() => {
   // 组件卸载时清理
-  console.log('离开')
   clearTimer()
 })
 </script>

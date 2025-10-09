@@ -24,9 +24,6 @@ const reactiveData = reactive({
 // 保存方法
 const saveClick = throttleSave(async () => {
   try {
-    console.log('保存1', reactiveData.detailsList)
-    console.log('保存2', reactiveData.setData)
-
     if (reactiveData.detailsList.length === 0) {
       uni.showToast({
         title: '无提交数据',
@@ -63,7 +60,6 @@ const saveClick = throttleSave(async () => {
       }
 
       // 检查条码是否配套
-      // console.log('item', item.isInteger, item)
       if (!item.isInteger && item.barcodeList && item.barcodeList.length > 0) {
         // 条码不是整数的提示
         uni.showToast({
@@ -95,8 +91,6 @@ const saveClick = throttleSave(async () => {
       FStockLocId[FStockLocPJ] = {
         FNumber: item.detailList.locationNumber
       }
-      console.log('locationNumber', item.WarehousePosition)
-      console.log('FStockLocId', FStockLocId)
       Model.FEntity.push({
         FEntryID: item.entryId,
         FQty: item.Quantity2,
@@ -117,15 +111,11 @@ const saveClick = throttleSave(async () => {
       return
     }
 
-    console.log('条码值', barcodeList)
-
     // 查询条码状态
     const tmStatusRes: any = await TMStatusQuery({
       barcodes: barcodeList,
       status: '1,3'
     })
-
-    console.log('tmStatusRes', tmStatusRes)
 
     if (tmStatusRes && tmStatusRes.data && tmStatusRes.data.length > 0) {
       // 条码状态不为1的提示
@@ -137,16 +127,10 @@ const saveClick = throttleSave(async () => {
       return
     }
 
-    console.log('detailsList', JSON.stringify(Model.FEntity))
-
     /**库存检查***************************************************************** */
-
-    console.log('Model', Model)
-    console.log('Model', JSON.stringify(Model))
 
     // 保存生产退料单
     const res = await saveOutsourceMaterialReturn(Model)
-    console.log('保存结果', res)
     if (res && res.data.Result.ResponseStatus.ErrorCode === 500) {
       uni.showToast({
         icon: 'none',

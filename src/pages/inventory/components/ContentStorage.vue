@@ -21,8 +21,6 @@ const reactiveData = reactive({
 
 //保存
 const saveClick = async () => {
-  console.log('保存1', reactiveData.detailsList)
-  console.log('保存2', props.scanCodeType)
   //获取当前员工
   const username = uni.getStorageSync('username')
   let Model = {
@@ -74,7 +72,6 @@ const saveClick = async () => {
     reactiveData.detailsList = []
     reactiveData.loading = true
   })
-  console.log('保存结果', res)
 }
 
 //暴露方法

@@ -45,7 +45,6 @@ const getBarCode = async (item: any, index: number) => {
 const longpressClick = (item: any, index: number) => {
   if (isMoved) return // 如果有移动，不触发长按事件
 
-  console.log('长按事件', item, index)
   //弹出删除提示框
   uni.showModal({
     title: '提示',
@@ -91,7 +90,6 @@ const handleTouchMove = (e: TouchEvent) => {
 //仓位
 const warehouseChange = debounceSave((val: any) => {
   const warehouseId: any = reactiveData.locationList.find((item: any) => item.value === val)
-  console.log('warehouseId1', warehouseId)
   if (!warehouseId && val != '') {
     uni.showToast({
       title: '仓位不存在',
@@ -121,7 +119,6 @@ const warehouseChange = debounceSave((val: any) => {
 })
 
 const pickerConfirm = (warehouseItem: any) => {
-  console.log('pickerConfirm', warehouseItem)
   reactiveData.detailsList[reactiveData.barcodeIndex].FStockLocId = warehouseItem.Id
   reactiveData.detailsList[reactiveData.barcodeIndex].WarehousePosition = warehouseItem.value
   reactiveData.detailsList[reactiveData.barcodeIndex].WarehousePositionNumber = warehouseItem.value
@@ -151,7 +148,6 @@ const clearTimer = () => {
 watch(
   () => props.detailsList,
   (val: any) => {
-    console.log('val', val)
     reactiveData.detailsList = val
   },
   { immediate: true, deep: true }

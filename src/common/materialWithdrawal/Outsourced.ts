@@ -5,8 +5,6 @@ import { lowerCamelCase2, lowerCamelCase3 } from '@/api/modules/storage'
 export const getOutsourcing = async (searchValue: any) => {
   let fid = 0
   const res = await lookOutsourcing(searchValue)
-  console.log('条码单数据', res.data)
-
   if (res && res.data) {
     if (res.data.Result?.ResponseStatus?.IsSuccess === false) {
       uni.showToast({
@@ -25,7 +23,6 @@ export const getOutsourcing = async (searchValue: any) => {
 
     fid = res.data.Result.Result.Id
     const TreeEntity = res.data.Result.Result.Entity
-    console.log('生产领料属性', TreeEntity)
 
     const tempDataList = []
 
@@ -59,7 +56,6 @@ export const getOutsourcing = async (searchValue: any) => {
           inventory += data[0]
         }
       }
-      console.log('仓位', actualValue)
       // 查询储位
       let storageLocation = ''
       const FilterString2 = `F_QADV_WL='${item.MaterialId_Id}' AND F_QADV_WH = '${
@@ -198,7 +194,6 @@ export const getOutsourcing = async (searchValue: any) => {
 
       tempDataList.push(data)
     }
-    console.log('合并钱', tempDataList)
     // 合并相同项
     const keyMap = new Map()
 
@@ -237,7 +232,6 @@ export const getOutsourcing = async (searchValue: any) => {
         storageSet.add(item.detailList.storageLocation)
         const storageLocationArray = [...storageSet].filter((item: unknown) => item !== '')
         existing.detailList.storageLocation = storageLocationArray.join(',')
-        console.log('储位', existing.detailList.storageLocation)
       } else {
         keyMap.set(key, {
           ...item,
@@ -264,7 +258,6 @@ export const getOutsourcing = async (searchValue: any) => {
         receivableField.value = item.canReceive
       }
     }
-    console.log('合并后的生产入库明细数据', mergedDataList)
 
     return { dataList: mergedDataList, fid }
   }
@@ -275,7 +268,6 @@ export const getSanOutsourcing = async (searchValue: any) => {
   let fid = 0 // 存储单据ID
   // 调用生产领料单接口
   const res = await lookOutsourcing(searchValue)
-  console.log('条码单数据', res.data)
 
   // 判断接口返回数据有效性
   if (res && res.data) {
@@ -299,7 +291,6 @@ export const getSanOutsourcing = async (searchValue: any) => {
     // 提取基础数据
     fid = res.data.Result.Result.Id
     const TreeEntity = res.data.Result.Result.Entity
-    console.log('生产领料属性', TreeEntity)
 
     // 处理原始数据
     const tempDataList = []
@@ -323,7 +314,6 @@ export const getSanOutsourcing = async (searchValue: any) => {
           }
         }
       }
-      console.log('FlexNumber', item.MaterialId)
       // 查询库存信息
       let inventory = 0
       const FilterString = `FMaterialId.Fnumber = '${item.MaterialId.Number}' ${
@@ -336,7 +326,6 @@ export const getSanOutsourcing = async (searchValue: any) => {
           inventory += data[0]
         }
       }
-      console.log('FilterString', FilterString)
       // 查询储位信息
       let storageLocation = ''
       const FilterString2 = `F_QADV_WL='${item.MaterialId_Id}' AND F_QADV_WH = '${
@@ -348,7 +337,6 @@ export const getSanOutsourcing = async (searchValue: any) => {
       if (lowerRes2 && lowerRes2.data && lowerRes2.data.length > 0) {
         storageLocation = lowerRes2.data[0][0]
       }
-      console.log('storageLocation', storageLocation)
       // 构造完整数据对象
       const data = {
         currentList: [
@@ -554,8 +542,6 @@ export const getSanOutsourcing = async (searchValue: any) => {
         inventoryField.value = item.detailList.inventory
       }
     }
-    console.log('合并后的生产入库明细数据', mergedDataList)
-
     return { dataList: mergedDataList, fid }
   }
 }

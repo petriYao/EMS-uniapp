@@ -7,7 +7,6 @@ export const getcamelCase = async (searchValue: any) => {
   const dataList = [] as any
   let fid = 0
   const res = await lookqueryStorage(searchValue)
-  console.log('条码单数据', res.data)
 
   if (res && res.data) {
     if (res.data.Result?.ResponseStatus?.IsSuccess === false) {
@@ -26,9 +25,7 @@ export const getcamelCase = async (searchValue: any) => {
     }
     fid = res.data.Result.Result.Id
     const TreeEntity = res.data.Result.Result.PUR_MRBENTRY
-    console.log('生产订单属性', TreeEntity)
     for (const item of TreeEntity) {
-      console.log('item', item)
       const data = {
         currentList: [
           {
@@ -165,7 +162,6 @@ export const getcamelCase = async (searchValue: any) => {
       dataList.push(data)
     }
   }
-  console.log('生产入库明细数据', dataList)
 
   return { dataList, fid }
 }
@@ -176,7 +172,6 @@ export const purchaseScanBarcode = async (searchValue: any) => {
   if (res && res.data) {
     //条码详情
     const barCodeData = res.data.Result.Result
-    console.log('条码信息', barCodeData)
     ///条码单不存在
     if (barCodeData == null) {
       uni.showToast({
@@ -253,7 +248,6 @@ export const purchaseScanBarcode = async (searchValue: any) => {
       })
       return null
     }
-    console.log('采购订单数据', resOrder.data)
     const packagingData = {} as any
     const packagingSig = [] as string[] //分装编号
 
@@ -286,7 +280,6 @@ export const purchaseScanBarcode = async (searchValue: any) => {
     if (barCodeData.F_QADV_BARCODEENTRY.length > 0) {
       packData = barCodeData.F_QADV_BARCODEENTRY[barCodeData.F_QADV_BARCODEENTRY.length - 1]
     }
-    console.log('packData', packData)
 
     const stockLoc = packData?.F_QADV_STOCKLOCID
     let actualValue = null
@@ -388,7 +381,6 @@ export const purchaseScanBarcode = async (searchValue: any) => {
       isInteger: false,
       FZquantity: 0
     }
-    console.log('扫描条码2222', data)
 
     return data
   }
@@ -410,7 +402,6 @@ export function queryPurchaseReturn(FormId: string, FilterString: string, FieldK
       }
     ]
   }
-  console.log('提货单数据', data)
   return executeBillQueryApi(data)
 }
 

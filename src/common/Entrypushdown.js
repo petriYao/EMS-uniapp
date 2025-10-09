@@ -13,5 +13,4 @@ export function Listprocess(items) {
     return acc
   }, {})
   return groupedList
-  //console.log(Object.keys(groupedList));//拿到分录ids
 }

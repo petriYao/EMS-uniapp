@@ -16,8 +16,6 @@ const reactiveData = reactive({
 
 //保存
 const saveClick = throttleSave(async () => {
-  console.log('保存1', reactiveData.detailsList)
-  console.log('保存2', reactiveData.setData)
   if (reactiveData.detailsList.length == 0) {
     uni.showToast({
       title: '无提交数据',
@@ -41,7 +39,6 @@ const saveClick = throttleSave(async () => {
       continue
     } else {
       let cangku = item.currentList.find((i: any) => i.label === '仓库')
-      console.log('cangku', cangku)
       if (cangku.value == '') {
         uni.showToast({
           title: '仓库不可为空',
@@ -96,7 +93,6 @@ const saveClick = throttleSave(async () => {
       Model.FEntity.push(JSON.parse(JSON.stringify(FEntity)))
     }
   }
-  console.log('保存3', Model)
   const res = await saveOutsourceMaterialRequisition(Model)
   if (res && res.data && res.data?.Result?.Number) {
     uni.showToast({
@@ -118,7 +114,6 @@ const saveClick = throttleSave(async () => {
       duration: 5000
     })
   }
-  console.log('保存', res)
   setTimeout(() => {
     reactiveData.loading = true
   }, 200)

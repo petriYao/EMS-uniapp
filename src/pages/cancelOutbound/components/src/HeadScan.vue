@@ -91,7 +91,6 @@ const searchChange = () => {
       reactiveData.pickupOrderValue = reactiveData.searchValue
       reactiveData.searchValue = ''
     } else {
-      console.log('后续扫码-扫描单号', reactiveData.lowerCamelCaseList.barcodeList.length > 0)
       //后续扫码-扫描条码
       if (reactiveData.lowerCamelCaseList.barcodeList.length > 0) {
         //判断条码中F_BARCODENO是否有相同的条码
@@ -116,7 +115,6 @@ const searchChange = () => {
         reactiveData.pickupOrderValue,
         reactiveData.containerNoValue
       )
-      console.log('后续扫码-扫描条码', res)
       if (res != null) {
         reactiveData.detailsList = res
         reactiveData.lowerCamelCaseList.currentList = res.lowerCamelCaseList.currentList
@@ -134,16 +132,11 @@ const searchChange = () => {
         if (reactiveData.lowerCamelCaseList.barcodeList.length === 0) {
           reactiveData.lowerCamelCaseList.isFE = res.isFE
         }
-        console.log('是否分装', res.isFE)
-
-        console.log('分装情况下1', reactiveData.lowerCamelCaseList.barcodeList, res.FEntityIndex)
         if (index !== -1) {
           //分装情况下
           if (reactiveData.lowerCamelCaseList.isFE) {
             //判断之前是否存在待删除分装，并且分装编号F_QADV_FZLOT一致
-            console.log('分装情况下2', reactiveData.lowerCamelCaseList)
             if (reactiveData.lowerCamelCaseList.barcodeList.length > 0) {
-              console.log('分装情况下4')
               if (
                 reactiveData.lowerCamelCaseList.barcodeList[0].F_QADV_FZLOT ===
                 reactiveData.detailsList.Model.FEntity[res.FEntityIndex].F_QADV_XSCKSubEntity[index]
@@ -154,7 +147,6 @@ const searchChange = () => {
                     index
                   ]
                 )
-                console.log('报错1')
                 reactiveData.lowerCamelCaseList.packagingData[
                   reactiveData.detailsList.Model.FEntity[res.FEntityIndex].F_QADV_XSCKSubEntity[
                     index
@@ -172,7 +164,6 @@ const searchChange = () => {
                   reactiveData.detailsList.Model.FEntity[res.FEntityIndex].F_QADV_XSCKSubEntity[
                     index
                   ].F_JUNITQTY
-                console.log('报错2')
                 reactiveData.lowerCamelCaseList.packagingData[
                   reactiveData.detailsList.Model.FEntity[res.FEntityIndex].F_QADV_XSCKSubEntity[
                     index
@@ -201,28 +192,19 @@ const searchChange = () => {
                 const minQty = Math.min(...finishedQtys)
 
                 if (!isAllEqual) {
-                  console.log(`finishedQty 不全相等， 最小值为：${minQty}`)
                   reactiveData.lowerCamelCaseList.FRealQty = minQty
                   reactiveData.lowerCamelCaseList.isInteger = false
                 } else {
                   const isInteger = finishedQtys.every((qty) => Number.isInteger(qty))
                   if (isInteger) {
-                    console.log(`finishedQty 全相等，且为整数`, minQty)
                     reactiveData.lowerCamelCaseList.FRealQty = minQty
                     reactiveData.lowerCamelCaseList.isInteger = true
                   } else {
-                    console.log(`finishedQty 全相等，但不是整数`, minQty)
                     reactiveData.lowerCamelCaseList.FRealQty = minQty
                     reactiveData.lowerCamelCaseList.isInteger = false
                   }
                 }
                 reactiveData.lowerCamelCaseList.currentList[9].value = minQty
-                console.log(
-                  'packagingSig',
-                  reactiveData.lowerCamelCaseList.packagingSig,
-                  'packagingData',
-                  reactiveData.lowerCamelCaseList.packagingData
-                )
               } else {
                 //提示 分装产品非同批出货
                 uni.showToast({
@@ -237,7 +219,6 @@ const searchChange = () => {
                 return
               }
             } else {
-              console.log('分装情况下3')
               //原数组没值，直接添加
               reactiveData.lowerCamelCaseList.barcodeList.push(
                 reactiveData.detailsList.Model.FEntity[res.FEntityIndex].F_QADV_XSCKSubEntity[index]
@@ -258,13 +239,6 @@ const searchChange = () => {
                   finishedQty: 0
                 }
               }
-              console.log('报错', reactiveData.lowerCamelCaseList.barcodeList)
-              console.log('报错3', reactiveData.lowerCamelCaseList.barcodeList[0])
-
-              console.log(
-                '报错4',
-                packagingData[reactiveData.lowerCamelCaseList.barcodeList[0].F_FZNO]
-              )
 
               packagingData[reactiveData.lowerCamelCaseList.barcodeList[0].F_FZNO]['quantity'] +=
                 reactiveData.lowerCamelCaseList.barcodeList[0].F_UNITQTY
@@ -279,15 +253,6 @@ const searchChange = () => {
             }
           } else {
             //非分装的情况下替换
-            console.log(
-              '非分装的情况下替换1',
-              reactiveData.detailsList.Model.FEntity[res.FEntityIndex]
-            )
-            console.log(
-              '非分装的情况下替换2',
-              reactiveData.detailsList.Model.FEntity[res.FEntityIndex],
-              index
-            )
             reactiveData.lowerCamelCaseList.barcodeList = [
               reactiveData.detailsList.Model.FEntity[res.FEntityIndex].F_QADV_XSCKSubEntity[index]
             ]
@@ -311,7 +276,6 @@ const searchChange = () => {
     }
 
     emit('update:detailsList', reactiveData.detailsList)
-    console.log('处理', reactiveData.lowerCamelCaseList)
     emit('update:lowerCamelCaseList', reactiveData.lowerCamelCaseList)
     reactiveData.searchValue = ''
     reactiveData.focus = 22
@@ -341,7 +305,6 @@ const containerNoClick = async (val: any) => {
   reactiveData.detailsList = {}
   emit('update:detailsList', reactiveData.detailsList)
   emit('update:lowerCamelCaseList', reactiveData.lowerCamelCaseList)
-  console.log('清空数据', reactiveData.lowerCamelCaseList)
   reactiveData.pickerShow = false
 }
 
@@ -360,7 +323,6 @@ const clearTimer = () => {
     clearInterval(hideTimer.value)
     hideTimer.value = null
   }
-  console.log('清除定时器', hideTimer.value)
 }
 
 onBeforeMount(() => {
@@ -369,7 +331,6 @@ onBeforeMount(() => {
 })
 onBeforeUnmount(() => {
   // 组件卸载时清理
-  console.log('离开')
   clearTimer()
 })
 

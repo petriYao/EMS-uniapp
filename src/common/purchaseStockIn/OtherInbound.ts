@@ -1,12 +1,10 @@
 import { lookBarCode, queryBarCode } from '@/api/modules/storage'
 // 其他入库-扫描条码
 export const purchaseScanBarcode = async (searchValue: any, setData: any) => {
-  console.log('条码仓位', setData)
   const res = await lookBarCode(searchValue)
   if (res && res.data) {
     //条码详情
     const barCodeData = res.data.Result.Result
-    console.log('条码信息', barCodeData)
     ///条码单不存在
     if (barCodeData == null) {
       uni.showToast({
@@ -265,8 +263,6 @@ export const purchaseScanBarcode = async (searchValue: any, setData: any) => {
       isInteger: false,
       FZquantity: 0
     }
-    console.log('扫描条码2222', data)
-
     return data
   }
 }

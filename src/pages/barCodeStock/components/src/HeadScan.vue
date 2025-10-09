@@ -29,7 +29,6 @@ const searchChange = () => {
     ss()
     //调用条码（单据查询）
     const queryRes: any = await queryBarCode(`fnumber = '${reactiveData.searchValue}'`)
-    console.log('查询结果AC5879TEX0002', queryRes)
     if (queryRes && queryRes.data.length > 0) {
       reactiveData.heardList.num = ''
       let data = queryRes.data[0]
@@ -39,7 +38,6 @@ const searchChange = () => {
       //库存查询
       const stockRes: any = await QueryStock(data[0])
       // const stockRes: any = await QueryStock('AC5879TEX0002')
-      console.log('库存结果2', stockRes)
       if (stockRes && stockRes.data.length > 0) {
         //合计数量
         let num = 0
@@ -70,7 +68,6 @@ const searchClick = async () => {
     scanType: ['barCode', 'qrCode'],
     onlyFromCamera: true
   })
-  console.log('扫码结果', res)
   if (res) {
     reactiveData.searchValue = res.result
     searchChange()
@@ -92,7 +89,6 @@ const clearTimer = () => {
     clearInterval(hideTimer.value)
     hideTimer.value = null
   }
-  console.log('清除定时器', hideTimer.value)
 }
 
 onBeforeMount(() => {
@@ -101,7 +97,6 @@ onBeforeMount(() => {
 })
 onBeforeUnmount(() => {
   // 组件卸载时清理
-  console.log('离开')
   clearTimer()
 })
 </script>

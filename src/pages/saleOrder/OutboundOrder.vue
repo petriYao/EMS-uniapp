@@ -28,7 +28,6 @@ const reactiveData = reactive({
 const getData = async () => {
   const res: any = await lookOutstock(reactiveData.Model.FID)
   let resData = res.data.Result.Result
-  console.log('res', resData.CustomerID)
 
   reactiveData.Model.FCustomerID = {
     FNumber: resData.CustomerID.Number
@@ -60,7 +59,6 @@ const getData = async () => {
   }
 
   for (const item of resData.SAL_OUTSTOCKENTRY) {
-    console.log('明细', item)
     let mxData = {
       number: item.MaterialID.Number,
       MustQty: item.MustQty,
@@ -150,13 +148,11 @@ const getData = async () => {
 }
 
 const actionClick = async (name: any) => {
-  console.log('name', name)
   switch (name.label) {
     case '保存':
       for (let i = 0; i < reactiveData.contentList.length; i++) {
         let qty = reactiveData.contentList[i].list[1].value
-        console.log('contentList', reactiveData.contentList[i])
-        console.log('qty', qty)
+
         reactiveData.Model.FEntity[i].FRealQty = qty
         reactiveData.Model.FEntity[i].FSALUNITQTY = qty
         reactiveData.Model.FEntity[i].FSALBASEQTY = qty
@@ -164,9 +160,7 @@ const actionClick = async (name: any) => {
         reactiveData.Model.FEntity[i].FARNOTJOINQTY = qty
       }
 
-      console.log('Model', reactiveData.Model)
       const saveRes: any = await SaveClient('SAL_OUTSTOCK', reactiveData.Model)
-      console.log('saveRes', saveRes)
       reactiveData.number = saveRes.data.Result.Number
       break
     case '审核':

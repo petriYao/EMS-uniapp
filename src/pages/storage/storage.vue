@@ -31,7 +31,6 @@ const currentWarehouse = reactive({
 }) as any
 
 const saveClick = throttleSave(async () => {
-  console.log('保存')
   // uni.showToast({
   //   title: '保存成功',
   //   icon: 'success'
@@ -42,9 +41,7 @@ const saveClick = throttleSave(async () => {
     case '单码双扫':
       // 执行扫码入库的保存逻辑
       // 执行单码双扫的保存逻辑
-      console.log('扫码入库')
       const results12 = await titleStorageRef.value?.backClick()
-      console.log('results1', results12)
 
       if (results12 && !results12.isError) {
         currentWarehouse.name = results12.currentData.currentWarehouseName //获取当前库位
@@ -62,7 +59,6 @@ const saveClick = throttleSave(async () => {
           })
         }
         const res1 = await saveProductionOrder(results12.dataList, results12.fid, results12.SCCJ)
-        console.log('res', res1)
         if (res1 && res1.data && res1.data?.Result?.Number) {
           for (const item of results12.dataList) {
             let tmList = [] as any
@@ -100,7 +96,6 @@ const saveClick = throttleSave(async () => {
     case '扫单入库':
       // 执行扫单入库的保存逻辑
       const results3 = await titleStorageRefB.value?.backClick()
-      console.log('results3', results3)
       if (results3 && !results3.isError) {
         const res3 = await saveProductionOrder(results3.dataList, results3.fid, results3.SCCJ)
         if (res3 && res3.data && res3.data?.Result?.Number) {
@@ -152,7 +147,6 @@ const clearTimer = () => {
 useEmitt({
   name: 'update:handleFocus',
   callback: async () => {
-    console.log('设置定时器')
     handleFocus()
   }
 })
@@ -177,7 +171,6 @@ onBeforeUnmount(() => {
 })
 
 onLoad((e: any) => {
-  console.log('ee', e)
   //修改导航栏名称
   reactiveData.title = e.type
 })

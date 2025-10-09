@@ -1,5 +1,5 @@
 import FromData from '@/common/FromIDs.json'
-import { AttachmentUpLoadType } from '@/types/commonModel'
+//import { AttachmentUpLoadType } from '@/types/commonModel'
 import {
   executeBillQueryApi,
   saveApi,
@@ -36,7 +36,6 @@ export function getAuxiliary(fidValue: string, FParentId?: string) {
 
 //通用保存
 export function SaveClient(formid: string, Model: any) {
-  console.log('通用保存', Model)
   const data = {
     formid: formid,
     data: {
@@ -46,7 +45,6 @@ export function SaveClient(formid: string, Model: any) {
       Model: Model
     }
   }
-  console.log('保存', data)
   return saveApi(data)
 }
 
@@ -155,8 +153,7 @@ export function lookDepartment(Id: string) {
 }
 
 //上传附件
-export function setFileList(filedata: AttachmentUpLoadType) {
-  console.log('上传附件', filedata)
+export function setFileList(filedata: any) {
   const data = {
     data: filedata
   }
@@ -241,7 +238,6 @@ export function getAttachmentList(FieldKeys: string, FilterString: any) {
 
 //辅助资料 `FID in (${Filter})` 'FNumber,FDataValue,FMASTERID'
 export function getAuxiliaryMaterials(FieldKeys: string, Filter?: string) {
-  console.log('辅助资料', Filter)
   const data = {
     parameters: [
       {

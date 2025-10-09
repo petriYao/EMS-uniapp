@@ -89,14 +89,12 @@ const handleTouchMove = (e: TouchEvent) => {
 const openName = ref('')
 //打开选择
 const openSelect = (item: any, disabled: boolean) => {
-  console.log('打开选择', item)
   if (disabled) return
   openName.value = item
   pickerShow.value = true
 }
 //手动选择
 const pickerConfirm = (warehouseItem: any, name: any) => {
-  console.log('pickerConfirm', warehouseItem)
   if (name === '仓位') {
     // 修改仓位
     reactiveData.detailsList[reactiveData.barcodeIndex].currentList.find(
@@ -122,7 +120,6 @@ const pickerConfirm = (warehouseItem: any, name: any) => {
 }
 
 const quantChange = debounce((val: any, item: any) => {
-  console.log('val', val, item)
   switch (item.label) {
     case '数量':
       let Quantity = val
@@ -144,11 +141,9 @@ const quantChange = debounce((val: any, item: any) => {
       break
     case '仓库':
       warehouseChange(val)
-      console.log('仓库', reactiveData.detailsList)
       break
     case '仓位':
       locationChange(val)
-      console.log('仓位', reactiveData.detailsList)
       break
   }
   emit('update:detailsList', reactiveData.detailsList)
@@ -231,15 +226,9 @@ const locationChange = debounce((val: any) => {
   reactiveData.detailsList[reactiveData.barcodeIndex].detailList.stockLocName = location.text
   reactiveData.detailsList[reactiveData.barcodeIndex].detailList.locationNumber = location.value
   reactiveData.detailsList[reactiveData.barcodeIndex].stockLocNumber = location.value
-  console.log(
-    '选择仓位',
-    reactiveData.detailsList[reactiveData.barcodeIndex].stockLocNumber,
-    location.value
-  )
 }, 300)
 
 const clearTimer = () => {
-  console.log('清除定时器')
   // 清除定时器
   emitter.emit('update:clearTimer')
 }
@@ -267,7 +256,6 @@ watch(
     } else {
       reactiveData.locationList = []
     }
-    console.log('页面数据改动', val)
   },
   { immediate: true, deep: true }
 )

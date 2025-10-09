@@ -2,8 +2,6 @@ import { lowerCamelCase2 } from '@/api/modules/storage'
 //推荐仓位
 export const getStockLoc = async (MaterialNumber: any, lot: any, FlexNumber: any, StockId: any) => {
   //编码、批号、仓库FlexNumber，StockId
-  console.log('推荐仓位', MaterialNumber, lot, FlexNumber, StockId)
-
   if (FlexNumber !== '' && FlexNumber) {
     let FilterString = `FMaterialId.Fnumber = '${MaterialNumber}'`
     if (lot !== ' ' && lot !== '') {

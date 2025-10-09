@@ -29,7 +29,6 @@ export function queryBarCode(F_QADV_FZLOT: string) {
       }
     ]
   }
-  console.log('条码单数据', data)
   return executeBillQueryApi(data)
 }
 
@@ -183,7 +182,6 @@ export function lowerCamelCase3(FilterString: string, FieldKeys: string) {
 }
 //生产入库单保存
 export function saveProductionOrder(FEntity: any, FID: any, SCCJ: string) {
-  console.log('生产入库单保存')
   // 获取当前时间（本地时区）
   const now = new Date()
 
@@ -194,8 +192,6 @@ export function saveProductionOrder(FEntity: any, FID: any, SCCJ: string) {
   const formattedDate = `${now.getFullYear()}-${padZero(now.getMonth() + 1)}-${padZero(
     now.getDate()
   )} ${padZero(now.getHours())}:${padZero(now.getMinutes())}:${padZero(now.getSeconds())}`
-
-  console.log(formattedDate) // 示例输出: "2024-04-25 14:30:45"
 
   const data = {
     formid: 'PRD_INSTOCK',
@@ -242,7 +238,6 @@ export function saveProductionOrder(FEntity: any, FID: any, SCCJ: string) {
       }
     }
   }
-  console.log('生产入库单保存', JSON.stringify(data.data.Model))
   return saveApi(data) as any
 }
 

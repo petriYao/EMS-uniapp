@@ -6,7 +6,6 @@ export const transferScanBarcode = async (searchValue: any, setData: any, locati
   if (res && res.data) {
     //条码详情
     const barCodeData = res.data.Result.Result
-    console.log('条码信息', barCodeData)
     ///条码单不存在
     if (barCodeData == null) {
       uni.showToast({
@@ -77,7 +76,6 @@ export const transferScanBarcode = async (searchValue: any, setData: any, locati
     }
     const stockLoc =
       barCodeData.F_QADV_BARCODEENTRY[barCodeData.F_QADV_BARCODEENTRY.length - 1].F_QADV_STOCKLOCID
-    console.log('stockLoc', stockLoc)
     let actualValue = null
     // 获取对象的所有 key
     const FStockLocId = {} as any
@@ -86,8 +84,6 @@ export const transferScanBarcode = async (searchValue: any, setData: any, locati
       const keys = Object.keys(stockLoc)
 
       for (const key of keys) {
-        console.log('key', key)
-
         if (
           key.startsWith('F10000') &&
           stockLoc[key] !== null &&
@@ -101,7 +97,6 @@ export const transferScanBarcode = async (searchValue: any, setData: any, locati
         }
       }
     }
-    console.log('测试123', barCodeData.F_QADV_HTENTRYID)
     const data = {
       currentList: [
         {
@@ -285,8 +280,6 @@ export const transferScanBarcode = async (searchValue: any, setData: any, locati
       isInteger: false,
       FZquantity: 0
     }
-    console.log('扫描条码2222', data)
-
     return data
   }
 }

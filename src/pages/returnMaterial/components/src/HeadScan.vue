@@ -36,7 +36,6 @@ const searchInput = ref()
 //扫描条码
 // 使用防抖优化搜索函数，避免频繁触发
 const searchChange = debounce(async () => {
-  console.log('搜索值', reactiveData.searchValue)
   if (!reactiveData.searchValue) return // 空值检查提前
 
   handleFocus() // 聚焦操作
@@ -60,11 +59,8 @@ const searchChange = debounce(async () => {
 // 单据查询处理
 const handleDocumentSearch = async () => {
   let queryRes: any = {}
-  console.log(props.title)
-
   switch (props.title) {
     case '采购退货':
-      console.log('采购退货123')
       queryRes = await getcamelCase(reactiveData.searchValue)
       break
     // case '销售退货':
@@ -74,8 +70,6 @@ const handleDocumentSearch = async () => {
       queryRes = await getOtherCase(reactiveData.searchValue)
       break
   }
-
-  console.log('单据查询结果', queryRes)
 
   // 处理无结果情况
   if (!queryRes?.dataList?.length) {
@@ -105,8 +99,6 @@ const handleBarcodeScan = async () => {
       queryRes = await otherScanBarcode(reactiveData.searchValue)
       break
   }
-
-  console.log('条码扫描结果', queryRes)
 
   if (!queryRes) {
     // showToast('无效条码')
@@ -259,7 +251,6 @@ const canAcceptForDetail = (detail: any, queryRes: any): boolean => {
 // 检查条码是否重复
 const isBarcodeDuplicate = (index: number, barcode: string): boolean => {
   return reactiveData.detailsList[index].barcodeList.some((item: any) => {
-    console.log('条码重复', item, barcode)
     return item.FNumber === barcode
   })
 }
@@ -291,7 +282,6 @@ const updateDetailItem = (index: number, queryRes: any) => {
       break
   }
   emitter.emit('update:datailsIndex', index)
-  console.log('分装处理', detail)
   // 分装处理
   if (detail.IsSplit) {
     handleSplitPackage(detail, queryRes)
@@ -319,7 +309,6 @@ const updateDetailItem = (index: number, queryRes: any) => {
 // 处理分装逻辑
 const handleSplitPackage = (detail: any, queryRes: any) => {
   const fzlot = queryRes.FZLOTList[0]
-  console.log('处理分装逻辑1', queryRes)
   // 添加新分装批号
   if (!detail.FZLOTList.includes(fzlot)) {
     detail.FZLOTList.push(fzlot)
@@ -333,15 +322,12 @@ const handleSplitPackage = (detail: any, queryRes: any) => {
 
   // 更新分装数据
   const packagingData = detail.packagingDataFZLOT[fzlot].packagingData[queryRes.SplitCode]
-  console.log('处理分装逻辑2', packagingData)
 
   packagingData.quantity += queryRes.SplitValue
   packagingData.unitQty = queryRes.unitQty
   packagingData.finishedQty = packagingData.quantity / packagingData.unitQty
-  console.log('处理分装逻辑3', packagingData.quantity, packagingData.unitQty)
   // 计算成品数量
   const productsQuantity = calculateProductsQuantity(detail, fzlot)
-  console.log('productsQuantity', productsQuantity)
   // 更新分装状态和数量
   updatePackageStatus(detail, fzlot, productsQuantity)
 }
@@ -376,12 +362,9 @@ const updatePackageStatus = (detail: any, fzlot: string, productsQuantity: numbe
   const isInteger = productsQuantity > 0 && productsQuantity % 1 === 0
   packagingData.isInteger = isInteger
   detail.isInteger = isInteger
-  console.log('分装状态', isInteger)
-  console.log('分装状态2', productsQuantity)
   // 验证所有分装是否一致
   if (isInteger) {
     packagingData.packagingSig.forEach((key: string) => {
-      console.log('分装状态3', packagingData.packagingData[key]?.finishedQty)
       if (packagingData.packagingData[key]?.finishedQty !== productsQuantity) {
         packagingData.isInteger = false
         detail.isInteger = false
@@ -448,20 +431,17 @@ const clearTimer = () => {
     clearInterval(hideTimer.value)
     hideTimer.value = null
   }
-  console.log('清除定时器', hideTimer.value)
 }
 
 useEmitt({
   name: 'update:handleFocus',
   callback: async () => {
-    console.log('设置定时器')
     handleFocus()
   }
 })
 useEmitt({
   name: 'update:clearTimer',
   callback: async () => {
-    console.log('清除定时器')
     clearTimer()
   }
 })
@@ -471,7 +451,6 @@ onBeforeMount(() => {
 })
 onBeforeUnmount(() => {
   // 组件卸载时清理
-  console.log('离开')
   clearTimer()
 })
 </script>

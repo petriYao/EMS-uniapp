@@ -15,8 +15,6 @@ const reactiveData = reactive({
 
 //保存
 const saveClick = async () => {
-  console.log('保存1', reactiveData.detailsList)
-  console.log('保存2', reactiveData.setData)
   if (reactiveData.detailsList.length == 0) {
     uni.showToast({
       title: '无提交数据',
@@ -36,7 +34,6 @@ const saveClick = async () => {
     FStockLocId[FStockLocPJ] = {
       FNumber: item.WarehousePosition
     }
-    console.log('FStockLocId', item, FStockLocId)
     Model.FInStockEntry.push({
       FEntryID: item.entryId,
       FRealQty: item.Quantity2,
@@ -52,7 +49,6 @@ const saveClick = async () => {
       FStockLocId: FStockLocId
     })
   }
-  console.log('保存3', Model)
   const res = await savePurchaseOrder(Model)
   if (res && res.data && res.data?.Result?.Number) {
     uni.showToast({
@@ -74,7 +70,6 @@ const saveClick = async () => {
       duration: 5000
     })
   }
-  console.log('保存', res)
   reactiveData.loading = true
 }
 

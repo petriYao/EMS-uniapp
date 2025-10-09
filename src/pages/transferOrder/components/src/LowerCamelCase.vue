@@ -39,23 +39,19 @@ const getBarCode = async (item: any, index: number) => {
 const longpressClick = (item: any, index: number) => {
   if (isMoved) return // 如果有移动，不触发长按事件
 
-  console.log('长按事件', item, index)
   //弹出删除提示框
   uni.showModal({
     title: '提示',
     content: '是否删除当前明细',
     success: (res) => {
       if (res.confirm) {
-        console.log('用户点击确定')
         //删除当前明细
         reactiveData.detailsList.splice(index, 1)
         if (reactiveData.detailsList.length === 0) {
           reactiveData.barcodeIndex = 0
         } else if (reactiveData.barcodeIndex > index) {
-          console.log('删除1')
           reactiveData.barcodeIndex--
         } else {
-          console.log('删除2')
           reactiveData.barcodeIndex = reactiveData.detailsList.length - 1
         }
       } else if (res.cancel) {
@@ -87,7 +83,6 @@ const handleTouchMove = (e: TouchEvent) => {
 
 const longpressDetailsClick = (item: any, index: number) => {
   if (isMoved) return // 如果有移动，不触发长按事件
-  console.log('长按事件', item, index)
   //弹出删除提示框
   uni.showModal({
     title: '提示',
@@ -159,12 +154,10 @@ const longpressDetailsClick = (item: any, index: number) => {
             reactiveData.detailsList[reactiveData.barcodeIndex]
           )
         } else {
-          console.log('非分装情况下', item)
           //非分装情况下
           reactiveData.detailsList[reactiveData.barcodeIndex].Quantity-- //件数
           reactiveData.detailsList[reactiveData.barcodeIndex].Quantity2 -= item.F_UNITQTY //数量
         }
-        console.log('删除后的值：', reactiveData.detailsList)
         if (reactiveData.detailsList[reactiveData.barcodeIndex].barcodeList.length === 0) {
           //删除明细
           reactiveData.detailsList.splice(reactiveData.barcodeIndex, 1)
@@ -192,7 +185,6 @@ const warehouseChange = debounceSave((val: any) => {
   const warehouseId: any = reactiveData.locationList.find(
     (item: any) => item.value === val || item.Id === val
   )
-  console.log('warehouseId1', warehouseId)
   if (!warehouseId && val != '') {
     //提示仓库不存在
     uni.showToast({
@@ -229,7 +221,6 @@ const warehouseChange = debounceSave((val: any) => {
 })
 
 const pickerConfirm = (warehouseItem: any) => {
-  console.log('pickerConfirm', warehouseItem)
   reactiveData.detailsList[reactiveData.barcodeIndex].WarehousePosition = warehouseItem.Id
   reactiveData.detailsList[reactiveData.barcodeIndex].WarehousePositionNumber = warehouseItem.value
 
@@ -262,7 +253,6 @@ useEmitt({
 watch(
   () => props.detailsList,
   (val: any) => {
-    console.log('val', val)
     reactiveData.detailsList = val
   },
   { immediate: true, deep: true }
@@ -272,7 +262,6 @@ watch(
   () => props.locationList,
   (val: any) => {
     reactiveData.locationList = val
-    console.log('页面数据改动', val)
   },
   { immediate: true, deep: true }
 )

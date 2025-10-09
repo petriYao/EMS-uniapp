@@ -67,7 +67,6 @@ const searchChange = debounce(async () => {
     //调用条码（单据查询）
     //先看物料中是否存在
     const queryRes1: any = await queryMaterial(`fnumber = '${reactiveData.searchValue}'`)
-    console.log('查询结果1', queryRes1)
     if (queryRes1 && queryRes1.data.length > 0) {
       reactiveData.heardList.num = ''
       let data = queryRes1.data[0]
@@ -76,7 +75,6 @@ const searchChange = debounce(async () => {
       reactiveData.heardList.type = data[2]
     } else {
       const queryRes: any = await queryBarCode(`fnumber = '${reactiveData.searchValue}'`)
-      console.log('查询结果2', queryRes)
       if (queryRes && queryRes.data.length > 0) {
         reactiveData.heardList.num = ''
         let data = queryRes.data[0]
@@ -99,13 +97,11 @@ const searchChange = debounce(async () => {
       }
     }
     //库存查询
-    console.log('库存查询1', reactiveData.heardList.number)
     const stockRes: any = await QueryInvByCW(
       reactiveData.heardList.number,
       reactiveData.setData.warehouseName
     )
     // const stockRes: any = await QueryStock('AC5879TEX0002')
-    console.log('库存结果2', stockRes)
     if (stockRes && stockRes.data.length > 0) {
       //合计数量
       let num = 0
@@ -135,7 +131,6 @@ const searchClick = async () => {
     scanType: ['barCode', 'qrCode'],
     onlyFromCamera: true
   })
-  console.log('扫码结果', res)
   if (res) {
     if (reactiveData.focus === 1) {
       reactiveData.searchValue = res.result
@@ -161,7 +156,6 @@ const getWarehouseList = async () => {
 }
 // 仓库变更
 const warehouseChange = debounceSave(async (val: string) => {
-  console.log('仓库变更', reactiveData.warehouseList, val)
   const warehouse = reactiveData.warehouseList.find((item: any) => item.value === val)
   if (!warehouse && val) {
     uni.showToast({ title: '仓库不存在', icon: 'none' })
@@ -217,7 +211,6 @@ const clearTimer = () => {
     clearInterval(hideTimer.value)
     hideTimer.value = null
   }
-  console.log('清除定时器', hideTimer.value)
 }
 
 watch(

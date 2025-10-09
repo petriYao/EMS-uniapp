@@ -13,8 +13,6 @@ const reactiveData = reactive({
 
 // 保存方法
 const saveClick = throttleSave(async () => {
-  console.log('保存1', reactiveData.detailsList)
-  console.log('保存2', reactiveData.setData)
   let details = reactiveData.detailsList[reactiveData.selectIndex]
   //新增
   const Model = {
@@ -30,9 +28,7 @@ const saveClick = throttleSave(async () => {
     F_QADV_WHCW: details.locationcode, //仓位名称
     F_QADV_CW: details.storagelocation //储位
   }
-  console.log('保存', Model)
   const res = await saveLocation(Model)
-  console.log('保存结果', res)
   if (res && res.data.Result.ResponseStatus.ErrorCode === 500) {
     uni.showToast({
       icon: 'none',
@@ -54,7 +50,6 @@ const saveClick = throttleSave(async () => {
   setTimeout(() => {
     reactiveData.loading = true
   }, 100)
-  console.log('新增', Model)
 })
 
 // 暴露方法

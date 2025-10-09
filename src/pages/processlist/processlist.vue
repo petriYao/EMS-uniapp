@@ -512,7 +512,6 @@ onLoad(async (option: any) => {
   const resTop: any = await TM_LOAD_TOP(Fid)
   YuandanGetProess(resTop.data)
   const resBottom: any = await TM_LOAD_Bottom(Fid)
-  console.log('res', resBottom)
   dataprocess(resBottom.data)
 })
 
@@ -539,7 +538,6 @@ onMounted(() => {
 })
 
 const scroll = (e: any) => {
-  console.log(e)
   old.scrollTop = e.detail.scrollTop
 }
 
@@ -582,7 +580,6 @@ const FnResetting = (str: string) => {
     })
     ZhuangTaiData.value[0].checked = true
     ScreenSearch.value.push(ZhuangTaiData.value[0].value)
-    console.log('状态1', ZhuangTaiData.value)
   }
   if (str === '转移') {
     ZYScreenSearch.value = []
@@ -690,7 +687,6 @@ const GongxuListcheckboxChange = (e: any) => {
 
 const checkboxChangeAll = (e: any) => {
   //全选 / 反选操作
-  console.log('全选', e)
   let ccall = e.detail.value
   checkboxCheckedList.value = []
   if (ccall.length > 0) {
@@ -712,7 +708,6 @@ const ConditionalSearch = (type_s: string) => {
   switch (type_s) {
     case '状态':
       Arr = ScreenSearch.value
-      //console.log("状态", Arr);
       newList = []
       GongxuList.value = YuanShiFenLu.value
       if (Arr.length == 0 || Arr[0] == 0) {
@@ -731,7 +726,6 @@ const ConditionalSearch = (type_s: string) => {
       break
     case '转移':
       Arr = ZYScreenSearch.value
-      //console.log("转移", Arr);
       GongxuList.value = YuanShiFenLu.value
       Arr.forEach((a) => {
         if (a > 0) {
@@ -749,7 +743,6 @@ const ConditionalSearch = (type_s: string) => {
       break
     case '组别':
       Arr = ZBieScreenSearch.value
-      //console.log("组别", Arr);
       if (Arr.length > 0) {
         GongxuList.value = YuanShiFenLu.value
         newList = []
@@ -781,7 +774,6 @@ const ConditionalSearch = (type_s: string) => {
 }
 
 const checkboxChange = (e: any) => {
-  console.log('状态选择', e.detail.value)
   let checklist = e.detail.value
   if (checklist.length > 0) {
     if (checklist.includes(0)) {
@@ -814,7 +806,6 @@ const checkboxChange = (e: any) => {
 }
 
 const search = async (e: any) => {
-  console.log('扫码内容E', e)
   let insertVal = ''
   if (e instanceof Object) {
     insertVal = e.value
@@ -822,7 +813,6 @@ const search = async (e: any) => {
     insertVal = e
   }
   if (insertVal === '') return
-  console.log('扫码内容', insertVal)
   if (Scanbarcodestorage.value.includes(insertVal)) {
     msgcontent.value = '扫码重复！'
     msg_popup.value = true
@@ -870,7 +860,6 @@ const search = async (e: any) => {
     let JMcode = insertVal.split('*') //[生产工单号*工序号]
     if (JMcode.length > 1) {
       //套打条码解析查询
-      console.log('解析参数', JMcode[0], JMcode[1])
       const { data: res }: any = await TM_GetSource_F_SCDNumberData_GXH_TOP(JMcode[0], JMcode[1])
       if (res.length == 0) {
         msgcontent.value = '暂无数据！'
@@ -988,7 +977,6 @@ const dataprocess = async (Arr: any[]) => {
     await setTimeout(function () {
       uni.hideLoading()
     }, 1000)
-    console.log('完犊子', e)
   }
   GongxuList.value = GongxuListItems
   YuanShiFenLu.value = GongxuListItems

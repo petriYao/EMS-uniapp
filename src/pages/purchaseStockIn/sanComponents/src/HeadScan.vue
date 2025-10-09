@@ -59,8 +59,6 @@ const searchClick = async () => {
     scanType: ['barCode', 'qrCode'],
     onlyFromCamera: true
   })
-  console.log('扫码结果', res)
-  console.log('reactiveData.focus', reactiveData.focus)
   if (res) {
     //在focusIndex.value为0时，给搜索框赋值
     if (reactiveData.focus === 99) {
@@ -81,7 +79,6 @@ const searchClick = async () => {
 
 //扫描条码
 const searchChange = () => {
-  console.log('搜索值', reactiveData.searchValue)
   setTimeout(async () => {
     if (reactiveData.searchValue === '') {
       return
@@ -90,7 +87,6 @@ const searchChange = () => {
     if (reactiveData.heardList.documentNumber === '') {
       //扫描采购订单
       const queryRes: any = await getcamelCase(reactiveData.searchValue)
-      console.log('查询结果', queryRes)
       if (queryRes && queryRes.dataList.length > 0) {
         reactiveData.setData.fid = queryRes.fid
 
@@ -112,8 +108,6 @@ const searchChange = () => {
         reactiveData.searchValue = ''
         focusTm()
       }
-      console.log('是否第一次', reactiveData.detailsList[props.barcodeIndex].isLowerCamelCase)
-      console.log('查询结果', reactiveData.detailsList[props.barcodeIndex], queryRes)
       if (
         reactiveData.detailsList[props.barcodeIndex].MaterialCode === queryRes.MaterialCode &&
         reactiveData.detailsList[props.barcodeIndex].Lot === queryRes.Lot

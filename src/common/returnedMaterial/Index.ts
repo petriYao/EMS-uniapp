@@ -25,7 +25,6 @@ export const getcamelCase = async (searchValue: any) => {
     }
     fid = res.data.Result.Result.Id
     const TreeEntity = res.data.Result.Result.Entity
-    console.log('生产退料属性', TreeEntity)
     for (const item of TreeEntity) {
       const stockLoc = item.StockLocId
       let actualValue = null
@@ -220,7 +219,6 @@ export const getcamelCase = async (searchValue: any) => {
     for (const item of dataList) {
       // 新的合并条件：stockName, stockLocName, MaterialCode, Lot
       const key = `${item.SourceOrderNo}-${item.SourceOrderLineNo}- ${item.WarehouseName}-${item.WarehousePosition}-${item.MaterialCode}-${item.Lot}`
-      console.log('key', key)
       if (keyMap.has(key)) {
         const existing = keyMap.get(key)
 
@@ -241,24 +239,18 @@ export const getcamelCase = async (searchValue: any) => {
 
     // 转换为数组并返回结果
     const mergedDataList = Array.from(keyMap.values())
-
-    console.log('合并后的生产入库明细数据', mergedDataList)
-
     return { dataList: mergedDataList, fid }
   }
-  console.log('生产入库明细数据', dataList)
 
   return { dataList, fid }
 }
 
 //条码扫描
 export const purchaseScanBarcode = async (searchValue: any, setData: any) => {
-  console.log('条码仓位', setData)
   const res = await lookBarCode(searchValue)
   if (res && res.data) {
     //条码详情
     const barCodeData = res.data.Result.Result
-    console.log('条码信息', barCodeData)
     ///条码单不存在
     if (barCodeData == null) {
       uni.showToast({
@@ -322,8 +314,6 @@ export const purchaseScanBarcode = async (searchValue: any, setData: any) => {
           }
         }
       }
-
-      console.log('分装数量', barCodeData.F_UNITQTY)
       packagingData[barCodeData.F_FZNO].quantity = barCodeData.F_UNITQTY
       packagingData[barCodeData.F_FZNO].unitQty = barCodeData.F_JUNITQTY
       packagingData[barCodeData.F_FZNO].finishedQty = barCodeData.F_UNITQTY / barCodeData.F_JUNITQTY
@@ -417,7 +407,6 @@ export const purchaseScanBarcode = async (searchValue: any, setData: any) => {
       isInteger: false,
       FZquantity: 0
     }
-    console.log('扫描条码2222', data)
 
     return data
   }
@@ -428,7 +417,6 @@ export const getSanDan = async (searchValue: any) => {
   let fid = 0 // 存储单据ID
   // 调用生产领料单接口
   const res = await lookReturn(searchValue)
-  console.log('条码单数据', res.data)
 
   // 判断接口返回数据有效性
   if (res && res.data) {
@@ -452,7 +440,6 @@ export const getSanDan = async (searchValue: any) => {
     // 提取基础数据
     fid = res.data.Result.Result.Id
     const TreeEntity = res.data.Result.Result.Entity
-    console.log('生产领料属性123', TreeEntity)
 
     // 处理原始数据
     const tempDataList = []
@@ -662,8 +649,6 @@ export const getSanDan = async (searchValue: any) => {
         inventoryField.value = item.detailList.receivableQuantity
       }
     }
-    console.log('合并后的生产入库明细数据', mergedDataList)
-
     return { dataList: mergedDataList, fid }
   }
 }
@@ -674,7 +659,6 @@ export const scanBarCode = async (searchValue: any) => {
   if (res && res.data) {
     //条码详情
     const barCodeData = res.data.Result.Result
-    console.log('条码信息', barCodeData)
     ///条码单不存在
     if (barCodeData == null) {
       uni.showToast({
@@ -727,8 +711,6 @@ export const scanBarCode = async (searchValue: any) => {
       //当前条码数量
       CurrentQty: barCodeData.F_UNITQTY
     }
-    console.log('扫描条码2222', data)
-
     return data
   }
 }

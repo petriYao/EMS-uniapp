@@ -74,7 +74,6 @@ const findMatchingDetails = (queryRes: any): any[] => {
 
 //扫描条码
 const searchChange = debounce(async () => {
-  console.log('搜索值', reactiveData.searchValue)
   // 防止空值搜索
   if (!reactiveData.searchValue.trim()) {
     return
@@ -95,13 +94,11 @@ const searchChange = debounce(async () => {
           queryRes = await getSanOutsourcing(reactiveData.searchValue)
           break
       }
-      console.log('查询结果', queryRes)
 
       if (queryRes && queryRes.dataList?.length > 0) {
         reactiveData.setData.fid = queryRes.fid
         reactiveData.detailsList = queryRes.dataList
         reactiveData.heardList.documentNumber = reactiveData.searchValue
-        console.log('查询结果2', queryRes.dataList[0])
         getWarehousePosition(queryRes.dataList[0].stockNumber)
         // 安全检查确保数据存在
         if (queryRes.dataList[0]) {
@@ -241,8 +238,6 @@ const searchChange = debounce(async () => {
 
 // 仓库变更
 const warehouseChange = debounceSave(async (val: string) => {
-  console.log('仓库变更', warehouseData.warehouseList, val)
-
   if (val === '') {
     reactiveData.heardList.warehouse = ''
     reactiveData.setData.warehouseNumber = ''
@@ -252,7 +247,6 @@ const warehouseChange = debounceSave(async (val: string) => {
   const warehouse = warehouseData.warehouseList.find(
     (item: any) => item.value === val || item.text === val
   )
-  console.log('仓库', warehouse)
   if (!warehouse && val) {
     uni.showToast({ title: '仓库不存在', icon: 'none' })
     reactiveData.heardList.warehouse = ''
@@ -280,9 +274,7 @@ const warehouseChange = debounceSave(async (val: string) => {
 
 //仓位清空
 const clearStock = async () => {
-  console.log('清空明细中的仓位')
   reactiveData.detailsList.forEach(async (item: any) => {
-    console.log('清空明细中的仓位1', reactiveData.setData.FlexNumber)
     item.WarehousePosition = ''
     item.WarehousePositionName = ''
     item.WarehousePositionId = ''
@@ -300,14 +292,12 @@ const clearStock = async () => {
         FlexNumber,
         reactiveData.setData.warehouseNumber
       )
-      console.log('清空明细中的仓位2', TJStockId)
       item.currentList.find((i: any) => i.label === '推荐').value = TJStockId
     }
   })
 }
 
 const focusTm = () => {
-  console.log('光标重聚')
   reactiveData.focus = 0
   setTimeout(() => {
     reactiveData.focus = 99
@@ -351,15 +341,12 @@ const pickerConfirm = async (val: any) => {
 }
 //获取仓位
 const getWarehousePosition = async (warehouseId: any) => {
-  console.log('获取仓位', warehouseId)
   //查看仓位
   if (warehouseId) {
     const res: any = await lookqueryStorage(warehouseId)
-    console.log('res', res)
     if (res) {
       const list = res.data.Result.Result.StockFlexItem[0].StockFlexDetail
       reactiveData.setData.FlexNumber = res.data.Result.Result.StockFlexItem[0].FlexId?.FlexNumber
-      console.log('list', list)
       if (list[0].Id === 0) {
         reactiveData.locationList = []
         reactiveData.setData.locationDisplay = true
@@ -382,13 +369,11 @@ const getWarehousePosition = async (warehouseId: any) => {
       } else {
         reactiveData.setData.locationDisplay = false
         setTimeout(() => {
-          console.log('到我')
           reactiveData.focus = 99
         }, 200)
       }
       //handleFocus()
       emit('update:locationList', reactiveData.locationList)
-      console.log('reactiveData.locationList', reactiveData.locationList)
     }
   }
 }

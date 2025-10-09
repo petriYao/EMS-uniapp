@@ -7,10 +7,8 @@ export const getPickupOrder = async (searchValue: any) => {
 
   let model = {} as any
   const res = await lookPickupOrder(searchValue)
-  console.log('提货单数据', res.data)
 
   if (res && res.data) {
-    console.log('提货单数据2', res.data.Result?.ResponseStatus?.IsSuccess)
     if (res.data.Result?.ResponseStatus?.IsSuccess === false) {
       uni.showToast({
         title: '提货单不存在',
@@ -28,7 +26,6 @@ export const getPickupOrder = async (searchValue: any) => {
     const PickupOrder = res.data.Result.Result
     const TreeEntity = res.data.Result.Result.SAL_DELIVERYNOTICEENTRY
 
-    console.log('生产订单属性', TreeEntity)
     for (const item of TreeEntity) {
       if (item.Qty - item.SumOutQty > 0) {
         const data = {
@@ -195,7 +192,6 @@ export const productionGetData = async (searchValue: any) => {
   if (res && res.data) {
     //条码-明细
     const barCodeData = res.data.Result.Result
-    console.log('条码数据', barCodeData)
     if (barCodeData == null) {
       uni.showToast({
         title: '条码单不存在',
@@ -266,7 +262,6 @@ export const productionGetData = async (searchValue: any) => {
     if (barCodeData.F_QADV_BARCODEENTRY.length > 0) {
       packData = barCodeData.F_QADV_BARCODEENTRY[barCodeData.F_QADV_BARCODEENTRY.length - 1]
     }
-    console.log('packData', packData)
 
     const stockLoc = packData?.F_QADV_STOCKLOCID
     let actualValue = null
@@ -278,8 +273,6 @@ export const productionGetData = async (searchValue: any) => {
       const keys = Object.keys(stockLoc)
 
       for (const key of keys) {
-        console.log('key', key)
-
         if (
           key.startsWith('F10000') &&
           stockLoc[key] !== null &&
@@ -294,7 +287,6 @@ export const productionGetData = async (searchValue: any) => {
       }
     }
 
-    console.log('实际值存储在:', actualValue)
     const data = {
       barcodeList: {
         FNumber: barCodeData.Number, //编码

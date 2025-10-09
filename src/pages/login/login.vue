@@ -45,10 +45,8 @@ const NavChange = async () => {
     password: reactiveData.password,
     lcid: 2052
   }
-  console.log('登录中')
   try {
     const { data: res }: any = await login(newdata)
-    console.log('登录', res)
     let userid = 0
     if (res != null) {
       let result = res.LoginResultType
@@ -63,14 +61,12 @@ const NavChange = async () => {
         uni.setStorageSync('KDSVCSessionId', KDSVCSessionId) // 注释：cookie的 kdservice-sessionid 值，需要用这个值写入cookie，同时写入reqeust的headers， kdservice-sessionid = a7066f3d-f09c-44eb-8fa5-d2a971e109dc 。
         //验证PDA用户信息是否存在
         const { data: res_user }: any = await loginPDAUser(reactiveData.username)
-        console.log('res_user', res_user)
         if (res_user.length > 0) {
           for (var i = 0; i < res_user.length; i++) {
             let item = res_user[i]
             let userFid = item[5]
             if (userid == userFid) {
               const { data: roles }: any = await loginPDAUserRole(item[4])
-              console.log('roles', roles)
               if (roles.length > 0) {
                 let Filter = ''
                 roles.forEach((item: any) => {
@@ -79,13 +75,11 @@ const NavChange = async () => {
                 })
                 //删除最后一个逗号
                 Filter = Filter.substring(0, Filter.length - 1)
-                console.log('Filter123', Filter)
 
                 const { data: auxRes }: any = await getAuxiliaryMaterials(
                   'FNumber,FDataValue,FMASTERID',
                   `FMASTERID in (${Filter})`
                 )
-                console.log('auxRes', auxRes)
                 if (auxRes.length > 0) {
                   let authority = [] as string[]
                   auxRes.forEach((item: any) => {

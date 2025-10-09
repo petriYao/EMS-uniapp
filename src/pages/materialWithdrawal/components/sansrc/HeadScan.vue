@@ -64,8 +64,6 @@ const searchClick = async () => {
 
 //扫描条码
 const searchChange = debounce(async () => {
-  console.log('搜索值', reactiveData.searchValue)
-
   // 防止空值搜索
   if (!reactiveData.searchValue.trim()) {
     return

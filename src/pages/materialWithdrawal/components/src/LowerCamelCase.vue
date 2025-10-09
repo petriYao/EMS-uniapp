@@ -30,14 +30,12 @@ const getBarCode = async (item: any, index: number) => {
 const longpressClick = (item: any, index: number) => {
   if (isMoved) return // 如果有移动，不触发长按事件
 
-  console.log('长按事件', item, index)
   //弹出删除提示框
   uni.showModal({
     title: '提示',
     content: '是否删除当前明细',
     success: (res) => {
       if (res.confirm) {
-        console.log('用户点击确定')
         //删除当前明细
         reactiveData.detailsList.splice(index, 1)
         if (reactiveData.detailsList.length === 0) {
@@ -76,7 +74,6 @@ const handleTouchMove = (e: TouchEvent) => {
 
 const longpressDetailsClick = (item: any, index: number) => {
   if (isMoved) return // 如果有移动，不触发长按事件
-  console.log('长按事件', item, index)
   //弹出删除提示框
   uni.showModal({
     title: '提示',
@@ -97,11 +94,6 @@ const deleteBarcode = (item: any, index: number) => {
     //分装情况下
     reactiveData.detailsList[reactiveData.barcodeIndex].Quantity--
     //减去数量
-    console.log(
-      '减去',
-      reactiveData.detailsList[reactiveData.barcodeIndex].packagingDataFZLOT,
-      item
-    )
     reactiveData.detailsList[reactiveData.barcodeIndex].packagingDataFZLOT[
       item.FZLOT
     ].packagingData[item.subPackageNo]['quantity'] -= item.quantity //数量
@@ -239,7 +231,6 @@ useEmitt({
 useEmitt({
   name: 'deleteBarcode',
   callback: async (val) => {
-    console.log('删除条码', val)
     deleteBarcode(val.item, val.index)
   }
 })
@@ -247,7 +238,6 @@ useEmitt({
 watch(
   () => props.detailsList,
   (val: any) => {
-    console.log('val', JSON.stringify(val[6]?.barcodeList))
     reactiveData.detailsList = val
   },
   { immediate: true, deep: true }

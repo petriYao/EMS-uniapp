@@ -24,7 +24,6 @@ export const getSimple = async (searchValue: any) => {
     }
     fid = res.data.Result.Result.Id
     const TreeEntity = res.data.Result.Result.Entity
-    console.log('简单生产退料属性', TreeEntity)
     for (const item of TreeEntity) {
       const stockLoc = item.StockLocId
       let actualValue = null
@@ -219,7 +218,6 @@ export const getSimple = async (searchValue: any) => {
     for (const item of dataList) {
       // 新的合并条件：stockName, stockLocName, MaterialCode, Lot
       const key = `${item.WarehouseName}-${item.WarehousePosition}-${item.MaterialCode}-${item.Lot}`
-      console.log('key', key)
       if (keyMap.has(key)) {
         const existing = keyMap.get(key)
 
@@ -240,12 +238,8 @@ export const getSimple = async (searchValue: any) => {
 
     // 转换为数组并返回结果
     const mergedDataList = Array.from(keyMap.values())
-
-    console.log('合并后的生产入库明细数据', mergedDataList)
-
     return { dataList: mergedDataList, fid }
   }
-  console.log('生产入库明细数据', dataList)
 
   return { dataList, fid }
 }
@@ -255,7 +249,6 @@ export const getSanSimple = async (searchValue: any) => {
   let fid = 0 // 存储单据ID
   // 调用生产领料单接口
   const res = await lookSimpleReturn(searchValue)
-  console.log('条码单数据', res.data)
 
   // 判断接口返回数据有效性
   if (res && res.data) {
@@ -279,7 +272,6 @@ export const getSanSimple = async (searchValue: any) => {
     // 提取基础数据
     fid = res.data.Result.Result.Id
     const TreeEntity = res.data.Result.Result.Entity
-    console.log('生产领料属性123', TreeEntity)
 
     // 处理原始数据
     const tempDataList = []
@@ -489,8 +481,6 @@ export const getSanSimple = async (searchValue: any) => {
         inventoryField.value = item.detailList.receivableQuantity
       }
     }
-    console.log('合并后的生产入库明细数据', mergedDataList)
-
     return { dataList: mergedDataList, fid }
   }
 }

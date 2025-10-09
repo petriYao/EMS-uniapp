@@ -17,8 +17,6 @@ const reactiveData = reactive({
 
 //保存
 const saveClick = throttleSave(async () => {
-  console.log('保存1', reactiveData.detailsList)
-  console.log('保存2', reactiveData.fid)
   if (reactiveData.detailsList.length == 0) {
     uni.showToast({
       title: '无提交数据',
@@ -52,12 +50,10 @@ const saveClick = throttleSave(async () => {
     })
     return
   }
-  console.log('条码值', barcodeList)
   const tmStatusRes: any = await TMStatusQuery({
     barcodes: barcodeList,
     status: '2'
   })
-  console.log('tmStatusRes', tmStatusRes)
   if (tmStatusRes && tmStatusRes.data && tmStatusRes.data.length > 0) {
     //条码状态不为1的提示
     uni.showToast({
@@ -72,7 +68,6 @@ const saveClick = throttleSave(async () => {
   let isValid = true
   for (let i = 0; i < reactiveData.detailsList.length; i++) {
     const item = reactiveData.detailsList[i]
-    console.log('item', item.isInteger, item)
     if (!item.isInteger && item.barcodeList.length > 0) {
       // 条码不是整数的提示
       uni.showToast({
@@ -98,7 +93,6 @@ const saveClick = throttleSave(async () => {
     return // 阻止后续代码的执行
   }
   const pushResYz = await saveMaterialRequisition({ FID: reactiveData.fid }, false)
-  console.log('pushResYz', pushResYz)
   if (pushResYz && pushResYz.data.Result.ResponseStatus.ErrorCode === 500) {
     uni.showToast({
       title: pushResYz.data.Result.ResponseStatus.Errors[0].Message,
@@ -107,7 +101,6 @@ const saveClick = throttleSave(async () => {
     })
     return
   }
-  console.log('detailsList', JSON.stringify(detailsList))
   /**库存检查***************************************************************** */
 
   const resQues: any = await MaterialRequisition({
@@ -115,7 +108,6 @@ const saveClick = throttleSave(async () => {
     detailsList: detailsList
   })
   const resQue = resQues.data
-  console.log('resQue', resQue)
   if (resQue && resQue.isSuccess) {
     reactiveData.loading = false
 
@@ -136,11 +128,8 @@ const saveClick = throttleSave(async () => {
           FActualQty: item[1]
         })
       }
-      console.log('Model', Model)
-      console.log('Model', JSON.stringify(Model))
       //3.保存其他出库单
       const pushResSaveData: any = await saveMaterialRequisition(Model)
-      console.log('pushResSaveData', pushResSaveData)
 
       EditCKTM({
         barcodes: barcodeList,

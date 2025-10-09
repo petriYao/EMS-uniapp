@@ -111,7 +111,6 @@ const handleScanPurchaseOrder = async () => {
 
   if (queryRes && queryRes.dataList?.length > 0) {
     const firstItem = queryRes.dataList[0]
-    console.log('采购订单', queryRes)
     setData.value = {
       fid: queryRes.fid,
       warehouseNumber: firstItem.WarehouseNumber,
@@ -179,7 +178,6 @@ const handleScanBarcode = async () => {
 // 查找物料索引
 // const findMaterialIndex = (queryRes: any) =>
 //   detailsList.value.findIndex((item: any) => {
-//     console.log('item', item, queryRes)
 //     return (
 //       item.MaterialCode === queryRes.MaterialCode && // 编码
 //       item.SourceOrderNo === queryRes.ContractNo && // 来源单号
@@ -281,7 +279,6 @@ const handleBarcodeAddition = (index: number, queryRes: any) => {
   detailsList.value[index].currentList[8].value = queryRes.Customer // 客户
   detailsList.value[index].currentList[9].value = queryRes.TotalBox // 总箱数
 
-  console.log('新增条码', queryRes)
   if (detailsList.value[index].IsSplit) {
     handleSplitBarcodeAddition(index, queryRes)
   } else {
@@ -289,7 +286,6 @@ const handleBarcodeAddition = (index: number, queryRes: any) => {
     detailsList.value[index].isInteger = true
   }
 
-  console.log('是否超', detailsList.value[index])
   if (detailsList.value[index].Quantity2 > detailsList.value[index].receivableQuantity) {
     let deleteBarcode = {
       item: detailsList.value[index].barcodeList[detailsList.value[index].barcodeList.length - 1],
@@ -309,11 +305,9 @@ const handleBarcodeAddition = (index: number, queryRes: any) => {
 // 分装处理
 const handleSplitBarcodeAddition = (index: number, queryRes: any) => {
   const { FZLOTList, SplitCode, SplitValue, UnitQty } = queryRes
-  console.log('分装处理', detailsList.value[index])
   const index2 = detailsList.value[index].FZLOTList.findIndex(
     (item: string) => item === FZLOTList[0]
   )
-  console.log('分装处理2', FZLOTList, SplitCode, SplitValue, UnitQty)
 
   if (index2 === -1) {
     detailsList.value[index].FZLOTList.push(FZLOTList[0])
@@ -328,7 +322,6 @@ const handleSplitBarcodeAddition = (index: number, queryRes: any) => {
 
   // 确保对象存在再访问
   const fzlotData = detailsList.value[index].packagingDataFZLOT[FZLOTList[0]]
-  console.log('分装处理3', fzlotData.packagingData[SplitCode])
   fzlotData.packagingData[SplitCode].unitQty = UnitQty
 
   const data = fzlotData.packagingData[SplitCode]
@@ -352,7 +345,6 @@ const handleSplitBarcodeAddition = (index: number, queryRes: any) => {
 
   const productsQuantity = hasZero || minNonZero === Infinity ? 0 : minNonZero
   const isInteger = productsQuantity % 1 === 0 && productsQuantity !== 0
-  console.log('是否整数1', isInteger)
   fzlotData.isInteger = isInteger
   detailsList.value[index].isInteger = isInteger
 
@@ -360,7 +352,6 @@ const handleSplitBarcodeAddition = (index: number, queryRes: any) => {
     packagingSig.forEach((element: any) => {
       // 确保对象存在再访问
       const packagingItem = fzlotData.packagingData[element]
-      console.log('是否整数2', packagingItem, productsQuantity)
       if (packagingItem && packagingItem.finishedQty !== productsQuantity) {
         fzlotData.isInteger = false
         detailsList.value[index].isInteger = false
@@ -479,7 +470,6 @@ const warehouseChange = debounceSave(async (val: string) => {
     }, 200)
     return
   }
-  console.log('仓库变更', warehouse, setData.value.warehouseId === warehouse.id)
   if (setData.value.warehouseId === warehouse.id) return
   heardList.value.location = ''
 
@@ -496,9 +486,7 @@ const warehouseChange = debounceSave(async (val: string) => {
 
 //仓位清空
 const clearStock = async () => {
-  console.log('清空明细中的仓位')
   detailsList.value.forEach(async (item: any) => {
-    console.log('清空明细中的仓位1', setData.value.FlexNumber)
     item.WarehousePosition = ''
     item.WarehousePositionName = ''
     item.WarehousePositionId = ''
@@ -516,7 +504,6 @@ const clearStock = async () => {
         FlexNumber,
         setData.value.warehouseNumber
       )
-      console.log('清空明细中的仓位2', TJStockId)
       item.currentList.find((i: any) => i.label === '推荐').value = TJStockId
     }
   })

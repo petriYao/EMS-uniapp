@@ -83,16 +83,13 @@ const searchChange = async () => {
       reactiveData.detailsList = res.dataList
       reactiveData.fid = res.fid
 
-      console.log('单据内容', reactiveData.detailsList)
       if (reactiveData.detailsList.length !== 0) {
         reactiveData.titleList[0].value = reactiveData.searchValue
         reactiveData.titleList[2].value = reactiveData.detailsList[0].WarehouseName
-        console.log('仓库', reactiveData.titleList)
         //仓库
         currentWarehouse.name = reactiveData.detailsList[0].WarehouseName
         currentWarehouse.number = reactiveData.detailsList[0].WarehouseId
         warehouseClick(reactiveData.detailsList[0].WarehouseId)
-        console.log('报错1')
         //仓位
         pickerConfirm2(
           {
@@ -101,10 +98,9 @@ const searchChange = async () => {
           },
           false
         )
-        console.log('报错2')
         setTimeout(() => {
           focusIndex.value = 0
-        }, 500)
+        }, 200)
       }
       reactiveData.searchValue = ''
       changeFocus()
@@ -115,7 +111,6 @@ const searchChange = async () => {
       reactiveData.searchValue,
       currentWarehousePosition.number
     )
-    console.log('res', res)
     if (!res) {
       reactiveData.searchValue = ''
       loading.value = false
@@ -123,10 +118,8 @@ const searchChange = async () => {
       return
     }
     const index = reactiveData.detailsList.findIndex((item: any) => {
-      console.log('判断之前是否有一样的', item, res)
       return item.MaterialCode === res.MaterialCode && item.Lot === res.Lot
     })
-    console.log('判断', index)
     if (index !== -1) {
       if (!reactiveData.detailsList[index].isLowerCamelCase) {
         reactiveData.detailsList[index].isLowerCamelCase = true
@@ -150,14 +143,12 @@ const searchChange = async () => {
   }, 500)
 }
 const changeFocus = () => {
-  console.log('重新定义光标值1')
   //光标位置
   focusIndex.value = 20
   if (currentWarehouse.number === '' && !reactiveData.titleList[3].display) {
     setTimeout(() => {
       focusIndex.value = 2
     }, 500)
-    console.log('重新定义光标值2')
   } else if (
     currentWarehousePosition.number === '' &&
     !reactiveData.titleList[3].disabled &&
@@ -166,12 +157,10 @@ const changeFocus = () => {
     setTimeout(() => {
       focusIndex.value = 3
     }, 500)
-    console.log('重新定义光标值3')
   } else {
     setTimeout(() => {
       focusIndex.value = 0
     }, 500)
-    console.log('光标值:', focusIndex.value)
   }
 }
 
@@ -196,7 +185,6 @@ const searchClick = async () => {
     scanType: ['barCode', 'qrCode'],
     onlyFromCamera: true
   })
-  console.log('扫码结果', res)
   if (res) {
     const result = res.result
 
@@ -249,7 +237,6 @@ const warehouseChange = debounceSave(
         reactiveData.titleList[2].value = ''
         currentWarehouse.name = ''
         currentWarehouse.number = ''
-        console.log('warehouseId', reactiveData.titleList[2].value)
         //重新回到光标位置
         focusIndex.value = 20
         setTimeout(() => {
@@ -291,7 +278,6 @@ const warehouseChange = debounceSave(
             reactiveData.detailsList[reactiveData.datailsIndex].WarehousePosition =
               warehouseId.value
           }
-          console.log('仓位', reactiveData.detailsList)
         } else {
           reactiveData.detailsList[reactiveData.datailsIndex].currentList[12].value =
             warehouseId.text
@@ -315,7 +301,6 @@ const warehouseClick = async (val: any) => {
   //查看仓位
   if (val) {
     const res: any = await lookqueryStorage(val)
-    console.log('查看仓位', res)
     if (res) {
       const list = res.data.Result.Result.StockFlexItem[0].StockFlexDetail
       FlexNumber.value = res.data.Result.Result.StockFlexItem[0].FlexId?.FlexNumber
@@ -361,14 +346,12 @@ const pickerConfirm2 = (val: any, iswarehousePosition?: boolean) => {
 
 //长按事件 删除明细
 const longpressClick = (item: any, index: number) => {
-  console.log('长按事件', item, index)
   //弹出删除提示框
   uni.showModal({
     title: '提示',
     content: '是否删除当前明细',
     success: (res) => {
       if (res.confirm) {
-        console.log('用户点击确定')
         //删除当前明细
         reactiveData.detailsList.splice(index, 1)
         if (reactiveData.detailsList.length === 0) {
@@ -409,7 +392,6 @@ const clearAllPositions = () => {
 //返回到父组件
 const backClick = async () => {
   // 声明为异步函数
-  console.log('返回到父组件', reactiveData.detailsList)
   //搜索条件 查找源单号和源单行号的分录编码
   const conditions = reactiveData.detailsList.map((item: any) => {
     return `(FBillNo = '${item.SourceOrderNo}' AND FTreeEntity_FSeq = ${item.SourceOrderLineNo})`
@@ -429,7 +411,6 @@ const backClick = async () => {
   // 使用Promise.all等待所有异步操作完成
   await Promise.all(
     reactiveData.detailsList.map(async (item: any, index: number) => {
-      console.log('item', item)
       if (!item.isInteger) {
         integer.isInteger = false //如果有一个不是整数就返回false
         integer.Name = item.Name
@@ -559,9 +540,6 @@ const backClick = async () => {
             FID: 'f11b462a-8733-40bd-8f29-0906afc6a201'
           } //流转单ID
         }
-        console.log('测试1', data)
-
-        console.log('测试2', JSON.stringify(data))
         if (item.Quantity2 !== 0) {
           dataList.push(data)
         }
@@ -579,7 +557,6 @@ const backClick = async () => {
   return { dataList, fid: reactiveData.fid, isError, SCCJ } // 返回填充后的数据
 }
 const quantChange = (val: any) => {
-  console.log('val', val)
   reactiveData.detailsList[reactiveData.datailsIndex].Quantity2 = val
   reactiveData.detailsList[reactiveData.datailsIndex].currentList[13].value = val
 }

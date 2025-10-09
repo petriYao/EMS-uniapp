@@ -56,7 +56,6 @@ const groupChange = () => {
 
 onBeforeMount(() => {
   let UserAuthority = uni.getStorageSync('UserAuthority')
-  console.log('UserAuthority', UserAuthority)
   // 判断权限
   switch (reactiveData.title) {
     case '生产退料':
@@ -159,7 +158,6 @@ onBeforeMount(() => {
 
 onBeforeUnmount(() => {
   // 组件卸载时清理
-  console.log('离开')
   clearTimer()
 })
 </script>

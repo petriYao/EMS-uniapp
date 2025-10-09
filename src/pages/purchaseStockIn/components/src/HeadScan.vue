@@ -59,7 +59,6 @@ const searchClick = async () => {
     scanType: ['barCode', 'qrCode'],
     onlyFromCamera: true
   })
-  console.log('扫码结果', res)
   if (res) {
     //在focusIndex.value为0时，给搜索框赋值
     if (reactiveData.focus === 99) {
@@ -89,7 +88,6 @@ const searchClick = async () => {
 
 //扫描条码
 const searchChange = () => {
-  console.log('搜索值', reactiveData.searchValue)
   setTimeout(async () => {
     if (reactiveData.searchValue === '') {
       return
@@ -97,7 +95,6 @@ const searchChange = () => {
     handleFocus()
     //调用条码（单据查询）
     const queryRes: any = await purchaseScanBarcode(reactiveData.searchValue, reactiveData.setData)
-    console.log('查询结果', queryRes)
     if (!queryRes) {
       reactiveData.searchValue = ''
       focusTm()
@@ -116,7 +113,6 @@ const searchChange = () => {
         return
       }
       const index = reactiveData.detailsList.findIndex((item: any) => {
-        console.log('判断之前是否有一样的', item, queryRes)
         return (
           item.MaterialCode === queryRes.MaterialCode &&
           item.SourceOrderNo === queryRes.SourceOrderNo &&
@@ -150,7 +146,6 @@ const searchChange = () => {
           const index2 = reactiveData.detailsList[index].FZLOTList.findIndex((item: any) => {
             return item === queryRes.FZLOTList[0]
           })
-          console.log('选中的明细1', index2)
           if (index2 === -1) {
             reactiveData.detailsList[index].FZLOTList.push(queryRes.FZLOTList[0])
 
@@ -206,11 +201,7 @@ const searchChange = () => {
 
           reactiveData.detailsList[index].isInteger =
             productsQuantity % 1 === 0 && productsQuantity !== 0
-          console.log('isInteger1', reactiveData.detailsList[index], queryRes.FZLOTList[0])
-          console.log(
-            'isInteger1',
-            reactiveData.detailsList[index].packagingDataFZLOT[queryRes.FZLOTList[0]]
-          )
+
           if (reactiveData.detailsList[index].packagingDataFZLOT[queryRes.FZLOTList[0]].isInteger) {
             reactiveData.detailsList[index].packagingDataFZLOT[
               queryRes.FZLOTList[0]
@@ -235,7 +226,6 @@ const searchChange = () => {
           //计算总数量
           reactiveData.detailsList[index].Quantity2 = reCompute(reactiveData.detailsList[index])
         } else {
-          console.log('未封装新增', reactiveData.detailsList[index])
           reactiveData.detailsList[index].Quantity2 += queryRes.Quantity2
           reactiveData.detailsList[index].isInteger = true //是否整数
         }
@@ -255,7 +245,6 @@ const searchChange = () => {
           focusTm()
           return
         }
-        console.log('重复', scannedBarcodes, scannedBarcodes.has(reactiveData.searchValue))
         reactiveData.detailsList.push(queryRes)
         emitter.emit('update:datailsIndex', reactiveData.detailsList.length - 1)
       }
@@ -289,7 +278,6 @@ const reCompute = (val: any) => {
 //获取仓库列表
 const getWarehouseList = async () => {
   const res: any = await queryStorage()
-  console.log('获取仓库列表', res)
   if (res) {
     warehouseData.warehouseList = res.data.map((item: any) => {
       return {
@@ -298,12 +286,10 @@ const getWarehouseList = async () => {
         value: item[1]
       }
     })
-    console.log('内容', warehouseData.warehouseList)
   }
 }
 //仓库选择器确认
 const pickerConfirm = async (val: any) => {
-  console.log('pickerConfirm', val)
   reactiveData.heardList.warehouse = val.text
   reactiveData.setData.warehouseNumber = val.value
   reactiveData.setData.warehouseId = val.id
@@ -320,11 +306,9 @@ const getWarehousePosition = async (warehouseId: any) => {
   //查看仓位
   if (warehouseId) {
     const res: any = await lookqueryStorage(warehouseId)
-    console.log('res', res)
     if (res) {
       const list = res.data.Result.Result.StockFlexItem[0].StockFlexDetail
       reactiveData.setData.FlexNumber = res.data.Result.Result.StockFlexItem[0].FlexId?.FlexNumber
-      console.log('list', list)
       if (list[0].Id === 0) {
         locationData.locationList = []
         reactiveData.setData.locationDisplay = true
@@ -353,13 +337,11 @@ const getWarehousePosition = async (warehouseId: any) => {
       } else {
         reactiveData.setData.locationDisplay = false
         setTimeout(() => {
-          console.log('到我')
           reactiveData.focus = 2
         }, 200)
       }
       handleFocus()
       emit('update:locationList', locationData.locationList)
-      console.log('focusIndex', reactiveData.focus)
     }
   }
 }
@@ -379,7 +361,6 @@ const locationPickerConfirm = (val: any) => {
 
 //仓库
 const warehouseChange = debounceSave((val: any) => {
-  console.log('warehouseChange', val)
   if (val == '') {
     reactiveData.setData.warehouseNumber = ''
     reactiveData.setData.warehouseId = ''
@@ -390,12 +371,10 @@ const warehouseChange = debounceSave((val: any) => {
     reactiveData.setData.locationDisplay = true
     return
   }
-  console.log('warehouseChange1', val)
   //获取仓库id替换为仓库名称
   const warehouseId: any = warehouseData.warehouseList.find(
     (item: any) => item.value === val || item.text === val
   )
-  console.log('warehouseId1', warehouseId)
 
   if (!warehouseId && val != '') {
     //提示仓库不存在
@@ -439,7 +418,6 @@ const locationChange = debounceSave((val: any) => {
       icon: 'none'
     })
     reactiveData.heardList.location = ''
-    console.log('仓位不存在', location)
     if (reactiveData.focus !== 0) {
       //重新回到光标位置
       reactiveData.focus = 0

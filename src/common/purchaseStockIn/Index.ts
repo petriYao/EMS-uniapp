@@ -2,12 +2,10 @@ import { lookBarCode, queryBarCode } from '@/api/modules/storage'
 import { transferOrder, getProductionOrder } from '@/api/modules/transferOrder'
 // 采购入库-扫描条码
 export const purchaseScanBarcode = async (searchValue: any, setData: any) => {
-  console.log('条码仓位', setData)
   const res = await lookBarCode(searchValue)
   if (res && res.data) {
     //条码详情
     const barCodeData = res.data.Result.Result
-    console.log('条码信息', barCodeData)
     ///条码单不存在
     if (barCodeData == null) {
       uni.showToast({
@@ -92,7 +90,6 @@ export const purchaseScanBarcode = async (searchValue: any, setData: any) => {
       })
       return null
     }
-    console.log('采购订单数据', resOrder.data)
     const packagingData = {} as any
     const packagingSig = [] as string[] //分装编号
 
@@ -301,7 +298,6 @@ export const purchaseScanBarcode = async (searchValue: any, setData: any) => {
       isInteger: false,
       FZquantity: 0
     }
-    console.log('扫描条码2222', data)
 
     return data
   }
@@ -312,7 +308,6 @@ export const getcamelCase = async (searchValue: any) => {
   const dataList = [] as any
   let fid = 0
   const res = await getProductionOrder(searchValue)
-  console.log('条码单数据', res.data)
 
   if (res && res.data) {
     if (res.data.Result?.ResponseStatus?.IsSuccess === false) {
@@ -331,9 +326,7 @@ export const getcamelCase = async (searchValue: any) => {
     }
     fid = res.data.Result.Result.Id
     const TreeEntity = res.data.Result.Result.InStockEntry
-    console.log('生产订单属性', TreeEntity)
     for (const item of TreeEntity) {
-      console.log('item', item)
       const stockLoc = item.StockLocId
       let actualValue = null
 
@@ -520,7 +513,6 @@ export const getcamelCase = async (searchValue: any) => {
       dataList.push(data)
     }
   }
-  console.log('生产入库明细数据', dataList)
 
   return { dataList, fid }
 }

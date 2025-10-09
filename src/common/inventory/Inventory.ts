@@ -7,7 +7,6 @@ export const getcamelCase = async (searchValue: any, scanCodeType: string) => {
   const dataList = [] as any
   let fid = 0
   const res = await getInventory(number)
-  console.log('条码单数据', res.data)
 
   if (res && res.data) {
     if (res.data.Result?.ResponseStatus?.IsSuccess === false) {
@@ -41,8 +40,6 @@ export const getcamelCase = async (searchValue: any, scanCodeType: string) => {
     fid = res.data.Result.Result.Id
     const TreeEntity = res.data.Result.Result.F_QADV_PDEntry
     const entry = TreeEntity[entrySeq - 1]
-    console.log('盘点单属性', TreeEntity)
-    console.log('entry', entry)
 
     // 判断，当盘点时，如果已有盘点人则提示
     if (
@@ -56,12 +53,10 @@ export const getcamelCase = async (searchValue: any, scanCodeType: string) => {
           content: '是否继续盘点？',
           success: (res) => {
             if (res.confirm) {
-              console.log('用户点击确定')
               const data = buildDataList(entry, searchValue, scanCodeType)
               dataList.push(data)
               resolve({ dataList, fid })
             } else if (res.cancel) {
-              console.log('用户点击取消')
               resolve({ dataList: [], fid: 0 })
             }
           }
@@ -73,7 +68,6 @@ export const getcamelCase = async (searchValue: any, scanCodeType: string) => {
       dataList.push(data)
     }
   }
-  console.log('生产入库明细数据', dataList)
 
   return { dataList, fid }
 }
@@ -99,7 +93,6 @@ function buildDataList(entry: any, searchValue: string, scanCodeType: string) {
     }
   }
 
-  console.log('actualValue', entry)
   return {
     currentList: [
       {

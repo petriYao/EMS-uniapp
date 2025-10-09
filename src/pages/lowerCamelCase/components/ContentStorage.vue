@@ -32,8 +32,6 @@ const reactiveData = reactive({
 
 //保存
 const saveClick = async () => {
-  console.log('保存1', reactiveData.model)
-  console.log('保存2', reactiveData.lowerCamelCaseList)
   if (reactiveData.lowerCamelCaseList.length === 0) {
     uni.showToast({
       title: '无提交数据',
@@ -47,7 +45,6 @@ const saveClick = async () => {
 
   await Promise.all(
     reactiveData.lowerCamelCaseList.map(async (item, index) => {
-      console.log('item', item.isInteger, item)
       if (!item.isInteger && item.barcodeList.length > 0) {
         throw new Error(`第${index + 1}行不配套`)
       }
@@ -185,7 +182,6 @@ const saveClick = async () => {
     })
     return null
   })
-  console.log('保存4', model.FEntity.length)
 
   if (model.FEntity.length === 0 && isError === false) {
     isError = true //有错误
@@ -194,8 +190,7 @@ const saveClick = async () => {
       icon: 'none'
     })
   }
-  console.log('拆分后的条码列表:', processedData)
-  console.log('保存5', model)
+
   return {
     model: model,
     lowerCamelCaseList: reactiveData.lowerCamelCaseList,

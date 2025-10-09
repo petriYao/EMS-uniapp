@@ -3,12 +3,10 @@ import { getSalesReturn } from '@/api/modules/transferOrder'
 import { getStockLoc } from '@/common/comModel/Index'
 // 采购入库-扫描条码
 export const purchaseScanBarcode = async (searchValue: any, setData: any) => {
-  console.log('条码仓位', setData)
   const res = await lookBarCode(searchValue)
   if (res && res.data) {
     //条码详情
     const barCodeData = res.data.Result.Result
-    console.log('条码信息', barCodeData)
     ///条码单不存在
     if (barCodeData == null) {
       uni.showToast({
@@ -82,7 +80,6 @@ export const purchaseScanBarcode = async (searchValue: any, setData: any) => {
         }
       }
 
-      console.log('分装数量', barCodeData.F_UNITQTY)
       packagingData[barCodeData.F_FZNO].quantity = barCodeData.F_UNITQTY
       packagingData[barCodeData.F_FZNO].unitQty = barCodeData.F_JUNITQTY
       packagingData[barCodeData.F_FZNO].finishedQty = barCodeData.F_UNITQTY / barCodeData.F_JUNITQTY
@@ -176,7 +173,6 @@ export const purchaseScanBarcode = async (searchValue: any, setData: any) => {
       isInteger: false,
       FZquantity: 0
     }
-    console.log('扫描条码2222', data)
 
     return data
   }
@@ -187,7 +183,6 @@ export const getcamelCase = async (searchValue: any) => {
   const dataList = [] as any
   let fid = 0
   const res = await getSalesReturn(searchValue)
-  console.log('条码单数据', res.data)
 
   if (res && res.data) {
     if (res.data.Result?.ResponseStatus?.IsSuccess === false) {
@@ -206,9 +201,7 @@ export const getcamelCase = async (searchValue: any) => {
     }
     fid = res.data.Result.Result.Id
     const TreeEntity = res.data.Result.Result.SAL_RETURNSTOCKENTRY
-    console.log('生产订单属性', TreeEntity)
     for (const item of TreeEntity) {
-      console.log('item', item)
       const stockLoc = item.StocklocId
       let actualValue = null
 
@@ -240,7 +233,6 @@ export const getcamelCase = async (searchValue: any) => {
         item.StockId?.Number
       )
 
-      console.log('FlexNumber123', FlexNumber)
       const data = {
         currentList: [
           {
@@ -398,7 +390,6 @@ export const getcamelCase = async (searchValue: any) => {
       dataList.push(data)
     }
   }
-  console.log('生产入库明细数据', dataList)
 
   return { dataList, fid }
 }

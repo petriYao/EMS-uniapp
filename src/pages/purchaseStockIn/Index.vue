@@ -47,8 +47,8 @@ const clearTimer = () => {
 }
 useEmitt({
   name: 'update:handleFocus',
+
   callback: async () => {
-    console.log('设置定时器')
     handleFocus()
   }
 })
@@ -61,8 +61,7 @@ useEmitt({
 
 watch(
   () => reactiveData.scanCodeType,
-  (val: any) => {
-    console.log('val', val)
+  () => {
     handleFocus()
   },
   { immediate: true, deep: true }

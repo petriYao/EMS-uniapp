@@ -7,8 +7,6 @@ export const getSalesCase = async (searchValue: any) => {
   const dataList = [] as any
   let fid = 0
   const res = await lookSalesReturn(searchValue)
-  console.log('条码单数据', res.data)
-
   if (res && res.data) {
     if (res.data.Result?.ResponseStatus?.IsSuccess === false) {
       uni.showToast({
@@ -26,9 +24,7 @@ export const getSalesCase = async (searchValue: any) => {
     }
     fid = res.data.Result.Result.Id
     const TreeEntity = res.data.Result.Result.BillEntry
-    console.log('生产订单属性', TreeEntity)
     for (const item of TreeEntity) {
-      console.log('item', item, item.CustId)
       const data = {
         currentList: [
           {
@@ -153,7 +149,6 @@ export const getSalesCase = async (searchValue: any) => {
       dataList.push(data)
     }
   }
-  console.log('生产入库明细数据', dataList)
 
   return { dataList, fid }
 }
@@ -164,7 +159,6 @@ export const salesScanBarcode = async (searchValue: any) => {
   if (res && res.data) {
     //条码详情
     const barCodeData = res.data.Result.Result
-    console.log('条码信息', barCodeData)
     ///条码单不存在
     if (barCodeData == null) {
       uni.showToast({
@@ -238,8 +232,6 @@ export const salesScanBarcode = async (searchValue: any) => {
     if (barCodeData.F_QADV_BARCODEENTRY.length > 0) {
       packData = barCodeData.F_QADV_BARCODEENTRY[barCodeData.F_QADV_BARCODEENTRY.length - 1]
     }
-    console.log('packData', packData)
-
     const stockLoc = packData?.F_QADV_STOCKLOCID
     let actualValue = null
 
@@ -328,8 +320,6 @@ export const salesScanBarcode = async (searchValue: any) => {
       isInteger: false,
       FZquantity: 0
     }
-    console.log('扫描条码2222', data)
-
     return data
   }
 }
@@ -350,7 +340,6 @@ export function queryPurchaseReturn(FormId: string, FilterString: string, FieldK
       }
     ]
   }
-  console.log('提货单数据', data)
   return executeBillQueryApi(data)
 }
 

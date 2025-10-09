@@ -41,7 +41,6 @@ export function pickupOrder(
       }
     ]
   }
-  console.log('提货单数据', data)
   return executeBillQueryApi(data)
 }
 //条码单据查询
@@ -60,7 +59,6 @@ export function queryBarCode(FilterString: string) {
       }
     ]
   }
-  console.log('条码单数据', data)
   return executeBillQueryApi(data)
 }
 
@@ -80,7 +78,6 @@ export function queryInventory(FilterString: string) {
       }
     ]
   }
-  console.log('条码单数据', data)
   return executeBillQueryApi(data)
 }
 //物料单据查询
@@ -99,7 +96,6 @@ export function queryMaterial(FilterString: string) {
       }
     ]
   }
-  console.log('条码单数据', data)
   return executeBillQueryApi(data)
 }
 //查看生成条码单
@@ -206,7 +202,6 @@ export function saveBarCode(Model: any) {
 }
 //销售出库单保存
 export function saveSalesOrder(Model: any) {
-  console.log('保存销售出库单', JSON.stringify(Model))
   const data = {
     formid: 'SAL_OUTSTOCK',
     data: {

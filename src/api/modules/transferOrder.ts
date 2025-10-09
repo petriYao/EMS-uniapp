@@ -40,7 +40,6 @@ export function saveProductionOrder(Model: any) {
       Model: Model
     }
   }
-  console.log('调拨单保存', JSON.stringify(data.data.Model))
   return saveApi(data) as any
 }
 //查看采购退料单
@@ -142,7 +141,6 @@ export function saveOtherInbound(Model: any) {
       Model: Model
     }
   }
-  console.log('其他入库单保存', JSON.stringify(data.data.Model))
   return saveApi(data) as any
 }
 
@@ -168,7 +166,6 @@ export function saveSalesReturn(Model: any) {
       Model: Model
     }
   }
-  console.log('其他入库单保存', JSON.stringify(data.data.Model))
   return saveApi(data) as any
 }
 

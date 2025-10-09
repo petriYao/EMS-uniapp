@@ -17,8 +17,6 @@ const reactiveData = reactive({
 
 //保存
 const saveClick = throttleSave(async () => {
-  console.log('保存1', reactiveData.detailsList)
-  console.log('保存2', reactiveData.setData)
   if (reactiveData.detailsList.length == 0) {
     uni.showToast({
       title: '无提交数据',
@@ -96,7 +94,6 @@ const saveClick = throttleSave(async () => {
       Model.FEntity.push(JSON.parse(JSON.stringify(FEntity)))
     }
   }
-  console.log('保存3', Model)
   const res = await saveOutsourceMaterialReturn(Model)
   if (res && res.data && res.data?.Result?.Number) {
     uni.showToast({
@@ -118,7 +115,6 @@ const saveClick = throttleSave(async () => {
       duration: 5000
     })
   }
-  console.log('保存', res)
   setTimeout(() => {
     reactiveData.loading = true
   }, 200)

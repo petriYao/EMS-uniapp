@@ -339,7 +339,6 @@ const searchChange = async () => {
       const FMaterialId = res.MaterialCode //物料编码FMaterialId.Fnumber
       const FLot = res.Lot //批号FLot
       const FStockId = currentWarehouse.number //仓库FStockId.Fname
-      console.log('获取推荐仓位（根据物料编码、批号、仓库查库存表）', FlexNumber)
       if (FlexNumber.value !== '') {
         let FilterString = `FMaterialId.Fnumber = '${FMaterialId}'`
         if (FLot !== '') {
@@ -409,7 +408,6 @@ const searchClick = async () => {
     scanType: ['barCode', 'qrCode'],
     onlyFromCamera: true
   })
-  console.log('扫码结果', res)
   if (res) {
     const result = res.result
 
@@ -442,7 +440,6 @@ function sectionChange(index: any) {
 //仓库扫出数据
 const warehouseChange = debounceSave(
   async (val: any, iswarehouse: boolean, focus: number, iswarehousePosition?: boolean) => {
-    console.log('warehouseChange', focusIndex.value, focus)
     if (focusIndex.value == focus) {
       handleFocus()
     }
@@ -476,7 +473,6 @@ const warehouseChange = debounceSave(
       }
       if (currentWarehouse.name == warehouseId.text) return
 
-      console.log('warehouseId', warehouseId)
       reactiveData.titleList[2].value = warehouseId.text
       currentWarehouse.name = warehouseId.text
       currentWarehouse.number = warehouseId.value
@@ -527,7 +523,6 @@ const warehouseChange = debounceSave(
           currentWarehousePosition.name = warehouseId.text
           currentWarehousePosition.number = warehouseId.value
           currentWarehousePosition.id = warehouseId.id
-          console.log('仓位', reactiveData.detailsList)
           if (reactiveData.detailsList.length !== 0) {
             reactiveData.detailsList[reactiveData.datailsIndex].WarehousePosition =
               warehouseId.value
@@ -802,7 +797,6 @@ const backClick = async () => {
   const barCodes = reactiveData.detailsList
     .map((item: any) => item.barcodeList.map((barCode: any) => barCode.F_BARCODENO))
     .flat()
-  console.log('barCodes', barCodes)
   if (barCodes.length === 0) {
     uni.showToast({
       icon: 'none',
@@ -814,7 +808,6 @@ const backClick = async () => {
     barcodes: barCodes,
     status: '1'
   })
-  console.log('tmStatusRes', tmStatusRes)
   if (tmStatusRes && tmStatusRes.data && tmStatusRes.data.length > 0) {
     //条码状态不为1的提示
     uni.showToast({
@@ -997,7 +990,6 @@ const backClick = async () => {
     })
     return null
   })
-  console.log('保存', dataList)
   let currentData = {
     currentWarehouseId: currentWarehouse.id,
     currentWarehouseName: currentWarehouse.name,

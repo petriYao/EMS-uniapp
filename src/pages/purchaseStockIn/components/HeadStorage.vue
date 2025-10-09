@@ -54,7 +54,6 @@ const groupChange = () => {
 
 onBeforeMount(() => {
   let UserAuthority = uni.getStorageSync('UserAuthority')
-  console.log('UserAuthority', UserAuthority)
   // 判断权限
   if (UserAuthority) {
     if (UserAuthority.includes('21')) {
@@ -69,7 +68,6 @@ onBeforeMount(() => {
   }
   //获取本地缓存的扫码类型
   const scanCodeType = uni.getStorageSync(`scanCodeType-${reactiveData.title}`)
-  console.log('scanCodeType', reactiveData.radioList[1].disabled)
   // 如果两个选项都不被禁用，则默认不选择任何选项
   if (reactiveData.radioList[0].disabled && reactiveData.radioList[1].disabled) {
     reactiveData.scanCodeType = scanCodeType // 默认空值

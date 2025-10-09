@@ -53,8 +53,6 @@ const editBarCode = async (Number: any) => {
 }
 //保存
 const saveClick = async () => {
-  console.log('保存', reactiveData)
-
   //判断如果reactiveData.detailsList是空对象,返回错误
   if (Object.keys(reactiveData.detailsList).length === 0) {
     uni.showToast({
@@ -64,7 +62,6 @@ const saveClick = async () => {
     return
   }
   reactiveData.Model = JSON.parse(JSON.stringify(reactiveData.detailsList.Model))
-  console.log('Model', reactiveData.Model)
   //如果是空对象，则返回
   if (Object.keys(reactiveData.lowerCamelCaseList).length === 0) {
     uni.showToast({
@@ -79,7 +76,6 @@ const saveClick = async () => {
     return item.FENTRYID === reactiveData.lowerCamelCaseList.FENTRYID
   })
   reactiveData.loading = true
-  console.log('找到单据体ID', index)
   let num = 0
 
   const barcodeList = reactiveData.lowerCamelCaseList.barcodeList.map((item: any) => {
@@ -108,7 +104,6 @@ const saveClick = async () => {
     if (reactiveData.lowerCamelCaseList.isInteger) {
       //删除Model.FEntity[0].F_QADV_XSCKSubEntity中F_BARCODENO=searchValue的值
 
-      console.log('barcodeList', reactiveData.Model)
       for (const item of reactiveData.lowerCamelCaseList.barcodeList) {
         // const result = await editBarCode(item.F_BARCODENO)
         // if (!result) return
@@ -125,12 +120,10 @@ const saveClick = async () => {
       if (reactiveData.Model.FEntity[index].FSALUNITQTY <= 0) {
         reactiveData.Model.FEntity.splice(index, 1)
       }
-      console.log('Model', reactiveData.Model)
       //如果删除后数组长度为0，则删除该单据
       if (reactiveData.Model.FEntity.length === 0) {
         //反审核
         const AuditRes: any = await UnAuditApiClient('SAL_OUTSTOCK', reactiveData.Model.FID)
-        console.log('反审核', AuditRes)
         if (AuditRes && AuditRes.data.Result.ResponseStatus.ErrorCode === 500) {
           uni.showToast({
             title: '销售出库不允许修改',
@@ -143,7 +136,6 @@ const saveClick = async () => {
         //调用删除单据接口
         const saveRes: any = await deleteSalesOrder(reactiveData.Model.FID)
 
-        console.log('删除', saveRes)
         if (saveRes && saveRes.data.Result.ResponseStatus.ErrorCode === 500) {
           uni.showToast({
             title: saveRes.data.Result.ResponseStatus.Errors[0].Message,
@@ -157,7 +149,6 @@ const saveClick = async () => {
         await UnAuditApiClient('SAL_OUTSTOCK', reactiveData.Model.FID)
 
         const saveRes = await saveSalesOrder(reactiveData.Model)
-        console.log('保存出库单', saveRes.data.Result.ResponseStatus.MsgCode)
 
         if (saveRes && saveRes.data?.Result?.ResponseStatus?.ErrorCode === 500) {
           uni.showToast({
@@ -201,7 +192,6 @@ const saveClick = async () => {
     if (reactiveData.Model.FEntity.length === 0) {
       //反审核
       const AuditRes: any = await UnAuditApiClient('SAL_OUTSTOCK', reactiveData.Model.FID)
-      console.log('反审核', AuditRes)
       if (AuditRes && AuditRes.data.Result.ResponseStatus.ErrorCode === 500) {
         uni.showToast({
           title: '销售出库不允许修改',
@@ -212,7 +202,6 @@ const saveClick = async () => {
         return
       }
       const saveRes: any = await deleteSalesOrder(reactiveData.Model.FID)
-      console.log('删除', saveRes)
       if (saveRes && saveRes.data.Result.ResponseStatus.ErrorCode === 500) {
         uni.showToast({
           title: saveRes.data.Result.ResponseStatus.Errors[0].Message,
@@ -226,7 +215,6 @@ const saveClick = async () => {
       await UnAuditApiClient('SAL_OUTSTOCK', reactiveData.Model.FID)
 
       const saveRes = await saveSalesOrder(reactiveData.Model)
-      console.log('保存出库单', saveRes)
       if (saveRes && saveRes.data?.Result?.ResponseStatus?.ErrorCode === 500) {
         uni.showToast({
           title: saveRes.data.Result.ResponseStatus.Errors[0].Message,

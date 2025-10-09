@@ -106,7 +106,6 @@ export function TMUpdate(parameters: any) {
   const data = {
     parameters: [parameters]
   }
-  console.log('修改条码', data)
   return http({
     url: '/k3cloud/Kingdee.BOS.TM.WebApi.ModifyBarcodeWebApiService.EditTM,Kingdee.BOS.TM.WebApi.common.kdsvc',
     method: 'POST',
@@ -120,7 +119,6 @@ export function EditCKTM(parameters: any) {
   const data = {
     parameters: [parameters]
   }
-  console.log('修改条码', data)
   return http({
     url: '/k3cloud/Kingdee.BOS.TM.WebApi.ModifyBarcodeWebApiService.EditCKTM,Kingdee.BOS.TM.WebApi.common.kdsvc',
     method: 'POST',

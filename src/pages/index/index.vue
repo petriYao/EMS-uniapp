@@ -21,7 +21,6 @@ const crmList5 = ref([] as any)
 const crmList6 = ref([] as any)
 
 const NavChange = (pages: any) => {
-  console.log('pages', pages)
   uni.navigateTo({
     url: `/pages/${pages}`
   })
@@ -29,9 +28,7 @@ const NavChange = (pages: any) => {
 
 //扫描条形码
 const scanCode = async () => {
-  console.log('条码类型点击:')
   const saleRes: any = await getPushCK('XSDD000001')
-  console.log('saleRes', saleRes.data.Result.ResponseStatus.SuccessEntitys[0].Id)
   router.push({
     url: `/pages/saleOrder/OutboundOrder?id=${saleRes.data.Result.ResponseStatus.SuccessEntitys[0].Id}`
   })
@@ -40,12 +37,9 @@ const scanCode = async () => {
   uni.scanCode({
     onlyFromCamera: true,
     success: async function (res: any) {
-      console.log('条码类型:' + res.scanType)
-      console.log('条码内容:' + res.result)
       //跳转并传参
       //1.下推
       const saleRes: any = await getPushCK(res.result)
-      console.log('saleRes', saleRes)
       //2.带参跳转
       router.push({
         url: `/pages/saleOrder/OutboundOrder?id=${saleRes.data.Result.ResponseStatus.SuccessEntitys[0].Id}`
@@ -56,7 +50,7 @@ const scanCode = async () => {
 
 onBeforeMount(() => {
   //更新
-  //UpdateInstallApp()
+  UpdateInstallApp()
   let UserAuthority = uni.getStorageSync('UserAuthority')
   crmList.value = []
   crmList2.value = []
@@ -74,7 +68,6 @@ onBeforeMount(() => {
     crmList5: [] as any[],
     crmList6: [] as any[]
   }
-  console.log('更新', UserAuthority)
   for (const item of UserAuthority) {
     switch (item) {
       case '8':
@@ -247,7 +240,6 @@ onBeforeMount(() => {
   crmList2.value = tempLists.crmList2
   crmList3.value = tempLists.crmList3
   crmList6.value = tempLists.crmList6
-  console.log('crmList6', crmList6.value)
   // 调整领料菜单顺序：生产领料 → 简单领料 → 委外领料 → 其他出库
   const materialMenus = tempLists.crmList5
   const reorderedMaterialMenus = []

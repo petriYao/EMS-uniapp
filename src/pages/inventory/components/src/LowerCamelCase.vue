@@ -30,14 +30,11 @@ const clearTimer = () => {
 }
 
 const quantChange = (val: any, item: any) => {
-  console.log('val', val)
-  console.log('item', item)
   // item.value = val
   // emit('update:detailsList', reactiveData.detailsList)
 }
 
 const clearChange = (val: any) => {
-  console.log('val', val)
   reactiveData.focus = 0
   setTimeout(() => {
     reactiveData.focus = val
@@ -47,7 +44,6 @@ const clearChange = (val: any) => {
 watch(
   () => props.detailsList,
   (val: any) => {
-    console.log('val dataList', val)
     reactiveData.detailsList = val
   },
   { immediate: true, deep: true }

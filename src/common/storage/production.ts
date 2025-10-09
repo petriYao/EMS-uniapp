@@ -10,10 +10,8 @@ export const getInboundOrder = async (searchValue: any) => {
   const dataList = [] as any
   let fid = 0
   const res = await getProductionOrder(searchValue)
-  console.log('条码单数据', res.data)
 
   if (res && res.data) {
-    console.log('条码单数据2', res.data.Result?.ResponseStatus?.IsSuccess)
     if (res.data.Result?.ResponseStatus?.IsSuccess === false) {
       uni.showToast({
         title: '生产入库单不存在',
@@ -30,9 +28,7 @@ export const getInboundOrder = async (searchValue: any) => {
     }
     fid = res.data.Result.Result.Id
     const TreeEntity = res.data.Result.Result.Entity
-    console.log('生产订单属性', TreeEntity)
     for (const item of TreeEntity) {
-      console.log('条码信息', JSON.stringify(item.F_BARSubEntity))
       const packagingSig = [] as string[] //分装编号
       const packagingData: {
         [key: string]: { quantity: number; unitQty: number; finishedQty: number }
@@ -64,8 +60,6 @@ export const getInboundOrder = async (searchValue: any) => {
         const keys = Object.keys(stockLoc)
 
         for (const key of keys) {
-          console.log('key', key)
-
           if (
             key.startsWith('F10000') &&
             stockLoc[key] !== null &&
@@ -80,7 +74,6 @@ export const getInboundOrder = async (searchValue: any) => {
         }
       }
 
-      console.log('数量', item.RealQty)
       const data = {
         currentList: [
           {
@@ -241,7 +234,6 @@ export const getInboundOrder = async (searchValue: any) => {
         // packagngSig: packagingSig
       }
       dataList.push(data)
-      console.log('生产入库明细数据123', data)
     }
   }
   return { dataList, fid }
@@ -257,8 +249,6 @@ export const productionGetData = async (
   if (res && res.data) {
     //生产订单-明细
     const barCodeData = res.data.Result.Result
-    console.log('生产订单行数据', barCodeData)
-
     if (barCodeData == null) {
       uni.showToast({
         title: '条码单不存在',
@@ -320,8 +310,6 @@ export const productionGetData = async (
       })
       return null
     }
-    console.log('条码状态', barCodeData.F_BARSTATUS)
-
     if (barCodeData.F_BARSTATUS != 1) {
       uni.showToast({
         title: '条码非创建状态',
@@ -334,7 +322,6 @@ export const productionGetData = async (
       `FBillNo = '${barCodeData.F_SourceFbillno}' AND FTreeEntity_FSeq = ${barCodeData.F_SourceEntry}`,
       `FBillNo,FNoStockInQty,FID,FTreeEntity_FEntryId,FWorkShopID.FNumber,FStockInQuaAuxQty` //单据编号,未入库数量,单据ID,行号ID,车间,累计入库
     )
-    console.log('查找最大可收货数量', res2.data)
     const packagingData = {} as any
     const packagingSig = [] as string[] //分装编号
 
@@ -362,7 +349,6 @@ export const productionGetData = async (
       packagingData[barCodeData.F_FZNO].unitQty = barCodeData.F_JUNITQTY
       packagingData[barCodeData.F_FZNO].finishedQty = barCodeData.F_UNITQTY / barCodeData.F_JUNITQTY
     }
-    console.log('测试', packagingData)
     const data = {
       currentList: [
         {
@@ -558,7 +544,6 @@ export const productionGetData = async (
       isInteger: false,
       FZquantity: 0
     }
-    console.log('扫描条码2222')
 
     return data
   }
@@ -569,7 +554,6 @@ export const getcamelCase = async (searchValue: any) => {
   const dataList = [] as any
   let fid = 0
   const res = await getProductionOrder(searchValue)
-  console.log('条码单数据', res.data)
 
   if (res && res.data) {
     if (res.data.Result?.ResponseStatus?.IsSuccess === false) {
@@ -588,7 +572,6 @@ export const getcamelCase = async (searchValue: any) => {
     }
     fid = res.data.Result.Result.Id
     const TreeEntity = res.data.Result.Result.Entity
-    console.log('生产订单属性', TreeEntity)
     for (const item of TreeEntity) {
       const stockLoc = item.StockLocId
       let actualValue = null
@@ -600,8 +583,6 @@ export const getcamelCase = async (searchValue: any) => {
         const keys = Object.keys(stockLoc)
 
         for (const key of keys) {
-          console.log('key', key)
-
           if (
             key.startsWith('F10000') &&
             stockLoc[key] !== null &&
@@ -777,7 +758,6 @@ export const getcamelCase = async (searchValue: any) => {
         Unit: item.BaseUnitId.Name[0].Value
       }
       dataList.push(data)
-      console.log('生产入库明细数据', data)
     }
   }
   return { dataList, fid }
