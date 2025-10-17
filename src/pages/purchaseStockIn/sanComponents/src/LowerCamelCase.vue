@@ -95,7 +95,9 @@ const warehouseChange = debounceSave((val: any) => {
       title: '仓位不存在',
       icon: 'none'
     })
-    reactiveData.detailsList[reactiveData.barcodeIndex].currentList[12].value = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].currentList.find(
+      (i: any) => i.label === '仓位'
+    ).value = ''
     reactiveData.detailsList[reactiveData.barcodeIndex].WarehousePosition = ''
     reactiveData.detailsList[reactiveData.barcodeIndex].WarehousePositionNumber = ''
     reactiveData.detailsList[reactiveData.barcodeIndex].detailList.location = ''
@@ -106,7 +108,9 @@ const warehouseChange = debounceSave((val: any) => {
     }, 100)
     return
   }
-  reactiveData.detailsList[reactiveData.barcodeIndex].currentList[12].value = warehouseId.value
+  reactiveData.detailsList[reactiveData.barcodeIndex].currentList.find(
+    (i: any) => i.label === '仓位'
+  ).value = warehouseId.value
   reactiveData.detailsList[reactiveData.barcodeIndex].WarehousePosition = warehouseId.Id
   reactiveData.detailsList[reactiveData.barcodeIndex].WarehousePositionNumber = warehouseId.value
 
@@ -124,15 +128,22 @@ const pickerConfirm = (warehouseItem: any) => {
   reactiveData.detailsList[reactiveData.barcodeIndex].WarehousePositionNumber = warehouseItem.value
 
   reactiveData.detailsList[reactiveData.barcodeIndex].detailList.location = warehouseItem.text
-  reactiveData.detailsList[reactiveData.barcodeIndex].currentList[12].value = warehouseItem.text
+  reactiveData.detailsList[reactiveData.barcodeIndex].currentList.find(
+    (i: any) => i.label === '仓位'
+  ).value = warehouseItem.text
   pickerShow.value = false
   emit('update:detailsList', reactiveData.detailsList)
   // emitter.emit('update:handleFocus')
 }
 
-const quantChange = (val: any) => {
-  reactiveData.detailsList[reactiveData.barcodeIndex].Quantity2 = val * 1
-  reactiveData.detailsList[reactiveData.barcodeIndex].currentList[13].value = val * 1
+const quantChange = (val: any, item: any) => {
+  console.log(val, item)
+  if (item.label == '数量') {
+    reactiveData.detailsList[reactiveData.barcodeIndex].Quantity2 = val * 1
+  } else if (item.label == '计价数') {
+    reactiveData.detailsList[reactiveData.barcodeIndex].detailList.priceUnitQty = val * 1
+    //reactiveData.detailsList[reactiveData.barcodeIndex].currentList[15].value = val * 1
+  }
 }
 
 function sectionChange(index: any) {
@@ -180,7 +191,7 @@ watch(
         class="flex items-center mb-6rpx"
         :style="item.style"
       >
-        <view class="w-50px flex justify-center">
+        <view class="w-60px flex justify-center">
           {{ item.label }}
         </view>
         <view class="flex-1 mr-20rpx" v-if="item.type == 'input'">
@@ -206,7 +217,7 @@ watch(
             shape="round"
             placeholder=""
             type="number"
-            @change="quantChange"
+            @change="quantChange($event, item)"
             @click="clearTimer"
           />
         </view>
@@ -321,8 +332,9 @@ watch(
               </view>
 
               <view class="w-50% flex items-center h-20px">
-                <view class="w-50px text-end">数量：</view>
-                <view> {{ item.Quantity2 }}</view>
+                <view class="w-80px text-end">数量：</view>
+                <view class="mr-6px"> {{ item.Quantity2 }}</view>
+                <view>{{ item.detailList.unit }}</view>
               </view>
             </view>
             <view class="flex">
@@ -330,11 +342,14 @@ watch(
                 <view class="w-50px text-end">仓位：</view>
                 <view>{{ item.detailList.location }}</view>
               </view>
-
-              <!-- <view class="w-50% flex items-center h-20px">
-              <view class="w-50px text-end">件数：</view>
-              <view> {{ item.barcodeList.length }}</view>
-            </view> -->
+              <view
+                class="w-50% flex items-center h-20px"
+                v-if="item.detailList.priceUnit !== item.detailList.unit"
+              >
+                <view class="w-77px text-end">计价数量：</view>
+                <view class="mr-6px"> {{ item.detailList.priceUnitQty }}</view>
+                <view> {{ item.detailList.priceUnit }}</view>
+              </view>
             </view>
           </view>
         </view>

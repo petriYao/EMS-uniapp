@@ -275,7 +275,7 @@ const getWarehousePosition = async (warehouseId: any) => {
         reactiveData.focus = 0
         setTimeout(() => {
           reactiveData.focus = 2
-        }, 500)
+        }, 200)
       }
       emit('update:locationList', locationData.locationList)
     }

@@ -9,7 +9,7 @@ import { throttleSave } from '@/utils'
 //采购入库单
 const reactiveData = reactive({
   isShow: true, //是否选择
-  loading: false, //是否保存
+  loading: true, //是否保存
   title: '采购入库',
   FEntity: [] as any, //单据提交
   scanCodeType: ''
@@ -78,13 +78,13 @@ onBeforeUnmount(() => {
   </view>
   <scroll-view scroll-y style="height: calc(100vh - 40px - 44px - 24px)">
     <view v-if="reactiveData.scanCodeType == '扫码入库'">
-      <ContentStorage ref="contentStorageRef" />
+      <ContentStorage ref="contentStorageRef" v-model:loading="reactiveData.loading" />
     </view>
     <view v-if="reactiveData.scanCodeType == '扫单入库'">
-      <SanContentStorage ref="sanContentStorageRef" />
+      <SanContentStorage ref="sanContentStorageRef" v-model:loading="reactiveData.loading" />
     </view>
   </scroll-view>
-  <view class="h-40px">
+  <view class="h-40px" v-if="reactiveData.loading">
     <view>
       <view
         class="bg-#56a8fe text-#FFF w-100% h-40px flex justify-center items-center"

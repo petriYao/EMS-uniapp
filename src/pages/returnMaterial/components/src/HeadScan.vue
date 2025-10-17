@@ -54,7 +54,7 @@ const searchChange = debounce(async () => {
   } finally {
     resetSearchField() // 重置搜索字段
   }
-}, 500)
+}, 300)
 
 // 单据查询处理
 const handleDocumentSearch = async () => {
@@ -158,7 +158,9 @@ const findMatchingDetails = (queryRes: any): any[] => {
           item.MaterialCode === queryRes.MaterialCode &&
           item.SourceOrderNo === queryRes.SourceOrderNo &&
           item.Supplier === queryRes.Supplier &&
-          item.Lot === queryRes.Lot
+          item.Lot === queryRes.Lot &&
+          item.detailList.warehouseNumber === queryRes.barcodeList.FSTOCKNumber &&
+          item.detailList.stockLocNumber === queryRes.barcodeList.STOCKLOCNumber
         )
       case '其他出库':
         return item.MaterialCode === queryRes.MaterialCode && item.Lot === queryRes.Lot

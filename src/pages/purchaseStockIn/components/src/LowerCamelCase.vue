@@ -213,7 +213,9 @@ const warehouseChange = debounceSave((val: any) => {
       title: '仓位不存在',
       icon: 'none'
     })
-    reactiveData.detailsList[reactiveData.barcodeIndex].currentList[12].value = ''
+    reactiveData.detailsList[reactiveData.barcodeIndex].currentList.find(
+      (i: any) => i.label === '仓位'
+    ).value = ''
     reactiveData.detailsList[reactiveData.barcodeIndex].WarehousePosition = ''
     reactiveData.detailsList[reactiveData.barcodeIndex].WarehousePositionNumber = ''
     reactiveData.detailsList[reactiveData.barcodeIndex].detailList.location = ''
@@ -225,7 +227,9 @@ const warehouseChange = debounceSave((val: any) => {
     return
   }
   reactiveData.detailsList[reactiveData.barcodeIndex].FStockLocId = warehouseId.Id
-  reactiveData.detailsList[reactiveData.barcodeIndex].currentList[12].value = warehouseId.text
+  reactiveData.detailsList[reactiveData.barcodeIndex].currentList.find(
+    (i: any) => i.label === '仓位'
+  ).value = warehouseId.text
   reactiveData.detailsList[reactiveData.barcodeIndex].detailList.location = warehouseId.text
 
   reactiveData.detailsList[reactiveData.barcodeIndex].WarehousePosition = warehouseId.Id
@@ -240,7 +244,10 @@ const warehouseChange = debounceSave((val: any) => {
 
 const pickerConfirm = (warehouseItem: any) => {
   reactiveData.detailsList[reactiveData.barcodeIndex].FStockLocId = warehouseItem.Id
-  reactiveData.detailsList[reactiveData.barcodeIndex].currentList[12].value = warehouseItem.text
+  reactiveData.detailsList[reactiveData.barcodeIndex].currentList.find(
+    (i: any) => i.label === '仓位'
+  ).value = warehouseItem.text
+
   reactiveData.detailsList[reactiveData.barcodeIndex].detailList.location = warehouseItem.text
   pickerShow.value = false
   emit('update:detailsList', reactiveData.detailsList)
@@ -250,6 +257,13 @@ const pickerConfirm = (warehouseItem: any) => {
 function sectionChange(index: any) {
   reactiveData.curNow = index
   reactiveData.focus = 999
+}
+
+const quantChange = (val: any, item: any) => {
+  console.log(val, item)
+  if (item.label == '计价数') {
+    reactiveData.detailsList[reactiveData.barcodeIndex].detailList.priceUnitQty = val * 1
+  }
 }
 
 const clearTimer = () => {
@@ -302,7 +316,7 @@ watch(
         class="flex items-center mb-6rpx"
         :style="item.style"
       >
-        <view class="w-50px flex justify-center">
+        <view class="w-60px flex justify-center">
           {{ item.label }}
         </view>
         <view class="flex-1 mr-20rpx" v-if="item.type == 'input'">
@@ -312,6 +326,22 @@ watch(
             :disabled="item.disabled"
             shape="round"
             placeholder=""
+          />
+        </view>
+        <view
+          class="flex-1 mr-20rpx"
+          style="border: 1px solid #f8f8f8"
+          v-else-if="item.type == 'number'"
+        >
+          <u-input
+            v-model="item.value"
+            :showAction="false"
+            :disabled="item.disabled"
+            shape="round"
+            placeholder=""
+            type="number"
+            @change="quantChange($event, item)"
+            @click="clearTimer"
           />
         </view>
         <view
@@ -458,7 +488,8 @@ watch(
 
               <view class="w-50% flex items-center h-20px">
                 <view class="w-50px text-end">数量：</view>
-                <view> {{ item.Quantity2 }}</view>
+                <view class="mr-6px"> {{ item.Quantity2 }}</view>
+                <view> {{ item.detailList.unit }}</view>
               </view>
             </view>
             <view class="flex">
@@ -470,6 +501,13 @@ watch(
               <view class="w-50% flex items-center h-20px">
                 <view class="w-50px text-end">件数：</view>
                 <view> {{ item.barcodeList.length }}</view>
+              </view>
+            </view>
+            <view class="flex" v-if="!item.isUnit">
+              <view class="flex items-center h-20px">
+                <view class="w-77px text-end">计价数量：</view>
+                <view class="mr-6px">{{ item.detailList.priceUnitQty }}</view>
+                <view>{{ item.detailList.priceUnit }}</view>
               </view>
             </view>
           </view>

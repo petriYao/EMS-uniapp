@@ -132,7 +132,7 @@ const searchChange = () => {
 
     reactiveData.searchValue = ''
     focusTm()
-  }, 500)
+  }, 300)
 }
 
 const focusTm = () => {

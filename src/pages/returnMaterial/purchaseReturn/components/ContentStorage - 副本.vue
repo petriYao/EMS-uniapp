@@ -3,23 +3,19 @@ import { reactive } from 'vue'
 import HeadScan from '../../components/src/HeadScan.vue'
 import LowerCamelCase from '../../components/src/LowerCamelCase.vue'
 // import { pushClient } from '@/api/modules/transferOrder'
-import { EditCKTM, OutsourcedRequisition } from '@/api/commonHttp'
+import { EditCKTM, CYCKQuery } from '@/api/commonHttp'
 import { TMStatusQuery } from '@/api/commonHttp'
-import { throttleSave } from '@/utils'
-import {
-  queryPurchaseReturn,
-  saveOutsourceMaterialRequisition
-} from '@/common/returnMaterial/OtherOutbound'
+import { queryPurchaseReturn, savePurchaseReturn } from '@/common/returnMaterial/Index'
 
 const reactiveData = reactive({
   detailsList: [] as any,
   fid: '',
-  title: '委外领料',
+  title: '采购退货',
   loading: true
 })
 
 //保存
-const saveClick = throttleSave(async () => {
+const saveClick = async () => {
   if (reactiveData.detailsList.length == 0) {
     uni.showToast({
       title: '无提交数据',
@@ -29,22 +25,18 @@ const saveClick = throttleSave(async () => {
   }
   //判断条码入库状态
   let barcodeList = []
-
-  let index = 1
+  // for (const item of reactiveData.detailsList) {
+  //   barcodeList.push(
+  //     ...item.barcodeList.map((item: any) => {
+  //       return item.FNumber
+  //     })
+  //   )
+  // }
   //修改条码
   for (const item of reactiveData.detailsList) {
-    //当库存小于应发数量时提示
-    if (item.Quantity2 > item.detailList.inventory) {
-      uni.showToast({
-        title: `第${index}行库存不足`,
-        icon: 'none'
-      })
-      return
-    }
-    index++
-    //收集条码
     barcodeList.push(...item.barcodeList.map((item: any) => item.FNumber))
   }
+
   if (barcodeList.length == 0) {
     uni.showToast({
       title: '无提交数据',
@@ -79,12 +71,24 @@ const saveClick = throttleSave(async () => {
       isValid = false
       break
     }
+    if (!item.isUnit) {
+      console.log('item2', item.detailList.priceUnitQty)
+      if (item.Quantity2 > 0 && item.detailList.priceUnitQty == 0) {
+        uni.showToast({
+          title: `第${i + 1}行计价数量应大于0`,
+          icon: 'none'
+        })
+        isValid = false
+        return
+      }
+    }
+
     if (item.barcodeList.length !== 0) {
       detailsList.push({
-        srcBillNo: item.SrcBillNo,
-        srcEntrySeq: item.SrcEntrySeq,
+        entryId: item.entryId,
         isSplit: item.IsSplit,
-        lotId: item.Lot,
+        sum: item.Quantity2,
+        priceUnitQty: item.isUnit ? item.Quantity2 : item.detailList.priceUnitQty,
         barcodeList: item.barcodeList
       })
     }
@@ -93,75 +97,75 @@ const saveClick = throttleSave(async () => {
   if (!isValid) {
     return // 阻止后续代码的执行
   }
-  // const pushResYz = await saveOutsourceMaterialRequisition({ FID: reactiveData.fid }, false)
-  // if (pushResYz && pushResYz.data.Result.ResponseStatus.ErrorCode === 500) {
-  //   uni.showToast({
-  //     title: pushResYz.data.Result.ResponseStatus.Errors[0].Message,
-  //     icon: 'none',
-  //     duration: 5000
-  //   })
-  //   return
-  // }
-  /**库存检查***************************************************************** */
-
-  const resQues: any = await OutsourcedRequisition({
+  const pushResYz = await savePurchaseReturn({ FID: reactiveData.fid }, false)
+  if (pushResYz && pushResYz.data.Result.ResponseStatus.ErrorCode === 500) {
+    uni.showToast({
+      title: pushResYz.data.Result.ResponseStatus.Errors[0].Message,
+      icon: 'none',
+      duration: 5000
+    })
+    return
+  }
+  //自定义api，用于拆分条码
+  const resQues: any = await CYCKQuery({
     fid: reactiveData.fid,
     detailsList: detailsList
   })
   const resQue = resQues.data
+  /**库存检查***************************************************************** */
+
   if (resQue && resQue.isSuccess) {
     reactiveData.loading = false
 
     //单据查询 采购退料单
     const resView: any = await queryPurchaseReturn(
-      'SUB_PickMtrl',
+      'PUR_MRB',
       `fid = '${reactiveData.fid}'`,
-      'FEntity_FEntryID,FActualQty'
+      'FPURMRBENTRY_FEntryID,FRMREALQTY'
     )
     if (resView && resView.data.length > 0) {
       let Model = {
         FID: reactiveData.fid,
-        FEntity: [] as any
+        FPURMRBENTRY: [] as any
       }
       for (const item of resView.data) {
-        Model.FEntity.push({
+        Model.FPURMRBENTRY.push({
           FENTRYID: item[0],
-          FActualQty: item[1]
+          FRMREALQTY: item[1]
         })
       }
-      //3.保存其他出库单
-      const pushResSaveData: any = await saveOutsourceMaterialRequisition(Model)
-      if (pushResSaveData && pushResSaveData.data.Result.ResponseStatus.ErrorCode === 500) {
+      //3.保存采购退货单
+      const pushResSaveData = await savePurchaseReturn(Model)
+      if (pushResSaveData.data.Result.Number && pushResSaveData.data.Result.Number.length > 3) {
+        EditCKTM({
+          barcodes: barcodeList,
+          documentNumber: pushResSaveData.data.Result.Number,
+          documentType: '采购退料单',
+          status: '3'
+        })
+        uni.showToast({
+          title: '操作成功',
+          icon: 'none'
+        })
+        reactiveData.detailsList = []
+      } else {
         uni.showToast({
           title: pushResSaveData.data.Result.ResponseStatus.Errors[0].Message,
           icon: 'none',
           duration: 5000
         })
-        return
       }
-      EditCKTM({
-        barcodes: barcodeList,
-        documentNumber: pushResSaveData.data.Result.Number,
-        documentType: '委外领料单',
-        status: '3'
-      })
-      reactiveData.detailsList = []
     }
-
-    uni.showToast({
-      title: '操作成功',
-      icon: 'none'
-    })
   } else {
     uni.showToast({
       title: resQue.message,
-      icon: 'none'
+      icon: 'none',
+      duration: 5000
     })
   }
-  setTimeout(() => {
-    reactiveData.loading = true
-  }, 200)
-})
+  reactiveData.loading = true
+}
+
 //暴露方法
 defineExpose({
   saveClick
@@ -180,7 +184,7 @@ defineExpose({
   </view>
   <!-- 内容 -->
   <view class="bg-#FFF" v-if="reactiveData.loading">
-    <LowerCamelCase v-model:detailsList="reactiveData.detailsList" />
+    <LowerCamelCase v-model:detailsList="reactiveData.detailsList" :title="reactiveData.title" />
   </view>
 </template>
 <style lang="less" scoped>

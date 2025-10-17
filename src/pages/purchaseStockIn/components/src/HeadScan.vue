@@ -71,14 +71,14 @@ const searchClick = async () => {
       //触发更新事件
       setTimeout(() => {
         reactiveData.focus = 3
-      }, 500)
+      }, 200)
     } else if (reactiveData.focus === 2) {
       //在reactiveData.focus为3时，给仓位赋值
       reactiveData.heardList.location = res.result
       locationChange(res.result)
       setTimeout(() => {
         reactiveData.focus = 0
-      }, 500)
+      }, 200)
     } else {
       searchInput.value.setValue(res.result)
     }
@@ -252,6 +252,7 @@ const searchChange = () => {
       reactiveData.detailsList.push(queryRes)
       emitter.emit('update:datailsIndex', 0)
     }
+    console.log('addNewBarcodeDetail', reactiveData.detailsList)
     emit('update:detailsList', reactiveData.detailsList)
 
     reactiveData.searchValue = ''
@@ -293,6 +294,7 @@ const pickerConfirm = async (val: any) => {
   reactiveData.heardList.warehouse = val.text
   reactiveData.setData.warehouseNumber = val.value
   reactiveData.setData.warehouseId = val.id
+  console.log('pickerConfirm', val)
   //清空所有仓位
   clearAllPositions()
 
@@ -352,6 +354,7 @@ const locationPickerConfirm = (val: any) => {
   reactiveData.heardList.location = val.text
   reactiveData.setData.locationNumber = val.value
   reactiveData.setData.locationId = val.Id
+  // FStockLocId
   locationData.show = false
   focusTm()
   handleFocus()
@@ -543,7 +546,7 @@ onBeforeMount(() => {
           @blur="warehouseChange"
         >
           <template #suffix>
-            <view @click="warehouseData.show = true">
+            <view @click="reactiveData.setData.warehouseDisplay ? '' : (warehouseData.show = true)">
               <u-icon name="arrow-down" size="20" />
             </view>
             <view>

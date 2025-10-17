@@ -17,6 +17,7 @@ const reactiveData = reactive({
 
 //保存
 const saveClick = throttleSave(async () => {
+  console.log('保存1', reactiveData.detailsList)
   if (reactiveData.detailsList.length == 0) {
     uni.showToast({
       title: '无提交数据',
@@ -92,15 +93,15 @@ const saveClick = throttleSave(async () => {
   if (!isValid) {
     return // 阻止后续代码的执行
   }
-  const pushResYz = await saveMaterialRequisition({ FID: reactiveData.fid }, false)
-  if (pushResYz && pushResYz.data.Result.ResponseStatus.ErrorCode === 500) {
-    uni.showToast({
-      title: pushResYz.data.Result.ResponseStatus.Errors[0].Message,
-      icon: 'none',
-      duration: 5000
-    })
-    return
-  }
+  // const pushResYz = await saveMaterialRequisition({ FID: reactiveData.fid }, false)
+  // if (pushResYz && pushResYz.data.Result.ResponseStatus.ErrorCode === 500) {
+  //   uni.showToast({
+  //     title: pushResYz.data.Result.ResponseStatus.Errors[0].Message,
+  //     icon: 'none',
+  //     duration: 5000
+  //   })
+  //   return
+  // }
   /**库存检查***************************************************************** */
 
   const resQues: any = await MaterialRequisition({

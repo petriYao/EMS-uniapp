@@ -122,7 +122,7 @@ const searchChange = debounce(async () => {
     setTimeout(() => {
       reactiveData.focus = 1
     }, 200)
-  }, 500)
+  }, 300)
 }, 300)
 
 //扫码

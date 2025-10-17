@@ -104,7 +104,7 @@ const saveClick = throttleSave(async () => {
     reactiveData.isShow = false //隐藏标题组件
     setTimeout(() => {
       reactiveData.isShow = true //显示标题组件
-    }, 500)
+    }, 200)
     reactiveData.detailsList = []
     reactiveData.barcodeIndex = 0
     reactiveData.setData = {}

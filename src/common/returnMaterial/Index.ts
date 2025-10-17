@@ -26,6 +26,32 @@ export const getcamelCase = async (searchValue: any) => {
     fid = res.data.Result.Result.Id
     const TreeEntity = res.data.Result.Result.PUR_MRBENTRY
     for (const item of TreeEntity) {
+      console.log('PRICEUNITID', item)
+
+      const stockLoc = item?.FSTOCKLOCID
+      let actualValue = null
+
+      // 获取对象的所有 key
+      const FStockLocId = {} as any
+      // 找到第一个 F10000x 字段，且其值不为 null
+      if (stockLoc != null) {
+        const keys = Object.keys(stockLoc)
+
+        for (const key of keys) {
+          if (
+            key.startsWith('F10000') &&
+            stockLoc[key] !== null &&
+            typeof stockLoc[key] === 'object'
+          ) {
+            FStockLocId[`FSTOCKLOCID__F` + key] = {
+              Fnumber: stockLoc[key].Number
+            }
+            actualValue = stockLoc[key]
+            break
+          }
+        }
+      }
+
       const data = {
         currentList: [
           {
@@ -76,14 +102,14 @@ export const getcamelCase = async (searchValue: any) => {
             value: item.F_QADV_HTNO,
             disabled: true,
             type: 'input',
-            style: { width: '65%' }
+            style: { width: '60%' }
           },
           {
             label: '批量',
             value: null,
             disabled: true,
             type: 'input',
-            style: { width: '35%' }
+            style: { width: '40%' }
           },
 
           {
@@ -91,14 +117,14 @@ export const getcamelCase = async (searchValue: any) => {
             value: item.F_QADV_KH?.Name?.[0]?.Value,
             disabled: true,
             type: 'input',
-            style: { width: '65%' }
+            style: { width: '60%' }
           },
           {
             label: '总箱数',
             value: null,
             disabled: true,
             type: 'input',
-            style: { width: '35%' }
+            style: { width: '40%' }
           },
 
           {
@@ -106,25 +132,54 @@ export const getcamelCase = async (searchValue: any) => {
             value: item.RMREALQTY,
             disabled: true,
             type: 'input',
-            style: { width: '65%' }
+            style: { width: '60%' }
           },
           {
             label: '单位',
             value: item.FUnitID?.Name[0].Value,
             disabled: true,
             type: 'input',
-            style: { width: '35%' }
+            style: { width: '40%' }
+          },
+          {
+            label: '计价数',
+            value: item.PRICEUNITQTY,
+            disabled: false,
+            type: 'number',
+            style: {
+              width: '60%',
+              display: item.FUnitID?.Name[0].Value == item.PRICEUNITID?.Name[0].Value ? 'none' : ''
+            }
+          },
+
+          {
+            label: '计价单位',
+            value: item.PRICEUNITID?.Name[0].Value,
+            disabled: true,
+            type: 'input',
+            style: {
+              width: '40%',
+              display: item.FUnitID?.Name[0].Value == item.PRICEUNITID?.Name[0].Value ? 'none' : ''
+            }
           }
         ],
         detailList: {
           //编码，批号，名称，规格，可退，数量，仓位，件数
           fnumber: item.MATERIALID.Number, //编码
           lot: item.Lot_Text, //批号
+          unit: item.FUnitID?.Name[0].Value, //单位
           name: item.MATERIALID?.Name[0].Value, //名称
           specification: item.MATERIALID.MultiLanguageText[0].Specification, //规格
           receivableQuantity: item.RMREALQTY, //可退
+          priceUnitQty: item.PRICEUNITQTY, //计价数量
+          priceUnit: item.PRICEUNITID?.Name[0].Value, //计价单位
+          warehouseNumber: item.STOCKID?.Number, //仓库
+          warehouseName: item.STOCKID?.Name?.[0]?.Value, //仓位
+          stockLocName: actualValue?.Name?.[0]?.Value, //仓位
+          stockLocNumber: actualValue?.Number,
           quantity: 0 //数量
         },
+        isUnit: item.FUnitID?.Name[0].Value == item.PRICEUNITID?.Name[0].Value, //单位与计价单位是否相同
         barcodeList: [],
         //供应商
         Supplier: res.data.Result.Result.SUPPLIERID?.Name[0].Value,

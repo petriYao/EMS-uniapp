@@ -47,7 +47,9 @@ export const getSimple = async (searchValue: any) => {
       // 查询库存
       let inventory = 0
       const FilterString = `FMaterialId.Fnumber = '${item.MaterialId.Number}' ${
-        item.Lot_Text == ' ' ? '' : "AND FLot.Fnumber = '" + item.Lot_Text + "'"
+        item.Lot_Text == ' ' || item.Lot_Text == ''
+          ? ''
+          : "AND FLot.Fnumber = '" + item.Lot_Text + "'"
       } AND FStockId.Fnumber = '${item.StockId.Number}'`
       const FieldKeys = 'FBaseQty'
       const lowerRes: any = await lowerCamelCase2(FilterString, FieldKeys)
@@ -565,4 +567,20 @@ export const getSanSimple = async (searchValue: any) => {
 
     return { dataList: mergedDataList, fid }
   }
+}
+
+export const getInventory = async (Number: any, Lot_Text: any, StockId: any) => {
+  // 查询库存信息
+  let inventory = 0
+  const FilterString = `FMaterialId.Fnumber = '${Number}' ${
+    Lot_Text == ' ' || Lot_Text == '' ? '' : "AND FLot.Fnumber = '" + Lot_Text + "'"
+  } AND FStockId.Fnumber = '${StockId}'`
+  const FieldKeys = 'FBaseQty'
+  const lowerRes: any = await lowerCamelCase2(FilterString, FieldKeys)
+  if (lowerRes && lowerRes.data && lowerRes.data.length > 0) {
+    for (const data of lowerRes.data) {
+      inventory += data[0]
+    }
+  }
+  return inventory
 }

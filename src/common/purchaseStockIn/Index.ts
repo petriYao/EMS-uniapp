@@ -1,5 +1,5 @@
 import { lookBarCode, queryBarCode } from '@/api/modules/storage'
-import { transferOrder, getProductionOrder } from '@/api/modules/transferOrder'
+import { transferOrder, getProductionOrder, queryMaterial } from '@/api/modules/transferOrder'
 // 采购入库-扫描条码
 export const purchaseScanBarcode = async (searchValue: any, setData: any) => {
   const res = await lookBarCode(searchValue)
@@ -90,6 +90,9 @@ export const purchaseScanBarcode = async (searchValue: any, setData: any) => {
       })
       return null
     }
+    //查询物料
+    const resMaterial: any = await queryMaterial(`FNumber = '${barCodeData.F_NUMBER.Number}'`)
+    console.log(resMaterial, resMaterial.data[0][2] === resMaterial.data[0][3])
     const packagingData = {} as any
     const packagingSig = [] as string[] //分装编号
 
@@ -166,17 +169,17 @@ export const purchaseScanBarcode = async (searchValue: any, setData: any) => {
           label: '合同',
           value:
             barCodeData.F_HTNO +
-            (barCodeData.F_QADV_HTENTRYID !== ' ' ? '-' + barCodeData.F_QADV_HTENTRYID : ''),
+            (barCodeData.F_QADV_HTENTRYID != 0 ? '-' + barCodeData.F_QADV_HTENTRYID : ''),
           disabled: true,
           type: 'input',
-          style: { width: '65%' }
+          style: { width: '60%' }
         },
         {
           label: '批量',
           value: barCodeData.F_POQTY,
           disabled: true,
           type: 'input',
-          style: { width: '35%' }
+          style: { width: '40%' }
         },
 
         {
@@ -184,28 +187,49 @@ export const purchaseScanBarcode = async (searchValue: any, setData: any) => {
           value: barCodeData.FCUSTID?.Name?.[0]?.Value,
           disabled: true,
           type: 'input',
-          style: { width: '65%' }
+          style: { width: '60%' }
         },
         {
           label: '总箱数',
           value: barCodeData.F_TOTALCARTONQTY,
           disabled: true,
           type: 'input',
-          style: { width: '35%' }
+          style: { width: '40%' }
         },
         {
           label: '推荐',
           value: '',
           disabled: true,
           type: 'input',
-          style: { width: '65%' }
+          style: { width: '60%' }
         },
         {
           label: '单位',
           value: barCodeData.F_NUMBER.MaterialBase[0].BaseUnitId.Name[0].Value,
           disabled: true,
           type: 'input',
-          style: { width: '35%' }
+          style: { width: '40%' }
+        },
+        {
+          label: '计价数',
+          value: null,
+          disabled: false,
+          type: 'number',
+          style: {
+            width: '60%',
+            display: resMaterial.data[0][2] === resMaterial.data[0][3] ? 'none' : ''
+          }
+        },
+
+        {
+          label: '计价单位',
+          value: resMaterial.data[0][3],
+          disabled: true,
+          type: 'input',
+          style: {
+            width: '40%',
+            display: resMaterial.data[0][2] === resMaterial.data[0][3] ? 'none' : ''
+          }
         },
         {
           label: '仓位',
@@ -236,12 +260,16 @@ export const purchaseScanBarcode = async (searchValue: any, setData: any) => {
         //编码，批号，名称，规格，可收，数量，仓位，件数
         fnumber: barCodeData.F_NUMBER.Number, //编码
         lot: barCodeData.F_WLLOT, //批号
+        unit: barCodeData.F_NUMBER.MaterialBase[0].BaseUnitId.Name[0].Value, //单位
         name: barCodeData.F_NUMBER.Name[0].Value, //名称
         specification: barCodeData.F_NUMBER.MultiLanguageText[0].Specification, //规格
         receivableQuantity: barCodeData.F_POQTY, //可收
         quantity: barCodeData.F_UNITQTY, //数量
-        location: setData.locationNumber //仓位
+        location: setData.locationNumber, //仓位
+        priceUnitQty: 0, //计价数量
+        priceUnit: resMaterial.data[0][3] //计价单位
       },
+      isUnit: resMaterial.data[0][2] === resMaterial.data[0][3],
       //生产部门
       ProductionDepartment: barCodeData.F_ALMA_BM?.Number,
       //条码单编码
@@ -401,14 +429,14 @@ export const getcamelCase = async (searchValue: any) => {
             value: item.F_QADV_HTNO,
             disabled: true,
             type: 'input',
-            style: { width: '65%' }
+            style: { width: '60%' }
           },
           {
             label: '批量',
             value: null,
             disabled: true,
             type: 'input',
-            style: { width: '35%' }
+            style: { width: '40%' }
           },
 
           {
@@ -416,21 +444,21 @@ export const getcamelCase = async (searchValue: any) => {
             value: item.F_QADV_KH?.Name?.[0]?.Value,
             disabled: true,
             type: 'input',
-            style: { width: '65%' }
+            style: { width: '60%' }
           },
           {
             label: '总箱数',
             value: null,
             disabled: true,
             type: 'input',
-            style: { width: '35%' }
+            style: { width: '40%' }
           },
           {
             label: '推荐',
             value: '',
             disabled: true,
             type: 'input',
-            style: { width: '65%' }
+            style: { width: '60%' }
           },
 
           {
@@ -438,7 +466,30 @@ export const getcamelCase = async (searchValue: any) => {
             value: item.BaseUnitID?.Name[0].Value,
             disabled: true,
             type: 'input',
-            style: { width: '35%' }
+            style: { width: '40%' }
+          },
+          {
+            label: '计价数',
+            value: item.PriceUnitQty,
+            disabled: false,
+            type: 'number',
+            style: {
+              width: '60%',
+              display:
+                item.BaseUnitID?.Name[0].Value == item.PriceUnitID?.Name[0].Value ? 'none' : ''
+            }
+          },
+
+          {
+            label: '计价单位',
+            value: item.PriceUnitID?.Name[0].Value,
+            disabled: true,
+            type: 'input',
+            style: {
+              width: '40%',
+              display:
+                item.BaseUnitID?.Name[0].Value == item.PriceUnitID?.Name[0].Value ? 'none' : ''
+            }
           },
           {
             label: '仓位',
@@ -469,8 +520,11 @@ export const getcamelCase = async (searchValue: any) => {
           specification: item.MaterialId.MultiLanguageText[0].Specification, //规格
           receivableQuantity: item.MustQty, //可收
           quantity: item.RealQty, //数量
+          unit: item.BaseUnitID?.Name[0].Value, //单位
           location: actualValue?.Number, //仓位
-          FlexNumber: FlexNumber
+          FlexNumber: FlexNumber,
+          priceUnitQty: item.PriceUnitQty, //计价数量
+          priceUnit: item.PriceUnitID?.Name[0].Value //计价单位
         },
         entryId: item.Id,
         //是否第一次扫描条码

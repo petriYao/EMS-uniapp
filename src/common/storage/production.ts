@@ -73,7 +73,7 @@ export const getInboundOrder = async (searchValue: any) => {
           }
         }
       }
-
+      console.log('item FMoId', item)
       const data = {
         currentList: [
           {
@@ -181,7 +181,10 @@ export const getInboundOrder = async (searchValue: any) => {
         /*
         //条码单编码
         BarCode: searchValue,
+        
         */
+        id: item.Id, //行号ID
+        // MOFID: item.MoBillNo, //生产订单FID
         //是否整数
         isInteger: false,
         //生产部门
@@ -322,6 +325,14 @@ export const productionGetData = async (
       `FBillNo = '${barCodeData.F_SourceFbillno}' AND FTreeEntity_FSeq = ${barCodeData.F_SourceEntry}`,
       `FBillNo,FNoStockInQty,FID,FTreeEntity_FEntryId,FWorkShopID.FNumber,FStockInQuaAuxQty` //单据编号,未入库数量,单据ID,行号ID,车间,累计入库
     )
+    if (!res2 || !res2.data || res2.data.length === 0) {
+      uni.showToast({
+        title: '未找到生产订单',
+        icon: 'none'
+      })
+      return null
+    }
+    console.log('res2', res2)
     const packagingData = {} as any
     const packagingSig = [] as string[] //分装编号
 

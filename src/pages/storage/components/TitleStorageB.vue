@@ -140,7 +140,7 @@ const searchChange = async () => {
 
     loading.value = false
     changeFocus()
-  }, 500)
+  }, 300)
 }
 const changeFocus = () => {
   //光标位置
@@ -148,7 +148,7 @@ const changeFocus = () => {
   if (currentWarehouse.number === '' && !reactiveData.titleList[3].display) {
     setTimeout(() => {
       focusIndex.value = 2
-    }, 500)
+    }, 200)
   } else if (
     currentWarehousePosition.number === '' &&
     !reactiveData.titleList[3].disabled &&
@@ -156,11 +156,11 @@ const changeFocus = () => {
   ) {
     setTimeout(() => {
       focusIndex.value = 3
-    }, 500)
+    }, 200)
   } else {
     setTimeout(() => {
       focusIndex.value = 0
-    }, 500)
+    }, 200)
   }
 }
 
@@ -196,13 +196,13 @@ const searchClick = async () => {
       warehouseChange(result, 2, true) // 手动调用仓库 change
       setTimeout(() => {
         focusIndex.value = 3
-      }, 500)
+      }, 200)
     } else if (focusIndex.value === 3) {
       reactiveData.titleList[3].value = result
       warehouseChange(result, 3, false) // 手动调用仓位 change
       setTimeout(() => {
         focusIndex.value = 0
-      }, 500)
+      }, 200)
     } else {
       searchInput.value.setValue(result)
     }

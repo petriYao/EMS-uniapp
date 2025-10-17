@@ -57,7 +57,7 @@ const searchChange = debounce(async () => {
   } finally {
     resetSearchField()
   }
-}, 500)
+}, 300)
 
 // 单据查询处理
 const handleDocumentSearch = async () => {

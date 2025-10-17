@@ -3,6 +3,10 @@ import { reactive, watch } from 'vue'
 import { useEmitt } from '@/hooks/useEmitt'
 
 const props = defineProps({
+  title: {
+    type: String,
+    default: ''
+  },
   detailsList: {
     type: Array as any,
     default: () => [] as any
@@ -12,7 +16,7 @@ const props = defineProps({
 const emit = defineEmits<{
   (e: 'update:detailsList', modelValue: any): void
 }>()
-// const { emitter } = useEmitt()
+const { emitter } = useEmitt()
 
 const reactiveData = reactive({
   detailsList: [] as any,
@@ -188,7 +192,16 @@ const reCompute = (val: any) => {
   })
   return sum
 }
-
+const quantChange = (val: any, item: any) => {
+  if (item.label == '计价数') {
+    reactiveData.detailsList[reactiveData.barcodeIndex].detailList.priceUnitQty = val * 1
+  }
+}
+const clearTimer = () => {
+  // 清除定时器
+  emitter.emit('update:focus')
+  emitter.emit('update:clearTimer')
+}
 useEmitt({
   name: 'update:datailsIndex',
   callback: async (val) => {
@@ -229,7 +242,7 @@ watch(
         class="flex items-center mb-6rpx"
         :style="item.style"
       >
-        <view class="w-50px flex justify-center">
+        <view class="w-60px flex justify-center">
           {{ item.label }}
         </view>
         <view class="flex-1 mr-20rpx" v-if="item.type == 'input'">
@@ -239,6 +252,22 @@ watch(
             :disabled="item.disabled"
             shape="round"
             placeholder=""
+          />
+        </view>
+        <view
+          class="flex-1 mr-20rpx"
+          style="border: 1px solid #f8f8f8"
+          v-else-if="item.type == 'number'"
+          @click="clearTimer"
+        >
+          <u-input
+            v-model="item.value"
+            :showAction="false"
+            :disabled="item.disabled"
+            shape="round"
+            placeholder=""
+            type="number"
+            @change="quantChange($event, item)"
           />
         </view>
       </view>
@@ -315,6 +344,18 @@ watch(
               <view class="flex-wrap">{{ item.detailList.specification }}</view>
             </view>
 
+            <view class="flex" v-if="props.title === '采购退货'">
+              <view class="w-33% flex items-center h-20px">
+                <view class="w-50px text-end">仓库：</view>
+                <view> {{ item.detailList.warehouseName }}</view>
+              </view>
+
+              <view class="w-33% flex items-center h-20px">
+                <view class="w-50px text-end">仓位：</view>
+                <view> {{ item.detailList.stockLocName }}</view>
+              </view>
+            </view>
+
             <view class="flex">
               <view class="w-33% flex items-center h-20px">
                 <view class="w-50px text-end">可退：</view>
@@ -323,13 +364,19 @@ watch(
 
               <view class="w-33% flex items-center h-20px">
                 <view class="w-50px text-end">数量：</view>
-                <view> {{ item.Quantity2 }}</view>
+                <view class="mr-6px"> {{ item.Quantity2 }}</view>
+                <view> {{ item.detailList.unit }}</view>
               </view>
 
               <view class="w-33% flex items-center h-20px">
                 <view class="w-50px text-end">件数：</view>
                 <view> {{ item.barcodeList.length }}</view>
               </view>
+            </view>
+            <view class="flex items-center" v-if="!item.isUnit">
+              <view class="w-77px text-end">计价数量：</view>
+              <view class="mr-6px"> {{ item.detailList.priceUnitQty }}</view>
+              <view> {{ item.detailList.priceUnit }}</view>
             </view>
           </view>
         </view>

@@ -114,7 +114,7 @@ const searchChange = () => {
     handleBarcodeResult(queryRes)
     emit('update:detailsList', reactiveData.detailsList)
     resetSearch()
-  }, 500)
+  }, 300)
 }
 
 // 处理扫码结果

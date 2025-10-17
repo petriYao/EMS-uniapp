@@ -143,6 +143,26 @@ export function getProductionOrder(Number: any) {
   }
   return viewApi(data) as any
 }
+//生产入库单单据查询接口 FBillNo ='CGRK00122'，
+export function queryProductionOrder(FilterString: string) {
+  const data = {
+    parameters: [
+      {
+        FormId: `STK_InStock`,
+        FieldKeys:
+          'FInStockEntry_FEntryID,FMaterialId.FNumber,FStockId.Fnumber,FStockLocId,FRealQty,FPRICEUNITQTY',
+        FilterString: FilterString,
+        OrderString: '',
+        TopRowCount: 0,
+        StartRow: 0,
+        Limit: 2000,
+        SubSystemId: ''
+      }
+    ]
+  }
+  return executeBillQueryApi(data)
+}
+
 //即时库存单据查询接口
 export function lowerCamelCase2(FilterString: string, FieldKeys: string) {
   const data = {
@@ -181,7 +201,7 @@ export function lowerCamelCase3(FilterString: string, FieldKeys: string) {
   return executeBillQueryApi(data)
 }
 //生产入库单保存
-export function saveProductionOrder(FEntity: any, FID: any, SCCJ: string) {
+export function saveProductionOrder(FEntity: any, FID: any, SCCJ?: string) {
   // 获取当前时间（本地时区）
   const now = new Date()
 
@@ -198,7 +218,7 @@ export function saveProductionOrder(FEntity: any, FID: any, SCCJ: string) {
     data: {
       NeedUpDateFields: [],
       NeedReturnFields: [],
-      IsDeleteEntry: 'true',
+      IsDeleteEntry: 'false',
       SubSystemId: '',
       IsVerifyBaseDataField: 'false',
       IsEntryBatchFill: false,
@@ -241,6 +261,33 @@ export function saveProductionOrder(FEntity: any, FID: any, SCCJ: string) {
   return saveApi(data) as any
 }
 
+//生产入库单保存
+export function saveProductionOrder2(FEntity: any, FID: any) {
+  const data = {
+    formid: 'PRD_INSTOCK',
+    data: {
+      NeedUpDateFields: [],
+      NeedReturnFields: [],
+      IsDeleteEntry: true,
+      SubSystemId: '',
+      IsVerifyBaseDataField: 'false',
+      IsEntryBatchFill: false,
+      ValidateFlag: 'true',
+      NumberSearch: 'true',
+      IsAutoAdjustField: 'false',
+      InterationFlags: '',
+      IgnoreInterationFlag: '',
+      IsControlPrecision: 'false',
+      ValidateRepeatJson: 'false',
+      IsAutoSubmitAndAudit: true,
+      Model: {
+        FID: FID,
+        FEntity: FEntity
+      }
+    }
+  }
+  return saveApi(data) as any
+}
 //通用提交
 export function SubmitClient(formid: string, Numbers: any) {
   const data = {

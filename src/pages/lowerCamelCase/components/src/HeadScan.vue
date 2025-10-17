@@ -128,7 +128,7 @@ const searchChange = () => {
         reactiveData.focus = 20
         setTimeout(() => {
           reactiveData.focus = 1
-        }, 500)
+        }, 300)
 
         return
       }
@@ -281,9 +281,9 @@ const searchChange = () => {
     setTimeout(() => {
       reactiveData.searchValue = ''
       reactiveData.focus = 1
-    }, 500)
+    }, 300)
     emit('update:loading', false)
-  }, 500)
+  }, 300)
 }
 
 //柜号选择

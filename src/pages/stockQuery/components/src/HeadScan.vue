@@ -79,8 +79,8 @@ const searchChange = debounce(async () => {
     setTimeout(() => {
       reactiveData.focus = 1
     }, 200)
-  }, 500)
-}, 500)
+  }, 200)
+}, 300)
 //扫码
 const searchClick = async () => {
   const res: any = await uni.scanCode({

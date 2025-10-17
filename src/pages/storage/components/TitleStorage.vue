@@ -362,7 +362,7 @@ const searchChange = async () => {
 
     loading.value = false
     changeFocus()
-  }, 500)
+  }, 300)
 }
 
 const changeFocus = () => {
@@ -371,7 +371,7 @@ const changeFocus = () => {
   if (currentWarehouse.number === '' && !reactiveData.titleList[3].display) {
     setTimeout(() => {
       focusIndex.value = 2
-    }, 500)
+    }, 200)
   } else if (
     currentWarehousePosition.number === '' &&
     !reactiveData.titleList[3].disabled &&
@@ -379,11 +379,11 @@ const changeFocus = () => {
   ) {
     setTimeout(() => {
       focusIndex.value = 3
-    }, 500)
+    }, 200)
   } else {
     setTimeout(() => {
       focusIndex.value = 0
-    }, 500)
+    }, 200)
   }
 }
 
@@ -419,13 +419,13 @@ const searchClick = async () => {
       warehouseChange(result, 3, true) // 手动调用仓库 change
       setTimeout(() => {
         focusIndex.value = 3
-      }, 500)
+      }, 200)
     } else if (focusIndex.value === 3) {
       reactiveData.titleList[3].value = result
       warehouseChange(result, 2, false) // 手动调用仓位 change
       setTimeout(() => {
         focusIndex.value = 0
-      }, 500)
+      }, 200)
     } else {
       searchInput.value.setValue(result)
     }
@@ -783,6 +783,7 @@ const reCompute = (val: any) => {
 
 //返回到父组件
 const backClick = async () => {
+  console.log('保存', reactiveData.detailsList)
   // 声明为异步函数
   if (reactiveData.detailsList.length === 0) {
     uni.showToast({
@@ -878,6 +879,7 @@ const backClick = async () => {
       }
       // 构建 data 对象（同上）
       let data = {
+        id: item?.id,
         FSrcEntryId: entryInnerCode, //源单分录内码
         FIsNew: false, //是否新增行
         FMaterialId: {

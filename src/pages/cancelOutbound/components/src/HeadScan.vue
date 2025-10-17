@@ -282,7 +282,7 @@ const searchChange = () => {
     setTimeout(() => {
       reactiveData.focus = 1
     }, 200)
-  }, 500)
+  }, 300)
 }
 
 //柜号选择

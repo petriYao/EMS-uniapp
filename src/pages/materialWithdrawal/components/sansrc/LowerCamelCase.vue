@@ -3,6 +3,7 @@ import { reactive, watch, ref, onBeforeMount } from 'vue'
 import { debounce } from 'lodash-es'
 import { useEmitt } from '@/hooks/useEmitt'
 import { queryStorage, lookqueryStorage } from '@/api/modules/storage'
+import { getInventory } from '@/common/materialWithdrawal/Simple'
 
 const props = defineProps({
   detailsList: {
@@ -135,38 +136,45 @@ const getWarehousePosition = async (warehouseId: any) => {
 }
 
 //手动选择
-const pickerConfirm = (warehouseItem: any, name: any) => {
+const pickerConfirm = async (warehouseItem: any, name: any) => {
+  let data = reactiveData.detailsList[reactiveData.barcodeIndex]
+
   if (name === '仓位') {
     // 修改仓位
-    reactiveData.detailsList[reactiveData.barcodeIndex].currentList.find(
-      (i: any) => i.label === '仓位'
-    ).value = warehouseItem.text
-    reactiveData.detailsList[reactiveData.barcodeIndex].stockLocName = warehouseItem.text
-    reactiveData.detailsList[reactiveData.barcodeIndex].detailList.stockLocName =
-      warehouseItem.value
+    data.currentList.find((i: any) => i.label === '仓位').value = warehouseItem.text
+    data.stockLocName = warehouseItem.text
+    data.detailList.stockLocName = warehouseItem.value
+    data.stockLocNumber = warehouseItem.value
     //获取仓库，储位
-
-    for (const item of reactiveData.detailsList[reactiveData.barcodeIndex].EntityList) {
+    console.log('warehouseItem', warehouseItem)
+    for (const item of data.EntityList) {
       item.stockLocName = warehouseItem.text
       item.detailList.stockLocName = warehouseItem.value
+      item.detailList.stockLocNumber = warehouseItem.value
     }
   } else {
     /**仓库名称 */
-    reactiveData.detailsList[reactiveData.barcodeIndex].stockName = warehouseItem.text
-    reactiveData.detailsList[reactiveData.barcodeIndex].stockNumber = warehouseItem.value
-    reactiveData.detailsList[reactiveData.barcodeIndex].currentList.find(
-      (i: any) => i.label === '仓库'
-    ).value = warehouseItem.text
+    console.log('warehouseItem', warehouseItem)
+    data.stockName = warehouseItem.text
+    data.stockNumber = warehouseItem.value
     //getWarehousePosition(warehouseItem.value)
     /**仓位删除 */
-    reactiveData.detailsList[reactiveData.barcodeIndex].currentList.find(
-      (i: any) => i.label === '仓位'
-    ).value = ''
-    reactiveData.detailsList[reactiveData.barcodeIndex].stockLocName = ''
-    reactiveData.detailsList[reactiveData.barcodeIndex].detailList.stockLocName = ''
+    data.currentList.find((i: any) => i.label === '仓库').value = warehouseItem.text
+    data.currentList.find((i: any) => i.label === '仓位').value = ''
+    data.stockLocName = ''
+    data.detailList.stockLocName = ''
+    data.detailList.stockLocNumber = ''
+    for (const item of data.EntityList) {
+      item.stockLocName = ''
+      item.detailList.stockLocName = ''
+      item.detailList.stockLocNumber = ''
+    }
+    const inventoryRes = await getInventory(data.MaterialCode, data.Lot, warehouseItem.value)
+    data.currentList.find((i: any) => i.label === '库存').value = inventoryRes
+    data.detailList.inventory = inventoryRes
   }
   pickerShow.value = false
-  emit('update:detailsList', reactiveData.detailsList)
+  // emit('update:detailsList', reactiveData.detailsList)
 }
 
 const quantChange = debounce((val: any, item: any) => {
@@ -221,54 +229,45 @@ const distributeValueToEntityList = (val: number) => {
   // emit('update:detailsList', reactiveData.detailsList)
 }
 // ========== 输入处理 ==========
-const warehouseChange = debounce((val: any) => {
+const warehouseChange = debounce(async (val: any) => {
+  const data = reactiveData.detailsList[reactiveData.barcodeIndex]
   if (val === '') {
-    reactiveData.detailsList[reactiveData.barcodeIndex].stockName = ''
-    reactiveData.detailsList[reactiveData.barcodeIndex].stockNumber = ''
-    reactiveData.detailsList[reactiveData.barcodeIndex].currentList.find(
-      (i: any) => i.label === '仓库'
-    ).value = ''
-    reactiveData.detailsList[reactiveData.barcodeIndex].currentList.find(
-      (i: any) => i.label === '仓位'
-    ).value = ''
-    reactiveData.detailsList[reactiveData.barcodeIndex].stockLocName = ''
-    reactiveData.detailsList[reactiveData.barcodeIndex].stockLocNumber = ''
-    reactiveData.detailsList[reactiveData.barcodeIndex].detailList.stockLocName = ''
+    data.stockName = ''
+    data.stockNumber = ''
+    data.currentList.find((i: any) => i.label === '仓库').value = ''
+    data.currentList.find((i: any) => i.label === '仓位').value = ''
+    data.stockLocName = ''
+    data.stockLocNumber = ''
+    data.detailList.stockLocName = ''
   }
   const warehouseId = reactiveData.warehouseList.find(
     (item: any) => item.value === val || item.text === val
   )
   if (!warehouseId) {
-    reactiveData.detailsList[reactiveData.barcodeIndex].stockName = ''
-    reactiveData.detailsList[reactiveData.barcodeIndex].stockNumber = ''
-    reactiveData.detailsList[reactiveData.barcodeIndex].currentList.find(
-      (i: any) => i.label === '仓库'
-    ).value = ''
-    reactiveData.detailsList[reactiveData.barcodeIndex].currentList.find(
-      (i: any) => i.label === '仓位'
-    ).value = ''
-    reactiveData.detailsList[reactiveData.barcodeIndex].stockLocName = ''
-    reactiveData.detailsList[reactiveData.barcodeIndex].stockLocNumber = ''
-    reactiveData.detailsList[reactiveData.barcodeIndex].detailList.stockLocName = ''
+    data.stockName = ''
+    data.stockNumber = ''
+    data.currentList.find((i: any) => i.label === '仓库').value = ''
+    data.currentList.find((i: any) => i.label === '仓位').value = ''
+    data.stockLocName = ''
+    data.stockLocNumber = ''
+    data.detailList.stockLocName = ''
 
     uni.showToast({ title: '仓库不存在', icon: 'none' })
     return
   } else {
-    if (reactiveData.detailsList[reactiveData.barcodeIndex].stockNumber === warehouseId.value)
-      return
-    reactiveData.detailsList[reactiveData.barcodeIndex].stockName = warehouseId.text
-    reactiveData.detailsList[reactiveData.barcodeIndex].stockNumber = warehouseId.value
-    reactiveData.detailsList[reactiveData.barcodeIndex].currentList.find(
-      (i: any) => i.label === '仓库'
-    ).value = warehouseId.text
+    if (data.stockNumber === warehouseId.value) return
+    data.stockName = warehouseId.text
+    data.stockNumber = warehouseId.value
+    data.currentList.find((i: any) => i.label === '仓库').value = warehouseId.text
     getWarehousePosition(warehouseId.value)
 
-    reactiveData.detailsList[reactiveData.barcodeIndex].currentList.find(
-      (i: any) => i.label === '仓位'
-    ).value = ''
-    reactiveData.detailsList[reactiveData.barcodeIndex].stockLocName = ''
-    reactiveData.detailsList[reactiveData.barcodeIndex].stockLocNumber = ''
-    reactiveData.detailsList[reactiveData.barcodeIndex].detailList.stockLocName = ''
+    data.currentList.find((i: any) => i.label === '仓位').value = ''
+    data.stockLocName = ''
+    data.stockLocNumber = ''
+    data.detailList.stockLocName = ''
+    const inventoryRes = await getInventory(data.MaterialCode, data.Lot, warehouseId.value)
+    data.currentList.find((i: any) => i.label === '库存').value = inventoryRes
+    data.detailList.inventory = inventoryRes
   }
 }, 50)
 //仓位
@@ -294,6 +293,16 @@ const locationChange = debounce((val: any) => {
   reactiveData.detailsList[reactiveData.barcodeIndex].stockLocName = location.text
   reactiveData.detailsList[reactiveData.barcodeIndex].detailList.stockLocName = location.text
   reactiveData.detailsList[reactiveData.barcodeIndex].stockLocNumber = location.value
+
+  for (const item of reactiveData.detailsList[reactiveData.barcodeIndex].EntityList) {
+    item.stockLocName = location.text
+    item.detailList.stockLocName = location.text
+    item.detailList.stockLocNumber = location.value
+  }
+  console.log(
+    ' reactiveData.detailsList[reactiveData.barcodeIndex]',
+    reactiveData.detailsList[reactiveData.barcodeIndex]
+  )
 }, 50)
 
 const clearTimer = () => {

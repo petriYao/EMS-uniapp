@@ -119,6 +119,7 @@ export const getOtherCase = async (searchValue: any) => {
           receivableQuantity: item.Qty, //可退
           quantity: 0 //数量
         },
+        isUnit: true,
         barcodeList: [],
         entryId: item.Id,
         //是否第一次扫描条码

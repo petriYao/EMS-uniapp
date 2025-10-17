@@ -1,5 +1,23 @@
 import { pushApi, saveApi, executeBillQueryApi, viewApi } from '@/api/commonHttp'
 
+export function queryMaterial(FilterString: string) {
+  const data = {
+    parameters: [
+      {
+        FormId: `BD_MATERIAL`,
+        FieldKeys: 'FNumber,FName,FPurchaseUnitId.fname,FPurchasePriceUnitId.fname',
+        FilterString: FilterString,
+        OrderString: '',
+        TopRowCount: 0,
+        StartRow: 0,
+        Limit: 2000,
+        SubSystemId: ''
+      }
+    ]
+  }
+  return executeBillQueryApi(data)
+}
+
 //采购订单单据查询
 export function transferOrder(FilterString: string) {
   const data = {

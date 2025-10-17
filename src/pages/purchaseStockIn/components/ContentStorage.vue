@@ -6,6 +6,7 @@ import { pushClient } from '@/api/modules/transferOrder'
 import { TMUpdate } from '@/api/commonHttp'
 import { SaveClient, SubmitClient, AuditApiClient } from '@/api/modules/user'
 import { TMStatusQuery } from '@/api/commonHttp'
+import { queryProductionOrder } from '@/api/modules/storage'
 
 const reactiveData = reactive({
   detailsList: [] as any,
@@ -14,8 +15,13 @@ const reactiveData = reactive({
   loading: true
 })
 
+const emit = defineEmits<{
+  (e: 'update:loading', modelValue: any): void
+}>()
+
 //保存
 const saveClick = async () => {
+  console.log('saveClick', reactiveData.detailsList)
   if (reactiveData.detailsList.length == 0) {
     uni.showToast({
       title: '无提交数据',
@@ -31,6 +37,7 @@ const saveClick = async () => {
     })
     return
   }
+  emit('update:loading', false)
   //判断条码入库状态
   let barcodeList = []
   // for (const item of reactiveData.detailsList) {
@@ -52,12 +59,14 @@ const saveClick = async () => {
       icon: 'none',
       duration: 5000
     })
+    emit('update:loading', true)
     return
   }
 
   let isValid = true
   for (let i = 0; i < reactiveData.detailsList.length; i++) {
     const item = reactiveData.detailsList[i]
+    console.log('item', item)
     if (!item.isInteger && item.barcodeList.length > 0) {
       // 条码不是整数的提示
       uni.showToast({
@@ -67,9 +76,22 @@ const saveClick = async () => {
       isValid = false
       break
     }
+    if (!item.isUnit) {
+      console.log('item2', item.detailList.priceUnitQty, item.detailList.priceUnitQty == 0)
+      if (item.Quantity2 > 0 && !item.isUnit && item.detailList.priceUnitQty == 0) {
+        uni.showToast({
+          title: `第${i + 1}行计价数量应大于0`,
+          icon: 'none'
+        })
+        isValid = false
+        emit('update:loading', true)
+        return
+      }
+    }
   }
 
   if (!isValid) {
+    emit('update:loading', true)
     return // 阻止后续代码的执行
   }
 
@@ -86,13 +108,16 @@ const saveClick = async () => {
       FStockID: reactiveData.setData.warehouseId, //库存ID
       FStockLocID: item.FStockLocId, //仓位ID
       FRealQty: item.Quantity2, //实际数量
+      FPriceUnitQty: item.isUnit ? item.Quantity2 : item.detailList.priceUnitQty, //计价数量
       lot: item.detailList.lot, //批号
       F_QADV_WGTMSubEntity: item.barcodeList //条码列表
     })
   }
+  console.log('CustomParams', CustomParams)
   //保存
   CustomParams.Numbers = Array.from(new Set(CustomParams.Numbers))
   let EntryIds = CustomParams.Numbers.map((item: any) => item).join(',')
+  //采购订单-采购入库 单据转换
   const res = await pushClient(EntryIds, CustomParams.FEntry)
   if (res && res.data.Result.ResponseStatus.ErrorCode === 500) {
     uni.showToast({
@@ -101,36 +126,65 @@ const saveClick = async () => {
       duration: 5000
     })
     reactiveData.loading = true
+    emit('update:loading', true)
     return
   }
   if (res && res.data) {
     let numbers = res.data.Result.ResponseStatus.SuccessEntitys[0].Number
+
+    //构造保存数据，将FPriceUnitQty传过去
     let Model = {
-      FID: res.data.Result.ResponseStatus.SuccessEntitys[0].Id
+      FID: res.data.Result.ResponseStatus.SuccessEntitys[0].Id,
+      FInStockEntry: [] as any
     }
-    //提交审核
-    await SaveClient('STK_InStock', Model)
-    await SubmitClient('STK_InStock', numbers)
-    const res2: any = await AuditApiClient('STK_InStock', numbers)
-    if (res2 && res2.data.Result.ResponseStatus.ErrorCode === 500) {
-      uni.showToast({
-        icon: 'none',
-        title: res2.data.Result.ResponseStatus.Errors[0].Message,
-        duration: 5000
-      })
-      reactiveData.loading = true
-      return
-    }
-    for (const item of reactiveData.detailsList) {
-      const tmList = item.barcodeList.map((item: any) => item.F_BARCODENO)
-      TMUpdate({
-        barcodes: tmList,
-        warehouse: reactiveData.setData.warehouseId,
-        location: item.FStockLocId,
-        documentNumber: numbers,
-        documentType: '采购入库单',
-        status: '2'
-      })
+    //查看单据（找到对应的，编码，仓库仓位，实收数量）
+    const OrderRes: any = await queryProductionOrder(`FBillNo ='${numbers}'`)
+    if (OrderRes && OrderRes.data) {
+      for (const orderItem of OrderRes.data) {
+        Model.FInStockEntry.push({
+          FEntryID: orderItem[0],
+          FRealQty: orderItem[4],
+          FPRICEUNITQTY: orderItem[5]
+        })
+      }
+
+      console.log('Model', JSON.stringify(Model))
+      //保存
+      const saveRes: any = await SaveClient('STK_InStock', Model)
+      if (saveRes && saveRes.data.Result.ResponseStatus.ErrorCode === 500) {
+        uni.showToast({
+          icon: 'none',
+          title: saveRes.data.Result.ResponseStatus.Errors[0].Message,
+          duration: 5000
+        })
+        reactiveData.loading = true
+        emit('update:loading', true)
+        return
+      }
+      //提交审核
+      await SubmitClient('STK_InStock', numbers)
+      const res2: any = await AuditApiClient('STK_InStock', numbers)
+      if (res2 && res2.data.Result.ResponseStatus.ErrorCode === 500) {
+        uni.showToast({
+          icon: 'none',
+          title: res2.data.Result.ResponseStatus.Errors[0].Message,
+          duration: 5000
+        })
+        reactiveData.loading = true
+        emit('update:loading', true)
+        return
+      }
+      for (const item of reactiveData.detailsList) {
+        const tmList = item.barcodeList.map((item: any) => item.F_BARCODENO)
+        TMUpdate({
+          barcodes: tmList,
+          warehouse: reactiveData.setData.warehouseId,
+          location: item.FStockLocId,
+          documentNumber: numbers,
+          documentType: '采购入库单',
+          status: '2'
+        })
+      }
     }
 
     reactiveData.detailsList = []
@@ -141,6 +195,7 @@ const saveClick = async () => {
       duration: 5000
     })
   }
+  emit('update:loading', true)
   reactiveData.loading = true
 }
 

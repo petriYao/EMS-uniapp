@@ -16,6 +16,7 @@ const reactiveData = reactive({
 
 //保存
 const saveClick = throttleSave(async () => {
+  console.log('保存1', reactiveData.detailsList)
   if (reactiveData.detailsList.length == 0) {
     uni.showToast({
       title: '无提交数据',
@@ -103,7 +104,7 @@ const saveClick = throttleSave(async () => {
     reactiveData.isShow = false //隐藏标题组件
     setTimeout(() => {
       reactiveData.isShow = true //显示标题组件
-    }, 500)
+    }, 200)
     reactiveData.detailsList = []
     reactiveData.barcodeIndex = 0
     reactiveData.setData = {}

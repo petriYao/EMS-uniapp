@@ -58,7 +58,7 @@ const searchChange = () => {
 
     searchValue.value = ''
     resetFocus()
-  }, 500)
+  }, 300)
 }
 
 // 重置焦点

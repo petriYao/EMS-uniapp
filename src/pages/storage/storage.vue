@@ -4,7 +4,7 @@ import { reactive, ref, onBeforeUnmount, watch } from 'vue'
 import HeadStorage from './components/HeadStorage.vue'
 import TitleStorage from './components/TitleStorage.vue'
 import TitleStorageB from './components/TitleStorageB.vue'
-import { saveProductionOrder } from '@/api/modules/storage'
+import { saveProductionOrder, saveProductionOrder2 } from '@/api/modules/storage'
 import { throttleSave } from '@/utils'
 import { TMUpdate } from '@/api/commonHttp'
 import { useEmitt } from '@/hooks/useEmitt'
@@ -36,9 +36,9 @@ const saveClick = throttleSave(async () => {
   //   icon: 'success'
   // })
   reactiveData.loading = true //显示保存按钮
+  console.log('保存类型', reactiveData.scanCodeType)
   switch (reactiveData.scanCodeType) {
     case '扫码入库':
-    case '单码双扫':
       // 执行扫码入库的保存逻辑
       // 执行单码双扫的保存逻辑
       const results12 = await titleStorageRef.value?.backClick()
@@ -81,7 +81,7 @@ const saveClick = throttleSave(async () => {
           reactiveData.isShow = false //隐藏标题组件
           setTimeout(() => {
             reactiveData.isShow = true //显示标题组件
-          }, 500)
+          }, 200)
         } else {
           uni.showToast({
             icon: 'none',
@@ -92,7 +92,60 @@ const saveClick = throttleSave(async () => {
       }
       reactiveData.loading = false
       break
-
+    case '单码双扫':
+      // 执行单码双扫的保存逻辑
+      const results2 = await titleStorageRef.value?.backClick()
+      if (results2 && !results2.isError) {
+        if (results2.dataList.length === 0) {
+          uni.showToast({
+            icon: 'none',
+            title: '无提交数据'
+          })
+        }
+        let FEntity = [] as any
+        for (const item of results2.dataList) {
+          FEntity.push({
+            FEntryID: item.id,
+            FStockId: item.FStockId,
+            FStockLocId: item.FStockLocId,
+            FRealQty: item.FRealQty,
+            F_BARSubEntity: item.F_BARSubEntity
+          })
+        }
+        const res1 = await saveProductionOrder2(FEntity, results2.fid)
+        if (res1 && res1.data && res1.data?.Result?.Number) {
+          for (const item of results2.dataList) {
+            let tmList = [] as any
+            for (const item2 of item.F_BARSubEntity) {
+              tmList.push(item2.F_BARCODENO)
+            }
+            TMUpdate({
+              barcodes: tmList,
+              warehouse: results2.currentData.currentWarehouseId,
+              location: item.currentWarehousePositionId,
+              documentNumber: res1.data?.Result?.Number,
+              documentType: '生产入库单',
+              status: '2'
+            })
+          }
+          uni.showToast({
+            icon: 'none',
+            title: '提交成功'
+          })
+          reactiveData.isShow = false //隐藏标题组件
+          setTimeout(() => {
+            reactiveData.isShow = true //显示标题组件
+          }, 200)
+        } else {
+          uni.showToast({
+            icon: 'none',
+            title: res1.data?.Result?.ResponseStatus?.Errors[0].Message,
+            duration: 5000
+          })
+        }
+      }
+      reactiveData.loading = false
+      break
     case '扫单入库':
       // 执行扫单入库的保存逻辑
       const results3 = await titleStorageRefB.value?.backClick()
@@ -106,7 +159,7 @@ const saveClick = throttleSave(async () => {
           reactiveData.isShow = false //隐藏标题组件
           setTimeout(() => {
             reactiveData.isShow = true //显示标题组件
-          }, 500)
+          }, 200)
         } else {
           uni.showToast({
             icon: 'none',

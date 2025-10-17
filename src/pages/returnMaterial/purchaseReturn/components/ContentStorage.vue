@@ -3,9 +3,9 @@ import { reactive } from 'vue'
 import HeadScan from '../../components/src/HeadScan.vue'
 import LowerCamelCase from '../../components/src/LowerCamelCase.vue'
 // import { pushClient } from '@/api/modules/transferOrder'
-import { EditCKTM, CYCKQuery } from '@/api/commonHttp'
+import { EditCKTM } from '@/api/commonHttp'
 import { TMStatusQuery } from '@/api/commonHttp'
-import { queryPurchaseReturn, savePurchaseReturn } from '@/common/returnMaterial/Index'
+import { savePurchaseReturn } from '@/common/returnMaterial/Index'
 
 const reactiveData = reactive({
   detailsList: [] as any,
@@ -16,6 +16,7 @@ const reactiveData = reactive({
 
 //保存
 const saveClick = async () => {
+  console.log('保存', reactiveData.detailsList)
   if (reactiveData.detailsList.length == 0) {
     uni.showToast({
       title: '无提交数据',
@@ -71,12 +72,45 @@ const saveClick = async () => {
       isValid = false
       break
     }
+    if (!item.isUnit) {
+      console.log('item2', item.detailList.priceUnitQty)
+      if (item.Quantity2 > 0 && item.detailList.priceUnitQty == 0) {
+        uni.showToast({
+          title: `第${i + 1}行计价数量应大于0`,
+          icon: 'none'
+        })
+        isValid = false
+        return
+      }
+    }
+
     if (item.barcodeList.length !== 0) {
+      let THTMSubEntity = []
+      for (const barcodeItem of item.barcodeList) {
+        let THTMSub = {
+          Seq: i + 1,
+          F_BARCODENO: barcodeItem.FNumber,
+          F_UNITQTY: barcodeItem.quantity,
+          F_FZNO: barcodeItem.FLot,
+          F_BJNAME: barcodeItem.partNumberName,
+          F_JUNITQTY: barcodeItem.unitQuantity,
+          F_QADV_FZLOT: barcodeItem.FZLOT
+        }
+        THTMSubEntity.push(THTMSub)
+      }
+
       detailsList.push({
-        entryId: item.entryId,
-        isSplit: item.IsSplit,
-        sum: item.Quantity2,
-        barcodeList: item.barcodeList
+        FEntryID: item.entryId,
+        FRMREALQTY: item.Quantity2, //实退数量
+        FREPLENISHQTY: item.Quantity2, //补料数量
+        FKEAPAMTQTY: item.Quantity2, //扣款数量
+        //FBASEUNITQTY: item.Quantity2,
+        //FBaseReplayQty: item.Quantity2,//基本补料数量
+        //FBaseKeapamtQty: item.Quantity2,
+        FCarryQty: item.Quantity2, //采购数量
+        //FCarryBaseQty: item.Quantity2,
+        FpriceUnitQty: item.isUnit ? item.Quantity2 : item.detailList.priceUnitQty,
+        F_QADV_THTMSubEntity: THTMSubEntity
       })
     }
   }
@@ -84,60 +118,29 @@ const saveClick = async () => {
   if (!isValid) {
     return // 阻止后续代码的执行
   }
-  const pushResYz = await savePurchaseReturn({ FID: reactiveData.fid }, false)
-  if (pushResYz && pushResYz.data.Result.ResponseStatus.ErrorCode === 500) {
-    uni.showToast({
-      title: pushResYz.data.Result.ResponseStatus.Errors[0].Message,
-      icon: 'none',
-      duration: 5000
-    })
-    return
+  reactiveData.loading = false
+  //3.保存采购退货单
+  const Model = {
+    FID: reactiveData.fid,
+    FPURMRBENTRY: detailsList
   }
-  const resQues: any = await CYCKQuery({
-    fid: reactiveData.fid,
-    detailsList: detailsList
-  })
-  const resQue = resQues.data
-  /**库存检查***************************************************************** */
-
-  if (resQue && resQue.isSuccess) {
-    reactiveData.loading = false
-
-    //单据查询 采购退料单
-    const resView: any = await queryPurchaseReturn(
-      'PUR_MRB',
-      `fid = '${reactiveData.fid}'`,
-      'FPURMRBENTRY_FEntryID,FRMREALQTY'
-    )
-    if (resView && resView.data.length > 0) {
-      let Model = {
-        FID: reactiveData.fid,
-        FPURMRBENTRY: [] as any
-      }
-      for (const item of resView.data) {
-        Model.FPURMRBENTRY.push({
-          FENTRYID: item[0],
-          FRMREALQTY: item[1]
-        })
-      }
-      //3.保存采购退货单
-      const pushResSaveData = await savePurchaseReturn(Model)
-
-      EditCKTM({
-        barcodes: barcodeList,
-        documentNumber: pushResSaveData.data.Result.Number,
-        documentType: '采购退料单',
-        status: '3'
-      })
-      uni.showToast({
-        title: '操作成功',
-        icon: 'none'
-      })
-      reactiveData.detailsList = []
-    }
+  console.log('Model', JSON.stringify(Model))
+  const pushResSaveData = await savePurchaseReturn(Model)
+  if (pushResSaveData.data.Result.Number && pushResSaveData.data.Result.Number.length > 3) {
+    EditCKTM({
+      barcodes: barcodeList,
+      documentNumber: pushResSaveData.data.Result.Number,
+      documentType: '采购退料单',
+      status: '3'
+    })
+    uni.showToast({
+      title: '操作成功',
+      icon: 'none'
+    })
+    reactiveData.detailsList = []
   } else {
     uni.showToast({
-      title: resQue.message,
+      title: pushResSaveData.data.Result.ResponseStatus.Errors[0].Message,
       icon: 'none',
       duration: 5000
     })
@@ -163,7 +166,7 @@ defineExpose({
   </view>
   <!-- 内容 -->
   <view class="bg-#FFF" v-if="reactiveData.loading">
-    <LowerCamelCase v-model:detailsList="reactiveData.detailsList" />
+    <LowerCamelCase v-model:detailsList="reactiveData.detailsList" :title="reactiveData.title" />
   </view>
 </template>
 <style lang="less" scoped>
