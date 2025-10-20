@@ -23,6 +23,7 @@ const reactiveData = reactive({
 
 // 保存方法
 const saveClick = throttleSave(async () => {
+  console.log('保存', reactiveData.detailsList)
   try {
     if (reactiveData.detailsList.length === 0) {
       uni.showToast({
@@ -128,6 +129,8 @@ const saveClick = throttleSave(async () => {
     }
     /**库存检查***************************************************************** */
     // 保存生产退料单
+    console.log('Model1', JSON.stringify(Model))
+    console.log('Mode2', Model)
     const res = await saveMaterialReturn(Model)
     if (res && res.data.Result.ResponseStatus.ErrorCode === 500) {
       uni.showToast({

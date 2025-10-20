@@ -454,6 +454,7 @@ export const purchaseScanBarcode = async (searchValue: any) => {
       isInteger: false,
       FZquantity: 0
     }
+    console.log('data', data)
     return data
   }
 }

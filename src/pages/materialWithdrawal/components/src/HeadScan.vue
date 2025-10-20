@@ -89,6 +89,7 @@ const handleDocumentSearch = async () => {
 // 获取所有匹配的明细项（用于扫码时多匹配处理）
 const findMatchingDetails = (queryRes: any): any[] => {
   return reactiveData.detailsList.filter((item: any) => {
+    console.log('匹配明细项', item.MaterialCode, item.Lot, queryRes.MaterialCode, queryRes.Lot)
     return item.MaterialCode === queryRes.MaterialCode && item.Lot === queryRes.Lot
   })
 }
@@ -211,6 +212,7 @@ const handleBarcodeScan = async () => {
     return
   }
   const matchingDetails = findMatchingDetails(queryRes)
+  console.log('条码扫描结果', queryRes)
   if (!matchingDetails.length) {
     showToast('条码与明细不符合')
     return
@@ -249,6 +251,7 @@ const handleBarcodeScan = async () => {
   if (!matched) {
     showToast('实领数量大于应领数量')
   } else {
+    console.log('更新后明细列表', reactiveData.detailsList)
     emit('update:detailsList', reactiveData.detailsList)
   }
 }

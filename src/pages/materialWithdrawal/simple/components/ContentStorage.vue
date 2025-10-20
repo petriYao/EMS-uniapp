@@ -20,6 +20,7 @@ const reactiveData = reactive({
 
 //保存
 const saveClick = throttleSave(async () => {
+  console.log('reactiveData.detailsList', reactiveData.detailsList)
   if (reactiveData.detailsList.length == 0) {
     uni.showToast({
       title: '无提交数据',
@@ -79,7 +80,8 @@ const saveClick = throttleSave(async () => {
         entryId: item.entryId,
         isSplit: item.IsSplit,
         lotId: item.Lot,
-        barcodeList: item.barcodeList
+        barcodeList: item.barcodeList,
+        packagingDataFZLOT: item.packagingDataFZLOT
       })
     }
   }
@@ -97,7 +99,8 @@ const saveClick = throttleSave(async () => {
   //   return
   // }
   /**库存检查***************************************************************** */
-
+  console.log('detailsList1', detailsList)
+  console.log('detailsList2', JSON.stringify(detailsList))
   const resQues: any = await SimpleMaterialRequisition({
     fid: reactiveData.fid,
     detailsList: detailsList

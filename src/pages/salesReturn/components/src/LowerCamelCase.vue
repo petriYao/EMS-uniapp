@@ -235,12 +235,15 @@ const warehouseChange = debounceSave((val: any) => {
   reactiveData.detailsList[reactiveData.barcodeIndex].detailList.location = warehouseId.text
   reactiveData.detailsList[reactiveData.barcodeIndex].detailList.locationNumber = warehouseId.value
   reactiveData.detailsList[reactiveData.barcodeIndex].FStockLocId = warehouseId.Id
+  reactiveData.detailsList[reactiveData.barcodeIndex].WarehousePositionId = warehouseId.Id
+
   pickerShow.value = false
   emit('update:detailsList', reactiveData.detailsList)
   emitter.emit('update:handleFocus')
 })
 
 const pickerConfirm = (warehouseItem: any) => {
+  reactiveData.detailsList[reactiveData.barcodeIndex].WarehousePositionId = warehouseItem.Id
   reactiveData.detailsList[reactiveData.barcodeIndex].FStockLocId = warehouseItem.Id
   reactiveData.detailsList[reactiveData.barcodeIndex].currentList[12].value = warehouseItem.text
   reactiveData.detailsList[reactiveData.barcodeIndex].detailList.location = warehouseItem.text

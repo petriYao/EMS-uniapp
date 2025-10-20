@@ -85,7 +85,8 @@ const saveClick = throttleSave(async () => {
         srcEntrySeq: item.SrcEntrySeq,
         isSplit: item.IsSplit,
         lotId: item.Lot,
-        barcodeList: item.barcodeList
+        barcodeList: item.barcodeList,
+        packagingDataFZLOT: item.packagingDataFZLOT
       })
     }
   }
