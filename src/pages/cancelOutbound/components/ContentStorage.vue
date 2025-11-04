@@ -18,6 +18,7 @@ const reactiveData = reactive({
   detailsList: {} as any, //保存值
   Model: {} as any,
   loading: false,
+  curNow: 0,
   isShow: true,
   pickupOrderValue: '', //单号
   containerNoValue: 1 //柜号
@@ -276,6 +277,7 @@ defineExpose({
   <view class="bg-#FFF" v-if="reactiveData.isShow">
     <LowerCamelCase
       v-model:lowerCamelCaseList="reactiveData.lowerCamelCaseList"
+      v-model:curNow="reactiveData.curNow"
       :packagingSig="reactiveData.detailsList.packagingSig"
       :packagingData="reactiveData.detailsList.packagingData"
     />

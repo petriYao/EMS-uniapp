@@ -367,6 +367,7 @@ export const purchaseScanBarcode = async (searchValue: any) => {
         subPackageNo: barCodeData.F_FZNO, //分装编号
         partNumberName: barCodeData.F_BJNAME, //部件名称
         unitQuantity: barCodeData.F_JUNITQTY, //单位用量
+        F_QADV_NBZQTY: barCodeData.F_QADV_NBZQTY, //内包装件数
         FSTOCKName: packData?.F_QADV_FSTOCKID?.Name?.[0]?.Value, //仓库
         FSTOCKNumber: packData?.F_QADV_FSTOCKID?.Number,
         STOCKLOCName: actualValue?.Name?.[0]?.Value, //仓位

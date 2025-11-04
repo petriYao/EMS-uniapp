@@ -434,7 +434,7 @@ watch(
             <view class="flex line-height-20px">
               <view class="w-30% flex items-center h-20px">
                 <view class="min-w-50px text-end">数量：</view>
-                <view> {{ item.Quantity2 }}</view>
+                <view> {{ item.Quantity2 }}{{ item.Unit }}</view>
               </view>
               <view class="w-24% flex items-center h-20px">
                 <view class="min-w-50px text-end">件数：</view>

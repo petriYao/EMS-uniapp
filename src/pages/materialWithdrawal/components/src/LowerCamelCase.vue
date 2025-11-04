@@ -329,6 +329,11 @@ watch(
           <view class="w-20px flex justify-center items-center">{{ index + 1 }}</view>
           <view class="flex-1">
             <view class="flex items-center">
+              <view class="min-w-50px text-end">源单：</view>
+              <view class="flex-wrap">{{ item?.SrcBillNo }} - {{ item?.SrcEntrySeq }}</view>
+            </view>
+
+            <view class="flex items-center">
               <view class="w-50px text-end">编码：</view>
               <view> {{ item.detailList.fnumber }}</view>
             </view>
@@ -352,10 +357,7 @@ watch(
                 item.detailList.storageLocation || item.detailList.stockLocName
               }}</view>
             </view>
-            <view class="flex items-center">
-              <view class="min-w-50px text-end">源单：</view>
-              <view class="flex-wrap">{{ item?.SrcBillNo }} - {{ item?.SrcEntrySeq }}</view>
-            </view>
+
             <view class="flex">
               <view class="w-33% flex items-center h-20px">
                 <view class="w-50px text-end">库存：</view>

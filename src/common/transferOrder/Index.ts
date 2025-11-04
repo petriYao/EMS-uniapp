@@ -231,13 +231,9 @@ export const transferScanBarcode = async (searchValue: any, setData: any, locati
       //源单单号
       SourceOrderNo: barCodeData.F_SourceFbillno,
       //源单行号
-      SourceOrderLineNo: barCodeData.F_SourceEntry * 1,
-      //需求来源
       SourceOrderType: barCodeData.F_QADV_XQLY,
       //需求单号
       SourceOrderNo2: barCodeData.F_YVRT_XQDJ,
-      //需求行号
-      SourceOrderLineNo2: barCodeData.F_YVRT_YDSeq,
       //仓位
       WarehousePosition: setData.locationId,
       //仓位编码
@@ -268,7 +264,7 @@ export const transferScanBarcode = async (searchValue: any, setData: any, locati
       UnitQty: barCodeData.F_JUNITQTY,
       //分装数量
       SplitValue: barCodeData.F_UNITQTY,
-      Unit: barCodeData.F_NUMBER.MaterialBase[0].BaseUnitId.Name[0].Value,
+      Unit: barCodeData.F_NUMBER.MaterialBase[0].BaseUnitId.Number,
       //分装批次号
       FZLOTList: [barCodeData.F_QADV_FZLOT],
       packagingDataFZLOT: {} as any

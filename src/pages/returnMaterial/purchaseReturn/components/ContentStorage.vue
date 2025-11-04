@@ -91,7 +91,7 @@ const saveClick = async () => {
           Seq: i + 1,
           F_BARCODENO: barcodeItem.FNumber,
           F_UNITQTY: barcodeItem.quantity,
-          F_FZNO: barcodeItem.FLot,
+          F_FZNO: barcodeItem.subPackageNo,
           F_BJNAME: barcodeItem.partNumberName,
           F_JUNITQTY: barcodeItem.unitQuantity,
           F_QADV_FZLOT: barcodeItem.FZLOT

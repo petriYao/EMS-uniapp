@@ -274,6 +274,7 @@ const warehouseChange = debounceSave(async (val: string) => {
 
 //仓位清空
 const clearStock = async () => {
+  console.log('仓位清空')
   reactiveData.detailsList.forEach(async (item: any) => {
     item.WarehousePosition = ''
     item.WarehousePositionName = ''
@@ -284,7 +285,8 @@ const clearStock = async () => {
     item.currentList.find((i: any) => i.label === '仓位').value = ''
 
     //删除FlexNumber第一个字符
-    if (reactiveData.setData.FlexNumber) {
+    console.log('FlexNumber', reactiveData.setData.FlexNumber)
+    if (reactiveData.setData.FlexNumber && reactiveData.setData.FlexNumber.length > 1) {
       let FlexNumber = reactiveData.setData.FlexNumber.substring(1)
       let TJStockId = await getStockLoc(
         item.MaterialCode,
@@ -293,6 +295,9 @@ const clearStock = async () => {
         reactiveData.setData.warehouseNumber
       )
       item.currentList.find((i: any) => i.label === '推荐').value = TJStockId
+    } else {
+      console.log('FlexNumber为空')
+      item.currentList.find((i: any) => i.label === '推荐').value = ''
     }
   })
 }

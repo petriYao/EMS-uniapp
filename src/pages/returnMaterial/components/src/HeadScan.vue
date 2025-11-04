@@ -151,6 +151,8 @@ const handleBarcodeScan = async () => {
 
 // 查找匹配的明细项（数组）
 const findMatchingDetails = (queryRes: any): any[] => {
+  console.log(reactiveData.detailsList)
+  console.log(queryRes)
   return reactiveData.detailsList.filter((item: any) => {
     switch (props.title) {
       case '采购退货':

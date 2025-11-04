@@ -242,8 +242,10 @@ const handleBarcodeAddition = (index: number, queryRes: any) => {
   detailsList.value[index].barcodeList.push(queryRes.barcodeList[0])
   detailsList.value[index].Quantity++
   detailsList.value[index].IsSplit = queryRes.IsSplit
-  detailsList.value[index].currentList[7].value = queryRes.F_POQTY // 批量
-  detailsList.value[index].currentList[9].value = queryRes.TotalBox // 总箱数
+
+  detailsList.value[index].currentList.find((i: any) => i.label === '批量').value = queryRes.F_POQTY // 批量
+  detailsList.value[index].currentList.find((i: any) => i.label === '总箱数').value =
+    queryRes.TotalBox // 总箱数
 
   if (detailsList.value[index].IsSplit) {
     handleSplitBarcodeAddition(index, queryRes)
@@ -450,17 +452,7 @@ const clearStock = async () => {
     item.WarehousePositionName = ''
     item.WarehousePositionId = ''
     item.detailList.location = ''
-    item.currentList[12].value = ''
-
-    //删除FlexNumber第一个字符
-    let FlexNumber = setData.value.FlexNumber.substring(1)
-    let TJStockId = await getStockLoc(
-      item.MaterialCode,
-      item.Lot,
-      FlexNumber,
-      setData.value.warehouseNumber
-    )
-    item.currentList[10].value = TJStockId
+    item.currentList.find((i: any) => i.label === '仓位').value = ''
   })
 }
 

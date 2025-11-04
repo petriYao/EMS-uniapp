@@ -412,11 +412,6 @@ watch(
               <view class="flex-wrap">{{ item.detailList.specification }}</view>
             </view>
 
-            <view class="flex items-center">
-              <view class="min-w-50px text-end">源单：</view>
-              <view class="flex-wrap">{{ item?.SrcBillNo }} - {{ item?.SrcEntrySeq }}</view>
-            </view>
-
             <view class="flex">
               <view class="w-33% flex items-center h-20px">
                 <view class="w-50px text-end">仓位：</view>
@@ -442,20 +437,20 @@ watch(
         v-for="(item, index) of reactiveData.detailsList[reactiveData.barcodeIndex]?.EntityList ||
         []"
         :key="index"
-        @click="getBarCode(item, index)"
-        @longpress="longpressClick(item, index)"
-        @touchstart="handleTouchStart"
-        @touchmove="handleTouchMove"
       >
         <view
           class="flex"
           :class="[
-            index % 2 === 0 ? 'bg-#F2F2F2' : 'bg-white', // 基础黑白交替
-            index === reactiveData.barcodeIndex ? '!bg-[#C4D8EE]' : '' // 覆盖选中状态
+            index % 2 === 0 ? 'bg-#F2F2F2' : 'bg-white' // 基础黑白交替
           ]"
         >
           <view class="w-20px flex justify-center items-center">{{ item.seq }}</view>
           <view class="flex-1">
+            <view class="flex items-center" v-if="props.title !== '简单生产退料'">
+              <view class="min-w-50px text-end">源单：</view>
+              <view class="flex-wrap">{{ item?.SrcBillNo }} - {{ item?.SrcEntrySeq }}</view>
+            </view>
+
             <view class="flex items-center">
               <view class="w-50px text-end">编码：</view>
               <view> {{ item.detailList.fnumber }}</view>

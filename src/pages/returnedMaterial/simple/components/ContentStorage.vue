@@ -211,6 +211,7 @@ defineExpose({
         ref="lowerCamelCaseRef"
         v-model:detailsList="reactiveData.detailsList"
         v-model:locationList="reactiveData.locationList"
+        :title="reactiveData.title"
       />
     </view>
   </view>

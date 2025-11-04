@@ -1,5 +1,7 @@
 import { lookBarCode, queryBarCode } from '@/api/modules/storage'
 import { transferOrder, getProductionOrder, queryMaterial } from '@/api/modules/transferOrder'
+import { getStockLoc } from '@/common/comModel/Index'
+
 // 采购入库-扫描条码
 export const purchaseScanBarcode = async (searchValue: any, setData: any) => {
   const res = await lookBarCode(searchValue)
@@ -282,12 +284,12 @@ export const purchaseScanBarcode = async (searchValue: any, setData: any) => {
       SourceOrderLineNo: barCodeData.F_SourceEntry * 1,
       //源单行ID
       SourceOrderLineId: resOrder.data[0][1],
+      //单据类型
+      FBillTypeID: resOrder.data[0][2],
       //需求来源
       SourceOrderType: barCodeData.F_QADV_XQLY,
       //需求单号
       SourceOrderNo2: barCodeData.F_YVRT_XQDJ,
-      //需求行号
-      SourceOrderLineNo2: barCodeData.F_YVRT_YDSeq,
       //批号
       Lot: barCodeData.F_WLLOT === ' ' ? '' : barCodeData.F_WLLOT,
       //名称
@@ -379,6 +381,15 @@ export const getcamelCase = async (searchValue: any) => {
           }
         }
       }
+
+      const TJStockId = await getStockLoc(
+        item.MaterialId.Number,
+        item.Lot_Text,
+        FlexNumber,
+        item.StockId?.Number
+      )
+      console.log('TJStockId', TJStockId)
+
       const data = {
         currentList: [
           {
@@ -455,7 +466,7 @@ export const getcamelCase = async (searchValue: any) => {
           },
           {
             label: '推荐',
-            value: '',
+            value: TJStockId,
             disabled: true,
             type: 'input',
             style: { width: '60%' }
@@ -523,10 +534,14 @@ export const getcamelCase = async (searchValue: any) => {
           unit: item.BaseUnitID?.Name[0].Value, //单位
           location: actualValue?.Number, //仓位
           FlexNumber: FlexNumber,
-          priceUnitQty: item.PriceUnitQty, //计价数量
+          priceUnitQty:
+            item.BaseUnitID?.Name[0].Value == item.PriceUnitID?.Name[0].Value
+              ? 0
+              : item.PriceUnitQty, //计价数量
           priceUnit: item.PriceUnitID?.Name[0].Value //计价单位
         },
         entryId: item.Id,
+        isUnit: item.BaseUnitID?.Name[0].Value == item.PriceUnitID?.Name[0].Value,
         //是否第一次扫描条码
         isLowerCamelCase: false,
         //是否整数

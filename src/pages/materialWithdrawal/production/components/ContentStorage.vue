@@ -104,7 +104,8 @@ const saveClick = throttleSave(async () => {
   //   return
   // }
   /**库存检查***************************************************************** */
-
+  console.log(detailsList)
+  console.log('Model', JSON.stringify(detailsList))
   const resQues: any = await MaterialRequisition({
     fid: reactiveData.fid,
     detailsList: detailsList
@@ -130,6 +131,8 @@ const saveClick = throttleSave(async () => {
           FActualQty: item[1]
         })
       }
+      console.log(Model)
+      console.log('Model', JSON.stringify(Model))
       //3.保存其他出库单
       const pushResSaveData: any = await saveMaterialRequisition(Model)
 

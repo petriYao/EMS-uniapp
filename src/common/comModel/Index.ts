@@ -8,7 +8,7 @@ export const getStockLoc = async (MaterialNumber: any, lot: any, FlexNumber: any
       FilterString += ` AND FLot.Fnumber = '${lot}'`
     }
     FilterString += ` AND FStockId.Fnumber = '${StockId}' AND FBaseQty > 0`
-    const FieldKeys = `FStockLocId.F${FlexNumber}.FNumber`
+    const FieldKeys = `FStockLocId.F${FlexNumber}.FName`
     const lowerRes: any = await lowerCamelCase2(FilterString, FieldKeys)
     if (lowerRes && lowerRes.data && lowerRes.data.length > 0) {
       return lowerRes.data.map((item: any) => item[0]).join(',') //推荐仓位

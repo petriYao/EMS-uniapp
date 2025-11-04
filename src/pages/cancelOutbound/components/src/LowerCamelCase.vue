@@ -18,18 +18,23 @@ const props = defineProps({
   loading: {
     type: Boolean,
     default: false
+  },
+  curNow: {
+    type: Number,
+    default: 0
   }
 })
 //类型式声明
 const emit = defineEmits<{
   (e: 'update:lowerCamelCaseList', modelValue: SalesOutboundType[]): void
+  (e: 'update:curNow', modelValue: SalesOutboundType[]): void
 }>()
 //数据
 const reactiveData = reactive({
   loading: '', //加载中
   searchValue: '', //搜索值
   subsectionList: ['当前', '条码'],
-  curNow: 1,
+  curNow: props.curNow,
   packagingSig: props.packagingSig,
   packagingData: props.packagingData,
   detailsList: [] as any
@@ -99,7 +104,10 @@ const longpressDetailsClick = (item: any, index: number) => {
     }
   })
 }
-//计算总数
+const curNowChange = (val: any) => {
+  reactiveData.curNow = val
+  emit('update:curNow', val)
+}
 
 watch(
   () => props.lowerCamelCaseList,
@@ -117,7 +125,7 @@ watch(
     <u-subsection
       :list="reactiveData.subsectionList"
       :current="reactiveData.curNow"
-      @change="reactiveData.curNow = $event"
+      @change="curNowChange($event)"
     />
     <view class="pt-6rpx">
       <!-- 当前 -->

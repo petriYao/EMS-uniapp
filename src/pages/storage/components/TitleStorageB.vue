@@ -5,6 +5,7 @@ import { camelCaseProduction, getcamelCase } from '@/common/storage/production'
 import { productionOrder } from '@/api/modules/storage'
 import { queryStorage, lookqueryStorage } from '@/api/modules/storage'
 import { useEmitt } from '@/hooks/useEmitt'
+import { getStockLoc } from '@/common/comModel/Index'
 
 //加载
 const loading = ref(false)
@@ -223,7 +224,6 @@ const warehouseChange = debounceSave(
     if (val == '') return
 
     if (iswarehouse) {
-      clearAllPositions()
       //获取仓库id替换为仓库名称
       const warehouseId: any = warehouseList.value.find(
         (item: any) => item.value === val || item.text === val
@@ -242,6 +242,7 @@ const warehouseChange = debounceSave(
         setTimeout(() => {
           focusIndex.value = 2
         }, 200)
+        clearAllPositions()
 
         return
       }
@@ -250,7 +251,8 @@ const warehouseChange = debounceSave(
       reactiveData.titleList[2].value = warehouseId.text
       currentWarehouse.name = warehouseId.text
       currentWarehouse.number = warehouseId.value
-      warehouseClick(val)
+      await warehouseClick(val)
+      await clearAllPositions()
     } else {
       //获取仓位id替换为仓位名称
       if (warehousePositionList.value.length !== 0) {
@@ -322,9 +324,10 @@ const pickerConfirm = async (val: any) => {
   currentWarehouse.name = val.text
   currentWarehouse.number = val.value
   reactiveData.titleList[2].value = val.text
-  clearAllPositions()
 
-  warehouseClick(val.value)
+  await warehouseClick(val.value)
+  await clearAllPositions()
+
   pickerShow.value = false
 }
 //仓位选择器确认
@@ -365,7 +368,6 @@ const longpressClick = (item: any, index: number) => {
     }
   })
 }
-
 //清空仓位
 const clearAllPositions = () => {
   // 清空当前仓位信息
@@ -376,14 +378,34 @@ const clearAllPositions = () => {
   reactiveData.titleList[3].value = ''
 
   // 清空明细列表中所有项目的仓位信息
+
   if (reactiveData.detailsList && reactiveData.detailsList.length > 0) {
-    reactiveData.detailsList.forEach((item: any) => {
+    reactiveData.detailsList.forEach(async (item: any) => {
       // 清空仓位编号
       item.WarehousePosition = ''
       item.WarehousePositionName = ''
       // 清空仓位相关字段
       if (item.currentList.length > 0) {
         item.currentList.find((i: any) => i.label === '仓位').value = ''
+      }
+      if (
+        currentWarehouse.number !== '' &&
+        FlexNumber.value !== '' &&
+        warehousePositionList.value.length > 0
+      ) {
+        let stockFlex = FlexNumber.value.slice(1)
+        console.log('iFlexNumber', FlexNumber)
+        const TJStockId = await getStockLoc(
+          item.MaterialCode,
+          item.Lot,
+          stockFlex,
+          currentWarehouse.number
+        )
+        //清空推荐
+        item.currentList.find((i: any) => i.label === '推荐').value = TJStockId
+      } else {
+        //清空推荐
+        item.currentList.find((i: any) => i.label === '推荐').value = ''
       }
     })
   }
@@ -400,25 +422,12 @@ const backClick = async () => {
   const res: any = await productionOrder(result)
 
   let dataList = [] as any
-  let integer = {
-    isInteger: true,
-    Name: ''
-  }
-
   //表头生产车间
   let SCCJ = 'BM000001'
   let isError = false //是否有错误
   // 使用Promise.all等待所有异步操作完成
   await Promise.all(
     reactiveData.detailsList.map(async (item: any, index: number) => {
-      if (!item.isInteger) {
-        integer.isInteger = false //如果有一个不是整数就返回false
-        integer.Name = item.Name
-        //提示不配套
-
-        throw new Error(`第${index + 1}行不配套`)
-      }
-
       if (currentWarehouse.number === '') {
         throw new Error('请先选择仓库')
       }
@@ -435,17 +444,9 @@ const backClick = async () => {
           return item1[1] === item.SourceOrderNo && item1[2] === item.SourceOrderLineNo
         })
         if (index === -1) return
-        //单据内码
-        const documentInnerCode = orderData[index][0] //单据内码
-        //分录内码
-        const entryInnerCode = orderData[index][3] //分录内码
         //应收数量
         const mustQty = orderData[index][4] //应收数量
 
-        //表头生产车间赋值
-        if (item.ProductionDepartment) {
-          SCCJ = item.ProductionDepartment
-        }
         //仓位
         const FStockLocPJ = 'FSTOCKLOCID__' + FlexNumber.value
         const FStockLocId = {} as any
@@ -454,91 +455,16 @@ const backClick = async () => {
         }
         // 构建 data 对象（同上）
         let data = {
-          FSrcEntryId: entryInnerCode, //源单分录内码
-          FIsNew: false, //是否新增行
-          FMaterialId: {
-            //物料编码
-            FNumber: item.MaterialCode
-          },
-          FProductType: '1', //产品类型
-          FInStockType: '1', //入库类型
-          FREQSRC: 1, //需求来源
-          FReqBillNo: item.SourceOrderNo, //需求单据
-          FReqBillId: entryInnerCode, //需求单据内码
-          FReqEntrySeq: item.SourceOrderLineNo, //需求单据行号
-          FUnitID: {
-            //单位
-            FNumber: item.Unit
-          },
+          FEntryID: item.FEntryID,
           FMustQty: mustQty, //应收数量
           FRealQty: item.Quantity2, //实收数量
-          FCostRate: 100.0, //成本权重
-          FBaseUnitId: {
-            //基本单位
-            FNumber: item.Unit
-          },
           FBaseMustQty: mustQty, //基本单位应收数量
           FBaseRealQty: item.Quantity2, //基本单位库存实收数量
-          FOwnerTypeId: 'BD_OwnerOrg', //货主类型
-          FOwnerId: {
-            //货主
-            FNumber: '100'
-          },
           FStockId: {
             //仓库
             FNumber: currentWarehouse.number
           },
-          FStockLocId: FStockLocId, //仓位
-          FLot: {
-            FNumber: item.Lot
-          },
-          FISBACKFLUSH: true, //倒冲领料
-          FWorkShopId1: {
-            //生产车间
-            FNumber: orderData[index][5]
-          },
-          FMoBillNo: item.SourceOrderNo, //生产订单编号
-          FMoId: documentInnerCode, //生产订单内码
-          FMoEntryId: entryInnerCode, //生产订单分录内码
-          FMoEntrySeq: item.SourceOrderLineNo, //生产订单行号
-          FMemo: item.otherData.FMemo, //备注
-          FStockUnitId: {
-            //库存单位
-            FNumber: item.Unit
-          },
-          FStockRealQty: item.Quantity2, //库存单位实收数量
-          FSecRealQty: 0.0, //辅助单位实收数量
-          FSrcBillType: 'PRD_MO', //源单类型
-          FSrcInterId: documentInnerCode, //源单内码
-          FSrcBillNo: item.SourceOrderNo, //源单编号
-          FBasePrdRealQty: item.Quantity2, //基本单位生产实收数量
-          FIsFinished: false, //完工
-          FStockStatusId: {
-            //库存状态
-            FNumber: 'KCZT01_SYS'
-          },
-          FSrcEntrySeq: item.SourceOrderLineNo, //源单行号
-          FMOMAINENTRYID: entryInnerCode, //生产订单主产品分录
-          FKeeperTypeId: 'BD_KeeperOrg', //保管者类型
-          FKeeperId: {
-            //保管者
-            FNumber: '100'
-          },
-          FSelReStkQty: 0.0, //退库选单数
-          FBaseSelReStkQty: 0.0, //基本单位退库选单数量
-          F_ALMA_SCANQTY: 0.0, //扫描数量
-          FIsOverLegalOrg: false, //组织间结算跨法人
-          F_QADV_KH: {
-            //客户
-            FNUMBER: item.otherData.F_QADV_KH
-          },
-          F_QADV_TIQTY: orderData[index][6], //累计入库数量
-          F_QADV_HTNO: item.otherData.F_QADV_HTNO, //合同号
-          F_BARSubEntity: item.barcodeList,
-          FEntity_Link: item.FEntity_Link,
-          FBFLowId: {
-            FID: 'f11b462a-8733-40bd-8f29-0906afc6a201'
-          } //流转单ID
+          FStockLocId: FStockLocId
         }
         if (item.Quantity2 !== 0) {
           dataList.push(data)

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { reactive, ref, onBeforeMount, onBeforeUnmount } from 'vue'
-
+import { debounce } from '@/utils'
 import { getPickupOrder, productionGetData } from '@/common/lowerCamelCase/LowerCamelCase'
 import { SalesOutboundType } from '@/types/LowerCamelCaseType'
 import { useEmitt } from '@/hooks/useEmitt'
@@ -81,11 +81,14 @@ const emit = defineEmits<{
 const { emitter } = useEmitt()
 
 //离开时搜索
-const searchChange = () => {
+const searchChange = debounce(() => {
   setTimeout(async () => {
     if (reactiveData.searchValue === '') {
       return
     }
+
+    console.log('扫描单号', reactiveData.pickupOrderValue)
+
     emit('update:loading', true)
     handleFocus()
     // 第一次扫单号
@@ -96,11 +99,11 @@ const searchChange = () => {
       if (res && res.dataList.length > 0) {
         reactiveData.TMdisabled = false
         emitter.emit('update:TMdisabled', false)
-        reactiveData.pickupOrderValue = JSON.parse(JSON.stringify(reactiveData.searchValue))
         reactiveData.detailsList = res.dataList
         emit('update:lowerCamelCaseList', res.dataList)
         emit('update:model', res.model)
-        emit('update:numbers', reactiveData.pickupOrderValue)
+        emit('update:numbers', reactiveData.searchValue)
+        reactiveData.pickupOrderValue = JSON.parse(JSON.stringify(reactiveData.searchValue))
       } else {
         //扫码有问题
         reactiveData.TMdisabled = false
@@ -132,10 +135,14 @@ const searchChange = () => {
 
         return
       }
+      console.log('后续扫码-扫描单号2', reactiveData.searchValue)
       const res = await productionGetData(reactiveData.searchValue)
       if (res) {
         //判断条码单合同号是否一致
         const index = reactiveData.detailsList.findIndex((item: any) => {
+          console.log('res', item.OrderNo, res.OrderNo)
+          console.log('res', item.OrderSeq, res.OrderSeq)
+          console.log('res', item.number, res.Fnumber)
           return (
             item.OrderNo === res.OrderNo &&
             item.OrderSeq === res.OrderSeq &&
@@ -283,8 +290,8 @@ const searchChange = () => {
       reactiveData.focus = 1
     }, 300)
     emit('update:loading', false)
-  }, 300)
-}
+  }, 100)
+}, 200)
 
 //柜号选择
 const containerNoClick = async (val: any) => {
@@ -326,9 +333,12 @@ const clearTimer = () => {
 onBeforeMount(() => {
   // 组件挂载前的逻辑
   handleFocus()
-  if (reactiveData.pickupOrderValue == '') {
+  console.log('props.numbers', reactiveData.pickupOrderValue, props.numbers)
+  if (reactiveData.pickupOrderValue == '' && props.numbers !== '') {
     reactiveData.searchValue = props.numbers
-    searchChange()
+    setTimeout(() => {
+      reactiveData.focus = 99
+    }, 100)
   }
   if (reactiveData.containerNoValue !== 0) {
     reactiveData.containerNoValue = props.containerNoValue
@@ -338,151 +348,6 @@ onBeforeUnmount(() => {
   // 组件卸载时清理
   clearTimer()
 })
-
-const testClick = () => {
-  let list = [
-    'PE650010A000325070001',
-    'PE650010A000425070001',
-    'PE650010A000525070001',
-    'PE650010A000625070001',
-    'PE650010A000725070001',
-    'PE650010A000825070001',
-    'PE650010A001025070001',
-    'PE650010A001225070001',
-    'PE650010A001325070001',
-    'PE650010A001425070001',
-    'PE650010A001525070001',
-    'PE650010A001625070001',
-    'PE650010A001725070001',
-    'PE650010A001825070001',
-    'PE650010A001925070001',
-    'PE650010A002025070001',
-    'PE650010A002125070001',
-    'PE650010A002225070001',
-    'PE650010A002325070001',
-    'PE650010A002425070001',
-    'PE650031A0001.000125070001',
-    'PE650031A0002.000125070001',
-    'HA77001B000125070002',
-    'HA77001B000125070003',
-    'HC73003A000125070002',
-    'HC73003A000125070003',
-    'PE650010A000125070002',
-    'PE650010A000125070003',
-    'PE650010A000325070003',
-    'PE650010A000325070002',
-    'PE650010A000225070003',
-    'PE650010A000425070002',
-    'PE650010A000425070003',
-    'PE650010A000525070002',
-    'PE650010A000525070003',
-    'PE650010A000725070003',
-    'PE650010A000725070002',
-    'PE650010A000625070003',
-    'PE650010A000625070002',
-    'PE650010A000825070002',
-    'PE650010A000825070003',
-    'PE650010A001025070002',
-    'PE650010A001025070003',
-    'PE650010A001125070002',
-    'PE650010A001125070003',
-    'PE650010A001225070002',
-    'PE650010A001225070003',
-    'PE650010A001325070002',
-    'PE650010A001325070003',
-    'PE650010A001425070002',
-    'PE650010A001425070003',
-    'PE650010A001525070002',
-    'PE650010A001625070002',
-    'PE650010A001625070003',
-    'PE650010A001725070002',
-    'PE650010A001725070003',
-    'PE650010A001825070002',
-    'PE650010A001825070003',
-    'PE650010A001925070002',
-    'PE650010A001925070003',
-    'PE650010A002025070002',
-    'PE650010A002025070003',
-    'PE650010A002125070002',
-    'PE650010A002125070003',
-    'PE650010A002225070002',
-    'PE650010A002225070003',
-    'PE650010A002325070002',
-    'PE650010A002325070003',
-    'PE650010A002425070002',
-    'PE650010A002425070003',
-    'PE650031A0001.000125070003',
-    'PE650031A0002.000125070002',
-    'PE650031A0002.000125070003',
-    'PE650010A000125070004',
-    'PE650010A000225070004',
-    'PE650010A000325070004',
-    'PE650010A000425070004',
-    'PE650010A000525070004',
-    'PE650010A000625070004',
-    'PE650010A000725070004',
-    'PE650010A000825070004',
-    'PE650010A001325070004',
-    'PE650010A001225070004',
-    'PE650010A001125070004',
-    'PE650010A001025070004',
-    'PE650010A001425070004',
-    'PE650010A001525070004',
-    'PE650010A001625070004',
-    'PE650010A001725070004',
-    'PE650010A001925070004',
-    'PE650010A002025070004',
-    'PE650010A002125070004',
-    'PE650010A000125070005',
-    'PE650010A002425070004',
-    'PE650010A002325070004',
-    'PE650010A002225070004',
-    'PE650010A000225070005',
-    'PE650010A000325070005',
-    'PE650010A000425070005',
-    'PE650010A000525070005',
-    'PE650010A001025070005',
-    'PE650010A000825070005',
-    'PE650010A000725070005',
-    'PE650010A000625070005',
-    'PE650010A001125070005',
-    'PE650010A001225070005',
-    'PE650010A001325070005',
-    'PE650010A001425070005',
-    'PE650010A001625070005',
-    'PE650010A001725070005',
-    'PE650010A001825070005',
-    'PE650010A002025070005',
-    'PE650010A001925070005',
-    'B1C2001N10ROP000125070001',
-    'B1C2014A04RAT000125070001',
-    'B1C2014N04RAT000125070001',
-    'HA77001B000125070001',
-    'HC73003A000125070001',
-    'PE650010A000125070001',
-    'PE650010A000225070001',
-    'PE650010A000225070002',
-    'PE650010A001125070001',
-    'PE650010A001525070003',
-    'PE650010A001525070005',
-    'PE650010A001825070004',
-    'PE650031A0001.000125070002'
-  ]
-
-  //每两秒读取一个值给搜索框赋值
-  let b = 0
-  const intervalId = setInterval(() => {
-    if (b >= list.length) {
-      clearInterval(intervalId) // 停止定时器
-      return
-    }
-
-    reactiveData.searchValue = list[b]
-    searchChange()
-    b++
-  }, 1000)
-  return
-}
 </script>
 
 <template>

@@ -11,6 +11,10 @@ const props = defineProps({
   locationList: {
     type: Array as any,
     default: () => []
+  },
+  title: {
+    type: String,
+    default: ''
   }
 })
 //类型式声明
@@ -441,6 +445,13 @@ watch(
         >
           <view class="w-20px flex justify-center items-center">{{ index + 1 }}</view>
           <view class="flex-1">
+            <view class="flex items-center" v-if="props.title !== '简单生产退料'">
+              <view class="min-w-50px text-end">源单：</view>
+              <view class="flex-wrap">
+                {{ item?.SourceOrderNo }} - {{ item?.SourceOrderLineNo }}
+              </view>
+            </view>
+
             <view class="flex items-center">
               <view class="w-50px text-end">编码：</view>
               <view> {{ item.detailList.fnumber }}</view>
@@ -470,12 +481,7 @@ watch(
                 <view> {{ item.Quantity2 }}</view>
               </view>
             </view>
-            <view class="flex items-center">
-              <view class="min-w-50px text-end">源单：</view>
-              <view class="flex-wrap"
-                >{{ item?.SourceOrderNo }} - {{ item?.SourceOrderLineNo }}</view
-              >
-            </view>
+
             <view class="flex">
               <view class="w-50% flex items-center h-20px">
                 <view class="w-50px text-end">仓位：</view>

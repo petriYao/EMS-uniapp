@@ -129,6 +129,7 @@ const handleFocus = () => {
     uni.hideKeyboard()
   }, 50) as unknown as number
 }
+
 const clearTimer = () => {
   // 清除定时器
   if (hideTimer.value) {

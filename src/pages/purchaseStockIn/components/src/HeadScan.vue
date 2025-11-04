@@ -5,6 +5,7 @@ import { purchaseScanBarcode } from '@/common/purchaseStockIn/Index'
 // import { queryBarCode } from '@/api/modules/lowerCamelCase'
 import { debounceSave } from '@/utils'
 import { useEmitt } from '@/hooks/useEmitt'
+import { getStockLoc } from '@/common/comModel/Index'
 
 const props = defineProps({
   loading: {
@@ -90,6 +91,15 @@ const searchClick = async () => {
 const searchChange = () => {
   setTimeout(async () => {
     if (reactiveData.searchValue === '') {
+      return
+    }
+    if (reactiveData.setData.warehouseNumber === '') {
+      uni.showToast({
+        title: '请先选择仓库',
+        icon: 'none'
+      })
+      reactiveData.searchValue = ''
+      focusTm()
       return
     }
     handleFocus()
@@ -245,10 +255,55 @@ const searchChange = () => {
           focusTm()
           return
         }
+
+        //判断单据类型
+        if (queryRes.FBillTypeID != reactiveData.detailsList[0].FBillTypeID) {
+          uni.showToast({
+            title: '单据类型不一致',
+            icon: 'none'
+          })
+          reactiveData.searchValue = ''
+          focusTm()
+          return
+        }
+
+        if (
+          reactiveData.setData.warehouseNumber !== '' &&
+          warehouseData.warehouseList.length > 0 &&
+          reactiveData.setData.FlexNumber !== '' &&
+          reactiveData.setData.FlexNumber &&
+          reactiveData.setData.FlexNumber.length > 0
+        ) {
+          let stockFlex = reactiveData.setData.FlexNumber.slice(1)
+          const TJStockId = await getStockLoc(
+            queryRes.MaterialCode,
+            queryRes.Lot,
+            stockFlex,
+            reactiveData.setData.warehouseNumber
+          )
+          queryRes.currentList.find((i: any) => i.label === '推荐').value = TJStockId
+        }
         reactiveData.detailsList.push(queryRes)
         emitter.emit('update:datailsIndex', reactiveData.detailsList.length - 1)
       }
     } else {
+      if (
+        reactiveData.setData.warehouseNumber !== '' &&
+        warehouseData.warehouseList.length > 0 &&
+        reactiveData.setData.FlexNumber !== '' &&
+        reactiveData.setData.FlexNumber &&
+        reactiveData.setData.FlexNumber.length > 0
+      ) {
+        let stockFlex = reactiveData.setData.FlexNumber.slice(1)
+        const TJStockId = await getStockLoc(
+          queryRes.MaterialCode,
+          queryRes.Lot,
+          stockFlex,
+          reactiveData.setData.warehouseNumber
+        )
+        queryRes.currentList.find((i: any) => i.label === '推荐').value = TJStockId
+      }
+
       reactiveData.detailsList.push(queryRes)
       emitter.emit('update:datailsIndex', 0)
     }

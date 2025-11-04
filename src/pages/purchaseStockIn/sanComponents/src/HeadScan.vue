@@ -4,6 +4,7 @@ import { queryStorage, lookqueryStorage } from '@/api/modules/storage'
 import { camelCaseProduction, getcamelCase } from '@/common/purchaseStockIn/Index'
 import { debounceSave } from '@/utils'
 import { useEmitt } from '@/hooks/useEmitt'
+import { getStockLoc } from '@/common/comModel/Index'
 
 const props = defineProps({
   barcodeIndex: {
@@ -161,8 +162,9 @@ const pickerConfirm = async (val: any) => {
   reactiveData.setData.warehouseNumber = val.value
   reactiveData.setData.warehouseId = val.id
 
-  clearAllPositions()
-  getWarehousePosition(val.value)
+  await getWarehousePosition(val.value)
+  await clearAllPositions()
+
   emit('update:setData', reactiveData.setData)
   warehouseData.show = false
 }
@@ -218,7 +220,7 @@ const locationPickerConfirm = (val: any) => {
 }
 
 //仓库
-const warehouseChange = debounceSave((val: any) => {
+const warehouseChange = debounceSave(async (val: any) => {
   if (reactiveData.focus == 1) {
     handleFocus()
   }
@@ -262,8 +264,9 @@ const warehouseChange = debounceSave((val: any) => {
   reactiveData.setData.warehouseNumber = warehouseId.value
   reactiveData.setData.warehouseId = warehouseId.id
   ///清空所有仓位
-  clearAllPositions()
-  getWarehousePosition(val)
+  await getWarehousePosition(val)
+  await clearAllPositions()
+
   emit('update:setData', reactiveData.setData)
 })
 
@@ -313,12 +316,35 @@ const clearAllPositions = () => {
 
   // 清空明细列表中所有项目的仓位信息（如果存在）
   if (reactiveData.detailsList && reactiveData.detailsList.length > 0) {
-    reactiveData.detailsList.forEach((item: any) => {
+    reactiveData.detailsList.forEach(async (item: any) => {
       // 清空仓位相关字段
       if (item.currentList && item.currentList.length > 12) {
         // 假设仓位信息存储在索引12的位置
         item.currentList.find((i: any) => i.label === '仓位').value = ''
       }
+      console.log('item', reactiveData.setData.FlexNumber)
+      if (
+        reactiveData.setData.warehouseNumber !== '' &&
+        warehouseData.warehouseList.length > 0 &&
+        reactiveData.setData.FlexNumber !== '' &&
+        reactiveData.setData.FlexNumber &&
+        reactiveData.setData.FlexNumber.length > 0
+      ) {
+        let stockFlex = reactiveData.setData.FlexNumber.slice(1)
+
+        const TJStockId = await getStockLoc(
+          item.MaterialCode,
+          item.Lot,
+          stockFlex,
+          reactiveData.setData.warehouseNumber
+        )
+        //清空推荐
+        item.currentList.find((i: any) => i.label === '推荐').value = TJStockId
+      } else {
+        //清空推荐
+        item.currentList.find((i: any) => i.label === '推荐').value = ''
+      }
+
       // 如果有其他仓位相关字段，也在这里清空
       item.detailList.location = ''
       item.WarehousePosition = ''

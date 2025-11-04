@@ -24,7 +24,7 @@ export function transferOrder(FilterString: string) {
     parameters: [
       {
         FormId: `PUR_PurchaseOrder`,
-        FieldKeys: 'FID,FPOOrderEntry_FEntryID',
+        FieldKeys: 'FID,FPOOrderEntry_FEntryID,FBillTypeID',
         FilterString: FilterString,
         OrderString: '',
         TopRowCount: 0,

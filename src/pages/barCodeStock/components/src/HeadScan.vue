@@ -38,6 +38,7 @@ const searchChange = () => {
       //库存查询
       const stockRes: any = await QueryStock(data[0])
       // const stockRes: any = await QueryStock('AC5879TEX0002')
+      console.log('stockRes', stockRes)
       if (stockRes && stockRes.data.length > 0) {
         //合计数量
         let num = 0

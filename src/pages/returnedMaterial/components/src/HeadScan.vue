@@ -73,7 +73,7 @@ const searchClick = async () => {
 const searchChange = () => {
   setTimeout(async () => {
     if (!searchValue.value) return
-    //handleFocus()
+    handleFocus()
     if (!heardList.value.documentNumber) {
       await handleScanPurchaseOrder()
     } else {
@@ -83,7 +83,7 @@ const searchChange = () => {
 
     searchValue.value = ''
     resetFocus()
-  }, 300)
+  }, 200)
 }
 
 // 重置焦点
@@ -496,7 +496,7 @@ const clearStock = async () => {
     item.currentList.find((i: any) => i.label === '仓位').value = ''
 
     //删除FlexNumber第一个字符
-    if (setData.value.FlexNumber) {
+    if (setData.value.FlexNumber && setData.value.FlexNumber.length > 1) {
       let FlexNumber = setData.value.FlexNumber.substring(1)
       let TJStockId = await getStockLoc(
         item.MaterialCode,
@@ -505,12 +505,17 @@ const clearStock = async () => {
         setData.value.warehouseNumber
       )
       item.currentList.find((i: any) => i.label === '推荐').value = TJStockId
+    } else {
+      item.currentList.find((i: any) => i.label === '推荐').value = ''
     }
   })
 }
 
 const clearTimer = () => {
   emitter.emit('update:clearTimer')
+}
+const handleFocus = () => {
+  emitter.emit('update:handleFocus')
 }
 
 onBeforeMount(() => {

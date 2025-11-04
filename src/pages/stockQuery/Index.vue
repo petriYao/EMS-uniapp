@@ -3,7 +3,7 @@ import { reactive, ref } from 'vue'
 import HeadStorage from './components/HeadStorage.vue'
 import ContentStorage from './components/ContentStorage.vue'
 
-//条码库存查询
+//库存查询
 const reactiveData = reactive({
   isShow: true, //是否选择
   loading: false, //是否保存

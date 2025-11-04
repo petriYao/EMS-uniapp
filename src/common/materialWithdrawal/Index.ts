@@ -84,7 +84,8 @@ export const getcamelCase = async (searchValue: any) => {
           },
           {
             label: '源单',
-            value: item.MoBillNo + '-' + item.MoEntrySeq,
+            // value: item.MoBillNo + '-' + item.MoEntrySeq ,
+            value: item.MoBillNo + (item.MoEntrySeq != 0 ? '-' + item.MoEntrySeq : ''),
             disabled: true,
             type: 'input',
             style: { width: '100%' }
@@ -567,7 +568,8 @@ export const getSanDan = async (searchValue: any) => {
           },
           {
             label: '源单',
-            value: item.MoBillNo + '-' + item.MoEntrySeq,
+            // value: item.MoBillNo + '-' + item.MoEntrySeq,
+            value: item.MoBillNo + (item.MoEntrySeq != 0 ? '-' + item.MoEntrySeq : ''),
             disabled: true,
             type: 'input',
             style: { width: '100%' }

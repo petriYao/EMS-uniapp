@@ -1,6 +1,5 @@
 import { lookBarCode, queryBarCode } from '@/api/modules/storage'
 import { getSalesReturn } from '@/api/modules/transferOrder'
-import { getStockLoc } from '@/common/comModel/Index'
 // 采购入库-扫描条码
 export const purchaseScanBarcode = async (searchValue: any, setData: any) => {
   const res = await lookBarCode(searchValue)
@@ -226,13 +225,6 @@ export const getcamelCase = async (searchValue: any) => {
           }
         }
       }
-      const TJStockId = await getStockLoc(
-        item.MaterialId.Number,
-        item.Lot_Text,
-        FlexNumber,
-        item.StockId?.Number
-      )
-
       const data = {
         currentList: [
           {
@@ -276,9 +268,15 @@ export const getcamelCase = async (searchValue: any) => {
             value: item.Lot_Text,
             disabled: true,
             type: 'input',
-            style: { width: '100%' }
+            style: { width: '65%' }
           },
-
+          {
+            label: '单位',
+            value: item.UnitId?.Name[0].Value,
+            disabled: true,
+            type: 'input',
+            style: { width: '35%' }
+          },
           {
             label: '合同',
             value: item.OrderNo + (item.F_QADV_POENTRYID !== 0 ? '-' + item.F_QADV_POENTRYID : ''),
@@ -308,21 +306,7 @@ export const getcamelCase = async (searchValue: any) => {
             type: 'input',
             style: { width: '35%' }
           },
-          {
-            label: '推荐',
-            value: TJStockId,
-            disabled: true,
-            type: 'input',
-            style: { width: '65%' }
-          },
 
-          {
-            label: '单位',
-            value: item.UnitId?.Name[0].Value,
-            disabled: true,
-            type: 'input',
-            style: { width: '35%' }
-          },
           {
             label: '仓位',
             value: actualValue?.Number,

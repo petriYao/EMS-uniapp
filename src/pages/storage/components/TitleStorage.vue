@@ -6,6 +6,7 @@ import { lowerCamelCase2 } from '@/api/modules/storage'
 import { queryStorage, lookqueryStorage } from '@/api/modules/storage'
 import { TMStatusQuery } from '@/api/commonHttp'
 import { useEmitt } from '@/hooks/useEmitt'
+import { getStockLoc } from '@/common/comModel/Index'
 
 const props = defineProps({
   title: {
@@ -127,13 +128,13 @@ const searchChange = async () => {
           currentWarehouse.number = reactiveData.detailsList[0].WarehouseId
           warehouseClick(reactiveData.detailsList[0].WarehouseId)
           //仓位
-          pickerConfirm2(
-            {
-              text: reactiveData.detailsList[0].WarehousePositionName,
-              value: reactiveData.detailsList[0].WarehousePosition
-            },
-            false
-          )
+          // pickerConfirm2(
+          //   {
+          //     text: reactiveData.detailsList[0].WarehousePositionName,
+          //     value: reactiveData.detailsList[0].WarehousePosition
+          //   },
+          //   false
+          // )
         }
         reactiveData.searchValue = ''
         reactiveData.curNow = 1
@@ -321,15 +322,19 @@ const searchChange = async () => {
           })
         } else {
           //获取推荐仓位（根据物料编码、批号、仓库查库存表）
-          // const FMaterialId = res.MaterialCode //物料编码FMaterialId.Fnumber
-          // const FLot = res.Lot //批号FLot
-          // const FStockId = currentWarehouse.number //仓库FStockId.Fname
+          if (currentWarehouse.number !== '' && warehousePositionList.value.length > 0) {
+            let stockFlex = FlexNumber.value.slice(1)
 
-          // const lowerRes = await lowerCamelCase2(`
-          //   FMaterialId.Fnumber = '${FMaterialId}' AND FLot.Fnumber = '${FLot}' AND FStockId.Fnumber = '${FStockId}'
-          // `)
-
+            const TJStockId = await getStockLoc(
+              res.MaterialCode,
+              res.Lot,
+              stockFlex,
+              currentWarehouse.number
+            )
+            res.currentList.find((i: any) => i.label === '推荐').value = TJStockId
+          }
           reactiveData.detailsList.push(res)
+
           reactiveData.curNow = 0
           reactiveData.datailsIndex = reactiveData.detailsList.length - 1
         }
@@ -461,6 +466,7 @@ const warehouseChange = debounceSave(
         currentWarehouse.id = ''
         //清空所有仓位
         clearAllPositions()
+
         //重新回到光标位置
         if (focusIndex.value == focus) {
           focusIndex.value = 20
@@ -477,7 +483,16 @@ const warehouseChange = debounceSave(
       currentWarehouse.name = warehouseId.text
       currentWarehouse.number = warehouseId.value
       currentWarehouse.id = warehouseId.id
-      warehouseClick(val)
+      //清空仓位
+      await warehouseClick(val)
+      await clearAllPositions()
+      //获取推荐仓位
+      // const TJStockId = await getStockLoc(
+      //   item.MaterialId.Number,
+      //   item.Lot_Text,
+      //   FlexNumber.value,
+      //   item.StockId?.Number
+      // )
     } else {
       //获取仓位id替换为仓位名称
       if (warehousePositionList.value.length !== 0) {
@@ -554,15 +569,35 @@ const clearAllPositions = () => {
 
   // 清空明细列表中所有项目的仓位信息
   if (reactiveData.detailsList && reactiveData.detailsList.length > 0) {
-    reactiveData.detailsList.forEach((item: any) => {
+    reactiveData.detailsList.forEach(async (item: any) => {
       // 清空仓位编号和ID
       item.WarehousePosition = ''
       item.WarehousePositionId = ''
       item.WarehousePositionName = ''
 
       // 如果有currentList且包含仓位字段，则清空该字段的值
-      if (item.currentList && item.currentList.length > 12) {
-        item.currentList[12].value = ''
+      // 清空仓位相关字段
+      if (item.currentList.length > 0) {
+        item.currentList.find((i: any) => i.label === '仓位').value = ''
+      }
+      if (
+        currentWarehouse.number !== '' &&
+        warehousePositionList.value.length > 0 &&
+        FlexNumber.value !== ''
+      ) {
+        let stockFlex = FlexNumber.value.slice(1)
+
+        const TJStockId = await getStockLoc(
+          item.MaterialCode,
+          item.Lot,
+          stockFlex,
+          currentWarehouse.number
+        )
+        //清空推荐
+        item.currentList.find((i: any) => i.label === '推荐').value = TJStockId
+      } else {
+        //清空推荐
+        item.currentList.find((i: any) => i.label === '推荐').value = ''
       }
     })
   }
@@ -570,8 +605,6 @@ const clearAllPositions = () => {
 
 //选择仓库
 const warehouseClick = async (val: any) => {
-  //清空仓位
-  clearAllPositions()
   //查看仓位
   if (val) {
     const res: any = await lookqueryStorage(val)
@@ -612,7 +645,9 @@ const pickerConfirm = async (val: any) => {
   currentWarehouse.number = val.value
 
   reactiveData.titleList[2].value = val.text
-  warehouseClick(val.value)
+  //清空仓位
+  await warehouseClick(val.value)
+  await clearAllPositions()
   pickerShow.value = false
 }
 

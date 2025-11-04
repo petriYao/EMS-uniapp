@@ -4,6 +4,7 @@ import {
   getProductionOrder,
   productionOrder
 } from '@/api/modules/storage'
+import { getStockLoc } from '@/common/comModel/Index'
 
 /*单码双扫-根据单号获取数据*/
 export const getInboundOrder = async (searchValue: any) => {
@@ -51,10 +52,13 @@ export const getInboundOrder = async (searchValue: any) => {
       })
 
       const stockLoc = item.StockLocId
+      console.log('stockLoc')
+      console.log(stockLoc)
       let actualValue = null
 
       // 获取对象的所有 key
       const FStockLocId = {} as any
+      let FlexNumber = ''
       // 找到第一个 F10000x 字段，且其值不为 null
       if (stockLoc != null) {
         const keys = Object.keys(stockLoc)
@@ -69,11 +73,21 @@ export const getInboundOrder = async (searchValue: any) => {
               Fnumber: stockLoc[key].Number
             }
             actualValue = stockLoc[key]
+            FlexNumber = key
             break
           }
         }
       }
       console.log('item FMoId', item)
+      console.log(actualValue)
+      const TJStockId = await getStockLoc(
+        item.MaterialId.Number,
+        item.Lot_Text,
+        FlexNumber,
+        item.StockId?.Number
+      )
+
+      console.log('TJStockId', TJStockId)
       const data = {
         currentList: [
           {
@@ -150,7 +164,7 @@ export const getInboundOrder = async (searchValue: any) => {
           },
           {
             label: '推荐',
-            value: '',
+            value: TJStockId,
             disabled: true,
             type: 'input',
             style: { width: '65%' }
@@ -543,11 +557,12 @@ export const productionGetData = async (
       UnitQty: barCodeData.F_JUNITQTY,
       //分装数量
       SplitValue: barCodeData.F_UNITQTY,
-      Unit: barCodeData.F_NUMBER.MaterialBase[0].BaseUnitId.Name[0].Value,
+      Unit: barCodeData.F_NUMBER.MaterialBase[0].BaseUnitId.Number,
       //分装批次号
       FZLOTList: [barCodeData.F_QADV_FZLOT],
       packagingDataFZLOT: {} as any
     }
+    console.log(barCodeData)
     data.packagingDataFZLOT[barCodeData.F_QADV_FZLOT] = {
       //分装批次号
       packagingData: packagingData,
@@ -589,6 +604,7 @@ export const getcamelCase = async (searchValue: any) => {
 
       // 获取对象的所有 key
       const FStockLocId = {} as any
+      let FlexNumber = ''
       // 找到第一个 F10000x 字段，且其值不为 null
       if (stockLoc != null) {
         const keys = Object.keys(stockLoc)
@@ -603,10 +619,18 @@ export const getcamelCase = async (searchValue: any) => {
               Fnumber: stockLoc[key].Number
             }
             actualValue = stockLoc[key]
+            FlexNumber = key
             break
           }
         }
       }
+      const TJStockId = await getStockLoc(
+        item.MaterialId.Number,
+        item.Lot_Text,
+        FlexNumber,
+        item.StockId?.Number
+      )
+
       const data = {
         currentList: [
           {
@@ -683,7 +707,7 @@ export const getcamelCase = async (searchValue: any) => {
           },
           {
             label: '推荐',
-            value: '',
+            value: TJStockId,
             disabled: true,
             type: 'input',
             style: { width: '65%' }
@@ -733,6 +757,7 @@ export const getcamelCase = async (searchValue: any) => {
         //条码单编码
         BarCode: searchValue,
         */
+        FEntryID: item.Id,
         //是否第一次扫描条码
         isLowerCamelCase: false,
         //是否整数

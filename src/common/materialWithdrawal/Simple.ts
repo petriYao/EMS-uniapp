@@ -82,10 +82,7 @@ export const getSimple = async (searchValue: any) => {
           },
           {
             label: '源单',
-            value:
-              (item.SrcBillNo || '') +
-              (item.SrcBillNo && item.SrcEntrySeq ? '-' : '') +
-              (item.SrcEntrySeq || ''),
+            value: item.SrcBillNo + (item.SrcEntrySeq != 0 ? '-' + item.SrcEntrySeq : ''),
             disabled: true,
             type: 'input',
             style: { width: '100%' }
@@ -366,10 +363,7 @@ export const getSanSimple = async (searchValue: any) => {
           },
           {
             label: '源单',
-            value:
-              (item.SrcBillNo || '') +
-              (item.SrcBillNo && item.SrcEntrySeq ? '-' : '') +
-              (item.SrcEntrySeq || ''),
+            value: item.SrcBillNo + (item.SrcEntrySeq != 0 ? '-' + item.SrcEntrySeq : ''),
             disabled: true,
             type: 'input',
             style: { width: '100%' }

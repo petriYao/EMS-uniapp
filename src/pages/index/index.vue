@@ -73,14 +73,14 @@ onBeforeMount(() => {
       case '8':
         tempLists.crmList.push({
           name: '生产工单',
-          icon: '/static/index/生产工单.png',
+          icon: '/static/index/ProductionOrder.png',
           src: 'productionorder/productionorder'
         })
         break
       case '9':
         tempLists.crmList.push({
           name: '生产报工',
-          icon: '/static/index/生产报工.png',
+          icon: '/static/index/ProductionReporting.png',
           src: 'productionreporting/productionreporting'
         })
         break
@@ -88,7 +88,7 @@ onBeforeMount(() => {
       case '12':
         tempLists.crmList2.push({
           name: '生产入库',
-          icon: '/static/index/生产入库.png',
+          icon: '/static/index/ProductionInbound.png',
           src: 'storage/storage?type=生产入库'
         })
         break
@@ -102,14 +102,14 @@ onBeforeMount(() => {
       case '20':
         tempLists.crmList2.push({
           name: '采购入库',
-          icon: '/static/index/采购入库.png',
+          icon: '/static/index/purchaseInbound.png',
           src: 'purchaseStockIn/Index'
         })
         break
       case '24':
         tempLists.crmList2.push({
           name: '其他入库',
-          icon: '/static/index/其他入库.png',
+          icon: '/static/index/OtherInbound.png',
           src: 'otherInbound/Index'
         })
         break
@@ -117,21 +117,21 @@ onBeforeMount(() => {
       case '28':
         tempLists.crmList3.push({
           name: '销售出库',
-          icon: '/static/index/销售出库.png',
+          icon: '/static/index/salesOutbound.png',
           src: 'lowerCamelCase/PascalCase'
         })
         break
       case '29':
         tempLists.crmList3.push({
           name: '出库撤销',
-          icon: '/static/index/出库撤销.png',
+          icon: '/static/index/outboundCancel.png',
           src: 'cancelOutbound/Index'
         })
         break
       case '35':
         tempLists.crmList3.push({
           name: '销售退货',
-          icon: '/static/index/销售退货.png',
+          icon: '/static/index/SalesReturn.png',
           src: 'salesReturn/Index'
         })
         break
@@ -140,35 +140,35 @@ onBeforeMount(() => {
       case '30':
         tempLists.crmList4.push({
           name: '条码库存',
-          icon: '/static/index/条码库存.png',
+          icon: '/static/index/barcodeInventory.png',
           src: 'barCodeStock/Index'
         })
         break
       case '31':
         tempLists.crmList4.push({
           name: '调拨',
-          icon: '/static/index/调拨.png',
+          icon: '/static/index/transfer.png',
           src: 'transferOrder/Index'
         })
         break
       case '40':
         tempLists.crmList4.push({
           name: '库存查询',
-          icon: '/static/index/库存查询.png',
+          icon: '/static/index/stockQuery.png',
           src: 'stockQuery/Index'
         })
         break
       case '41':
         tempLists.crmList4.push({
           name: '盘点',
-          icon: '/static/index/盘点.png',
+          icon: '/static/index/panDian.png',
           src: 'inventory/Index'
         })
         break
       case '45':
         tempLists.crmList4.push({
           name: '储位',
-          icon: '/static/index/储位.png',
+          icon: '/static/index/storageLocation.png',
           src: 'storageLocation/Index'
         })
         break
@@ -176,7 +176,7 @@ onBeforeMount(() => {
       case '32':
         tempLists.crmList6.push({
           name: '采购退货',
-          icon: '/static/index/采购退货.png',
+          icon: '/static/index/purchaseReturnOrder.png',
           src: 'returnMaterial/purchaseReturn/Index'
         })
         break
@@ -184,21 +184,21 @@ onBeforeMount(() => {
       case '42':
         tempLists.crmList6.push({
           name: '生产退料',
-          icon: '/static/index/生产退料.png',
+          icon: '/static/index/productionReturn.png',
           src: 'returnedMaterial/production/Index'
         })
         break
       case '43':
         tempLists.crmList6.push({
           name: '简单退料',
-          icon: '/static/index/简单退料.png',
+          icon: '/static/index/simpleReturn.png',
           src: 'returnedMaterial/simple/Index'
         })
         break
       case '44':
         tempLists.crmList6.push({
           name: '委外退料',
-          icon: '/static/index/委外退料.png',
+          icon: '/static/index/subcontractReturn.png',
           src: 'returnedMaterial/outsourced/Index'
         })
         break
@@ -206,28 +206,28 @@ onBeforeMount(() => {
       case '37':
         tempLists.crmList5.push({
           name: '生产领料',
-          icon: '/static/index/生产领料.png',
+          icon: '/static/index/ProductionPicking.png',
           src: 'materialWithdrawal/production/Index'
         })
         break
       case '38':
         tempLists.crmList5.push({
           name: '简单领料', //SP_PickMtrl
-          icon: '/static/index/简单领料.png',
+          icon: '/static/index/simplePicking.png',
           src: 'materialWithdrawal/simple/Index'
         })
         break
       case '39':
         tempLists.crmList5.push({
           name: '委外领料', //SUB_PickMtrl
-          icon: '/static/index/委外领料.png',
+          icon: '/static/index/subcontractPicking.png',
           src: 'materialWithdrawal/outsourced/Index'
         })
         break
       case '36':
         tempLists.crmList5.push({
           name: '其他出库',
-          icon: '/static/index/其他出库.png',
+          icon: '/static/index/OtherOutbound.png',
           src: 'returnMaterial/otherOutbound/Index'
         })
         break

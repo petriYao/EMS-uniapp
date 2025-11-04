@@ -147,7 +147,11 @@ const addNewBarcodeDetail = async (queryRes: any) => {
   const FMaterialId = queryRes.MaterialCode //物料编码FMaterialId.Fnumber
   const FLot = queryRes.Lot //批号FLot
   const FStockId = reactiveData.setData.warehouseNumber //仓库FStockId.Fname
-  if (reactiveData.setData.FlexNumber !== '') {
+  if (
+    reactiveData.setData.FlexNumber !== '' &&
+    reactiveData.setData.FlexNumber !== null &&
+    reactiveData.setData.FlexNumber.length > 1
+  ) {
     let FilterString = `FMaterialId.Fnumber = '${FMaterialId}'`
     if (FLot !== '') {
       FilterString += ` AND FLot.Fnumber = '${FLot}'`

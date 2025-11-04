@@ -6,11 +6,6 @@ export async function UpdateInstallApp() {
   plus.runtime.getProperty(plus.runtime.appid, function (widgetinfo) {
     let version = widgetinfo.version //用户当前手机安装版本号
     uni.setStorageSync('Appversion', version)
-    // uni.showToast({
-    // 	title: `版本号${version}`,
-    // 	icon: 'success',
-    // 	duration: 2000
-    // })
     let versionnumber = res[0][0] //服务器维护版本号
     let updateUrl = res[0][1]
     if (parseFloat(versionnumber) > parseFloat(version)) {

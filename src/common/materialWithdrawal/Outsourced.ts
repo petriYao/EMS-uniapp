@@ -80,7 +80,7 @@ export const getOutsourcing = async (searchValue: any) => {
           },
           {
             label: '源单',
-            value: item.SubReqBillNo + '-' + item.SubReqEntrySeq,
+            value: item.SubReqBillNo + (item.SubReqEntrySeq != 0 ? '-' + item.SubReqEntrySeq : ''),
             disabled: true,
             type: 'input',
             style: { width: '100%' }
@@ -350,7 +350,7 @@ export const getSanOutsourcing = async (searchValue: any) => {
           },
           {
             label: '源单',
-            value: item.SubReqBillNo + '-' + item.SubReqEntrySeq,
+            value: item.SubReqBillNo + (item.SubReqEntrySeq != 0 ? '-' + item.SubReqEntrySeq : ''),
             disabled: true,
             type: 'input',
             style: { width: '100%' }

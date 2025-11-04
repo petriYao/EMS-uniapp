@@ -36,7 +36,7 @@ const saveClick = async () => {
   let i = 0
   for (const item of reactiveData.detailsList) {
     console.log('item2', item.detailList.priceUnitQty)
-    if (item.Quantity2 > 0 && item.detailList.priceUnitQty == 0) {
+    if (!item.isUnit && item.Quantity2 > 0 && item.detailList.priceUnitQty == 0) {
       uni.showToast({
         title: `第${i + 1}行计价数量应大于0`,
         icon: 'none'
@@ -56,7 +56,8 @@ const saveClick = async () => {
       FRealQty: item.Quantity2,
       // FRemainInStockQty: item.Quantity2,
       // FBaseUnitQty: item.Quantity2,
-      FPriceUnitQty: item.detailList.priceUnitQty,
+      FPriceUnitQty:
+        item.detailList.priceUnitQty === 0 ? item.Quantity2 : item.detailList.priceUnitQty,
       FStockId: {
         FNumber: reactiveData.setData.warehouseNumber
       },
@@ -67,6 +68,7 @@ const saveClick = async () => {
   reactiveData.loading = false
 
   console.log('提交数据', Model)
+  console.log('提交数据1', JSON.stringify(Model))
   const res = await savePurchaseOrder(Model)
   if (res && res.data && res.data?.Result?.Number) {
     uni.showToast({

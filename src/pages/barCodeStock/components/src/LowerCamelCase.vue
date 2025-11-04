@@ -23,6 +23,7 @@ const getBarCode = async (item: any, index: number, curNow = 1) => {
     item.F_QADV_FSTOCKID,
     item.F_QADV_STOCKLOCID
   ])
+  console.log('res', res)
   reactiveData.barcodeList = res.data
   // reactiveData.barcodeList = item.F_BARCODE
   reactiveData.curNow = curNow

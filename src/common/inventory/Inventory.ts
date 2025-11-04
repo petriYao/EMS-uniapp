@@ -186,7 +186,15 @@ function buildDataList(entry: any, searchValue: string, scanCodeType: string) {
       },
       {
         label: '实盘',
-        value: scanCodeType === '初盘' ? entry.F_QADV_CPQTY : entry.F_QADV_FPQTY,
+        // value: scanCodeType === '初盘' ? entry.F_QADV_CPQTY : entry.F_QADV_FPQTY,
+        value:
+          scanCodeType === '初盘'
+            ? entry.F_QADV_CPQTY === 0
+              ? null
+              : entry.F_QADV_CPQTY
+            : entry.F_QADV_FPQTY === 0
+            ? null
+            : entry.F_QADV_FPQTY,
         disabled: false,
         type: 'number',
         style: { width: '100%' }

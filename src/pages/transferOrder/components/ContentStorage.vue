@@ -86,7 +86,7 @@ const saveClick = async () => {
       },
       FUnitID: {
         // 单位
-        FNumber: 'Pcs'
+        FNumber: item.Unit
       },
       FLot: {
         FNumber: item.Lot
@@ -131,7 +131,7 @@ const saveClick = async () => {
       FExtAuxUnitQty: 0.0, // 扩展辅助单位数量
       FBaseUnitId: {
         // 基本单位
-        FNumber: 'Pcs'
+        FNumber: item.Unit
       },
       FBaseQty: item.Quantity2, // 基本数量
       FISFREE: false, // 是否赠品
@@ -154,13 +154,13 @@ const saveClick = async () => {
       },
       FSaleUnitId: {
         // 销售单位
-        FNumber: 'Pcs'
+        FNumber: item.Unit
       },
       FSaleQty: item.Quantity2, // 销售数量
       FSalBaseQty: item.Quantity2, // 销售基本数量
       FPriceUnitID: {
         // 计价单位
-        FNumber: 'Pcs'
+        FNumber: item.Unit
       },
       F_QADV_TBTMSubEntity: item.barcodeList, // 条码
       FPriceQty: item.Quantity2, // 计价数量
@@ -185,6 +185,8 @@ const saveClick = async () => {
     return
   }
   //保存
+  console.log(Model)
+  console.log('保存数据', JSON.stringify(Model))
   const res = await saveProductionOrder(Model)
   if (res && res.data.Result.ResponseStatus.ErrorCode === 500) {
     uni.showToast({
